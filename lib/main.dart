@@ -30,7 +30,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  var _numPlayers = minPlayers;
+  int _numPlayers = minPlayers;
 
   @override
   Widget build(BuildContext context) {

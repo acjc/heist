@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 void main() => runApp(new MyApp());
 
-const minPlayers = 5;
-const maxPlayers = 10;
+const int _minPlayers = 5;
+const int _maxPlayers = 10;
 
 class MyApp extends StatelessWidget {
   @override
@@ -24,13 +24,11 @@ class MyApp extends StatelessWidget {
 
 class HomePage extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return new HomePageState();
-  }
+  State<StatefulWidget> createState() => new HomePageState();
 }
 
 class HomePageState extends State<HomePage> {
-  int _numPlayers = minPlayers;
+  int _numPlayers = _minPlayers;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +49,7 @@ class HomePageState extends State<HomePage> {
       padding: const EdgeInsets.all(32.0),
       child: new Text(
         _numPlayers.toString(),
-        style: new TextStyle(
+        style: const TextStyle(
           fontSize: 32.0,
         ),
       ),
@@ -74,13 +72,13 @@ class HomePageState extends State<HomePage> {
             buildArrowColumn(
                 Icons.arrow_back,
                 () => setState(() {
-                      if (_numPlayers > minPlayers) _numPlayers--;
+                      if (_numPlayers > _minPlayers) _numPlayers--;
                     })),
             numPlayersText,
             buildArrowColumn(
                 Icons.arrow_forward,
                 () => setState(() {
-                      if (_numPlayers < maxPlayers) _numPlayers++;
+                      if (_numPlayers < _maxPlayers) _numPlayers++;
                     }))
           ],
         )

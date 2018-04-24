@@ -18,7 +18,11 @@ class Room {
         completed = json['completed'],
         completedAt = json['completedAt'],
         numPlayers = json['numPlayers'] {
-    json['roles'].forEach((role, b) {
+    _parseRoles(json['roles']);
+  }
+
+  void _parseRoles(var roles) {
+    roles.forEach((role, b) {
       if (b) {
         this.roles.add(role);
       }

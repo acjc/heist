@@ -8,7 +8,18 @@ class Room {
   final bool completed;
   final DateTime completedAt;
   final int numPlayers;
-  final Set<String> roles = new Set();
+  final Set<String> roles;
+
+  Room({
+    this.id,
+    this.code,
+    this.createdAt,
+    this.appVersion,
+    this.completed,
+    this.completedAt,
+    this.numPlayers,
+    this.roles
+  });
 
   Room.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -17,15 +28,33 @@ class Room {
         appVersion = json['appVersion'],
         completed = json['completed'],
         completedAt = json['completedAt'],
-        numPlayers = json['numPlayers'] {
-    _parseRoles(json['roles']);
+        numPlayers = json['numPlayers'],
+        roles = new Set() {
+    _decodeRoles(json['roles']);
   }
 
-  void _parseRoles(var roles) {
-    roles.forEach((role, b) {
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'code': code,
+    'createdAt': createdAt,
+    'appVersion': appVersion,
+    'completed': completed,
+    'completedAt': completedAt,
+    'numPlayers': numPlayers,
+    'roles': _encodeRoles(),
+  };
+
+  void _decodeRoles(var roleMap) {
+    roleMap.forEach((role, b) {
       if (b) {
-        this.roles.add(role);
+        roles.add(role);
       }
     });
+  }
+
+  Map<String, bool> _encodeRoles() {
+    Map<String, bool> encodedRoles = new Map();
+    roles.forEach((r) => encodedRoles[r] = true); // TODO: put false for roles not included
+    return encodedRoles;
   }
 }

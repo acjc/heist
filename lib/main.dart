@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'database_model.dart';
 
 void main() => runApp(new MyApp());
 
@@ -101,8 +102,29 @@ class HomePageState extends State<HomePage> {
     );
 
     return new Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [numPlayers, createRoomButton],
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [numPlayers, createRoomButton, _buildRoomList()],
+    );
+  }
+
+  Widget _buildRoomList() {
+    return new StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance.collection('rooms').snapshots,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return new Text('Loading...');
+        }
+        return new ListView(
+          shrinkWrap: true,
+          children: snapshot.data.documents.map((DocumentSnapshot document) {
+            Room room = new Room.fromJson(document.data);
+            return new ListTile(
+              title: new Text(room.code),
+              subtitle: new Text(room.createdAt.toString()),
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }

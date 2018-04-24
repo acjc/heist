@@ -1,5 +1,6 @@
+import 'package:meta/meta.dart';
+
 class Room {
-  final String id;
   final String code;
   final DateTime createdAt;
   final String appVersion;
@@ -9,18 +10,16 @@ class Room {
   final Set<String> roles;
 
   Room(
-      {this.id,
-      this.code,
-      this.createdAt,
-      this.appVersion,
-      this.completed,
+      {@required this.code,
+      @required this.createdAt,
+      @required this.appVersion,
+      this.completed = false,
       this.completedAt,
-      this.numPlayers,
-      this.roles});
+      @required this.numPlayers,
+      @required this.roles});
 
   Room.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
-        code = json['code'],
+      : code = json['code'],
         createdAt = json['createdAt'],
         appVersion = json['appVersion'],
         completed = json['completed'],
@@ -31,7 +30,6 @@ class Room {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
         'code': code,
         'createdAt': createdAt,
         'appVersion': appVersion,

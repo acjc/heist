@@ -1,5 +1,9 @@
-import 'package:flutter/material.dart';
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
+
 import 'database_model.dart';
 
 void main() => runApp(new MyApp());
@@ -87,8 +91,42 @@ class HomePageState extends State<HomePage> {
       ],
     );
 
+    int _getCapitalLetterOrdinal(Random random) {
+      return random.nextInt(26) + 65; // 65 is 'A' in ASCII
+    }
+
+    String _generateCode() {
+      Random random = new Random();
+      List<int> numbers = [
+        _getCapitalLetterOrdinal(random),
+        _getCapitalLetterOrdinal(random),
+        _getCapitalLetterOrdinal(random),
+        _getCapitalLetterOrdinal(random)
+      ];
+      return new String.fromCharCodes(numbers);
+    }
+
     void createRoom() {
       print('CREATE ROOM');
+
+      PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
+        // TODO: get the right roles
+        final Set<String> roles = new Set<String>();
+        roles.addAll(['ACCOUNTANT', 'KINGPIN', 'LEAD_AGENT']);
+
+        // create the room in the database
+        Firestore.instance.collection('rooms').document().setData(
+          new Room(
+            appVersion: packageInfo.version,
+            code: _generateCode(),
+            createdAt: new DateTime.now(),
+            numPlayers: _numPlayers,
+            roles: roles
+            ).toJson());
+        Scaffold.of(context).showSnackBar(new SnackBar(
+          content: new Text("Your room has been created"),
+        ));
+      });
     }
 
     Widget createRoomButton = new Container(

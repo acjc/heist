@@ -115,17 +115,16 @@ class HomePageState extends State<HomePage> {
         roles.addAll(['ACCOUNTANT', 'KINGPIN', 'LEAD_AGENT']);
 
         // create the room in the database
-        Firestore.instance.collection('rooms').document().setData(
-          new Room(
-            appVersion: packageInfo.version,
-            code: _generateCode(),
-            createdAt: new DateTime.now(),
-            numPlayers: _numPlayers,
-            roles: roles
-            ).toJson());
+        Firestore.instance.collection('rooms').document().setData(new Room(
+                appVersion: packageInfo.version,
+                code: _generateCode(),
+                createdAt: new DateTime.now(),
+                numPlayers: _numPlayers,
+                roles: roles)
+            .toJson());
         Scaffold.of(context).showSnackBar(new SnackBar(
-          content: new Text("Your room has been created"),
-        ));
+              content: new Text("Your room has been created"),
+            ));
       });
     }
 
@@ -146,23 +145,33 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget _buildRoomList() {
-    return new StreamBuilder<QuerySnapshot>(
+    return new Expanded(
+        child: new StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('rooms').snapshots,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
           return new Text('Loading...');
         }
+
+        final tiles = snapshot.data.documents.map((DocumentSnapshot document) {
+          Room room = new Room.fromJson(document.data);
+          return new ListTile(
+            title: new Text(room.code),
+            subtitle: new Text(room.createdAt.toString()),
+          );
+        }).toList();
+
+        final dividedTiles = ListTile
+            .divideTiles(
+              context: context,
+              tiles: tiles,
+            )
+            .toList();
+
         return new ListView(
-          shrinkWrap: true,
-          children: snapshot.data.documents.map((DocumentSnapshot document) {
-            Room room = new Room.fromJson(document.data);
-            return new ListTile(
-              title: new Text(room.code),
-              subtitle: new Text(room.createdAt.toString()),
-            );
-          }).toList(),
+          children: dividedTiles,
         );
       },
-    );
+    ));
   }
 }

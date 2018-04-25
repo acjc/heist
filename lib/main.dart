@@ -1,10 +1,13 @@
+library heist;
+
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
+import 'package:meta/meta.dart';
 
-import 'database_model.dart';
+part 'database_model.dart';
 
 void main() => runApp(new MyApp());
 
@@ -107,12 +110,9 @@ class HomePageState extends State<HomePage> {
     }
 
     void createRoom() {
-      print('CREATE ROOM');
-
       PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
         // TODO: get the right roles
-        final Set<String> roles = new Set<String>();
-        roles.addAll(['ACCOUNTANT', 'KINGPIN', 'LEAD_AGENT']);
+        final Set<String> roles = new Set.from(['ACCOUNTANT', 'KINGPIN', 'LEAD_AGENT']);
 
         // create the room in the database
         Firestore.instance.collection('rooms').document().setData(new Room(
@@ -131,8 +131,8 @@ class HomePageState extends State<HomePage> {
     Widget createRoomButton = new Container(
       padding: const EdgeInsets.all(32.0),
       child: new RaisedButton(
-        child: const Text('CREATE ROOM',
-            style: const TextStyle(color: Colors.white, fontSize: 16.0)),
+        child:
+            const Text('CREATE ROOM', style: const TextStyle(color: Colors.white, fontSize: 16.0)),
         onPressed: createRoom,
         color: Theme.of(context).primaryColor,
       ),

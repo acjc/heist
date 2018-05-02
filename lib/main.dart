@@ -4,11 +4,13 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:package_info/package_info.dart';
-import 'package:meta/meta.dart';
 
 part 'database_model.dart';
 part 'home_page.dart';
+part 'game.dart';
 
 void main() => runApp(new MyApp());
 

@@ -6,7 +6,12 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  static const EdgeInsets _padding = const EdgeInsets.all(24.0);
+  static const TextStyle _buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
+
   int _numPlayers = _minPlayers;
+  final _enterRoomFormKey = new GlobalKey<FormState>();
+  String _existingRoomCode;
 
   int _getCapitalLetterOrdinal(Random random) {
     return random.nextInt(26) + 65; // 65 is 'A' in ASCII
@@ -14,13 +19,10 @@ class HomePageState extends State<HomePage> {
 
   String _generateRoomCode() {
     Random random = new Random();
-    List<int> numbers = [
-      _getCapitalLetterOrdinal(random),
-      _getCapitalLetterOrdinal(random),
-      _getCapitalLetterOrdinal(random),
-      _getCapitalLetterOrdinal(random)
-    ];
-    return new String.fromCharCodes(numbers);
+    List<int> ordinals =
+        new List.generate(4, (i) => _getCapitalLetterOrdinal(random), growable: false);
+    return new String.fromCharCodes(
+        ordinals); // TODO: validate codes are unique for currently open rooms
   }
 
   void _createRoom() {
@@ -42,6 +44,16 @@ class HomePageState extends State<HomePage> {
     });
   }
 
+  Widget _buildTitle(String title) {
+    return new Container(
+      padding: _padding,
+      child: new Text(
+        title,
+        style: const TextStyle(fontSize: 16.0),
+      ),
+    );
+  }
+
   Column _buildArrowColumn(BuildContext context, IconData icon, Function onPressed) {
     Color color = Theme.of(context).primaryColor;
     return new Column(
@@ -55,10 +67,24 @@ class HomePageState extends State<HomePage> {
     );
   }
 
+  static final _onlyLetters = new RegExp(r"[A-Za-z]");
+  static final TextInputFormatter _capitalFormatter = TextInputFormatter
+      .withFunction((oldValue, newValue) => newValue.copyWith(text: newValue.text.toUpperCase()));
+
+  void _enterRoom() {
+    FormState enterRoomState = _enterRoomFormKey.currentState;
+    if (enterRoomState.validate()) {
+      enterRoomState.save();
+      Navigator
+          .of(context)
+          .push(new MaterialPageRoute(builder: (context) => new Game(_existingRoomCode)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget numPlayersText = new Container(
-      padding: const EdgeInsets.all(32.0),
+      padding: _padding,
       child: new Text(
         _numPlayers.toString(),
         style: const TextStyle(
@@ -67,17 +93,18 @@ class HomePageState extends State<HomePage> {
       ),
     );
 
-    Widget numPlayersTitle = new Container(
-      padding: const EdgeInsets.all(32.0),
-      child: const Text(
-        "Choose number of players:",
-        style: const TextStyle(fontSize: 16.0),
+    Widget createRoomButton = new Container(
+      padding: _padding,
+      child: new RaisedButton(
+        child: const Text('CREATE ROOM', style: _buttonTextStyle),
+        onPressed: _createRoom,
+        color: Theme.of(context).primaryColor,
       ),
     );
 
     Widget numPlayers = new Column(
       children: [
-        numPlayersTitle,
+        _buildTitle('Choose number of players:'),
         new Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -95,54 +122,50 @@ class HomePageState extends State<HomePage> {
                       if (_numPlayers < _maxPlayers) _numPlayers++;
                     }))
           ],
-        )
+        ),
+        createRoomButton,
       ],
     );
 
-    Widget createRoomButton = new Container(
-      padding: const EdgeInsets.all(32.0),
+    Form enterRoomForm = new Form(
+        key: _enterRoomFormKey,
+        child: new TextFormField(
+          decoration: new InputDecoration(
+            labelText: 'Enter an existing room code',
+            isDense: true,
+          ),
+          style: new TextStyle(color: Colors.black87, fontSize: 24.0),
+          maxLength: 4,
+          autocorrect: false,
+          textAlign: TextAlign.center,
+          inputFormatters: [new WhitelistingTextInputFormatter(_onlyLetters), _capitalFormatter],
+          validator: (value) =>
+              value.length != 4 ? 'Invalid code' : null, // TODO: validate room exists and is open
+          onSaved: (value) => _existingRoomCode = value,
+        ));
+
+    Widget enterRoomButton = new Container(
+      padding: _padding,
       child: new RaisedButton(
-        child:
-            const Text('CREATE ROOM', style: const TextStyle(color: Colors.white, fontSize: 16.0)),
-        onPressed: _createRoom,
+        child: const Text('ENTER ROOM', style: _buttonTextStyle),
+        onPressed: _enterRoom,
         color: Theme.of(context).primaryColor,
       ),
     );
 
-    return new Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [numPlayers, createRoomButton, _buildRoomList()],
+    Widget existingRoom = new Container(
+      padding: _padding,
+      child: new Column(
+        children: [
+          enterRoomForm,
+          enterRoomButton,
+        ],
+      ),
     );
-  }
 
-  Widget _buildRoomList() {
-    return new Expanded(
-        child: new StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('rooms').snapshots,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
-          return new Text('Loading...');
-        }
-
-        final tiles = snapshot.data.documents.map((DocumentSnapshot document) {
-          Room room = new Room.fromJson(document.data);
-          return new ListTile(
-            title: new Text(room.code),
-            subtitle: new Text(room.createdAt.toString()),
-          );
-        }).toList();
-
-        final dividedTiles = ListTile
-            .divideTiles(
-              context: context,
-              tiles: tiles,
-            )
-            .toList();
-
-        return new ListView(
-          children: dividedTiles,
-        );
-      },
-    ));
+    return new Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [numPlayers, existingRoom],
+    );
   }
 }

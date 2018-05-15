@@ -15,6 +15,7 @@ Map<String, bool> _setToBoolMap(Set<String> set) {
 }
 
 class Room {
+  final String id;
   final String code;
   final DateTime createdAt;
   final String appVersion;
@@ -24,7 +25,8 @@ class Room {
   final Set<String> roles;
 
   Room(
-      {@required this.code,
+      {this.id,
+      @required this.code,
       @required this.createdAt,
       @required this.appVersion,
       this.completed = false,
@@ -32,8 +34,9 @@ class Room {
       @required this.numPlayers,
       @required this.roles});
 
-  Room.fromJson(Map<String, dynamic> json)
-      : code = json['code'],
+  Room.fromJson(String id, Map<String, dynamic> json)
+      : this.id = id,
+        code = json['code'],
         createdAt = json['createdAt'],
         appVersion = json['appVersion'],
         completed = json['completed'],
@@ -55,29 +58,32 @@ class Room {
 }
 
 class Player {
+  final String id;
   final String installId;
-  final String roomRef;
+  final DocumentReference room;
   final String name;
   final int initialBalance;
   final String role;
 
   Player(
-      {@required this.installId,
-      @required this.roomRef,
+      {this.id,
+      @required this.installId,
+      @required this.room,
       @required this.name,
       @required this.initialBalance,
       @required this.role});
 
-  Player.fromJson(Map<String, dynamic> json)
-      : installId = json['installId'],
-        roomRef = json['roomRef'],
+  Player.fromJson(String id, Map<String, dynamic> json)
+      : this.id = id,
+        installId = json['installId'],
+        room = json['room'],
         name = json['name'],
         initialBalance = json['initialBalance'],
         role = json['role'];
 
   Map<String, dynamic> toJson() => {
         'installId': installId,
-        'roomRef': roomRef,
+        'room': room,
         'name': name,
         'initialBalance': initialBalance,
         'role': role,
@@ -85,17 +91,19 @@ class Player {
 }
 
 class Heist {
-  final String roomRef;
+  final String id;
+  final DocumentReference room;
   final int price;
   final int pot;
   final int numPlayers;
   final int order;
   final DateTime startedAt;
-  final Map<String, String> decisions;
+  final Map<dynamic, dynamic> decisions; // TODO: change to <String, String>
   // TODO: include Kingpin guesses
 
   Heist(
-      {@required this.roomRef,
+      {this.id,
+      @required this.room,
       @required this.price,
       @required this.pot,
       @required this.numPlayers,
@@ -103,8 +111,9 @@ class Heist {
       @required this.startedAt,
       @required this.decisions});
 
-  Heist.fromJson(Map<String, dynamic> json)
-      : roomRef = json['roomRef'],
+  Heist.fromJson(String id, Map<String, dynamic> json)
+      : this.id = id,
+        room = json['room'],
         price = json['price'],
         pot = json['pot'],
         numPlayers = json['numPlayers'],
@@ -113,7 +122,7 @@ class Heist {
         decisions = json['decisions'];
 
   Map<String, dynamic> toJson() => {
-        'roomRef': roomRef,
+        'room': room,
         'price': price,
         'pot': pot,
         'numPlayers': numPlayers,
@@ -124,30 +133,33 @@ class Heist {
 }
 
 class Round {
-  final String leader;
+  final String id;
+  final DocumentReference leader;
   final int order;
-  final String roomRef;
-  final String heistRef;
+  final DocumentReference room;
+  final DocumentReference heist;
   final DateTime startedAt;
-  final Set<String> team;
-  final Map<String, dynamic> bids; // TODO: convert to Map<String, Bid>
-  final Map<String, dynamic> gifts; // TODO: convert to Map<String, Gift>
+  final List<dynamic> team; // TODO: convert to Set<DocumentReference>
+  final Map<dynamic, dynamic> bids; // TODO: convert to Map<String, Bid>
+  final Map<dynamic, dynamic> gifts; // TODO: convert to Map<String, Gift>
 
   Round(
-      {@required this.leader,
+      {this.id,
+      @required this.leader,
       @required this.order,
-      @required this.roomRef,
-      @required this.heistRef,
+      @required this.room,
+      @required this.heist,
       @required this.startedAt,
       @required this.team,
       @required this.bids,
       @required this.gifts});
 
-  Round.fromJson(Map<String, dynamic> json)
-      : leader = json['leader'],
+  Round.fromJson(String id, Map<String, dynamic> json)
+      : this.id = id,
+        leader = json['leader'],
         order = json['order'],
-        roomRef = json['roomRef'],
-        heistRef = json['heistRef'],
+        room = json['room'],
+        heist = json['heist'],
         startedAt = json['startedAt'],
         team = json['team'],
         bids = json['bids'],
@@ -156,8 +168,8 @@ class Round {
   Map<String, dynamic> toJson() => {
         'leader': leader,
         'order': order,
-        'roomRef': roomRef,
-        'heistRef': heistRef,
+        'room': room,
+        'heist': heist,
         'startedAt': startedAt,
         'team': team,
         'bids': bids,

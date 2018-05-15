@@ -10,57 +10,34 @@ class Game extends StatefulWidget {
 }
 
 class GameState extends State<Game> {
-  final String code;
+  final Controller controller;
 
-  GameState(this.code);
-
-  Widget _buildRoomList() {
-    return new Expanded(
-        child: new StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('rooms').snapshots,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
-          return new Text('Loading...');
-        }
-
-        final tiles = snapshot.data.documents.map((DocumentSnapshot document) {
-          Room room = new Room.fromJson(document.data);
-          return new ListTile(
-            title: new Text(room.code),
-            subtitle: new Text(room.createdAt.toString()),
-          );
-        }).toList();
-
-        final dividedTiles = ListTile
-            .divideTiles(
-              context: context,
-              tiles: tiles,
-            )
-            .toList();
-
-        return new ListView(
-          children: dividedTiles,
-        );
-      },
-    ));
-  }
+  GameState(String code) : controller = new Controller(code);
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Room: $code"),
+        title: new Text("Room"),
       ),
       body: new Column(
         children: [
-          _buildRoomList(),
           new Card(
             elevation: 2.0,
-            child: new ListTile(
-              title: new Text(code),
-              subtitle: new Text('Game state'),
-            ),
-          )
+            child: new FutureBuilder(
+                future: controller.load(),
+                builder: (BuildContext context, AsyncSnapshot<GameModel> snapshot) {
+                  if (!snapshot.hasData) {
+                    return new Text('Loading...');
+                  }
+
+                  GameModel gameModel = snapshot.data;
+                  return new ListTile(
+                    title: new Text(gameModel.room.code),
+                    subtitle: new Text("${gameModel.player.name} (${gameModel.player.role})"),
+                  );
+                }),
+          ),
         ],
       ),
     );

@@ -1,48 +1,10 @@
 part of heist;
 
-class HomePage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => new HomePageState();
-}
-
-class HomePageState extends State<HomePage> {
+class HomePage extends StatelessWidget {
   static const EdgeInsets _padding = const EdgeInsets.all(24.0);
   static const TextStyle _buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
 
-  int _numPlayers = _minPlayers;
   final _enterRoomFormKey = new GlobalKey<FormState>();
-  String _existingRoomCode;
-
-  int _getCapitalLetterOrdinal(Random random) {
-    return random.nextInt(26) + 65; // 65 is 'A' in ASCII
-  }
-
-  String _generateRoomCode() {
-    Random random = new Random();
-    List<int> ordinals =
-        new List.generate(4, (i) => _getCapitalLetterOrdinal(random), growable: false);
-    return new String.fromCharCodes(
-        ordinals); // TODO: validate codes are unique for currently open rooms
-  }
-
-  void _createRoom() {
-    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
-      // TODO: get the right roles
-      final Set<String> roles = new Set.from(['ACCOUNTANT', 'KINGPIN', 'LEAD_AGENT']);
-
-      // create the room in the database
-      Firestore.instance.collection('rooms').document().setData(new Room(
-              appVersion: packageInfo.version,
-              code: _generateRoomCode(),
-              createdAt: new DateTime.now(),
-              numPlayers: _numPlayers,
-              roles: roles)
-          .toJson());
-      Scaffold.of(context).showSnackBar(new SnackBar(
-            content: new Text("Your room has been created"),
-          ));
-    });
-  }
 
   Widget _buildTitle(String title) {
     return new Container(
@@ -71,33 +33,29 @@ class HomePageState extends State<HomePage> {
   static final TextInputFormatter _capitalFormatter = TextInputFormatter
       .withFunction((oldValue, newValue) => newValue.copyWith(text: newValue.text.toUpperCase()));
 
-  void _enterRoom() {
-    FormState enterRoomState = _enterRoomFormKey.currentState;
-    if (enterRoomState.validate()) {
-      enterRoomState.save();
-      Navigator
-          .of(context)
-          .push(new MaterialPageRoute(builder: (context) => new Game(_existingRoomCode)));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    Widget numPlayersText = new Container(
-      padding: _padding,
-      child: new Text(
-        _numPlayers.toString(),
-        style: const TextStyle(
-          fontSize: 32.0,
-        ),
-      ),
-    );
+    Store<GameModel> store = StoreProvider.of<GameModel>(context);
+
+    Widget numPlayersText = new StoreConnector<GameModel, int>(
+        converter: (store) => store.state.room.numPlayers,
+        builder: (context, int numPlayers) {
+          return new Container(
+            padding: _padding,
+            child: new Text(
+              numPlayers.toString(),
+              style: const TextStyle(
+                fontSize: 32.0,
+              ),
+            ),
+          );
+        });
 
     Widget createRoomButton = new Container(
       padding: _padding,
       child: new RaisedButton(
         child: const Text('CREATE ROOM', style: _buttonTextStyle),
-        onPressed: _createRoom,
+        onPressed: () => store.dispatch(new CreateRoomAction()),
         color: Theme.of(context).primaryColor,
       ),
     );
@@ -109,18 +67,10 @@ class HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _buildArrowColumn(
-                context,
-                Icons.arrow_back,
-                () => setState(() {
-                      if (_numPlayers > _minPlayers) _numPlayers--;
-                    })),
+                context, Icons.arrow_back, () => store.dispatch(new DecrementNumPlayersAction())),
             numPlayersText,
             _buildArrowColumn(
-                context,
-                Icons.arrow_forward,
-                () => setState(() {
-                      if (_numPlayers < _maxPlayers) _numPlayers++;
-                    }))
+                context, Icons.arrow_forward, () => store.dispatch(new IncrementNumPlayersAction()))
           ],
         ),
         createRoomButton,
@@ -130,19 +80,29 @@ class HomePageState extends State<HomePage> {
     Form enterRoomForm = new Form(
         key: _enterRoomFormKey,
         child: new TextFormField(
-          decoration: new InputDecoration(
-            labelText: 'Enter an existing room code',
-            isDense: true,
-          ),
-          style: new TextStyle(color: Colors.black87, fontSize: 24.0),
-          maxLength: 4,
-          autocorrect: false,
-          textAlign: TextAlign.center,
-          inputFormatters: [new WhitelistingTextInputFormatter(_onlyLetters), _capitalFormatter],
-          validator: (value) =>
-              value.length != 4 ? 'Invalid code' : null, // TODO: validate room exists and is open
-          onSaved: (value) => _existingRoomCode = value,
-        ));
+            decoration: new InputDecoration(
+              labelText: 'Enter an existing room code',
+              isDense: true,
+            ),
+            style: new TextStyle(color: Colors.black87, fontSize: 24.0),
+            maxLength: 4,
+            autocorrect: false,
+            textAlign: TextAlign.center,
+            inputFormatters: [
+              new WhitelistingTextInputFormatter(_onlyLetters),
+              _capitalFormatter,
+            ],
+            validator: (value) =>
+                value.length != 4 ? 'Invalid code' : null, // TODO: validate room exists and is open
+            onSaved: (value) => store.dispatch(new EnterCodeAction(value))));
+
+    void _enterRoom() {
+      FormState enterRoomState = _enterRoomFormKey.currentState;
+      if (enterRoomState.validate()) {
+        enterRoomState.save();
+        store.dispatch(new EnterRoomAction());
+      }
+    }
 
     Widget enterRoomButton = new Container(
       padding: _padding,

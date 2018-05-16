@@ -8,33 +8,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info/package_info.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 
 part 'database.dart';
 part 'database_model.dart';
 part 'home_page.dart';
 part 'game.dart';
 part 'controller.dart';
+part 'middleware/middleware.dart';
+part 'middleware/room_middleware.dart';
+part 'reducers/reducers.dart';
+part 'reducers/room_reducers.dart';
 
 void main() => runApp(new MyApp());
 
 const int _minPlayers = 5;
 const int _maxPlayers = 10;
 
+final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+
 class MyApp extends StatelessWidget {
+  final store = new Store<GameModel>(
+    gameModelReducer,
+    initialState: new GameModel.initial(_minPlayers),
+    middleware: createMiddleware(),
+    distinct: true,
+  );
+
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-        title: 'Heist',
-        theme: new ThemeData(
-          primaryColor: Colors.deepOrange,
-        ),
-        home: new Scaffold(
-          appBar: new AppBar(
-            title: new Text("Heist"),
+    return new StoreProvider(
+      store: store,
+      child: new MaterialApp(
+          navigatorKey: navigatorKey,
+          title: 'Heist',
+          theme: new ThemeData(
+            primaryColor: Colors.deepOrange,
           ),
-          body: new HomePage(),
-        ));
+          home: new Scaffold(
+            appBar: new AppBar(
+              title: new Text("Heist"),
+            ),
+            body: new HomePage(),
+          )),
+    );
   }
 }
-
-

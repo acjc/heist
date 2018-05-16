@@ -1,10 +1,10 @@
 part of heist;
 
 final roomReducer = combineReducers<Room>([
-  new TypedReducer<Room, IncrementNumPlayersAction>(_reduce),
-  new TypedReducer<Room, DecrementNumPlayersAction>(_reduce),
-  new TypedReducer<Room, EnterCodeAction>(_reduce),
-  new TypedReducer<Room, EnterRoomAction>(_reduce),
+  new TypedReducer<Room, IncrementNumPlayersAction>(reduce),
+  new TypedReducer<Room, DecrementNumPlayersAction>(reduce),
+  new TypedReducer<Room, EnterCodeAction>(reduce),
+  new TypedReducer<Room, EnterRoomAction>(reduce),
 ]);
 
 class IncrementNumPlayersAction extends Action<Room> {

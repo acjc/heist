@@ -10,4 +10,4 @@ abstract class Action<State> {
 }
 
 /// Generic method to delegate reduction to the action itself.
-State _reduce<State>(State state, dynamic action) => action.reduce(state, action);
+State reduce<State>(State state, dynamic action) => action.reduce(state, action);

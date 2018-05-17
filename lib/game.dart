@@ -1,18 +1,6 @@
 part of heist;
 
-class Game extends StatefulWidget {
-  final String code;
-
-  Game(this.code);
-
-  @override
-  State<StatefulWidget> createState() => new GameState(code);
-}
-
-class GameState extends State<Game> {
-  final Controller controller;
-
-  GameState(String code) : controller = new Controller(code);
+class Game extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
@@ -24,19 +12,17 @@ class GameState extends State<Game> {
         children: [
           new Card(
             elevation: 2.0,
-            child: new FutureBuilder(
-                future: controller.load(),
-                builder: (BuildContext context, AsyncSnapshot<GameModel> snapshot) {
-                  if (!snapshot.hasData) {
+            child: new StoreConnector<GameModel, GameModel>(
+                converter: (store) => store.state,
+                builder: (context, GameModel gameModel) {
+                  if (gameModel.player == null) {
                     return new Text('Loading...');
                   }
-
-                  GameModel gameModel = snapshot.data;
                   return new ListTile(
                     title: new Text(gameModel.room.code),
                     subtitle: new Text("${gameModel.player.name} (${gameModel.player.role})"),
                   );
-                }),
+            }),
           ),
         ],
       ),

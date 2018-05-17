@@ -4,7 +4,7 @@ final roomReducer = combineReducers<Room>([
   new TypedReducer<Room, IncrementNumPlayersAction>(reduce),
   new TypedReducer<Room, DecrementNumPlayersAction>(reduce),
   new TypedReducer<Room, EnterCodeAction>(reduce),
-  new TypedReducer<Room, EnterRoomAction>(reduce),
+  new TypedReducer<Room, UpdateStateAction<Room>>(reduce),
 ]);
 
 class IncrementNumPlayersAction extends Action<Room> {
@@ -35,14 +35,5 @@ class EnterCodeAction extends Action<Room> {
   @override
   Room reduce(Room room, action) {
     return room.copyWith(code: code);
-  }
-}
-
-class EnterRoomAction extends Action<Room> {
-  @override
-  Room reduce(Room room, action) {
-    navigatorKey.currentState
-        .push(new MaterialPageRoute(builder: (context) => new Game(room.code)));
-    return room;
   }
 }

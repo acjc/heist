@@ -15,11 +15,14 @@ part 'database.dart';
 part 'database_model.dart';
 part 'home_page.dart';
 part 'game.dart';
-part 'controller.dart';
+part 'state.dart';
 part 'middleware/middleware.dart';
 part 'middleware/room_middleware.dart';
 part 'reducers/reducers.dart';
 part 'reducers/room_reducers.dart';
+part 'reducers/player_reducers.dart';
+part 'reducers/heist_reducers.dart';
+part 'reducers/round_reducers.dart';
 
 void main() => runApp(new MyApp());
 

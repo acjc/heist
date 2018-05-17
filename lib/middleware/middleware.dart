@@ -3,6 +3,7 @@ part of heist;
 List<Middleware<GameModel>> createMiddleware() {
   return [
     new TypedMiddleware<GameModel, CreateRoomAction>(_dispatchMiddleware),
+    new TypedMiddleware<GameModel, EnterRoomAction>(_dispatchMiddleware),
   ];
 }
 

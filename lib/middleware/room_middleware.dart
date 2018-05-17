@@ -29,3 +29,34 @@ class CreateRoomAction extends MiddlewareAction {
         ordinals); // TODO: validate codes are unique for currently open rooms
   }
 }
+
+class EnterRoomAction extends MiddlewareAction {
+  @override
+  void handle(Store<GameModel> store, action, NextDispatcher next) {
+    loadGame(store);
+    navigatorKey.currentState
+        .push(new MaterialPageRoute(builder: (context) => new Game()));
+  }
+
+  Future<void> loadGame(Store<GameModel> store) async {
+    DocumentSnapshot roomSnapshot = (await getRoom(store.state.room.code)).documents[0];
+    Room room = new Room.fromJson(roomSnapshot.documentID, roomSnapshot.data);
+    store.dispatch(new UpdateStateAction<Room>(room));
+
+    DocumentSnapshot playerSnapshot = (await getPlayer('test_install_id', room.id)).documents[0];
+    Player player = new Player.fromJson(playerSnapshot.documentID, playerSnapshot.data);
+    store.dispatch(new UpdateStateAction<Player>(player));
+
+    List<DocumentSnapshot> heistSnapshots = (await getHeists(room.id)).documents;
+    List<Heist> heists =
+        heistSnapshots.map((s) => new Heist.fromJson(s.documentID, s.data)).toList();
+    store.dispatch(new UpdateStateAction<List<Heist>>(heists));
+
+    Map<Heist, List<Round>> rounds = new Map();
+    for (Heist heist in heists) {
+      List<DocumentSnapshot> roundSnapshots = (await getRounds(room.id, heist.id)).documents;
+      rounds[heist] = roundSnapshots.map((s) => new Round.fromJson(s.documentID, s.data)).toList();
+    }
+    store.dispatch(new UpdateStateAction<Map<Heist, List<Round>>>(rounds));
+  }
+}

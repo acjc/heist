@@ -14,6 +14,7 @@ Map<String, bool> _setToBoolMap(Set<String> set) {
   return boolMap;
 }
 
+@immutable
 class Room {
   final String id;
   final String code;
@@ -26,13 +27,35 @@ class Room {
 
   Room(
       {this.id,
-      @required this.code,
-      @required this.createdAt,
-      @required this.appVersion,
+      this.code,
+      this.createdAt,
+      this.appVersion,
       this.completed = false,
       this.completedAt,
       @required this.numPlayers,
-      @required this.roles});
+      this.roles});
+
+  Room copyWith({
+    String id,
+    String code,
+    DateTime createdAt,
+    String appVersion,
+    bool completed,
+    DateTime completedAt,
+    int numPlayers,
+    Set<String> roles,
+  }) {
+    return new Room(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      createdAt: createdAt ?? this.createdAt,
+      appVersion: appVersion ?? this.appVersion,
+      completed: completed ?? this.completed,
+      completedAt: completedAt ?? this.completedAt,
+      numPlayers: numPlayers ?? this.numPlayers,
+      roles: roles ?? this.roles,
+    );
+  }
 
   Room.fromJson(String id, Map<String, dynamic> json)
       : this.id = id,

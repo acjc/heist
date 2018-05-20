@@ -30,3 +30,7 @@ Future<QuerySnapshot> getRounds(String roomRef, String heistRef) {
       .where('heist', isEqualTo: heist)
       .getDocuments();
 }
+
+Future<void> createRoom(Room room) {
+  return Firestore.instance.collection('rooms').document().setData(room.toJson());
+}

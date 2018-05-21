@@ -39,7 +39,7 @@ class UpdateMapEntryAction<Key, Value> extends Action<Map<Key, Value>> {
 
   @override
   Map<Key, Value> reduce(Map<Key, Value> state, action) {
-    Map<Key, Value> updated = new Map.from(state);
+    Map<Key, Value> updated = state != null ? new Map.from(state) : new Map();
     updated[key] = value;
     return updated;
   }

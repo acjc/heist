@@ -15,8 +15,14 @@ Map<String, bool> _setToBoolMap(Set<String> set) {
 }
 
 @immutable
-class Room {
+class Document {
   final String id;
+
+  Document({this.id});
+}
+
+@immutable
+class Room extends Document {
   final String code;
   final DateTime createdAt;
   final String appVersion;
@@ -26,14 +32,14 @@ class Room {
   final Set<String> roles;
 
   Room(
-      {this.id,
+      {id,
       this.code,
       this.createdAt,
       this.appVersion,
       this.completed = false,
       this.completedAt,
       @required this.numPlayers,
-      this.roles});
+      this.roles}) : super(id: id);
 
   Room copyWith({
     String id,
@@ -60,14 +66,14 @@ class Room {
   Room.fromSnapshot(DocumentSnapshot snapshot) : this.fromJson(snapshot.documentID, snapshot.data);
 
   Room.fromJson(String id, Map<String, dynamic> json)
-      : this.id = id,
-        code = json['code'],
+      : code = json['code'],
         createdAt = json['createdAt'],
         appVersion = json['appVersion'],
         completed = json['completed'],
         completedAt = json['completedAt'],
         numPlayers = json['numPlayers'],
-        roles = new Set() {
+        roles = new Set(),
+        super(id: id) {
     _boolMapToSet(json['roles'], roles);
   }
 
@@ -83,8 +89,7 @@ class Room {
 }
 
 @immutable
-class Player {
-  final String id;
+class Player extends Document {
   final String installId;
   final DocumentReference room;
   final String name;
@@ -92,12 +97,12 @@ class Player {
   final String role;
 
   Player(
-      {this.id,
+      {id,
       @required this.installId,
       @required this.room,
       @required this.name,
       @required this.initialBalance,
-      @required this.role});
+      @required this.role}) : super(id: id);
 
   Player copyWith({
     String id,
@@ -121,12 +126,12 @@ class Player {
       : this.fromJson(snapshot.documentID, snapshot.data);
 
   Player.fromJson(String id, Map<String, dynamic> json)
-      : this.id = id,
-        installId = json['installId'],
+      : installId = json['installId'],
         room = json['room'],
         name = json['name'],
         initialBalance = json['initialBalance'],
-        role = json['role'];
+        role = json['role'],
+        super(id: id);
 
   Map<String, dynamic> toJson() => {
         'installId': installId,
@@ -138,8 +143,7 @@ class Player {
 }
 
 @immutable
-class Heist {
-  final String id;
+class Heist extends Document {
   final DocumentReference room;
   final int price;
   final int pot;
@@ -150,14 +154,14 @@ class Heist {
   // TODO: include Kingpin guesses
 
   Heist(
-      {this.id,
+      {id,
       @required this.room,
       @required this.price,
       @required this.pot,
       @required this.numPlayers,
       @required this.order,
       @required this.startedAt,
-      @required this.decisions});
+      @required this.decisions}) : super(id: id);
 
   Heist copyWith({
     String id,
@@ -184,14 +188,14 @@ class Heist {
   Heist.fromSnapshot(DocumentSnapshot snapshot) : this.fromJson(snapshot.documentID, snapshot.data);
 
   Heist.fromJson(String id, Map<String, dynamic> json)
-      : this.id = id,
-        room = json['room'],
+      : room = json['room'],
         price = json['price'],
         pot = json['pot'],
         numPlayers = json['numPlayers'],
         order = json['order'],
         startedAt = json['startedAt'],
-        decisions = json['decisions'];
+        decisions = json['decisions'],
+        super(id: id);
 
   Map<String, dynamic> toJson() => {
         'room': room,
@@ -205,8 +209,7 @@ class Heist {
 }
 
 @immutable
-class Round {
-  final String id;
+class Round extends Document {
   final DocumentReference leader;
   final int order;
   final DocumentReference room;
@@ -217,7 +220,7 @@ class Round {
   final Map<dynamic, dynamic> gifts; // TODO: convert to Map<String, Gift>
 
   Round(
-      {this.id,
+      {id,
       @required this.leader,
       @required this.order,
       @required this.room,
@@ -225,7 +228,7 @@ class Round {
       @required this.startedAt,
       @required this.team,
       @required this.bids,
-      @required this.gifts});
+      @required this.gifts}) : super(id: id);
 
   Round copyWith({
     String id,
@@ -254,15 +257,15 @@ class Round {
   Round.fromSnapshot(DocumentSnapshot snapshot) : this.fromJson(snapshot.documentID, snapshot.data);
 
   Round.fromJson(String id, Map<String, dynamic> json)
-      : this.id = id,
-        leader = json['leader'],
+      : leader = json['leader'],
         order = json['order'],
         room = json['room'],
         heist = json['heist'],
         startedAt = json['startedAt'],
         team = json['team'],
         bids = json['bids'],
-        gifts = json['gifts'];
+        gifts = json['gifts'],
+        super(id: id);
 
   Map<String, dynamic> toJson() => {
         'leader': leader,

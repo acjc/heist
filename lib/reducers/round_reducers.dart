@@ -1,5 +1,5 @@
 part of heist;
 
-final roundReducer = combineReducers<Map<Heist, List<Round>>>([
-  new TypedReducer<Map<Heist, List<Round>>, UpdateStateAction<Map<Heist, List<Round>>>>(reduce),
+final roundReducer = combineReducers<Map<String, List<Round>>>([
+  new TypedReducer<Map<String, List<Round>>, UpdateMapEntryAction<String, List<Round>>>(reduce),
 ]);

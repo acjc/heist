@@ -100,7 +100,7 @@ class HomePage extends StatelessWidget {
       FormState enterRoomState = _enterRoomFormKey.currentState;
       if (enterRoomState.validate()) {
         enterRoomState.save();
-        store.dispatch(new EnterRoomAction());
+        Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Game()));
       }
     }
 

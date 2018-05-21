@@ -57,6 +57,8 @@ class Room {
     );
   }
 
+  Room.fromSnapshot(DocumentSnapshot snapshot) : this.fromJson(snapshot.documentID, snapshot.data);
+
   Room.fromJson(String id, Map<String, dynamic> json)
       : this.id = id,
         code = json['code'],
@@ -80,6 +82,7 @@ class Room {
       };
 }
 
+@immutable
 class Player {
   final String id;
   final String installId;
@@ -95,6 +98,27 @@ class Player {
       @required this.name,
       @required this.initialBalance,
       @required this.role});
+
+  Player copyWith({
+    String id,
+    String installId,
+    DocumentReference room,
+    String name,
+    int initialBalance,
+    String role,
+  }) {
+    return new Player(
+      id: id ?? this.id,
+      installId: installId ?? this.installId,
+      room: room ?? this.room,
+      name: name ?? this.name,
+      initialBalance: initialBalance ?? this.initialBalance,
+      role: role ?? this.role,
+    );
+  }
+
+  Player.fromSnapshot(DocumentSnapshot snapshot)
+      : this.fromJson(snapshot.documentID, snapshot.data);
 
   Player.fromJson(String id, Map<String, dynamic> json)
       : this.id = id,
@@ -113,6 +137,7 @@ class Player {
       };
 }
 
+@immutable
 class Heist {
   final String id;
   final DocumentReference room;
@@ -133,6 +158,30 @@ class Heist {
       @required this.order,
       @required this.startedAt,
       @required this.decisions});
+
+  Heist copyWith({
+    String id,
+    DocumentReference room,
+    int price,
+    int pot,
+    int numPlayers,
+    int order,
+    DateTime startedAt,
+    Map<dynamic, dynamic> decisions,
+  }) {
+    return new Heist(
+      id: id ?? this.id,
+      room: room ?? this.room,
+      price: price ?? this.price,
+      pot: pot ?? this.pot,
+      numPlayers: numPlayers ?? this.numPlayers,
+      order: order ?? this.order,
+      startedAt: startedAt ?? this.startedAt,
+      decisions: decisions ?? this.decisions,
+    );
+  }
+
+  Heist.fromSnapshot(DocumentSnapshot snapshot) : this.fromJson(snapshot.documentID, snapshot.data);
 
   Heist.fromJson(String id, Map<String, dynamic> json)
       : this.id = id,
@@ -155,6 +204,7 @@ class Heist {
       };
 }
 
+@immutable
 class Round {
   final String id;
   final DocumentReference leader;
@@ -176,6 +226,32 @@ class Round {
       @required this.team,
       @required this.bids,
       @required this.gifts});
+
+  Round copyWith({
+    String id,
+    DocumentReference leader,
+    int order,
+    DocumentReference room,
+    DocumentReference heist,
+    DateTime startedAt,
+    List<dynamic> team,
+    Map<dynamic, dynamic> bids,
+    Map<dynamic, dynamic> gifts,
+  }) {
+    return new Round(
+      id: id ?? this.id,
+      leader: leader ?? this.leader,
+      order: order ?? this.order,
+      room: room ?? this.room,
+      heist: heist ?? this.heist,
+      startedAt: startedAt ?? this.startedAt,
+      team: team ?? this.team,
+      bids: bids ?? this.bids,
+      gifts: gifts ?? this.gifts,
+    );
+  }
+
+  Round.fromSnapshot(DocumentSnapshot snapshot) : this.fromJson(snapshot.documentID, snapshot.data);
 
   Round.fromJson(String id, Map<String, dynamic> json)
       : this.id = id,

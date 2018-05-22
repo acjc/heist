@@ -14,7 +14,7 @@ class Game extends StatelessWidget {
           new Card(
             elevation: 2.0,
             child: new StoreConnector<GameModel, GameModel>(
-                onInit: (store) => store.dispatch(new EnterRoomAction()),
+                onInit: (store) => store.dispatch(new LoadGameAction()),
                 onDispose: (store) => store.dispatch(new CancelSubscriptionsAction()),
                 converter: (store) => store.state,
                 builder: (context, GameModel gameModel) {

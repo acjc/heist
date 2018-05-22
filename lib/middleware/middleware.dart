@@ -3,7 +3,7 @@ part of heist;
 List<Middleware<GameModel>> createMiddleware() {
   return [
     new TypedMiddleware<GameModel, CreateRoomAction>(_dispatchMiddleware),
-    new TypedMiddleware<GameModel, EnterRoomAction>(_dispatchMiddleware),
+    new TypedMiddleware<GameModel, LoadGameAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, ChangeNumPlayersAction>(_dispatchMiddleware),
   ];
 }
@@ -30,7 +30,8 @@ class CreateRoomAction extends MiddlewareAction {
               createdAt: new DateTime.now(),
               numPlayers: store.state.room.numPlayers,
               roles: roles))
-          .then((v) => store.dispatch(new EnterRoomAction()));
+          .then((v) => navigatorKey.currentState
+              .push(new MaterialPageRoute(builder: (context) => new Game())));
     });
   }
 
@@ -56,7 +57,7 @@ class ChangeNumPlayersAction extends MiddlewareAction {
   }
 }
 
-class EnterRoomAction extends MiddlewareAction {
+class LoadGameAction extends MiddlewareAction {
   @override
   void handle(Store<GameModel> store, action, NextDispatcher next) {
     _loadGame(store);

@@ -1,11 +1,19 @@
 part of heist;
 
 List<Middleware<GameModel>> createMiddleware() {
-  return [
+  List<Middleware<GameModel>> middleware = [
     new TypedMiddleware<GameModel, CreateRoomAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, LoadGameAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, ChangeNumPlayersAction>(_dispatchMiddleware),
   ];
+
+  // asserts only work in debug mode
+  assert(() {
+    middleware.add(new LoggingMiddleware.printer());
+    return true;
+  }());
+
+  return middleware;
 }
 
 /// Delegate middleware intercepts to the MiddlewareActions themselves.

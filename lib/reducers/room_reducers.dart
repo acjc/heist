@@ -10,7 +10,7 @@ final roomReducer = combineReducers<Room>([
 class IncrementNumPlayersAction extends Action<Room> {
   @override
   Room reduce(Room room, action) {
-    if (room.numPlayers < _maxPlayers) {
+    if (room.numPlayers < maxPlayers) {
       return room.copyWith(numPlayers: room.numPlayers + 1);
     }
     return room;
@@ -20,7 +20,7 @@ class IncrementNumPlayersAction extends Action<Room> {
 class DecrementNumPlayersAction extends Action<Room> {
   @override
   Room reduce(Room room, action) {
-    if (room.numPlayers > _minPlayers) {
+    if (room.numPlayers > minPlayers) {
       return room.copyWith(numPlayers: room.numPlayers - 1);
     }
     return room;

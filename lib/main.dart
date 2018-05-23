@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:package_info/package_info.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:redux_logging/redux_logging.dart';
 
 part 'database.dart';
 part 'database_model.dart';
@@ -26,15 +27,15 @@ part 'reducers/subscription_reducers.dart';
 
 void main() => runApp(new MyApp());
 
-const int _minPlayers = 5;
-const int _maxPlayers = 10;
+const int minPlayers = 5;
+const int maxPlayers = 10;
 
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
   final store = new Store<GameModel>(
     gameModelReducer,
-    initialState: new GameModel.initial(_minPlayers),
+    initialState: new GameModel.initial(minPlayers),
     middleware: createMiddleware(),
     distinct: true,
   );

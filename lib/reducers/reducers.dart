@@ -2,10 +2,11 @@ part of heist;
 
 GameModel gameModelReducer(GameModel gameModel, dynamic action) {
   return new GameModel(
-      room: roomReducer(gameModel.room, action),
-      player: playerReducer(gameModel.player, action),
-      heists: heistReducer(gameModel.heists, action),
-      rounds: roundReducer(gameModel.rounds, action),
+    subscriptions: subscriptionReducer(gameModel.subscriptions, action),
+    room: roomReducer(gameModel.room, action),
+    player: playerReducer(gameModel.player, action),
+    heists: heistReducer(gameModel.heists, action),
+    rounds: roundReducer(gameModel.rounds, action),
   );
 }
 
@@ -26,5 +27,20 @@ class UpdateStateAction<State> extends Action<State> {
   @override
   State reduce(State state, action) {
     return this.state;
+  }
+}
+
+/// Use to replace a value for a key in map state.
+class UpdateMapEntryAction<Key, Value> extends Action<Map<Key, Value>> {
+  final Key key;
+  final Value value;
+
+  UpdateMapEntryAction(this.key, this.value);
+
+  @override
+  Map<Key, Value> reduce(Map<Key, Value> state, action) {
+    Map<Key, Value> updated = state != null ? new Map.from(state) : new Map();
+    updated[key] = value;
+    return updated;
   }
 }

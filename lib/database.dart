@@ -68,3 +68,7 @@ Future<void> upsertRoom(Room room) {
 Future<void> upsertPlayer(Player player) {
   return Firestore.instance.collection('players').document(player.id).setData(player.toJson());
 }
+
+Future<void> delete(String collection, String documentId) {
+  return Firestore.instance.collection(collection).document(documentId).delete();
+}

@@ -3,79 +3,79 @@ import 'dart:async';
 import 'package:heist/main.dart';
 
 class MockFirestoreDb implements FirestoreDb {
-  GameModel gameModel = new GameModel();
+  GameModel _gameModel = new GameModel();
 
-  StreamController<Room> roomStream;
-  StreamController<Player> playerStream;
-  StreamController<List<Heist>> heistStream;
-  StreamController<List<Round>> roundStream;
+  StreamController<Room> _roomStream;
+  StreamController<Player> _playerStream;
+  StreamController<List<Heist>> _heistStream;
+  StreamController<List<Round>> _roundStream;
 
   @override
   Future<List<Heist>> getHeists(String roomRef) {
-    return new Future<List<Heist>>.value(gameModel.heists);
+    return new Future<List<Heist>>.value(_gameModel.heists);
   }
 
   @override
   Future<Player> getPlayer(String installId, String roomRef) {
-    return new Future<Player>.value(gameModel.player);
+    return new Future<Player>.value(_gameModel.player);
   }
 
   @override
   Future<Room> getRoom(String code) {
-    return new Future<Room>.value(gameModel.room);
+    return new Future<Room>.value(_gameModel.room);
   }
 
   @override
   Future<List<Round>> getRounds(String roomRef, String heistRef) {
-    return new Future<List<Round>>.value(gameModel.rounds[heistRef]);
+    return new Future<List<Round>>.value(_gameModel.rounds[heistRef]);
   }
 
   @override
   StreamSubscription<List<Heist>> listenOnHeists(String roomRef, void onData(List<Heist> heists)) {
-    heistStream = new StreamController(onCancel: () => heistStream.close(), sync: true);
-    return heistStream.stream.listen(onData);
+    _heistStream = new StreamController(onCancel: () => _heistStream.close(), sync: true);
+    return _heistStream.stream.listen(onData);
   }
 
   @override
   StreamSubscription<Player> listenOnPlayer(
       String installId, String roomRef, void onData(Player player)) {
-    playerStream = new StreamController(onCancel: () => playerStream.close(), sync: true);
-    StreamSubscription<Player> subscription = playerStream.stream.listen(onData);
+    _playerStream = new StreamController(onCancel: () => _playerStream.close(), sync: true);
+    StreamSubscription<Player> subscription = _playerStream.stream.listen(onData);
     _postPlayer();
     return subscription;
   }
 
   void _postPlayer() {
-    if (playerStream != null && !playerStream.isClosed && gameModel.player != null) {
-      playerStream.add(gameModel.player);
+    if (_playerStream != null && !_playerStream.isClosed && _gameModel.player != null) {
+      _playerStream.add(_gameModel.player);
     }
   }
 
   @override
   StreamSubscription<Room> listenOnRoom(String code, void Function(Room room) onData) {
-    roomStream = new StreamController(onCancel: () => roomStream.close(), sync: true);
-    StreamSubscription<Room> subscription = roomStream.stream.listen(onData);
+    _roomStream = new StreamController(onCancel: () => _roomStream.close(), sync: true);
+    StreamSubscription<Room> subscription = _roomStream.stream.listen(onData);
     _postRoom();
     return subscription;
   }
 
   void _postRoom() {
-    if (roomStream != null && !roomStream.isClosed && gameModel.room != null) {
-      roomStream.add(gameModel.room);
+    if (_roomStream != null && !_roomStream.isClosed && _gameModel.room != null) {
+      _roomStream.add(_gameModel.room);
     }
   }
 
   @override
   StreamSubscription<List<Round>> listenOnRounds(
       String roomRef, String heistRef, void onData(List<Round> rounds)) {
-    roundStream = new StreamController(onCancel: () => roundStream.close(), sync: true);
-    return roundStream.stream.listen(onData);
+    _roundStream = new StreamController(onCancel: () => _roundStream.close(), sync: true);
+    return _roundStream.stream.listen(onData);
   }
 
   @override
   Future<void> upsertPlayer(Player player) {
     return new Future<void>(() {
-      gameModel = gameModel.copyWith(player: player);
+      _gameModel = _gameModel.copyWith(player: player);
       _postPlayer();
     });
   }
@@ -83,7 +83,7 @@ class MockFirestoreDb implements FirestoreDb {
   @override
   Future<void> upsertRoom(Room room) {
     return new Future<void>(() {
-      gameModel = gameModel.copyWith(room: room);
+      _gameModel = _gameModel.copyWith(room: room);
       _postRoom();
     });
   }

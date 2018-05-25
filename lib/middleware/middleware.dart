@@ -22,7 +22,7 @@ void _dispatchMiddleware(Store<GameModel> store, dynamic action, NextDispatcher 
 
 /// MiddlewareActions know how to handle themselves.
 abstract class MiddlewareAction {
-  void handle(Store<GameModel> store, dynamic action, NextDispatcher next);
+  Future<void> handle(Store<GameModel> store, dynamic action, NextDispatcher next);
 }
 
 class CreateRoomAction extends MiddlewareAction {
@@ -30,17 +30,31 @@ class CreateRoomAction extends MiddlewareAction {
   static Set<String> roles = new Set.from(['ACCOUNTANT', 'KINGPIN', 'LEAD_AGENT']);
 
   @override
-  void handle(Store<GameModel> store, action, NextDispatcher next) {
-    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
-      upsertRoom(new Room(
-              appVersion: packageInfo.version,
-              code: _generateRoomCode(),
-              createdAt: new DateTime.now(),
-              numPlayers: store.state.room.numPlayers,
-              roles: roles))
-          .then((v) => navigatorKey.currentState
-              .push(new MaterialPageRoute(builder: (context) => new Game())));
-    });
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
+    String appVersion = await _getAppVersion();
+    String code = _generateRoomCode();
+    await store.state.db.upsertRoom(new Room(
+        appVersion: appVersion,
+        code: code,
+        createdAt: new DateTime.now(),
+        numPlayers: store.state.room.numPlayers,
+        roles: roles));
+
+    store.dispatch(new EnterCodeAction(code));
+
+    NavigatorState navigatorState = navigatorKey.currentState;
+    if (navigatorState != null) {
+      navigatorState.push(new MaterialPageRoute(builder: (context) => new Game()));
+    }
+  }
+
+  Future<String> _getAppVersion() async {
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      return packageInfo.version;
+    } catch (e) {
+      return '<unknown>';
+    }
   }
 
   int _getCapitalLetterOrdinal(Random random) {
@@ -59,77 +73,73 @@ class CreateRoomAction extends MiddlewareAction {
 // TODO: This is just a proof of concept that the UI can update directly from firestore
 class ChangeNumPlayersAction extends MiddlewareAction {
   @override
-  void handle(Store<GameModel> store, action, NextDispatcher next) {
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
     Room room = store.state.room.copyWith(numPlayers: new Random().nextInt(5) + 5);
-    upsertRoom(room);
+    return store.state.db.upsertRoom(room);
   }
 }
 
 class LoadGameAction extends MiddlewareAction {
   @override
-  void handle(Store<GameModel> store, action, NextDispatcher next) {
-    _loadGame(store);
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
+    return _loadGame(store);
   }
 
-  void _loadGame(Store<GameModel> store) async {
+  Future<void> _loadGame(Store<GameModel> store) async {
+    FirestoreDb db = store.state.db;
     String code = store.state.room.code;
-    QuerySnapshot roomSnapshot = (await getRoom(code));
-    Room room = new Room.fromSnapshot(roomSnapshot.documents[0]);
 
-    List<DocumentSnapshot> heistSnapshots = (await getHeists(room.id)).documents;
-    List<Heist> heists = heistSnapshots.map((s) => new Heist.fromSnapshot(s)).toList();
+    Room room = await db.getRoom(code);
+    List<Heist> heists = await db.getHeists(room.id);
 
     _subscribe(store, room, heists);
   }
 
-  StreamSubscription<QuerySnapshot> _roomSubscription(Store<GameModel> store, String code) {
-    return listenOnRoom(code, (querySnapshot) {
-      Room room = new Room.fromSnapshot(querySnapshot.documents[0]);
-      store.dispatch(new UpdateStateAction<Room>(room));
-    });
+  StreamSubscription<Room> _roomSubscription(Store<GameModel> store, String code) {
+    return store.state.db
+        .listenOnRoom(code, (room) {
+          store.dispatch(new UpdateStateAction<Room>(room));
+        });
   }
 
-  StreamSubscription<QuerySnapshot> _playerSubscription(Store<GameModel> store, String roomId) {
-    return listenOnPlayer('test_install_id', roomId, (querySnapshot) {
-      Player player = new Player.fromSnapshot(querySnapshot.documents[0]);
-      store.dispatch(new UpdateStateAction<Player>(player));
-    });
+  StreamSubscription<Player> _playerSubscription(Store<GameModel> store, String roomId) {
+    return store.state.db.listenOnPlayer('test_install_id', roomId,
+        (player) => store.dispatch(new UpdateStateAction<Player>(player)));
   }
 
-  StreamSubscription<QuerySnapshot> _heistsSubscription(Store<GameModel> store, String roomId) {
-    return listenOnHeists(roomId, (querySnapshot) {
-      List<Heist> heists = querySnapshot.documents.map((s) => new Heist.fromSnapshot(s)).toList();
-      store.dispatch(new UpdateStateAction<List<Heist>>(heists));
-    });
+  StreamSubscription<List<Heist>> _heistsSubscription(Store<GameModel> store, String roomId) {
+    return store.state.db.listenOnHeists(
+        roomId, (heists) => store.dispatch(new UpdateStateAction<List<Heist>>(heists)));
   }
 
-  List<StreamSubscription<QuerySnapshot>> _roundsSubscription(
+  List<StreamSubscription<List<Round>>> _roundsSubscription(
       Store<GameModel> store, String roomId, List<Heist> heists) {
     return new List.generate(heists.length, (i) {
       String heistRef = heists[i].id;
-      return listenOnRounds(roomId, heistRef, (querySnapshot) {
-        List<Round> rounds = querySnapshot.documents.map((s) => new Round.fromSnapshot(s)).toList();
-        store.dispatch(new UpdateMapEntryAction<String, List<Round>>(heistRef, rounds));
-      });
+      return store.state.db.listenOnRounds(
+          roomId,
+          heistRef,
+          (rounds) =>
+              store.dispatch(new UpdateMapEntryAction<String, List<Round>>(heistRef, rounds)));
     });
   }
 
   void _subscribe(Store<GameModel> store, Room room, List<Heist> heists) {
-    // ignore: cancel_subscriptions
-    StreamSubscription<QuerySnapshot> roomSubscription = _roomSubscription(store, room.code);
+    List<StreamSubscription> subs = new List();
 
-    // ignore: cancel_subscriptions
-    StreamSubscription<QuerySnapshot> playerSubscription = _playerSubscription(store, room.id);
+    if (room != null) {
+      subs.addAll([
+        _roomSubscription(store, room.code),
+        _playerSubscription(store, room.id),
+        _heistsSubscription(store, room.id)
+      ]);
+    }
 
-    // ignore: cancel_subscriptions
-    StreamSubscription<QuerySnapshot> heistsSubscription = _heistsSubscription(store, room.id);
+    if (heists != null && heists.isNotEmpty) {
+      subs += _roundsSubscription(store, room.id, heists);
+    }
 
-    List<StreamSubscription<QuerySnapshot>> roundsSubscriptions =
-        _roundsSubscription(store, room.id, heists);
-
-    Subscriptions subscriptions = new Subscriptions(
-      subs: [roomSubscription, playerSubscription, heistsSubscription] + roundsSubscriptions,
-    );
+    Subscriptions subscriptions = new Subscriptions(subs: subs);
     store.dispatch(new AddSubscriptionsAction(subscriptions));
   }
 }

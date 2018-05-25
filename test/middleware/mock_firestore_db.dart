@@ -26,6 +26,11 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
+  Future<bool> roomExists(String code) {
+    return new Future<bool>.value(false);
+  }
+
+  @override
   Future<List<Round>> getRounds(String roomRef, String heistRef) {
     return new Future<List<Round>>.value(_gameModel.rounds[heistRef]);
   }

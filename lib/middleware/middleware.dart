@@ -32,7 +32,8 @@ class CreateRoomAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
     String appVersion = await _getAppVersion();
-    String code = _generateRoomCode();
+    String code = await _newRoomCode(store);
+
     await store.state.db.upsertRoom(new Room(
         appVersion: appVersion,
         code: code,
@@ -61,12 +62,19 @@ class CreateRoomAction extends MiddlewareAction {
     return random.nextInt(26) + 65; // 65 is 'A' in ASCII
   }
 
+  Future<String> _newRoomCode(Store<GameModel> store) async {
+    String code = _generateRoomCode();
+    while (await store.state.db.roomExists(code)) {
+      code = _generateRoomCode();
+    }
+    return code;
+  }
+
   String _generateRoomCode() {
     Random random = new Random();
     List<int> ordinals =
         new List.generate(4, (i) => _getCapitalLetterOrdinal(random), growable: false);
-    return new String.fromCharCodes(
-        ordinals); // TODO: validate codes are unique for currently open rooms
+    return new String.fromCharCodes(ordinals);
   }
 }
 
@@ -96,10 +104,9 @@ class LoadGameAction extends MiddlewareAction {
   }
 
   StreamSubscription<Room> _roomSubscription(Store<GameModel> store, String code) {
-    return store.state.db
-        .listenOnRoom(code, (room) {
-          store.dispatch(new UpdateStateAction<Room>(room));
-        });
+    return store.state.db.listenOnRoom(code, (room) {
+      store.dispatch(new UpdateStateAction<Room>(room));
+    });
   }
 
   StreamSubscription<Player> _playerSubscription(Store<GameModel> store, String roomId) {
@@ -107,12 +114,12 @@ class LoadGameAction extends MiddlewareAction {
         (player) => store.dispatch(new UpdateStateAction<Player>(player)));
   }
 
-  StreamSubscription<List<Heist>> _heistsSubscription(Store<GameModel> store, String roomId) {
+  StreamSubscription<List<Heist>> _heistSubscription(Store<GameModel> store, String roomId) {
     return store.state.db.listenOnHeists(
         roomId, (heists) => store.dispatch(new UpdateStateAction<List<Heist>>(heists)));
   }
 
-  List<StreamSubscription<List<Round>>> _roundsSubscription(
+  List<StreamSubscription<List<Round>>> _roundSubscriptions(
       Store<GameModel> store, String roomId, List<Heist> heists) {
     return new List.generate(heists.length, (i) {
       String heistRef = heists[i].id;
@@ -131,12 +138,12 @@ class LoadGameAction extends MiddlewareAction {
       subs.addAll([
         _roomSubscription(store, room.code),
         _playerSubscription(store, room.id),
-        _heistsSubscription(store, room.id)
+        _heistSubscription(store, room.id)
       ]);
     }
 
     if (heists != null && heists.isNotEmpty) {
-      subs += _roundsSubscription(store, room.id, heists);
+      subs += _roundSubscriptions(store, room.id, heists);
     }
 
     Subscriptions subscriptions = new Subscriptions(subs: subs);

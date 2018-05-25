@@ -10,6 +10,14 @@ class FirestoreDb {
     return new Room.fromSnapshot(snapshot.documents[0]);
   }
 
+  Future<bool> roomExists(String code) async {
+    QuerySnapshot snapshot = await _roomQuery(code)
+        .where('completed', isEqualTo: false)
+        .where('createdAt', isGreaterThanOrEqualTo: new DateTime.now().add(new Duration(days: -1)))
+        .getDocuments();
+    return snapshot.documents.isNotEmpty;
+  }
+
   StreamSubscription<Room> listenOnRoom(String code, void onData(Room room)) {
     return _roomQuery(code)
         .snapshots()

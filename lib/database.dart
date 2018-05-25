@@ -29,24 +29,22 @@ class FirestoreDb {
     return _firestore.collection('rooms').where('code', isEqualTo: code);
   }
 
-  Future<Player> getPlayer(String installId, String roomRef) async {
-    QuerySnapshot snapshot = await _playerQuery(installId, roomRef).getDocuments();
-    return new Player.fromSnapshot(snapshot.documents[0]);
+  Future<Set<Player>> getPlayers(String roomRef) async {
+    QuerySnapshot snapshot = await _playerQuery(roomRef).getDocuments();
+    return snapshot.documents.map((s) => new Player.fromSnapshot(s)).toSet();
   }
 
-  StreamSubscription<Player> listenOnPlayer(
-      String installId, String roomRef, void onData(Player player)) {
-    return _playerQuery(installId, roomRef)
+  StreamSubscription<Set<Player>> listenOnPlayers(String roomRef, void onData(Set<Player> players)) {
+    return _playerQuery(roomRef)
         .snapshots()
-        .map((snapshot) => new Player.fromSnapshot(snapshot.documents[0]))
+        .map((snapshot) => snapshot.documents.map((s) => new Player.fromSnapshot(s)).toSet())
         .listen(onData);
   }
 
-  Query _playerQuery(String installId, String roomRef) {
+  Query _playerQuery(String roomRef) {
     DocumentReference room = _firestore.document("/rooms/$roomRef");
     return _firestore
         .collection('players')
-        .where('installId', isEqualTo: installId)
         .where('room', isEqualTo: room);
   }
 

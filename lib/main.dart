@@ -27,6 +27,8 @@ part 'reducers/subscription_reducers.dart';
 
 void main() => runApp(new MyApp());
 
+const String installId = 'test_install_id';
+
 const int minPlayers = 5;
 const int maxPlayers = 10;
 

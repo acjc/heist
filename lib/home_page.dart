@@ -124,7 +124,6 @@ class HomePage extends StatelessWidget {
     );
 
     return new Column(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [numPlayers, existingRoom],
     );
   }

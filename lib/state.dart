@@ -7,7 +7,7 @@ class GameModel {
   final Subscriptions subscriptions;
 
   final Room room;
-  final Player player;
+  final Set<Player> players;
   final List<Heist> heists;
   final Map<String, List<Round>> rounds;
 
@@ -17,7 +17,7 @@ class GameModel {
       {this.db,
       this.subscriptions,
       this.room,
-      this.player,
+      this.players,
       this.heists,
       this.rounds,
       this.currentBalance});
@@ -25,7 +25,7 @@ class GameModel {
   GameModel copyWith(
       {Subscriptions subscriptions,
       Room room,
-      Player player,
+      Set<Player> players,
       List<Heist> heists,
       Map<String, List<Round>> rounds,
       int currentBalance}) {
@@ -33,7 +33,7 @@ class GameModel {
       db: this.db,
       subscriptions: subscriptions ?? this.subscriptions,
       room: room ?? this.room,
-      player: player ?? this.player,
+      players: players ?? this.players,
       heists: heists ?? this.heists,
       rounds: rounds ?? this.rounds,
       currentBalance: currentBalance ?? this.currentBalance,
@@ -42,6 +42,10 @@ class GameModel {
 
   factory GameModel.initial(FirestoreDb db, int numPlayers) =>
       GameModel(db: db, room: new Room(numPlayers: numPlayers));
+
+  Player me() {
+    return players.firstWhere((p) => p.installId == installId);
+  }
 }
 
 @immutable

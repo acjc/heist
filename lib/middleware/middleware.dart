@@ -35,9 +35,10 @@ class CreateRoomAction extends MiddlewareAction {
     String code = await _newRoomCode(store);
 
     await store.state.db.upsertRoom(new Room(
-        appVersion: appVersion,
         code: code,
         createdAt: new DateTime.now(),
+        appVersion: appVersion,
+        owner: installId,
         numPlayers: store.state.room.numPlayers,
         roles: roles));
 
@@ -109,9 +110,9 @@ class LoadGameAction extends MiddlewareAction {
     });
   }
 
-  StreamSubscription<Player> _playerSubscription(Store<GameModel> store, String roomId) {
-    return store.state.db.listenOnPlayer('test_install_id', roomId,
-        (player) => store.dispatch(new UpdateStateAction<Player>(player)));
+  StreamSubscription<Set<Player>> _playerSubscription(Store<GameModel> store, String roomId) {
+    return store.state.db.listenOnPlayers(
+        roomId, (players) => store.dispatch(new UpdateStateAction<Set<Player>>(players)));
   }
 
   StreamSubscription<List<Heist>> _heistSubscription(Store<GameModel> store, String roomId) {

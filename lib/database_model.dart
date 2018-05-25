@@ -26,6 +26,7 @@ class Room extends Document {
   final String code;
   final DateTime createdAt;
   final String appVersion;
+  final String owner;
   final bool completed;
   final DateTime completedAt;
   final int numPlayers;
@@ -36,16 +37,19 @@ class Room extends Document {
       this.code,
       this.createdAt,
       this.appVersion,
+      this.owner,
       this.completed = false,
       this.completedAt,
-      @required this.numPlayers,
-      this.roles}) : super(id: id);
+      this.numPlayers,
+      this.roles})
+      : super(id: id);
 
   Room copyWith({
     String id,
     String code,
     DateTime createdAt,
     String appVersion,
+    String owner,
     bool completed,
     DateTime completedAt,
     int numPlayers,
@@ -56,6 +60,7 @@ class Room extends Document {
       code: code ?? this.code,
       createdAt: createdAt ?? this.createdAt,
       appVersion: appVersion ?? this.appVersion,
+      owner: owner ?? this.owner,
       completed: completed ?? this.completed,
       completedAt: completedAt ?? this.completedAt,
       numPlayers: numPlayers ?? this.numPlayers,
@@ -69,6 +74,7 @@ class Room extends Document {
       : code = json['code'],
         createdAt = json['createdAt'],
         appVersion = json['appVersion'],
+        owner = json['owner'],
         completed = json['completed'],
         completedAt = json['completedAt'],
         numPlayers = json['numPlayers'],
@@ -81,6 +87,7 @@ class Room extends Document {
         'code': code,
         'createdAt': createdAt,
         'appVersion': appVersion,
+        'owner': owner,
         'completed': completed,
         'completedAt': completedAt,
         'numPlayers': numPlayers,
@@ -102,7 +109,8 @@ class Player extends Document {
       @required this.room,
       @required this.name,
       @required this.initialBalance,
-      @required this.role}) : super(id: id);
+      @required this.role})
+      : super(id: id);
 
   Player copyWith({
     String id,
@@ -161,7 +169,8 @@ class Heist extends Document {
       @required this.numPlayers,
       @required this.order,
       @required this.startedAt,
-      @required this.decisions}) : super(id: id);
+      @required this.decisions})
+      : super(id: id);
 
   Heist copyWith({
     String id,
@@ -228,7 +237,8 @@ class Round extends Document {
       @required this.startedAt,
       @required this.team,
       @required this.bids,
-      @required this.gifts}) : super(id: id);
+      @required this.gifts})
+      : super(id: id);
 
   Round copyWith({
     String id,

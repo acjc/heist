@@ -6,7 +6,7 @@ class MockFirestoreDb implements FirestoreDb {
   GameModel _gameModel = new GameModel();
 
   StreamController<Room> _roomStream;
-  StreamController<Player> _playerStream;
+  StreamController<Set<Player>> _playerStream;
   StreamController<List<Heist>> _heistStream;
   StreamController<List<Round>> _roundStream;
 
@@ -16,8 +16,8 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<Player> getPlayer(String installId, String roomRef) {
-    return new Future<Player>.value(_gameModel.player);
+  Future<Set<Player>> getPlayers(String roomRef) {
+    return new Future<Set<Player>>.value(_gameModel.players);
   }
 
   @override
@@ -42,17 +42,16 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  StreamSubscription<Player> listenOnPlayer(
-      String installId, String roomRef, void onData(Player player)) {
+  StreamSubscription<Set<Player>> listenOnPlayers(String roomRef, void onData(Set<Player> players)) {
     _playerStream = new StreamController(onCancel: () => _playerStream.close(), sync: true);
-    StreamSubscription<Player> subscription = _playerStream.stream.listen(onData);
+    StreamSubscription<Set<Player>> subscription = _playerStream.stream.listen(onData);
     _postPlayer();
     return subscription;
   }
 
   void _postPlayer() {
-    if (_playerStream != null && !_playerStream.isClosed && _gameModel.player != null) {
-      _playerStream.add(_gameModel.player);
+    if (_playerStream != null && !_playerStream.isClosed && _gameModel.players != null) {
+      _playerStream.add(_gameModel.players);
     }
   }
 
@@ -80,7 +79,9 @@ class MockFirestoreDb implements FirestoreDb {
   @override
   Future<void> upsertPlayer(Player player) {
     return new Future<void>(() {
-      _gameModel = _gameModel.copyWith(player: player);
+      Set<Player> updated = new Set<Player>.from(_gameModel.players);
+      updated.add(player);
+      _gameModel = _gameModel.copyWith(players: updated);
       _postPlayer();
     });
   }

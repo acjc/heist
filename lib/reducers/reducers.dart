@@ -5,7 +5,7 @@ GameModel gameModelReducer(GameModel gameModel, dynamic action) {
     db: gameModel.db,
     subscriptions: subscriptionReducer(gameModel.subscriptions, action),
     room: roomReducer(gameModel.room, action),
-    player: playerReducer(gameModel.player, action),
+    players: playerReducer(gameModel.players, action),
     heists: heistReducer(gameModel.heists, action),
     rounds: roundReducer(gameModel.rounds, action),
   );

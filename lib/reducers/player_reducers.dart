@@ -1,5 +1,5 @@
 part of heist;
 
-final playerReducer = combineReducers<Player>([
-  new TypedReducer<Player, UpdateStateAction<Player>>(reduce),
+final playerReducer = combineReducers<Set<Player>>([
+  new TypedReducer<Set<Player>, UpdateStateAction<Set<Player>>>(reduce),
 ]);

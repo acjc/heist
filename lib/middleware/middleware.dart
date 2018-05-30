@@ -123,18 +123,19 @@ class LoadGameAction extends MiddlewareAction {
     });
   }
 
+  // TODO: We need to subscribe to new rounds as they are created
   void _subscribe(Store<GameModel> store, Room room, List<Heist> heists) {
+    assert(room != null);
+
     List<StreamSubscription> subs = new List();
 
-    if (room != null) {
-      subs.addAll([
-        _roomSubscription(store, room.code),
-        _playerSubscription(store, room.id),
-        _heistSubscription(store, room.id)
-      ]);
-    }
+    subs.addAll([
+      _roomSubscription(store, room.code),
+      _playerSubscription(store, room.id),
+      _heistSubscription(store, room.id)
+    ]);
 
-    if (heists != null && heists.isNotEmpty) {
+    if (heists.isNotEmpty) {
       subs += _roundSubscriptions(store, room.id, heists);
     }
 

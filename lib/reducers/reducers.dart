@@ -4,10 +4,12 @@ GameModel gameModelReducer(GameModel gameModel, dynamic action) {
   return new GameModel(
     db: gameModel.db,
     subscriptions: subscriptionReducer(gameModel.subscriptions, action),
+    busy: gameModel.busy,
     room: roomReducer(gameModel.room, action),
-    player: playerReducer(gameModel.player, action),
+    players: playerReducer(gameModel.players, action),
     heists: heistReducer(gameModel.heists, action),
     rounds: roundReducer(gameModel.rounds, action),
+    currentBalance: gameModel.currentBalance,
   );
 }
 

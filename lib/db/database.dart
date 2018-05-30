@@ -10,6 +10,15 @@ class FirestoreDb {
     return new Room.fromSnapshot(snapshot.documents[0]);
   }
 
+  Future<bool> roomExists(String code) async {
+    QuerySnapshot snapshot = await _roomQuery(code)
+        .where('completed', isEqualTo: false)
+        .where('createdAt',
+            isGreaterThanOrEqualTo: new DateTime.now().toUtc().add(new Duration(days: -1)))
+        .getDocuments();
+    return snapshot.documents.isNotEmpty;
+  }
+
   StreamSubscription<Room> listenOnRoom(String code, void onData(Room room)) {
     return _roomQuery(code)
         .snapshots()
@@ -21,37 +30,36 @@ class FirestoreDb {
     return _firestore.collection('rooms').where('code', isEqualTo: code);
   }
 
-  Future<Player> getPlayer(String installId, String roomRef) async {
-    QuerySnapshot snapshot = await _playerQuery(installId, roomRef).getDocuments();
-    return new Player.fromSnapshot(snapshot.documents[0]);
+  Future<Set<Player>> getPlayers(String roomRef) async {
+    QuerySnapshot snapshot = await _playerQuery(roomRef).getDocuments();
+    return snapshot.documents.map((s) => new Player.fromSnapshot(s)).toSet();
   }
 
-  StreamSubscription<Player> listenOnPlayer(
-      String installId, String roomRef, void onData(Player player)) {
-    return _playerQuery(installId, roomRef)
+  StreamSubscription<Set<Player>> listenOnPlayers(
+      String roomRef, void onData(Set<Player> players)) {
+    return _playerQuery(roomRef)
         .snapshots()
-        .map((snapshot) => new Player.fromSnapshot(snapshot.documents[0]))
+        .map((snapshot) => snapshot.documents.map((s) => new Player.fromSnapshot(s)).toSet())
         .listen(onData);
   }
 
-  Query _playerQuery(String installId, String roomRef) {
+  Query _playerQuery(String roomRef) {
     DocumentReference room = _firestore.document("/rooms/$roomRef");
-    return _firestore
-        .collection('players')
-        .where('installId', isEqualTo: installId)
-        .where('room', isEqualTo: room);
+    return _firestore.collection('players').where('room', isEqualTo: room);
   }
 
   Future<List<Heist>> getHeists(String roomRef) async {
     QuerySnapshot snapshot = await _heistQuery(roomRef).getDocuments();
-    return snapshot.documents.map((s) => new Heist.fromSnapshot(s)).toList();
+    List<Heist> heists = snapshot.documents.map((s) => new Heist.fromSnapshot(s)).toList();
+    heists.sort((h1, h2) => h1.order.compareTo(h2.order));
+    return heists;
   }
 
   StreamSubscription<List<Heist>> listenOnHeists(String roomRef, void onData(List<Heist> heists)) {
-    return _heistQuery(roomRef)
-        .snapshots()
-        .map((snapshot) => snapshot.documents.map((s) => new Heist.fromSnapshot(s)).toList())
-        .listen(onData);
+    return _heistQuery(roomRef).snapshots().map((snapshot) {
+      List<Heist> heists = snapshot.documents.map((s) => new Heist.fromSnapshot(s)).toList();
+      heists.sort((h1, h2) => h1.order.compareTo(h2.order));
+    }).listen(onData);
   }
 
   Query _heistQuery(String roomRef) {
@@ -61,15 +69,18 @@ class FirestoreDb {
 
   Future<List<Round>> getRounds(String roomRef, String heistRef) async {
     QuerySnapshot snapshot = await _roundQuery(roomRef, heistRef).getDocuments();
-    return snapshot.documents.map((s) => new Round.fromSnapshot(s)).toList();
+    List<Round> rounds = snapshot.documents.map((s) => new Round.fromSnapshot(s)).toList();
+    rounds.sort((r1, r2) => r1.order.compareTo(r2.order));
+    return rounds;
   }
 
   StreamSubscription<List<Round>> listenOnRounds(
       String roomRef, String heistRef, void onData(List<Round> rounds)) {
-    return _roundQuery(roomRef, heistRef)
-        .snapshots()
-        .map((snapshot) => snapshot.documents.map((s) => new Round.fromSnapshot(s)).toList())
-        .listen(onData);
+    return _roundQuery(roomRef, heistRef).snapshots().map((snapshot) {
+      List<Round> rounds = snapshot.documents.map((s) => new Round.fromSnapshot(s)).toList();
+      rounds.sort((r1, r2) => r1.order.compareTo(r2.order));
+      return rounds;
+    }).listen(onData);
   }
 
   Query _roundQuery(String roomRef, String heistRef) {

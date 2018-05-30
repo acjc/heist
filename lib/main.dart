@@ -12,10 +12,10 @@ import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_logging/redux_logging.dart';
 
-part 'database.dart';
-part 'database_model.dart';
-part 'game.dart';
+part 'db/database.dart';
+part 'db/database_model.dart';
 part 'home_page.dart';
+part 'game.dart';
 part 'middleware/middleware.dart';
 part 'reducers/heist_reducers.dart';
 part 'reducers/player_reducers.dart';
@@ -27,10 +27,19 @@ part 'state.dart';
 
 void main() => runApp(new MyApp(Firestore.instance));
 
+final Set<String> agentRoles = new Set.of(['LEAD_AGENT', 'AGENT_1', 'AGENT_2', 'AGENT_3']);
+final Set<String> thiefRoles =
+    new Set.of(['KINGPIN', 'ACCOUNTANT', 'THIEF_1', 'THIEF_2', 'THIEF_3', 'THIEF_4']);
+final Set<String> allRoles = new Set.of(agentRoles)..addAll(thiefRoles);
+
 const int minPlayers = 5;
 const int maxPlayers = 10;
 
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+
+String installId() {
+  return 'test_install_id';
+}
 
 Store<GameModel> createStore(FirestoreDb db) {
   return new Store<GameModel>(

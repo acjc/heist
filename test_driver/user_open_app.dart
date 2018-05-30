@@ -12,7 +12,7 @@ Future main() async {
 
   // Call the `main()` of your app or call `runApp` with whatever widget
   // you are interested in testing.
-  FirebaseOptions options = new FirebaseOptions(); //TODO - not in GitHub
+  FirebaseOptions options = new FirebaseOptions(googleAppID: ''); //TODO - not in GitHub
 
   FirebaseApp app = await FirebaseApp.configure(name: 'name', options: options);
   Firestore firestore = new Firestore(app: app);

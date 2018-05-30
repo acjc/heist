@@ -135,7 +135,7 @@ class LoadGameAction extends MiddlewareAction {
       _heistSubscription(store, room.id)
     ]);
 
-    if (heists.isNotEmpty) {
+    if (heists != null && heists.isNotEmpty) {
       subs += _roundSubscriptions(store, room.id, heists);
     }
 

@@ -4,7 +4,6 @@ List<Middleware<GameModel>> createMiddleware() {
   List<Middleware<GameModel>> middleware = [
     new TypedMiddleware<GameModel, CreateRoomAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, LoadGameAction>(_dispatchMiddleware),
-    new TypedMiddleware<GameModel, ChangeNumPlayersAction>(_dispatchMiddleware),
   ];
 
   // asserts only work in debug mode
@@ -27,7 +26,8 @@ abstract class MiddlewareAction {
 
 class CreateRoomAction extends MiddlewareAction {
   // TODO: get the right roles
-  static Set<String> roles = new Set.from(['ACCOUNTANT', 'KINGPIN', 'LEAD_AGENT']);
+  static final Set<String> roles =
+      new Set.from(['ACCOUNTANT', 'KINGPIN', 'THIEF_1', 'LEAD_AGENT', 'AGENT_1']);
 
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
@@ -36,9 +36,9 @@ class CreateRoomAction extends MiddlewareAction {
 
     await store.state.db.upsertRoom(new Room(
         code: code,
-        createdAt: new DateTime.now(),
+        createdAt: new DateTime.now().toUtc(),
         appVersion: appVersion,
-        owner: installId,
+        owner: installId(),
         numPlayers: store.state.room.numPlayers,
         roles: roles));
 
@@ -76,15 +76,6 @@ class CreateRoomAction extends MiddlewareAction {
     List<int> ordinals =
         new List.generate(4, (i) => _getCapitalLetterOrdinal(random), growable: false);
     return new String.fromCharCodes(ordinals);
-  }
-}
-
-// TODO: This is just a proof of concept that the UI can update directly from firestore
-class ChangeNumPlayersAction extends MiddlewareAction {
-  @override
-  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
-    Room room = store.state.room.copyWith(numPlayers: new Random().nextInt(5) + 5);
-    return store.state.db.upsertRoom(room);
   }
 }
 

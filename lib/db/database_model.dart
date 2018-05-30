@@ -1,6 +1,7 @@
 part of heist;
 
-void _boolMapToSet(var boolMap, Set<String> set) {
+void _boolMapToSet(var boolMap) {
+  Set<String> set = new Set();
   boolMap.forEach((key, b) {
     if (b) {
       set.add(key);
@@ -8,9 +9,9 @@ void _boolMapToSet(var boolMap, Set<String> set) {
   });
 }
 
-Map<String, bool> _setToBoolMap(Set<String> set) {
+Map<String, bool> _setToBoolMap(Set<String> set, Set<String> allOptions) {
   Map<String, bool> boolMap = new Map();
-  set.forEach((r) => boolMap[r] = true);
+  allOptions.forEach((o) => boolMap[o] = set.contains(o));
   return boolMap;
 }
 
@@ -78,10 +79,8 @@ class Room extends Document {
         completed = json['completed'],
         completedAt = json['completedAt'],
         numPlayers = json['numPlayers'],
-        roles = new Set(),
-        super(id: id) {
-    _boolMapToSet(json['roles'], roles);
-  }
+        roles = _boolMapToSet(json['roles']),
+        super(id: id);
 
   Map<String, dynamic> toJson() => {
         'code': code,
@@ -91,7 +90,7 @@ class Room extends Document {
         'completed': completed,
         'completedAt': completedAt,
         'numPlayers': numPlayers,
-        'roles': _setToBoolMap(roles), // TODO: put false for roles not included
+        'roles': _setToBoolMap(roles, allRoles),
       };
 }
 
@@ -158,7 +157,7 @@ class Heist extends Document {
   final int numPlayers;
   final int order;
   final DateTime startedAt;
-  final Map<dynamic, dynamic> decisions; // TODO: change to <String, String>
+  final Map<String, String> decisions;
   // TODO: include Kingpin guesses
 
   Heist(
@@ -180,7 +179,7 @@ class Heist extends Document {
     int numPlayers,
     int order,
     DateTime startedAt,
-    Map<dynamic, dynamic> decisions,
+    Map<String, String> decisions,
   }) {
     return new Heist(
       id: id ?? this.id,
@@ -203,7 +202,7 @@ class Heist extends Document {
         numPlayers = json['numPlayers'],
         order = json['order'],
         startedAt = json['startedAt'],
-        decisions = json['decisions'],
+        decisions = json['decisions'].cast<String, String>(),
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -224,7 +223,7 @@ class Round extends Document {
   final DocumentReference room;
   final DocumentReference heist;
   final DateTime startedAt;
-  final List<dynamic> team; // TODO: convert to Set<DocumentReference>
+  final Set<DocumentReference> team;
   final Map<dynamic, dynamic> bids; // TODO: convert to Map<String, Bid>
   final Map<dynamic, dynamic> gifts; // TODO: convert to Map<String, Gift>
 
@@ -247,7 +246,7 @@ class Round extends Document {
     DocumentReference room,
     DocumentReference heist,
     DateTime startedAt,
-    List<dynamic> team,
+    Set<DocumentReference> team,
     Map<dynamic, dynamic> bids,
     Map<dynamic, dynamic> gifts,
   }) {
@@ -272,7 +271,7 @@ class Round extends Document {
         room = json['room'],
         heist = json['heist'],
         startedAt = json['startedAt'],
-        team = json['team'],
+        team = new Set.from(json['team'].cast<DocumentReference>()),
         bids = json['bids'],
         gifts = json['gifts'],
         super(id: id);

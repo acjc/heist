@@ -3,8 +3,11 @@ part of heist;
 @immutable
 class GameModel {
   final FirestoreDb db;
-
   final Subscriptions subscriptions;
+
+  /// Predicate to stop the client kicking off the same async task multiple times.
+  /// We may require more specific predicates in future but I've added only a generic one for now.
+  final bool busy;
 
   final Room room;
   final Set<Player> players;
@@ -16,6 +19,7 @@ class GameModel {
   GameModel(
       {this.db,
       this.subscriptions,
+      this.busy,
       this.room,
       this.players,
       this.heists,
@@ -24,6 +28,7 @@ class GameModel {
 
   GameModel copyWith(
       {Subscriptions subscriptions,
+      bool busy,
       Room room,
       Set<Player> players,
       List<Heist> heists,
@@ -32,6 +37,7 @@ class GameModel {
     return new GameModel(
       db: this.db,
       subscriptions: subscriptions ?? this.subscriptions,
+      busy: busy ?? this.busy,
       room: room ?? this.room,
       players: players ?? this.players,
       heists: heists ?? this.heists,
@@ -40,11 +46,43 @@ class GameModel {
     );
   }
 
-  factory GameModel.initial(FirestoreDb db, int numPlayers) =>
-      GameModel(db: db, room: new Room(numPlayers: numPlayers));
+  factory GameModel.initial(FirestoreDb db, int numPlayers) => GameModel(
+      db: db,
+      busy: false,
+      room: new Room(numPlayers: numPlayers),
+      players: new Set(),
+      heists: [],
+      rounds: {},
+      currentBalance: 0);
 
   Player me() {
-    return players.firstWhere((p) => p.installId == installId);
+    return players.firstWhere((p) => p.installId == installId());
+  }
+
+  bool amOwner() {
+    return room.owner == installId();
+  }
+
+  Heist currentHeist() {
+    return heists.last;
+  }
+
+  Round currentRound() {
+    return rounds[currentHeist().id].last;
+  }
+
+  bool waitingForPlayers() {
+    return players.length < room.numPlayers;
+  }
+
+  /// A game is new if roles have not yet been assigned.
+  bool isNewGame() {
+    return players.any((p) => p.role?.isEmpty);
+  }
+
+  /// Check various things to see if a game has loaded yet.
+  bool isLoading() {
+    return room.id == null || players.length <= 1;
   }
 }
 

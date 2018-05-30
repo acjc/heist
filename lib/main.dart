@@ -12,8 +12,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_logging/redux_logging.dart';
 
-part 'database.dart';
-part 'database_model.dart';
+part 'db/database.dart';
+part 'db/database_model.dart';
 part 'home_page.dart';
 part 'game.dart';
 part 'state.dart';
@@ -27,12 +27,19 @@ part 'reducers/subscription_reducers.dart';
 
 void main() => runApp(new MyApp());
 
-const String installId = 'test_install_id';
+final Set<String> agentRoles = new Set.of(['LEAD_AGENT', 'AGENT_1', 'AGENT_2', 'AGENT_3']);
+final Set<String> thiefRoles =
+    new Set.of(['KINGPIN', 'ACCOUNTANT', 'THIEF_1', 'THIEF_2', 'THIEF_3', 'THIEF_4']);
+final Set<String> allRoles = new Set.of(agentRoles)..addAll(thiefRoles);
 
 const int minPlayers = 5;
 const int maxPlayers = 10;
 
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+
+String installId() {
+  return 'test_install_id';
+}
 
 Store<GameModel> createStore(FirestoreDb db) {
   return new Store<GameModel>(

@@ -1,7 +1,7 @@
 part of heist;
 
 class HomePage extends StatelessWidget {
-  static const EdgeInsets _padding = const EdgeInsets.all(24.0);
+  static const EdgeInsets _padding = const EdgeInsets.all(16.0);
   static const TextStyle _buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
 
   final _enterRoomFormKey = new GlobalKey<FormState>();

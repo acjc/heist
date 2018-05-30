@@ -1,14 +1,14 @@
 library heist;
 
-import 'dart:math';
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart';
-import 'package:package_info/package_info.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_logging/redux_logging.dart';
 
@@ -16,16 +16,16 @@ part 'db/database.dart';
 part 'db/database_model.dart';
 part 'home_page.dart';
 part 'game.dart';
-part 'state.dart';
 part 'middleware/middleware.dart';
+part 'reducers/heist_reducers.dart';
+part 'reducers/player_reducers.dart';
 part 'reducers/reducers.dart';
 part 'reducers/room_reducers.dart';
-part 'reducers/player_reducers.dart';
-part 'reducers/heist_reducers.dart';
 part 'reducers/round_reducers.dart';
 part 'reducers/subscription_reducers.dart';
+part 'state.dart';
 
-void main() => runApp(new MyApp());
+void main() => runApp(new MyApp(Firestore.instance));
 
 final Set<String> agentRoles = new Set.of(['LEAD_AGENT', 'AGENT_1', 'AGENT_2', 'AGENT_3']);
 final Set<String> thiefRoles =
@@ -51,7 +51,9 @@ Store<GameModel> createStore(FirestoreDb db) {
 }
 
 class MyApp extends StatelessWidget {
-  final store = createStore(new FirestoreDb(Firestore.instance));
+  final Store<GameModel> store;
+
+  MyApp(Firestore firestore) : store = createStore(new FirestoreDb(firestore));
 
   @override
   Widget build(BuildContext context) {

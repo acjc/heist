@@ -80,9 +80,9 @@ class GameModel {
     return players.any((p) => p.role?.isEmpty);
   }
 
-  /// Check various things to see if a game has loaded yet.
+  /// Check to see if the game has loaded yet.
   bool isLoading() {
-    return room.id == null || players.length <= 1;
+    return room.id == null;
   }
 }
 

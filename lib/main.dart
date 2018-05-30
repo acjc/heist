@@ -32,13 +32,17 @@ const int maxPlayers = 10;
 
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
-class MyApp extends StatelessWidget {
-  final store = new Store<GameModel>(
+Store<GameModel> createStore(FirestoreDb db) {
+  return new Store<GameModel>(
     gameModelReducer,
-    initialState: new GameModel.initial(minPlayers),
+    initialState: new GameModel.initial(db, minPlayers),
     middleware: createMiddleware(),
     distinct: true,
   );
+}
+
+class MyApp extends StatelessWidget {
+  final store = createStore(new FirestoreDb(Firestore.instance));
 
   @override
   Widget build(BuildContext context) {

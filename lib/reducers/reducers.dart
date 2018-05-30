@@ -2,6 +2,7 @@ part of heist;
 
 GameModel gameModelReducer(GameModel gameModel, dynamic action) {
   return new GameModel(
+    db: gameModel.db,
     subscriptions: subscriptionReducer(gameModel.subscriptions, action),
     room: roomReducer(gameModel.room, action),
     player: playerReducer(gameModel.player, action),

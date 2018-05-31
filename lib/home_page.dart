@@ -36,6 +36,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
+    store.dispatch(new UnmarkAsBusyAction());
 
     Widget numPlayersText = new StoreConnector<GameModel, int>(
         converter: (store) => store.state.room.numPlayers,

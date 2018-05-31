@@ -23,6 +23,7 @@ part 'reducers/reducers.dart';
 part 'reducers/room_reducers.dart';
 part 'reducers/round_reducers.dart';
 part 'reducers/subscription_reducers.dart';
+part 'reducers/busy_reducers.dart';
 part 'state.dart';
 
 void main() => runApp(new MyApp(Firestore.instance));

@@ -19,6 +19,20 @@ class FirestoreDb {
     return snapshot.documents.isNotEmpty;
   }
 
+  Future<bool> heistExists(String roomId, int order) async {
+    QuerySnapshot snapshot = await _heistQuery(roomId)
+        .where('order', isEqualTo: order)
+        .getDocuments();
+    return snapshot.documents.isNotEmpty;
+  }
+
+  Future<bool> roundExists(String roomId, String heistId, int order) async {
+    QuerySnapshot snapshot = await _roundQuery(roomId, heistId)
+        .where('order', isEqualTo: order)
+        .getDocuments();
+    return snapshot.documents.isNotEmpty;
+  }
+
   StreamSubscription<Room> listenOnRoom(String code, void onData(Room room)) {
     return _roomQuery(code)
         .snapshots()
@@ -59,6 +73,7 @@ class FirestoreDb {
     return _heistQuery(roomRef).snapshots().map((snapshot) {
       List<Heist> heists = snapshot.documents.map((s) => new Heist.fromSnapshot(s)).toList();
       heists.sort((h1, h2) => h1.order.compareTo(h2.order));
+      return heists;
     }).listen(onData);
   }
 
@@ -94,6 +109,21 @@ class FirestoreDb {
 
   Future<void> upsertRoom(Room room) {
     return _firestore.collection('rooms').document(room.id).setData(room.toJson());
+  }
+
+  Future<String> upsertHeist(Heist heist, String roomId) async {
+    DocumentReference roomRef = _firestore.document("/rooms/$roomId");
+    heist = heist.copyWith(room: roomRef);
+    DocumentReference heistRef = _firestore.collection('heists').document(heist.id);
+    await heistRef.setData(heist.toJson());
+    return heistRef.documentID;
+  }
+
+  Future<void> upsertRound(Round round, String roomId, String heistId) {
+    DocumentReference roomRef = _firestore.document("/rooms/$roomId");
+    DocumentReference heistRef = _firestore.document("/heists/$heistId");
+    round = round.copyWith(room: roomRef, heist: heistRef);
+    return _firestore.collection('rounds').document(round.id).setData(round.toJson());
   }
 
   Future<void> upsertPlayer(Player player) {

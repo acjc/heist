@@ -4,7 +4,7 @@ GameModel gameModelReducer(GameModel gameModel, dynamic action) {
   return new GameModel(
     db: gameModel.db,
     subscriptions: subscriptionReducer(gameModel.subscriptions, action),
-    busy: gameModel.busy,
+    busy: busyReducer(gameModel.busy, action),
     room: roomReducer(gameModel.room, action),
     players: playerReducer(gameModel.players, action),
     heists: heistReducer(gameModel.heists, action),
@@ -29,7 +29,7 @@ class UpdateStateAction<State> extends Action<State> {
 
   @override
   State reduce(State state, action) {
-    return this.state;
+    return this.state ?? state;
   }
 }
 
@@ -42,6 +42,9 @@ class UpdateMapEntryAction<Key, Value> extends Action<Map<Key, Value>> {
 
   @override
   Map<Key, Value> reduce(Map<Key, Value> state, action) {
+    if (value == null) {
+      return state;
+    }
     Map<Key, Value> updated = state != null ? new Map.from(state) : new Map();
     updated[key] = value;
     return updated;

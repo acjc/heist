@@ -1,17 +1,22 @@
 part of heist;
 
-void _boolMapToSet(var boolMap) {
-  Set<String> set = new Set();
-  boolMap.forEach((key, b) {
-    if (b) {
-      set.add(key);
-    }
-  });
+Set<Key> _boolMapToSet<Key>(Map<Key, bool> boolMap) {
+  Set<Key> set = new Set();
+  if (boolMap != null) {
+    boolMap.forEach((key, b) {
+      if (b) {
+        set.add(key);
+      }
+    });
+  }
+  return set;
 }
 
 Map<String, bool> _setToBoolMap(Set<String> set, Set<String> allOptions) {
   Map<String, bool> boolMap = new Map();
-  allOptions.forEach((o) => boolMap[o] = set.contains(o));
+  if (set != null) {
+    allOptions.forEach((o) => boolMap[o] = set.contains(o));
+  }
   return boolMap;
 }
 
@@ -79,7 +84,7 @@ class Room extends Document {
         completed = json['completed'],
         completedAt = json['completedAt'],
         numPlayers = json['numPlayers'],
-        roles = _boolMapToSet(json['roles']),
+        roles = _boolMapToSet(json['roles']?.cast<String, bool>()),
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -162,13 +167,13 @@ class Heist extends Document {
 
   Heist(
       {id,
-      @required this.room,
+      this.room,
       @required this.price,
-      @required this.pot,
+      this.pot,
       @required this.numPlayers,
       @required this.order,
       @required this.startedAt,
-      @required this.decisions})
+      this.decisions})
       : super(id: id);
 
   Heist copyWith({
@@ -202,7 +207,7 @@ class Heist extends Document {
         numPlayers = json['numPlayers'],
         order = json['order'],
         startedAt = json['startedAt'],
-        decisions = json['decisions'].cast<String, String>(),
+        decisions = json['decisions']?.cast<String, String>(),
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -229,14 +234,14 @@ class Round extends Document {
 
   Round(
       {id,
-      @required this.leader,
+      this.leader,
       @required this.order,
-      @required this.room,
-      @required this.heist,
+      this.room,
+      this.heist,
       @required this.startedAt,
-      @required this.team,
-      @required this.bids,
-      @required this.gifts})
+      this.team,
+      this.bids,
+      this.gifts})
       : super(id: id);
 
   Round copyWith({
@@ -271,7 +276,7 @@ class Round extends Document {
         room = json['room'],
         heist = json['heist'],
         startedAt = json['startedAt'],
-        team = new Set.from(json['team'].cast<DocumentReference>()),
+        team = new Set.from(json['team']?.cast<DocumentReference>() ?? []),
         bids = json['bids'],
         gifts = json['gifts'],
         super(id: id);

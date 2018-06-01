@@ -4,6 +4,7 @@ List<Middleware<GameModel>> createMiddleware() {
   List<Middleware<GameModel>> middleware = [
     new TypedMiddleware<GameModel, CreateRoomAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, LoadGameAction>(_dispatchMiddleware),
+    new TypedMiddleware<GameModel, SetUpNewGameAction>(_dispatchMiddleware),
   ];
 
   // asserts only work in debug mode
@@ -87,7 +88,6 @@ class CreateRoomAction extends MiddlewareAction {
 }
 
 class SetUpNewGameAction extends MiddlewareAction {
-
   void _assignRoles(Store<GameModel> store) {
     List<String> roles = new List.of(store.state.room.roles);
     assert(roles.length == store.state.players.length);
@@ -103,7 +103,7 @@ class SetUpNewGameAction extends MiddlewareAction {
     String roomId = store.state.room.id;
     if (store.state.heists.isEmpty && !(await db.heistExists(roomId, 1))) {
       Heist heist =
-      new Heist(price: 12, numPlayers: 2, order: 1, startedAt: new DateTime.now().toUtc());
+          new Heist(price: 12, numPlayers: 2, order: 1, startedAt: new DateTime.now().toUtc());
       return db.upsertHeist(heist, roomId);
     }
     return store.state.heists[0].id;
@@ -137,9 +137,8 @@ class LoadGameAction extends MiddlewareAction {
   Future<void> _loadGame(Store<GameModel> store) async {
     FirestoreDb db = store.state.db;
 
-    Room room = store.state.room.id != null
-        ? store.state.room
-        : await db.getRoom(store.state.room.code);
+    Room room =
+        store.state.room.id != null ? store.state.room : await db.getRoom(store.state.room.code);
 
     List<Heist> heists = await db.getHeists(room.id);
 

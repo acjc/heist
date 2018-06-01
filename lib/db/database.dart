@@ -107,8 +107,10 @@ class FirestoreDb {
         .where('heist', isEqualTo: heist);
   }
 
-  Future<void> upsertRoom(Room room) {
-    return _firestore.collection('rooms').document(room.id).setData(room.toJson());
+  Future<String> upsertRoom(Room room) async {
+    DocumentReference roomRef = _firestore.collection('rooms').document(room.id);
+    await roomRef.setData(room.toJson());
+    return roomRef.documentID;
   }
 
   Future<String> upsertHeist(Heist heist, String roomId) async {
@@ -126,7 +128,9 @@ class FirestoreDb {
     return _firestore.collection('rounds').document(round.id).setData(round.toJson());
   }
 
-  Future<void> upsertPlayer(Player player) {
+  Future<void> upsertPlayer(Player player, String roomId) {
+    DocumentReference roomRef = _firestore.document("/rooms/$roomId");
+    player = player.copyWith(room: roomRef);
     return _firestore.collection('players').document(player.id).setData(player.toJson());
   }
 }

@@ -1,28 +1,32 @@
 import 'dart:async';
 
 import 'package:heist/main.dart';
+import 'package:uuid/uuid.dart';
 
 class MockFirestoreDb implements FirestoreDb {
-  GameModel _gameModel = new GameModel();
+  Room room;
+  Set<Player> players = new Set();
+  List<Heist> heists = new List();
+  Map<String, List<Round>> rounds = new Map();
 
   StreamController<Room> _roomStream;
   StreamController<Set<Player>> _playerStream;
   StreamController<List<Heist>> _heistStream;
-  Map<String, StreamController<List<Round>>> _roundStreams;
+  Map<String, StreamController<List<Round>>> _roundStreams = new Map();
 
   @override
   Future<List<Heist>> getHeists(String roomRef) {
-    return new Future<List<Heist>>.value(_gameModel.heists);
+    return new Future<List<Heist>>.value(heists);
   }
 
   @override
   Future<Set<Player>> getPlayers(String roomRef) {
-    return new Future<Set<Player>>.value(_gameModel.players);
+    return new Future<Set<Player>>.value(players);
   }
 
   @override
   Future<Room> getRoom(String code) {
-    return new Future<Room>.value(_gameModel.room);
+    return new Future<Room>.value(room);
   }
 
   @override
@@ -42,33 +46,33 @@ class MockFirestoreDb implements FirestoreDb {
 
   @override
   Future<List<Round>> getRounds(String roomRef, String heistRef) {
-    return new Future<List<Round>>.value(_gameModel.rounds[heistRef]);
+    return new Future<List<Round>>.value(rounds[heistRef]);
   }
 
   void _postRoom() {
-    if (_roomStream != null && !_roomStream.isClosed && _gameModel.room != null) {
-      _roomStream.add(_gameModel.room);
+    if (_roomStream != null && !_roomStream.isClosed && room != null) {
+      _roomStream.add(room);
     }
   }
 
   void _postPlayers() {
-    if (_playerStream != null && !_playerStream.isClosed && _gameModel.players != null) {
-      _playerStream.add(_gameModel.players);
+    if (_playerStream != null && !_playerStream.isClosed && players != null) {
+      _playerStream.add(players);
     }
   }
 
   void _postHeists() {
-    if (_heistStream != null && !_heistStream.isClosed && _gameModel.heists != null) {
-      _heistStream.add(_gameModel.heists);
+    if (_heistStream != null && !_heistStream.isClosed && heists != null) {
+      _heistStream.add(heists);
     }
   }
 
   void _postRounds(String heistId) {
-    if (_roundStreams != null && _gameModel.rounds != null) {
+    if (_roundStreams != null && rounds != null) {
       // ignore: close_sinks
       StreamController<List<Round>> roundStream = _roundStreams[heistId];
       if (roundStream != null && !roundStream.isClosed) {
-        roundStream.add(_gameModel.rounds[heistId]);
+        roundStream.add(rounds[heistId]);
       }
     }
   }
@@ -109,42 +113,58 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<void> upsertPlayer(Player player) {
+  Future<void> upsertPlayer(Player player, String roomId) {
     return new Future<void>(() {
-      Set<Player> updated = new Set<Player>.from(_gameModel.players)..add(player);
-      _gameModel = _gameModel.copyWith(players: updated);
+      if (player.id == null) {
+        player = player.copyWith(id: new Uuid().v4());
+      }
+      players
+        ..remove(player)
+        ..add(player);
       _postPlayers();
     });
   }
 
   @override
-  Future<void> upsertRoom(Room room) {
-    return new Future<void>(() {
-      _gameModel = _gameModel.copyWith(room: room);
+  Future<String> upsertRoom(Room room) {
+    return new Future<String>(() {
+      if (room.id == null) {
+        room = room.copyWith(id: new Uuid().v4());
+      }
+      this.room = room;
       _postRoom();
+      return room.id;
     });
   }
 
   @override
-  Future<void> upsertHeist(Heist heist, String roomId) {
-    return new Future<void>(() {
-      List<Heist> updated = new List.of(_gameModel.heists)
+  Future<String> upsertHeist(Heist heist, String roomId) {
+    return new Future<String>(() {
+      if (heist.id == null) {
+        heist = heist.copyWith(id: new Uuid().v4());
+      }
+      heists
         ..remove(heist)
         ..add(heist);
-      _gameModel = _gameModel.copyWith(heists: updated);
       _postHeists();
+      return heist.id;
     });
   }
 
   @override
   Future<void> upsertRound(Round round, String roomId, String heistId) {
     return new Future<void>(() {
-      Map<String, List<Round>> updated = new Map.of(_gameModel.rounds);
-      updated[heistId]
-        ..remove(round)
-        ..add(round);
+      if (round.id == null) {
+        round = round.copyWith(id: new Uuid().v4());
+      }
+      if (rounds.containsKey(heistId)) {
+        rounds[heistId]
+          ..remove(round)
+          ..add(round);
+      } else {
+        rounds[heistId] = [round];
+      }
       _postRounds(heistId);
-      _gameModel = _gameModel.copyWith(rounds: updated);
     });
   }
 }

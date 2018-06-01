@@ -97,6 +97,18 @@ class Room extends Document {
         'numPlayers': numPlayers,
         'roles': _setToBoolMap(roles, allRoles),
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is Room && id == other.id && code == other.code;
+
+  @override
+  int get hashCode => id.hashCode ^ code.hashCode;
+
+  @override
+  String toString() {
+    return 'Room{id: $id, code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completed: $completed, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles}';
+  }
 }
 
 @immutable
@@ -110,10 +122,10 @@ class Player extends Document {
   Player(
       {id,
       @required this.installId,
-      @required this.room,
+      this.room,
       @required this.name,
       @required this.initialBalance,
-      @required this.role})
+      this.role})
       : super(id: id);
 
   Player copyWith({
@@ -152,6 +164,23 @@ class Player extends Document {
         'initialBalance': initialBalance,
         'role': role,
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Player &&
+          id == other.id &&
+          installId == other.installId &&
+          room == other.room &&
+          name == other.name;
+
+  @override
+  int get hashCode => id.hashCode ^ installId.hashCode ^ room.hashCode ^ name.hashCode;
+
+  @override
+  String toString() {
+    return 'Player{id: $id, installId: $installId, room: $room, name: $name, initialBalance: $initialBalance, role: $role}';
+  }
 }
 
 @immutable
@@ -219,6 +248,25 @@ class Heist extends Document {
         'startedAt': startedAt,
         'decisions': decisions,
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Heist &&
+          id == other.id &&
+          room == other.room &&
+          order == other.order;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      room.hashCode ^
+      order.hashCode;
+
+  @override
+  String toString() {
+    return 'Heist{id: $id, room: $room, price: $price, pot: $pot, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions}';
+  }
 }
 
 @immutable
@@ -291,4 +339,25 @@ class Round extends Document {
         'bids': bids,
         'gifts': gifts,
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Round &&
+          id == other.id &&
+          order == other.order &&
+          room == other.room &&
+          heist == other.heist;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      order.hashCode ^
+      room.hashCode ^
+      heist.hashCode;
+
+  @override
+  String toString() {
+    return 'Round{id: $id, leader: $leader, order: $order, room: $room, heist: $heist, startedAt: $startedAt, team: $team, bids: $bids, gifts: $gifts}';
+  }
 }

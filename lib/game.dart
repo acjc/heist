@@ -12,7 +12,7 @@ class Game extends StatelessWidget {
   }
 
   Widget _waitForPlayers(Store<GameModel> store, GameModel viewModel) {
-    if (viewModel.me() == null && !viewModel.requestInProcess(Request.JoiningGame)) {
+    if (!viewModel.haveJoinedGame() && !viewModel.requestInProcess(Request.JoiningGame)) {
       store.dispatch(new StartRequestAction(Request.JoiningGame));
       store.dispatch(new JoinGameAction());
     }
@@ -77,10 +77,7 @@ class Game extends StatelessWidget {
         ),
         body: new StoreConnector<GameModel, GameModel>(
           onInit: (store) => store.dispatch(new LoadGameAction()),
-          onDispose: (store) {
-            store.dispatch(new ClearAllPendingRequestsAction());
-            store.dispatch(new CancelSubscriptionsAction());
-          },
+          onDispose: (store) => _resetGameStore(store),
           converter: (store) => store.state,
           builder: (context, viewModel) => new Card(
                 elevation: 2.0,
@@ -88,4 +85,13 @@ class Game extends StatelessWidget {
               ),
         ));
   }
+}
+
+void _resetGameStore(Store<GameModel> store) {
+  store.dispatch(new ClearAllPendingRequestsAction());
+  store.dispatch(new CancelSubscriptionsAction());
+  store.dispatch(new UpdateStateAction<Room>(store.state.room.copyWith(id: null, code: null)));
+  store.dispatch(new UpdateStateAction<Set<Player>>(new Set()));
+  store.dispatch(new UpdateStateAction<List<Heist>>([]));
+  store.dispatch(new UpdateStateAction<Map<Heist, List<Round>>>({}));
 }

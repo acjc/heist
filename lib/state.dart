@@ -64,6 +64,11 @@ class GameModel {
     return players.firstWhere((p) => p.installId == installId(), orElse: () => null);
   }
 
+  bool haveJoinedGame() {
+    Player myself = me();
+    return myself != null && myself.room?.documentID == room.id;
+  }
+
   bool amOwner() {
     return room.owner == installId();
   }

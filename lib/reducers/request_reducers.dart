@@ -3,6 +3,7 @@ part of heist;
 final requestReducer = combineReducers<Set<Request>>([
   new TypedReducer<Set<Request>, StartRequestAction>(reduce),
   new TypedReducer<Set<Request>, RequestCompleteAction>(reduce),
+  new TypedReducer<Set<Request>, ClearAllPendingRequestsAction>(reduce),
 ]);
 
 class StartRequestAction extends Action<Set<Request>> {

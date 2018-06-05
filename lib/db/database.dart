@@ -22,7 +22,7 @@ class FirestoreDb {
   }
 
   Future<bool> roomExists(String code) async {
-    return getRoom(code) != null;
+    return await getRoom(code) != null;
   }
 
   Future<bool> playerExists(String roomId, String installId) async {

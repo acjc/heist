@@ -99,7 +99,7 @@ class JoinGameAction extends MiddlewareAction {
     FirestoreDb db = store.state.db;
     String iid = installId();
 
-    if (store.state.me() == null && !(await db.playerExists(roomId, iid))) {
+    if (!store.state.haveJoinedGame() && !(await db.playerExists(roomId, iid))) {
       // TODO: initial balance may eventually depend on role
       return db.upsertPlayer(
           new Player(installId: iid, name: playerName, initialBalance: 8), roomId);
@@ -189,13 +189,13 @@ class LoadGameAction extends MiddlewareAction {
   }
 
   void _subscribe(Store<GameModel> store, String roomId, List<Heist> heists) {
-    List<StreamSubscription> subs = new List();
+    assert(roomId != null);
 
-    subs.addAll([
+    List<StreamSubscription> subs = [
       _roomSubscription(store, roomId),
       _playerSubscription(store, roomId),
       _heistSubscription(store, roomId)
-    ]);
+    ];
 
     if (heists != null && heists.isNotEmpty) {
       subs += _roundSubscriptions(store, roomId, heists);

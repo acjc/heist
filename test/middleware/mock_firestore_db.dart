@@ -5,28 +5,30 @@ import 'package:uuid/uuid.dart';
 
 class MockFirestoreDb implements FirestoreDb {
   Room room;
-  Set<Player> players = new Set();
-  List<Heist> heists = new List();
-  Map<String, List<Round>> rounds = new Map();
+  Set<Player> players;
+  List<Heist> heists;
+  Map<String, List<Round>> rounds;
 
   StreamController<Room> _roomStream;
   StreamController<Set<Player>> _playerStream;
   StreamController<List<Heist>> _heistStream;
   Map<String, StreamController<List<Round>>> _roundStreams = new Map();
 
-  @override
-  Future<List<Heist>> getHeists(String roomRef) {
-    return new Future<List<Heist>>.value(heists);
-  }
+  MockFirestoreDb({this.room, this.players, this.heists, this.rounds});
 
-  @override
-  Future<Set<Player>> getPlayers(String roomRef) {
-    return new Future<Set<Player>>.value(players);
-  }
+  MockFirestoreDb.empty()
+      : this.players = new Set(),
+        this.heists = [],
+        this.rounds = {};
 
   @override
   Future<Room> getRoom(String code) {
     return new Future<Room>.value(room);
+  }
+
+  @override
+  Future<List<Heist>> getHeists(String roomRef) {
+    return new Future<List<Heist>>.value(heists);
   }
 
   @override
@@ -45,8 +47,8 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<List<Round>> getRounds(String roomRef, String heistRef) {
-    return new Future<List<Round>>.value(rounds[heistRef]);
+  Future<bool> playerExists(String roomId, String installId) {
+    return new Future<bool>.value(false);
   }
 
   void _postRoom() {

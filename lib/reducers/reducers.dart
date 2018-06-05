@@ -4,11 +4,12 @@ GameModel gameModelReducer(GameModel gameModel, dynamic action) {
   return new GameModel(
     db: gameModel.db,
     subscriptions: subscriptionReducer(gameModel.subscriptions, action),
-    busy: busyReducer(gameModel.busy, action),
+    requests: requestReducer(gameModel.requests, action),
     room: roomReducer(gameModel.room, action),
     players: playerReducer(gameModel.players, action),
     heists: heistReducer(gameModel.heists, action),
     rounds: roundReducer(gameModel.rounds, action),
+    playerName: playerNameReducer(gameModel.playerName, action),
     currentBalance: gameModel.currentBalance,
   );
 }
@@ -20,6 +21,22 @@ abstract class Action<State> {
 
 /// Generic method to delegate reduction to the action itself.
 State reduce<State>(State state, dynamic action) => action.reduce(state, action);
+
+final playerNameReducer = combineReducers<String>([
+  new TypedReducer<String, SetPlayerNameAction>(reduce)
+]);
+
+class SetPlayerNameAction extends Action<String> {
+
+  final String _playerName;
+
+  SetPlayerNameAction(this._playerName);
+
+  @override
+  String reduce(String state, action) {
+    return _playerName;
+  }
+}
 
 /// Use to completely replace part of the global state.
 class UpdateStateAction<State> extends Action<State> {

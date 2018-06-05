@@ -5,6 +5,7 @@ List<Middleware<GameModel>> createMiddleware() {
     new TypedMiddleware<GameModel, CreateRoomAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, LoadGameAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, SetUpNewGameAction>(_dispatchMiddleware),
+    new TypedMiddleware<GameModel, JoinGameAction>(_dispatchMiddleware),
   ];
 
   // asserts only work in debug mode
@@ -35,10 +36,10 @@ class CreateRoomAction extends MiddlewareAction {
   static final Set<String> roles =
       new Set.from(['ACCOUNTANT', 'KINGPIN', 'THIEF_1', 'LEAD_AGENT', 'AGENT_1']);
 
-  Future<void> _createRoom(Store<GameModel> store, String code, String appVersion) {
+  Future<String> _createRoom(Store<GameModel> store, String code, String appVersion) {
     return store.state.db.upsertRoom(new Room(
         code: code,
-        createdAt: new DateTime.now().toUtc(),
+        createdAt: now(),
         appVersion: appVersion,
         owner: installId(),
         numPlayers: store.state.room.numPlayers,
@@ -49,8 +50,8 @@ class CreateRoomAction extends MiddlewareAction {
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
     String appVersion = await _getAppVersion();
     String code = await _newRoomCode(store);
-    await _createRoom(store, code, appVersion);
-    store.dispatch(new EnterCodeAction(code));
+    String roomId = await _createRoom(store, code, appVersion);
+    store.dispatch(new UpdateStateAction<Room>(store.state.room.copyWith(id: roomId, code: code)));
 
     NavigatorState navigatorState = navigatorKey.currentState;
     if (navigatorState != null) {
@@ -87,6 +88,25 @@ class CreateRoomAction extends MiddlewareAction {
   }
 }
 
+class JoinGameAction extends MiddlewareAction {
+  @override
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
+    String roomId = store.state.room.id;
+    assert(roomId != null);
+    String playerName = store.state.playerName;
+    assert(playerName != null && playerName.isNotEmpty);
+
+    FirestoreDb db = store.state.db;
+    String iid = installId();
+
+    if (store.state.me() == null && !(await db.playerExists(roomId, iid))) {
+      // TODO: initial balance may eventually depend on role
+      return db.upsertPlayer(
+          new Player(installId: iid, name: playerName, initialBalance: 8), roomId);
+    }
+  }
+}
+
 class SetUpNewGameAction extends MiddlewareAction {
   void _assignRoles(Store<GameModel> store) {
     List<String> roles = new List.of(store.state.room.roles);
@@ -102,8 +122,7 @@ class SetUpNewGameAction extends MiddlewareAction {
     FirestoreDb db = store.state.db;
     String roomId = store.state.room.id;
     if (store.state.heists.isEmpty && !(await db.heistExists(roomId, 1))) {
-      Heist heist =
-          new Heist(price: 12, numPlayers: 2, order: 1, startedAt: new DateTime.now().toUtc());
+      Heist heist = new Heist(price: 12, numPlayers: 2, order: 1, startedAt: now());
       return db.upsertHeist(heist, roomId);
     }
     return store.state.heists[0].id;
@@ -113,7 +132,7 @@ class SetUpNewGameAction extends MiddlewareAction {
     FirestoreDb db = store.state.db;
     String roomId = store.state.room.id;
     if (!store.state.hasRounds() && !(await db.roundExists(roomId, heistId, 1))) {
-      Round round = new Round(order: 1, startedAt: new DateTime.now().toUtc());
+      Round round = new Round(order: 1, startedAt: now());
       return db.upsertRound(round, roomId, heistId);
     }
   }
@@ -136,17 +155,13 @@ class LoadGameAction extends MiddlewareAction {
 
   Future<void> _loadGame(Store<GameModel> store) async {
     FirestoreDb db = store.state.db;
-
-    Room room =
-        store.state.room.id != null ? store.state.room : await db.getRoom(store.state.room.code);
-
-    List<Heist> heists = await db.getHeists(room.id);
-
-    _subscribe(store, room, heists);
+    String roomId = store.state.room.id ?? (await db.getRoom(store.state.room.code)).id;
+    List<Heist> heists = await db.getHeists(roomId);
+    _subscribe(store, roomId, heists);
   }
 
-  StreamSubscription<Room> _roomSubscription(Store<GameModel> store, String code) {
-    return store.state.db.listenOnRoom(code, (room) {
+  StreamSubscription<Room> _roomSubscription(Store<GameModel> store, String id) {
+    return store.state.db.listenOnRoom(id, (room) {
       store.dispatch(new UpdateStateAction<Room>(room));
     });
   }
@@ -173,19 +188,17 @@ class LoadGameAction extends MiddlewareAction {
     });
   }
 
-  void _subscribe(Store<GameModel> store, Room room, List<Heist> heists) {
-    assert(room != null);
-
+  void _subscribe(Store<GameModel> store, String roomId, List<Heist> heists) {
     List<StreamSubscription> subs = new List();
 
     subs.addAll([
-      _roomSubscription(store, room.code),
-      _playerSubscription(store, room.id),
-      _heistSubscription(store, room.id)
+      _roomSubscription(store, roomId),
+      _playerSubscription(store, roomId),
+      _heistSubscription(store, roomId)
     ]);
 
     if (heists != null && heists.isNotEmpty) {
-      subs += _roundSubscriptions(store, room.id, heists);
+      subs += _roundSubscriptions(store, roomId, heists);
     }
 
     Subscriptions subscriptions = new Subscriptions(subs: subs);

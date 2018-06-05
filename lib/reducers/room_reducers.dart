@@ -3,7 +3,7 @@ part of heist;
 final roomReducer = combineReducers<Room>([
   new TypedReducer<Room, IncrementNumPlayersAction>(reduce),
   new TypedReducer<Room, DecrementNumPlayersAction>(reduce),
-  new TypedReducer<Room, EnterCodeAction>(reduce),
+  new TypedReducer<Room, SetRoomCodeAction>(reduce),
   new TypedReducer<Room, UpdateStateAction<Room>>(reduce),
 ]);
 
@@ -27,10 +27,10 @@ class DecrementNumPlayersAction extends Action<Room> {
   }
 }
 
-class EnterCodeAction extends Action<Room> {
+class SetRoomCodeAction extends Action<Room> {
   final String code;
 
-  EnterCodeAction(this.code);
+  SetRoomCodeAction(this.code);
 
   @override
   Room reduce(Room room, action) {

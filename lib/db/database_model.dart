@@ -124,7 +124,7 @@ class Player extends Document {
       @required this.installId,
       this.room,
       @required this.name,
-      @required this.initialBalance,
+      this.initialBalance,
       this.role})
       : super(id: id);
 

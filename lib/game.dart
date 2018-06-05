@@ -11,8 +11,11 @@ class Game extends StatelessWidget {
     ));
   }
 
-  Widget _waitForPlayers(GameModel viewModel) {
-    // TODO: add self to game if not yet added
+  Widget _waitForPlayers(Store<GameModel> store, GameModel viewModel) {
+    if (viewModel.me() == null && !viewModel.requestInProcess(Request.JoiningGame)) {
+      store.dispatch(new StartRequestAction(Request.JoiningGame));
+      store.dispatch(new JoinGameAction());
+    }
     return new Center(
         child: new Text(
       "Waiting for players: ${viewModel.players.length} / ${viewModel.room.numPlayers}",
@@ -21,9 +24,8 @@ class Game extends StatelessWidget {
   }
 
   Widget _setUpNewGame(Store<GameModel> store, GameModel viewModel) {
-    print("busy = ${viewModel.busy}");
-    if (viewModel.amOwner() && !viewModel.busy) {
-      store.dispatch(new MarkAsBusyAction());
+    if (viewModel.amOwner() && !viewModel.requestInProcess(Request.CreatingNewRoom)) {
+      store.dispatch(new StartRequestAction(Request.CreatingNewRoom));
       store.dispatch(new SetUpNewGameAction());
     }
     return new Center(
@@ -39,15 +41,19 @@ class Game extends StatelessWidget {
     }
 
     if (viewModel.waitingForPlayers()) {
-      return _waitForPlayers(viewModel);
+      return _waitForPlayers(store, viewModel);
+    }
+
+    if (viewModel.requestInProcess(Request.JoiningGame)) {
+      store.dispatch(new RequestCompleteAction(Request.JoiningGame));
     }
 
     if (viewModel.isNewGame()) {
       return _setUpNewGame(store, viewModel);
     }
 
-    if (viewModel.busy) {
-      store.dispatch(new UnmarkAsBusyAction());
+    if (viewModel.requestInProcess(Request.CreatingNewRoom)) {
+      store.dispatch(new RequestCompleteAction(Request.CreatingNewRoom));
     }
 
     if (!viewModel.isReady()) {
@@ -64,14 +70,17 @@ class Game extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
-
+    // TODO: set up the game with store.onChange.listen(). UI elements should be 'dumb' as much as possible.
     return new Scaffold(
         appBar: new AppBar(
           title: new Text("Room: ${store.state.room.code}"),
         ),
         body: new StoreConnector<GameModel, GameModel>(
           onInit: (store) => store.dispatch(new LoadGameAction()),
-          onDispose: (store) => store.dispatch(new CancelSubscriptionsAction()),
+          onDispose: (store) {
+            store.dispatch(new ClearAllPendingRequestsAction());
+            store.dispatch(new CancelSubscriptionsAction());
+          },
           converter: (store) => store.state,
           builder: (context, viewModel) => new Card(
                 elevation: 2.0,

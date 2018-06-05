@@ -4,6 +4,7 @@ class HomePage extends StatelessWidget {
   static const EdgeInsets _padding = const EdgeInsets.all(16.0);
   static const TextStyle _buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
 
+  final _enterNameFormKey = new GlobalKey<FormState>();
   final _enterRoomFormKey = new GlobalKey<FormState>();
 
   Widget _buildTitle(String title) {
@@ -36,7 +37,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
-    store.dispatch(new UnmarkAsBusyAction());
 
     Widget numPlayersText = new StoreConnector<GameModel, int>(
         converter: (store) => store.state.room.numPlayers,
@@ -56,13 +56,33 @@ class HomePage extends StatelessWidget {
       padding: _padding,
       child: new RaisedButton(
         child: const Text('CREATE ROOM', style: _buttonTextStyle),
-        onPressed: () => store.dispatch(new CreateRoomAction()),
+        onPressed: () {
+          FormState enterNameState = _enterNameFormKey.currentState;
+          if (enterNameState.validate()) {
+            enterNameState.save();
+            store.dispatch(new CreateRoomAction());
+          }
+        },
         color: Theme.of(context).primaryColor,
       ),
     );
 
-    Widget numPlayers = new Column(
+    Form enterNameForm = new Form(
+        key: _enterNameFormKey,
+        child: new TextFormField(
+            decoration: new InputDecoration(
+              labelText: 'Enter your name',
+              isDense: true,
+            ),
+            style: new TextStyle(color: Colors.black87, fontSize: 24.0),
+            autocorrect: false,
+            textAlign: TextAlign.center,
+            validator: (value) => value == null || value.isEmpty ? 'Please enter a name' : null,
+            onSaved: (value) => store.dispatch(new SetPlayerNameAction(value))));
+
+    Widget createRoom = new Column(
       children: [
+        enterNameForm,
         _buildTitle('Choose number of players:'),
         new Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -93,9 +113,9 @@ class HomePage extends StatelessWidget {
               new WhitelistingTextInputFormatter(_onlyLetters),
               _capitalFormatter,
             ],
-            validator: (value) =>
-                value.length != 4 ? 'Invalid code' : null, // TODO: validate room exists and is open
-            onSaved: (value) => store.dispatch(new EnterCodeAction(value))));
+            // TODO: validate room exists and player was in it
+            validator: (value) => value.length != 4 ? 'Invalid code' : null,
+            onSaved: (value) => store.dispatch(new SetRoomCodeAction(value))));
 
     void _enterRoom() {
       FormState enterRoomState = _enterRoomFormKey.currentState;
@@ -125,7 +145,7 @@ class HomePage extends StatelessWidget {
     );
 
     return new Column(
-      children: [numPlayers, existingRoom],
+      children: [createRoom, existingRoom],
     );
   }
 }

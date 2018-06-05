@@ -11,8 +11,9 @@ class FirestoreDb {
         .collection('rooms')
         .where('code', isEqualTo: code)
         .where('completed', isEqualTo: false)
-        .where('createdAt',
-        isGreaterThanOrEqualTo: new DateTime.now().toUtc().add(new Duration(days: -1)))
+    // TODO: this is commented out during development
+//        .where('createdAt',
+//            isGreaterThanOrEqualTo: now().add(new Duration(days: -1)))
         .getDocuments();
     if (snapshot.documents.isNotEmpty) {
       return new Room.fromSnapshot(snapshot.documents[0]);

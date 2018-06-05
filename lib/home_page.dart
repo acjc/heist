@@ -41,30 +41,24 @@ class HomePage extends StatelessWidget {
     Widget numPlayersText = new StoreConnector<GameModel, int>(
         converter: (store) => store.state.room.numPlayers,
         builder: (context, int numPlayers) {
-          return new Container(
-            padding: _padding,
-            child: new Text(
-              numPlayers.toString(),
-              style: const TextStyle(
-                fontSize: 32.0,
-              ),
+          return new Text(
+            numPlayers.toString(),
+            style: const TextStyle(
+              fontSize: 32.0,
             ),
           );
         });
 
-    Widget createRoomButton = new Container(
-      padding: _padding,
-      child: new RaisedButton(
-        child: const Text('CREATE ROOM', style: _buttonTextStyle),
-        onPressed: () {
-          FormState enterNameState = _enterNameFormKey.currentState;
-          if (enterNameState.validate()) {
-            enterNameState.save();
-            store.dispatch(new CreateRoomAction());
-          }
-        },
-        color: Theme.of(context).primaryColor,
-      ),
+    Widget createRoomButton = new RaisedButton(
+      child: const Text('CREATE ROOM', style: _buttonTextStyle),
+      onPressed: () {
+        FormState enterNameState = _enterNameFormKey.currentState;
+        if (enterNameState.validate()) {
+          enterNameState.save();
+          store.dispatch(new CreateRoomAction());
+        }
+      },
+      color: Theme.of(context).primaryColor,
     );
 
     Form enterNameForm = new Form(
@@ -80,22 +74,25 @@ class HomePage extends StatelessWidget {
             validator: (value) => value == null || value.isEmpty ? 'Please enter a name' : null,
             onSaved: (value) => store.dispatch(new SetPlayerNameAction(value))));
 
-    Widget createRoom = new Column(
-      children: [
-        enterNameForm,
-        _buildTitle('Choose number of players:'),
-        new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildArrowColumn(
-                context, Icons.arrow_back, () => store.dispatch(new DecrementNumPlayersAction())),
-            numPlayersText,
-            _buildArrowColumn(
-                context, Icons.arrow_forward, () => store.dispatch(new IncrementNumPlayersAction()))
-          ],
-        ),
-        createRoomButton,
-      ],
+    Widget createRoom = new Container(
+      padding: _padding,
+      child: new Column(
+        children: [
+          enterNameForm,
+          _buildTitle('Choose number of players:'),
+          new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildArrowColumn(
+                  context, Icons.arrow_back, () => store.dispatch(new DecrementNumPlayersAction())),
+              numPlayersText,
+              _buildArrowColumn(
+                  context, Icons.arrow_forward, () => store.dispatch(new IncrementNumPlayersAction()))
+            ],
+          ),
+          createRoomButton,
+        ],
+      ),
     );
 
     Form enterRoomForm = new Form(
@@ -125,13 +122,10 @@ class HomePage extends StatelessWidget {
       }
     }
 
-    Widget enterRoomButton = new Container(
-      padding: _padding,
-      child: new RaisedButton(
-        child: const Text('ENTER ROOM', style: _buttonTextStyle),
-        onPressed: _enterRoom,
-        color: Theme.of(context).primaryColor,
-      ),
+    Widget enterRoomButton = new RaisedButton(
+      child: const Text('ENTER ROOM', style: _buttonTextStyle),
+      onPressed: _enterRoom,
+      color: Theme.of(context).primaryColor,
     );
 
     Widget existingRoom = new Container(

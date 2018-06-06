@@ -18,9 +18,14 @@ void main() {
     expect(room.numPlayers, minPlayers);
   });
 
-  test('enter code', () {
+  test('set room code', () {
     Room room = new Room(numPlayers: 5);
-    Room updatedRoom = reduce(room, new EnterCodeAction('ABCD'));
+    Room updatedRoom = reduce(room, new SetRoomCodeAction('ABCD'));
     expect(updatedRoom.code, 'ABCD');
+  });
+
+  test('set player name', () {
+    String playerName = reduce(null, new SetPlayerNameAction('_name'));
+    expect(playerName, '_name');
   });
 }

@@ -1,17 +1,22 @@
 part of heist;
 
-void _boolMapToSet(var boolMap) {
-  Set<String> set = new Set();
-  boolMap.forEach((key, b) {
-    if (b) {
-      set.add(key);
-    }
-  });
+Set<Key> _boolMapToSet<Key>(Map<Key, bool> boolMap) {
+  Set<Key> set = new Set();
+  if (boolMap != null) {
+    boolMap.forEach((key, b) {
+      if (b) {
+        set.add(key);
+      }
+    });
+  }
+  return set;
 }
 
 Map<String, bool> _setToBoolMap(Set<String> set, Set<String> allOptions) {
   Map<String, bool> boolMap = new Map();
-  allOptions.forEach((o) => boolMap[o] = set.contains(o));
+  if (set != null) {
+    allOptions.forEach((o) => boolMap[o] = set.contains(o));
+  }
   return boolMap;
 }
 
@@ -79,7 +84,7 @@ class Room extends Document {
         completed = json['completed'],
         completedAt = json['completedAt'],
         numPlayers = json['numPlayers'],
-        roles = _boolMapToSet(json['roles']),
+        roles = _boolMapToSet(json['roles']?.cast<String, bool>()),
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -92,6 +97,18 @@ class Room extends Document {
         'numPlayers': numPlayers,
         'roles': _setToBoolMap(roles, allRoles),
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is Room && id == other.id && code == other.code;
+
+  @override
+  int get hashCode => id.hashCode ^ code.hashCode;
+
+  @override
+  String toString() {
+    return 'Room{id: $id, code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completed: $completed, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles}';
+  }
 }
 
 @immutable
@@ -105,10 +122,10 @@ class Player extends Document {
   Player(
       {id,
       @required this.installId,
-      @required this.room,
+      this.room,
       @required this.name,
-      @required this.initialBalance,
-      @required this.role})
+      this.initialBalance,
+      this.role})
       : super(id: id);
 
   Player copyWith({
@@ -147,6 +164,23 @@ class Player extends Document {
         'initialBalance': initialBalance,
         'role': role,
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Player &&
+          id == other.id &&
+          installId == other.installId &&
+          room == other.room &&
+          name == other.name;
+
+  @override
+  int get hashCode => id.hashCode ^ installId.hashCode ^ room.hashCode ^ name.hashCode;
+
+  @override
+  String toString() {
+    return 'Player{id: $id, installId: $installId, room: $room, name: $name, initialBalance: $initialBalance, role: $role}';
+  }
 }
 
 @immutable
@@ -162,13 +196,13 @@ class Heist extends Document {
 
   Heist(
       {id,
-      @required this.room,
+      this.room,
       @required this.price,
-      @required this.pot,
+      this.pot,
       @required this.numPlayers,
       @required this.order,
       @required this.startedAt,
-      @required this.decisions})
+      this.decisions})
       : super(id: id);
 
   Heist copyWith({
@@ -202,7 +236,7 @@ class Heist extends Document {
         numPlayers = json['numPlayers'],
         order = json['order'],
         startedAt = json['startedAt'],
-        decisions = json['decisions'].cast<String, String>(),
+        decisions = json['decisions']?.cast<String, String>(),
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -214,6 +248,25 @@ class Heist extends Document {
         'startedAt': startedAt,
         'decisions': decisions,
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Heist &&
+          id == other.id &&
+          room == other.room &&
+          order == other.order;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      room.hashCode ^
+      order.hashCode;
+
+  @override
+  String toString() {
+    return 'Heist{id: $id, room: $room, price: $price, pot: $pot, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions}';
+  }
 }
 
 @immutable
@@ -229,14 +282,14 @@ class Round extends Document {
 
   Round(
       {id,
-      @required this.leader,
+      this.leader,
       @required this.order,
-      @required this.room,
-      @required this.heist,
+      this.room,
+      this.heist,
       @required this.startedAt,
-      @required this.team,
-      @required this.bids,
-      @required this.gifts})
+      this.team,
+      this.bids,
+      this.gifts})
       : super(id: id);
 
   Round copyWith({
@@ -271,7 +324,7 @@ class Round extends Document {
         room = json['room'],
         heist = json['heist'],
         startedAt = json['startedAt'],
-        team = new Set.from(json['team'].cast<DocumentReference>()),
+        team = new Set.from(json['team']?.cast<DocumentReference>() ?? []),
         bids = json['bids'],
         gifts = json['gifts'],
         super(id: id);
@@ -286,4 +339,25 @@ class Round extends Document {
         'bids': bids,
         'gifts': gifts,
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Round &&
+          id == other.id &&
+          order == other.order &&
+          room == other.room &&
+          heist == other.heist;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      order.hashCode ^
+      room.hashCode ^
+      heist.hashCode;
+
+  @override
+  String toString() {
+    return 'Round{id: $id, leader: $leader, order: $order, room: $room, heist: $heist, startedAt: $startedAt, team: $team, bids: $bids, gifts: $gifts}';
+  }
 }

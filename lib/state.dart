@@ -5,9 +5,10 @@ class GameModel {
   final FirestoreDb db;
   final Subscriptions subscriptions;
 
-  /// Predicate to stop the client kicking off the same async task multiple times.
-  /// We may require more specific predicates in future but I've added only a generic one for now.
-  final bool busy;
+  final String playerName;
+
+  /// List of pending requests to avoid kicking off the same request multiple times.
+  final Set<Request> requests;
 
   final Room room;
   final Set<Player> players;
@@ -19,7 +20,8 @@ class GameModel {
   GameModel(
       {this.db,
       this.subscriptions,
-      this.busy,
+      this.playerName,
+      this.requests,
       this.room,
       this.players,
       this.heists,
@@ -28,7 +30,8 @@ class GameModel {
 
   GameModel copyWith(
       {Subscriptions subscriptions,
-      bool busy,
+      String playerName,
+      Set<Request> requests,
       Room room,
       Set<Player> players,
       List<Heist> heists,
@@ -37,7 +40,8 @@ class GameModel {
     return new GameModel(
       db: this.db,
       subscriptions: subscriptions ?? this.subscriptions,
-      busy: busy ?? this.busy,
+      playerName: playerName ?? this.playerName,
+      requests: requests ?? this.requests,
       room: room ?? this.room,
       players: players ?? this.players,
       heists: heists ?? this.heists,
@@ -48,7 +52,8 @@ class GameModel {
 
   factory GameModel.initial(FirestoreDb db, int numPlayers) => GameModel(
       db: db,
-      busy: false,
+      playerName: null,
+      requests: new Set(),
       room: new Room(numPlayers: numPlayers),
       players: new Set(),
       heists: [],
@@ -56,7 +61,12 @@ class GameModel {
       currentBalance: 0);
 
   Player me() {
-    return players.firstWhere((p) => p.installId == installId());
+    return players.firstWhere((p) => p.installId == installId(), orElse: () => null);
+  }
+
+  bool haveJoinedGame() {
+    Player myself = me();
+    return myself != null && myself.room?.documentID == room.id;
   }
 
   bool amOwner() {
@@ -77,12 +87,24 @@ class GameModel {
 
   /// A game is new if roles have not yet been assigned.
   bool isNewGame() {
-    return players.any((p) => p.role?.isEmpty);
+    return players.any((p) => p.role?.isEmpty) || heists.isEmpty || !hasRounds();
+  }
+
+  bool hasRounds() {
+    return rounds.values.any((rs) => rs.isNotEmpty);
   }
 
   /// Check to see if the game has loaded yet.
   bool isLoading() {
     return room.id == null;
+  }
+
+  bool isReady() {
+    return !isLoading() && !isNewGame() && heists.isNotEmpty && rounds.isNotEmpty && hasRounds();
+  }
+
+  bool requestInProcess(Request request) {
+    return requests.contains(request);
   }
 }
 
@@ -95,4 +117,9 @@ class Subscriptions {
   Subscriptions copyWith(List<StreamSubscription> subs) {
     return new Subscriptions(subs: subs ?? this.subs);
   }
+}
+
+enum Request {
+  CreatingNewRoom,
+  JoiningGame
 }

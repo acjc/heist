@@ -4,6 +4,7 @@ class HomePage extends StatelessWidget {
   static const EdgeInsets _padding = const EdgeInsets.all(16.0);
   static const TextStyle _buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
 
+  final _enterNameFormKey = new GlobalKey<FormState>();
   final _enterRoomFormKey = new GlobalKey<FormState>();
 
   Widget _buildTitle(String title) {
@@ -40,41 +41,58 @@ class HomePage extends StatelessWidget {
     Widget numPlayersText = new StoreConnector<GameModel, int>(
         converter: (store) => store.state.room.numPlayers,
         builder: (context, int numPlayers) {
-          return new Container(
-            padding: _padding,
-            child: new Text(
-              numPlayers.toString(),
-              style: const TextStyle(
-                fontSize: 32.0,
-              ),
+          return new Text(
+            numPlayers.toString(),
+            style: const TextStyle(
+              fontSize: 32.0,
             ),
           );
         });
 
-    Widget createRoomButton = new Container(
-      padding: _padding,
-      child: new RaisedButton(
-        child: const Text('CREATE ROOM', style: _buttonTextStyle),
-        onPressed: () => store.dispatch(new CreateRoomAction()),
-        color: Theme.of(context).primaryColor,
-      ),
+    Widget createRoomButton = new RaisedButton(
+      child: const Text('CREATE ROOM', style: _buttonTextStyle),
+      onPressed: () {
+        FormState enterNameState = _enterNameFormKey.currentState;
+        if (enterNameState.validate()) {
+          enterNameState.save();
+          store.dispatch(new CreateRoomAction());
+        }
+      },
+      color: Theme.of(context).primaryColor,
     );
 
-    Widget numPlayers = new Column(
-      children: [
-        _buildTitle('Choose number of players:'),
-        new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildArrowColumn(
-                context, Icons.arrow_back, () => store.dispatch(new DecrementNumPlayersAction())),
-            numPlayersText,
-            _buildArrowColumn(
-                context, Icons.arrow_forward, () => store.dispatch(new IncrementNumPlayersAction()))
-          ],
-        ),
-        createRoomButton,
-      ],
+    Form enterNameForm = new Form(
+        key: _enterNameFormKey,
+        child: new TextFormField(
+            decoration: new InputDecoration(
+              labelText: 'Enter your name',
+              isDense: true,
+            ),
+            style: new TextStyle(color: Colors.black87, fontSize: 24.0),
+            autocorrect: false,
+            textAlign: TextAlign.center,
+            validator: (value) => value == null || value.isEmpty ? 'Please enter a name' : null,
+            onSaved: (value) => store.dispatch(new SetPlayerNameAction(value))));
+
+    Widget createRoom = new Container(
+      padding: _padding,
+      child: new Column(
+        children: [
+          enterNameForm,
+          _buildTitle('Choose number of players:'),
+          new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildArrowColumn(
+                  context, Icons.arrow_back, () => store.dispatch(new DecrementNumPlayersAction())),
+              numPlayersText,
+              _buildArrowColumn(
+                  context, Icons.arrow_forward, () => store.dispatch(new IncrementNumPlayersAction()))
+            ],
+          ),
+          createRoomButton,
+        ],
+      ),
     );
 
     Form enterRoomForm = new Form(
@@ -92,9 +110,9 @@ class HomePage extends StatelessWidget {
               new WhitelistingTextInputFormatter(_onlyLetters),
               _capitalFormatter,
             ],
-            validator: (value) =>
-                value.length != 4 ? 'Invalid code' : null, // TODO: validate room exists and is open
-            onSaved: (value) => store.dispatch(new EnterCodeAction(value))));
+            // TODO: validate room exists and player was in it
+            validator: (value) => value.length != 4 ? 'Invalid code' : null,
+            onSaved: (value) => store.dispatch(new SetRoomCodeAction(value))));
 
     void _enterRoom() {
       FormState enterRoomState = _enterRoomFormKey.currentState;
@@ -104,13 +122,10 @@ class HomePage extends StatelessWidget {
       }
     }
 
-    Widget enterRoomButton = new Container(
-      padding: _padding,
-      child: new RaisedButton(
-        child: const Text('ENTER ROOM', style: _buttonTextStyle),
-        onPressed: _enterRoom,
-        color: Theme.of(context).primaryColor,
-      ),
+    Widget enterRoomButton = new RaisedButton(
+      child: const Text('ENTER ROOM', style: _buttonTextStyle),
+      onPressed: _enterRoom,
+      color: Theme.of(context).primaryColor,
     );
 
     Widget existingRoom = new Container(
@@ -124,7 +139,7 @@ class HomePage extends StatelessWidget {
     );
 
     return new Column(
-      children: [numPlayers, existingRoom],
+      children: [createRoom, existingRoom],
     );
   }
 }

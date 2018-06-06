@@ -6,7 +6,6 @@ final subscriptionReducer = combineReducers<Subscriptions>([
 ]);
 
 class AddSubscriptionsAction extends Action<Subscriptions> {
-
   final Subscriptions subscriptions;
 
   AddSubscriptionsAction(this.subscriptions);
@@ -19,12 +18,13 @@ class AddSubscriptionsAction extends Action<Subscriptions> {
 }
 
 class CancelSubscriptionsAction extends Action<Subscriptions> {
-
   @override
   Subscriptions reduce(Subscriptions subscriptions, action) {
     debugPrint('Unsubscribe firestore listeners');
-    for (StreamSubscription<QuerySnapshot> sub in subscriptions.subs) {
-      sub.cancel();
+    if (subscriptions != null) {
+      for (StreamSubscription sub in subscriptions.subs) {
+        sub.cancel();
+      }
     }
     return new Subscriptions(subs: []);
   }

@@ -3,7 +3,7 @@ part of heist;
 class Game extends StatelessWidget {
   static const TextStyle standard = const TextStyle(fontSize: 16.0);
 
-  Widget loading() {
+  Widget _loading() {
     return new Center(
         child: new Text(
       'Loading...',
@@ -11,45 +11,58 @@ class Game extends StatelessWidget {
     ));
   }
 
-  Widget waitForPlayers(GameModel gameModel) {
-    // TODO: add self to game if not yet added
+  Widget _waitForPlayers(Store<GameModel> store, GameModel viewModel) {
+    if (!viewModel.haveJoinedGame() && !viewModel.requestInProcess(Request.JoiningGame)) {
+      store.dispatch(new StartRequestAction(Request.JoiningGame));
+      store.dispatch(new JoinGameAction());
+    }
     return new Center(
         child: new Text(
-      "Waiting for players: ${gameModel.players.length} / ${gameModel.room.numPlayers}",
+      "Waiting for players: ${viewModel.players.length} / ${viewModel.room.numPlayers}",
       style: standard,
     ));
   }
 
-  Widget setUpNewGame(GameModel gameModel) {
-    if (gameModel.amOwner() && !gameModel.busy) {
-      // TODO: 1) mark client as busy
-      // TODO: 2) assign roles
-      // TODO: 3) create first heist and round
-      // TODO: 4) when done, mark client as not busy
+  Widget _setUpNewGame(Store<GameModel> store, GameModel viewModel) {
+    if (viewModel.amOwner() && !viewModel.requestInProcess(Request.CreatingNewRoom)) {
+      store.dispatch(new StartRequestAction(Request.CreatingNewRoom));
+      store.dispatch(new SetUpNewGameAction());
     }
     return new Center(
         child: new Text(
-          "Assigning roles...",
-          style: standard,
-        ));
+      "Assigning roles...",
+      style: standard,
+    ));
   }
 
-  Widget body(GameModel gameModel) {
-    if (gameModel.isLoading()) {
-      return loading();
+  Widget _body(Store<GameModel> store, GameModel viewModel) {
+    if (viewModel.isLoading()) {
+      return _loading();
     }
 
-    if (gameModel.waitingForPlayers()) {
-      return waitForPlayers(gameModel);
+    if (viewModel.waitingForPlayers()) {
+      return _waitForPlayers(store, viewModel);
     }
 
-    if (gameModel.isNewGame()) {
-      return setUpNewGame(gameModel);
+    if (viewModel.requestInProcess(Request.JoiningGame)) {
+      store.dispatch(new RequestCompleteAction(Request.JoiningGame));
     }
 
-    Player me = gameModel.me();
+    if (viewModel.isNewGame()) {
+      return _setUpNewGame(store, viewModel);
+    }
+
+    if (viewModel.requestInProcess(Request.CreatingNewRoom)) {
+      store.dispatch(new RequestCompleteAction(Request.CreatingNewRoom));
+    }
+
+    if (!viewModel.isReady()) {
+      return _loading();
+    }
+
+    Player me = viewModel.me();
     return new ListTile(
-      title: new Text("${gameModel.room.code} - ${gameModel.room.numPlayers} players"),
+      title: new Text("${viewModel.room.code} - ${viewModel.room.numPlayers} players"),
       subtitle: new Text("${me.name} (${me.role})"),
     );
   }
@@ -57,19 +70,28 @@ class Game extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
-
+    // TODO: set up the game with store.onChange.listen(). UI elements should be 'dumb' as much as possible.
     return new Scaffold(
         appBar: new AppBar(
           title: new Text("Room: ${store.state.room.code}"),
         ),
         body: new StoreConnector<GameModel, GameModel>(
           onInit: (store) => store.dispatch(new LoadGameAction()),
-          onDispose: (store) => store.dispatch(new CancelSubscriptionsAction()),
+          onDispose: (store) => _resetGameStore(store),
           converter: (store) => store.state,
-          builder: (context, gameModel) => new Card(
+          builder: (context, viewModel) => new Card(
                 elevation: 2.0,
-                child: body(gameModel),
+                child: _body(store, viewModel),
               ),
         ));
   }
+}
+
+void _resetGameStore(Store<GameModel> store) {
+  store.dispatch(new ClearAllPendingRequestsAction());
+  store.dispatch(new CancelSubscriptionsAction());
+  store.dispatch(new UpdateStateAction<Room>(store.state.room.copyWith(id: null, code: null)));
+  store.dispatch(new UpdateStateAction<Set<Player>>(new Set()));
+  store.dispatch(new UpdateStateAction<List<Heist>>([]));
+  store.dispatch(new UpdateStateAction<Map<Heist, List<Round>>>({}));
 }

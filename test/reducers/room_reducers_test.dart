@@ -25,8 +25,7 @@ void main() {
   });
 
   test('set player name', () {
-    GameModel gameModel = new GameModel();
-    GameModel updated = reduce(gameModel, new SetPlayerNameAction('_name'));
-    expect(updated.playerName, '_name');
+    String playerName = reduce(null, new SetPlayerNameAction('_name'));
+    expect(playerName, '_name');
   });
 }

@@ -51,7 +51,7 @@ class CreateRoomAction extends MiddlewareAction {
     String appVersion = await _getAppVersion();
     String code = await _newRoomCode(store);
     String roomId = await _createRoom(store, code, appVersion);
-    store.dispatch(new UpdateStateAction<Room>(store.state.room.copyWith(id: roomId, code: code)));
+    store.dispatch(new UpdateStateAction<Room>(await store.state.db.getRoom(roomId)));
 
     NavigatorState navigatorState = navigatorKey.currentState;
     if (navigatorState != null) {
@@ -74,7 +74,7 @@ class CreateRoomAction extends MiddlewareAction {
 
   Future<String> _newRoomCode(Store<GameModel> store) async {
     String code = _generateRoomCode();
-    while (await store.state.db.roomExists(code)) {
+    while (await store.state.db.roomExistsWithCode(code)) {
       code = _generateRoomCode();
     }
     return code;
@@ -150,8 +150,8 @@ class SetUpNewGameAction extends MiddlewareAction {
 class LoadGameAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
-    _setUpGame(store);
-    return _loadGame(store);
+    _addGameSetUpListener(store);
+    return loadGame(store);
   }
 
   void _completeRequest(Store<GameModel> store, Request request) {
@@ -165,33 +165,38 @@ class LoadGameAction extends MiddlewareAction {
     _completeRequest(store, Request.JoiningGame);
   }
 
-  StreamSubscription<GameModel> _setUpGame(Store<GameModel> store) {
-    return store.onChange.takeWhile((gameModel) => !gameModel.ready()).listen((gameModel) {
-      if (!gameModel.roomIsAvailable()) {
-        return;
-      }
+  void _setUpGame(Store<GameModel> store, GameModel gameModel) {
+    if (!gameModel.roomIsAvailable()) {
+      return;
+    }
 
-      if (gameModel.waitingForPlayers()) {
-        if (!gameModel.haveJoinedGame() && !gameModel.requestInProcess(Request.JoiningGame)) {
-          store.dispatch(new StartRequestAction(Request.JoiningGame));
-          store.dispatch(new JoinGameAction());
-        }
-        return;
+    if (gameModel.waitingForPlayers()) {
+      if (!gameModel.haveJoinedGame() && !gameModel.requestInProcess(Request.JoiningGame)) {
+        store.dispatch(new StartRequestAction(Request.JoiningGame));
+        store.dispatch(new JoinGameAction());
       }
+      return;
+    }
 
-      if (gameModel.isNewGame()) {
-        if (gameModel.amOwner() && !gameModel.requestInProcess(Request.CreatingNewRoom)) {
-          store.dispatch(new StartRequestAction(Request.CreatingNewRoom));
-          store.dispatch(new SetUpNewGameAction());
-        }
-        return;
+    if (gameModel.isNewGame()) {
+      if (gameModel.amOwner() && !gameModel.requestInProcess(Request.CreatingNewRoom)) {
+        store.dispatch(new StartRequestAction(Request.CreatingNewRoom));
+        store.dispatch(new SetUpNewGameAction());
       }
-    }, onDone: () => _clearSetUpRequests(store), onError: (e) => _clearSetUpRequests(store));
+      return;
+    }
   }
 
-  Future<void> _loadGame(Store<GameModel> store) async {
+  void _addGameSetUpListener(Store<GameModel> store) {
+    store.onChange.takeWhile((gameModel) => !gameModel.ready()).listen(
+        (gameModel) => _setUpGame(store, gameModel),
+        onDone: () => _clearSetUpRequests(store),
+        onError: (e) => _clearSetUpRequests(store));
+  }
+
+  Future<void> loadGame(Store<GameModel> store) async {
     FirestoreDb db = store.state.db;
-    String roomId = store.state.room.id ?? (await db.getRoom(store.state.room.code)).id;
+    String roomId = store.state.room.id ?? (await db.getRoomByCode(store.state.room.code)).id;
     List<Heist> heists = await db.getHeists(roomId);
     _subscribe(store, roomId, heists);
   }

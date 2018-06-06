@@ -29,14 +29,17 @@ void main() {
 
     await _handle(store, new CreateRoomAction());
     expect(store.state.room.code.length, 4);
-
-    await _handle(store, new LoadGameAction());
-    expect(store.state.subscriptions.subs, isNotEmpty);
     expect(store.state.room.appVersion, isNotNull);
     expect(store.state.room.numPlayers, minPlayers);
 
+
+    // Call loadGame() manually to avoid some async calls that we call manually later in the test
+    await new LoadGameAction().loadGame(store);
+    expect(store.state.subscriptions.subs, isNotEmpty);
+
     await _handle(store, new JoinGameAction());
     expect(store.state.me(), isNotNull);
+
     await _addOtherPlayers(store);
 
     await _handle(store, new SetUpNewGameAction());
@@ -67,7 +70,7 @@ void main() {
     store.dispatch(new SetRoomCodeAction(code));
     expect(store.state.room.code, code);
 
-    await _handle(store, new LoadGameAction());
+    await new LoadGameAction().loadGame(store);
 
     expect(store.state.subscriptions.subs, isNotEmpty);
     expect(store.state.room.numPlayers, 2);

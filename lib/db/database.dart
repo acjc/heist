@@ -5,7 +5,12 @@ class FirestoreDb {
 
   FirestoreDb(this._firestore);
 
-  Future<Room> getRoom(String code) async {
+  Future<Room> getRoom(String id) async {
+    DocumentSnapshot snapshot = await _firestore.document("rooms/$id").get();
+    return new Room.fromSnapshot(snapshot);
+  }
+
+  Future<Room> getRoomByCode(String code) async {
     assert(code.length == 4);
     QuerySnapshot snapshot = await _firestore
         .collection('rooms')
@@ -21,8 +26,8 @@ class FirestoreDb {
     return null;
   }
 
-  Future<bool> roomExists(String code) async {
-    return await getRoom(code) != null;
+  Future<bool> roomExistsWithCode(String code) async {
+    return await getRoomByCode(code) != null;
   }
 
   Future<bool> playerExists(String roomId, String installId) async {

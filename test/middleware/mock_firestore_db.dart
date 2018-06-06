@@ -22,7 +22,12 @@ class MockFirestoreDb implements FirestoreDb {
         this.rounds = {};
 
   @override
-  Future<Room> getRoom(String code) {
+  Future<Room> getRoom(String id) {
+    return new Future<Room>.value(room);
+  }
+
+  @override
+  Future<Room> getRoomByCode(String code) {
     return new Future<Room>.value(room);
   }
 
@@ -32,7 +37,7 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<bool> roomExists(String code) {
+  Future<bool> roomExistsWithCode(String code) {
     return new Future<bool>.value(false);
   }
 

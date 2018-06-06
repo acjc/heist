@@ -137,4 +137,21 @@ class _PlayerInfoViewModel {
   final int balance;
 
   _PlayerInfoViewModel(this.me, this.balance);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is _PlayerInfoViewModel &&
+              me == other.me &&
+              balance == other.balance;
+
+  @override
+  int get hashCode =>
+      me.hashCode ^
+      balance.hashCode;
+
+  @override
+  String toString() {
+    return '_PlayerInfoViewModel{me: $me, balance: $balance}';
+  }
 }

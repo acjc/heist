@@ -109,6 +109,37 @@ class GameModel {
   int getCurrentBalance() {
     return currentBalance;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is GameModel &&
+              db == other.db &&
+              subscriptions == other.subscriptions &&
+              playerName == other.playerName &&
+              requests == other.requests &&
+              room == other.room &&
+              players == other.players &&
+              heists == other.heists &&
+              rounds == other.rounds &&
+              currentBalance == other.currentBalance;
+
+  @override
+  int get hashCode =>
+      db.hashCode ^
+      subscriptions.hashCode ^
+      playerName.hashCode ^
+      requests.hashCode ^
+      room.hashCode ^
+      players.hashCode ^
+      heists.hashCode ^
+      rounds.hashCode ^
+      currentBalance.hashCode;
+
+  @override
+  String toString() {
+    return 'GameModel{db: $db, subscriptions: $subscriptions, playerName: $playerName, requests: $requests, room: $room, players: $players, heists: $heists, rounds: $rounds, currentBalance: $currentBalance}';
+  }
 }
 
 @immutable

@@ -54,7 +54,9 @@ class GameModel {
       db: db,
       playerName: null,
       requests: new Set(),
-      room: new Room(numPlayers: numPlayers),
+      room: new Room(
+          numPlayers: numPlayers,
+          roles: getRolesIds(numPlayersToRolesMap[numPlayers])),
       players: new Set(),
       heists: [],
       rounds: {},

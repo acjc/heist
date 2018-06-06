@@ -49,6 +49,20 @@ class HomePage extends StatelessWidget {
           );
         });
 
+    Widget rolesText = new StoreConnector<GameModel, Set<String>>(
+        converter: (store) => store.state.room.roles,
+        builder: (context, Set<String> roles) {
+          return new Container(
+            padding: _padding,
+            child: new Text(
+              'Roles: ' + roles?.toString(),
+              style: const TextStyle(
+                fontSize: 16.0,
+              ),
+            ),
+          );
+        });
+
     Widget createRoomButton = new RaisedButton(
       child: const Text('CREATE ROOM', style: _buttonTextStyle),
       onPressed: () {
@@ -90,6 +104,7 @@ class HomePage extends StatelessWidget {
                   context, Icons.arrow_forward, () => store.dispatch(new IncrementNumPlayersAction()))
             ],
           ),
+          rolesText,
           createRoomButton,
         ],
       ),

@@ -95,7 +95,7 @@ class Room extends Document {
         'completed': completed,
         'completedAt': completedAt,
         'numPlayers': numPlayers,
-        'roles': _setToBoolMap(roles, allRoles),
+        'roles': _setToBoolMap(roles, getRolesIds(allRoles)),
       };
 
   @override

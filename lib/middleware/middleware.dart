@@ -150,7 +150,43 @@ class SetUpNewGameAction extends MiddlewareAction {
 class LoadGameAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
+    _setUpGame(store);
     return _loadGame(store);
+  }
+
+  void _completeRequest(Store<GameModel> store, Request request) {
+    if (store.state.requestInProcess(request)) {
+      store.dispatch(new RequestCompleteAction(request));
+    }
+  }
+
+  void _clearSetUpRequests(Store<GameModel> store) {
+    _completeRequest(store, Request.CreatingNewRoom);
+    _completeRequest(store, Request.JoiningGame);
+  }
+
+  StreamSubscription<GameModel> _setUpGame(Store<GameModel> store) {
+    return store.onChange.takeWhile((gameModel) => !gameModel.ready()).listen((gameModel) {
+      if (!gameModel.roomIsAvailable()) {
+        return;
+      }
+
+      if (gameModel.waitingForPlayers()) {
+        if (!gameModel.haveJoinedGame() && !gameModel.requestInProcess(Request.JoiningGame)) {
+          store.dispatch(new StartRequestAction(Request.JoiningGame));
+          store.dispatch(new JoinGameAction());
+        }
+        return;
+      }
+
+      if (gameModel.isNewGame()) {
+        if (gameModel.amOwner() && !gameModel.requestInProcess(Request.CreatingNewRoom)) {
+          store.dispatch(new StartRequestAction(Request.CreatingNewRoom));
+          store.dispatch(new SetUpNewGameAction());
+        }
+        return;
+      }
+    }, onDone: () => _clearSetUpRequests(store), onError: (e) => _clearSetUpRequests(store));
   }
 
   Future<void> _loadGame(Store<GameModel> store) async {

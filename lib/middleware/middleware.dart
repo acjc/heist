@@ -32,18 +32,15 @@ void _reloadSubscriptions(Store<GameModel> store) {
 }
 
 class CreateRoomAction extends MiddlewareAction {
-  // TODO: get the right roles
-  static final Set<String> roles =
-      new Set.from(['ACCOUNTANT', 'KINGPIN', 'THIEF_1', 'LEAD_AGENT', 'AGENT_1']);
 
   Future<String> _createRoom(Store<GameModel> store, String code, String appVersion) {
-    return store.state.db.upsertRoom(new Room(
+   return store.state.db.upsertRoom(new Room(
         code: code,
         createdAt: now(),
         appVersion: appVersion,
         owner: installId(),
         numPlayers: store.state.room.numPlayers,
-        roles: roles));
+        roles: store.state.room.roles));
   }
 
   @override

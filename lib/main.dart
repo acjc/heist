@@ -14,8 +14,9 @@ import 'package:redux_logging/redux_logging.dart';
 
 part 'db/database.dart';
 part 'db/database_model.dart';
-part 'home_page.dart';
 part 'game.dart';
+part 'role.dart';
+part 'home_page.dart';
 part 'middleware/middleware.dart';
 part 'reducers/heist_reducers.dart';
 part 'reducers/player_reducers.dart';
@@ -27,11 +28,6 @@ part 'reducers/request_reducers.dart';
 part 'state.dart';
 
 void main() => runApp(new MyApp(Firestore.instance));
-
-final Set<String> agentRoles = new Set.of(['LEAD_AGENT', 'AGENT_1', 'AGENT_2', 'AGENT_3']);
-final Set<String> thiefRoles =
-    new Set.of(['KINGPIN', 'ACCOUNTANT', 'THIEF_1', 'THIEF_2', 'THIEF_3', 'THIEF_4']);
-final Set<String> allRoles = new Set.of(agentRoles)..addAll(thiefRoles);
 
 const int minPlayers = 5;
 const int maxPlayers = 10;

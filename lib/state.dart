@@ -87,24 +87,27 @@ class GameModel {
 
   /// A game is new if roles have not yet been assigned.
   bool isNewGame() {
-    return players.any((p) => p.role?.isEmpty) || heists.isEmpty || !hasRounds();
+    return players.any((p) => p.role == null || p.role.isEmpty) || heists.isEmpty || !hasRounds();
   }
 
   bool hasRounds() {
-    return rounds.values.any((rs) => rs.isNotEmpty);
+    return rounds.isNotEmpty && rounds.values.any((rs) => rs.isNotEmpty);
   }
 
-  /// Check to see if the game has loaded yet.
-  bool isLoading() {
-    return room.id == null;
+  bool roomIsAvailable() {
+    return room.id != null;
   }
 
-  bool isReady() {
-    return !isLoading() && !isNewGame() && heists.isNotEmpty && rounds.isNotEmpty && hasRounds();
+  bool ready() {
+    return roomIsAvailable() && !isNewGame() && heists.isNotEmpty && hasRounds();
   }
 
   bool requestInProcess(Request request) {
     return requests.contains(request);
+  }
+
+  int getCurrentBalance() {
+    return currentBalance;
   }
 }
 
@@ -119,7 +122,4 @@ class Subscriptions {
   }
 }
 
-enum Request {
-  CreatingNewRoom,
-  JoiningGame
-}
+enum Request { CreatingNewRoom, JoiningGame }

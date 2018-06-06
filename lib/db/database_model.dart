@@ -50,6 +50,10 @@ class Room extends Document {
       this.roles})
       : super(id: id);
 
+  factory Room.initial() => Room(
+      numPlayers: minPlayers,
+      roles: getRolesIds(numPlayersToRolesMap[minPlayers]));
+
   Room copyWith({
     String id,
     String code,

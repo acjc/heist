@@ -90,7 +90,7 @@ class Game extends StatelessWidget {
 void _resetGameStore(Store<GameModel> store) {
   store.dispatch(new ClearAllPendingRequestsAction());
   store.dispatch(new CancelSubscriptionsAction());
-  store.dispatch(new UpdateStateAction<Room>(store.state.room.copyWith(id: null, code: null)));
+  store.dispatch(new UpdateStateAction<Room>(new Room.initial()));
   store.dispatch(new UpdateStateAction<Set<Player>>(new Set()));
   store.dispatch(new UpdateStateAction<List<Heist>>([]));
   store.dispatch(new UpdateStateAction<Map<Heist, List<Round>>>({}));

@@ -93,10 +93,13 @@ class Game extends StatelessWidget {
         });
   }
 
-  Widget _gameHistory() {
+  Widget _gameHistory(Store<GameModel> store) {
     return new StoreConnector<GameModel, List<Heist>>(
         converter: (store) => store.state.heists,
         builder: (context, viewModel) {
+          if (!store.state.ready()) {
+            return new Container();
+          }
           return new Card(
               elevation: 2.0,
               child: new Row(
@@ -119,7 +122,7 @@ class Game extends StatelessWidget {
         appBar: new AppBar(
           title: new Text("Room: ${store.state.room.code}"),
         ),
-        body: new Column(children: [_playerInfo(store), _mainBoard(store), _gameHistory()]));
+        body: new Column(children: [_playerInfo(store), _mainBoard(store), _gameHistory(store)]));
   }
 }
 

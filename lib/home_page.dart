@@ -78,6 +78,7 @@ class HomePage extends StatelessWidget {
     Form enterNameForm = new Form(
         key: _enterNameFormKey,
         child: new TextFormField(
+            initialValue: 'Mordred',
             decoration: new InputDecoration(
               labelText: 'Enter your name',
               isDense: true,
@@ -100,8 +101,8 @@ class HomePage extends StatelessWidget {
               _buildArrowColumn(
                   context, Icons.arrow_back, () => store.dispatch(new DecrementNumPlayersAction())),
               numPlayersText,
-              _buildArrowColumn(
-                  context, Icons.arrow_forward, () => store.dispatch(new IncrementNumPlayersAction()))
+              _buildArrowColumn(context, Icons.arrow_forward,
+                  () => store.dispatch(new IncrementNumPlayersAction()))
             ],
           ),
           rolesText,
@@ -113,6 +114,7 @@ class HomePage extends StatelessWidget {
     Form enterRoomForm = new Form(
         key: _enterRoomFormKey,
         child: new TextFormField(
+            initialValue: 'ABCD',
             decoration: new InputDecoration(
               labelText: 'Enter an existing room code',
               isDense: true,

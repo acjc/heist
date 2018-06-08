@@ -1,7 +1,7 @@
 part of heist;
 
-Set<Key> _boolMapToSet<Key>(Map<Key, bool> boolMap) {
-  Set<Key> set = new Set();
+Set<String> _boolMapToSet(Map<String, bool> boolMap) {
+  Set<String> set = new Set();
   if (boolMap != null) {
     boolMap.forEach((key, b) {
       if (b) {
@@ -12,10 +12,10 @@ Set<Key> _boolMapToSet<Key>(Map<Key, bool> boolMap) {
   return set;
 }
 
-Map<String, bool> _setToBoolMap(Set<String> set, Set<String> allOptions) {
+Map<String, bool> _toBoolMap(Iterable<String> it, Set<String> allOptions) {
   Map<String, bool> boolMap = new Map();
-  if (set != null) {
-    allOptions.forEach((o) => boolMap[o] = set.contains(o));
+  if (it != null) {
+    allOptions.forEach((o) => boolMap[o] = it.contains(o));
   }
   return boolMap;
 }
@@ -50,9 +50,8 @@ class Room extends Document {
       this.roles})
       : super(id: id);
 
-  factory Room.initial() => Room(
-      numPlayers: minPlayers,
-      roles: getRolesIds(numPlayersToRolesMap[minPlayers]));
+  factory Room.initial() =>
+      Room(numPlayers: minPlayers, roles: getRolesIds(numPlayersToRolesMap[minPlayers]));
 
   Room copyWith({
     String id,
@@ -99,7 +98,7 @@ class Room extends Document {
         'completed': completed,
         'completedAt': completedAt,
         'numPlayers': numPlayers,
-        'roles': _setToBoolMap(roles, getRolesIds(allRoles)),
+        'roles': _toBoolMap(roles, getRolesIds(allRoles)),
       };
 
   @override
@@ -217,7 +216,7 @@ class Heist extends Document {
     int numPlayers,
     int order,
     DateTime startedAt,
-    Map<String, String> decisions,
+    Map<String, String> decisions, // player ID -> { SUCCEED, FAIL, STEAL }
   }) {
     return new Heist(
       id: id ?? this.id,
@@ -256,21 +255,49 @@ class Heist extends Document {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Heist &&
-          id == other.id &&
-          room == other.room &&
-          order == other.order;
+      other is Heist && id == other.id && room == other.room && order == other.order;
 
   @override
-  int get hashCode =>
-      id.hashCode ^
-      room.hashCode ^
-      order.hashCode;
+  int get hashCode => id.hashCode ^ room.hashCode ^ order.hashCode;
 
   @override
   String toString() {
     return 'Heist{id: $id, room: $room, price: $price, pot: $pot, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions}';
   }
+}
+
+@immutable
+class Bid {
+  final int amount;
+  final DateTime timestamp;
+
+  Bid({this.amount, this.timestamp});
+
+  Bid.fromJson(Map<String, dynamic> json)
+      : amount = json['amount'],
+        timestamp = json['timestamp'];
+}
+
+@immutable
+class Gift {
+  final int amount;
+  final String recipient;
+  final DateTime timestamp;
+
+  Gift({this.amount, this.recipient, this.timestamp});
+
+  Gift.fromJson(Map<String, dynamic> json)
+      : amount = json['amount'],
+        recipient = json['recipient'],
+        timestamp = json['timestamp'];
+}
+
+Map<String, Value> _convertValues<Value>(Map<String, dynamic> map, Value transform(v)) {
+  Map<String, Value> bidMap = {};
+  if (map != null) {
+    map.forEach((k, v) => bidMap[k] = transform(v));
+  }
+  return bidMap;
 }
 
 @immutable
@@ -280,9 +307,9 @@ class Round extends Document {
   final DocumentReference room;
   final DocumentReference heist;
   final DateTime startedAt;
-  final Set<DocumentReference> team;
-  final Map<dynamic, dynamic> bids; // TODO: convert to Map<String, Bid>
-  final Map<dynamic, dynamic> gifts; // TODO: convert to Map<String, Gift>
+  final Set<String> team; // player IDs
+  final Map<String, Bid> bids; // player ID -> Bid
+  final Map<String, Gift> gifts; // player ID -> Gift
 
   Round(
       {id,
@@ -303,9 +330,9 @@ class Round extends Document {
     DocumentReference room,
     DocumentReference heist,
     DateTime startedAt,
-    Set<DocumentReference> team,
-    Map<dynamic, dynamic> bids,
-    Map<dynamic, dynamic> gifts,
+    Set<String> team,
+    Map<String, Bid> bids,
+    Map<String, Gift> gifts,
   }) {
     return new Round(
       id: id ?? this.id,
@@ -328,10 +355,15 @@ class Round extends Document {
         room = json['room'],
         heist = json['heist'],
         startedAt = json['startedAt'],
-        team = new Set.from(json['team']?.cast<DocumentReference>() ?? []),
-        bids = json['bids'],
-        gifts = json['gifts'],
-        super(id: id);
+        team = _boolMapToSet(json['team'].cast<String, bool>()),
+        bids = _convertValues(json['bids']?.cast<String, dynamic>(),
+            (v) => new Bid.fromJson(v.cast<String, dynamic>())),
+        gifts = _convertValues(json['gifts']?.cast<String, dynamic>(),
+            (v) => new Gift.fromJson(v.cast<String, dynamic>())),
+        super(id: id) {
+    print(json['bids'].runtimeType);
+    print(json['bids']);
+  }
 
   Map<String, dynamic> toJson() => {
         'leader': leader,
@@ -354,11 +386,7 @@ class Round extends Document {
           heist == other.heist;
 
   @override
-  int get hashCode =>
-      id.hashCode ^
-      order.hashCode ^
-      room.hashCode ^
-      heist.hashCode;
+  int get hashCode => id.hashCode ^ order.hashCode ^ room.hashCode ^ heist.hashCode;
 
   @override
   String toString() {

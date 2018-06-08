@@ -14,9 +14,10 @@ import 'package:redux_logging/redux_logging.dart';
 
 part 'db/database.dart';
 part 'db/database_model.dart';
-part 'game.dart';
-part 'role.dart';
-part 'home_page.dart';
+part 'widget/game.dart';
+part 'widget/home_page.dart';
+part 'widget/player_info.dart';
+part 'widget/game_history.dart';
 part 'middleware/middleware.dart';
 part 'reducers/heist_reducers.dart';
 part 'reducers/player_reducers.dart';
@@ -26,6 +27,7 @@ part 'reducers/round_reducers.dart';
 part 'reducers/subscription_reducers.dart';
 part 'reducers/request_reducers.dart';
 part 'state.dart';
+part 'role.dart';
 
 void main() => runApp(new MyApp(Firestore.instance));
 

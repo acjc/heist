@@ -280,7 +280,7 @@ class Round extends Document {
   final DocumentReference room;
   final DocumentReference heist;
   final DateTime startedAt;
-  final Set<DocumentReference> team;
+  final Set<String> team;
   final Map<dynamic, dynamic> bids; // TODO: convert to Map<String, Bid>
   final Map<dynamic, dynamic> gifts; // TODO: convert to Map<String, Gift>
 
@@ -303,7 +303,7 @@ class Round extends Document {
     DocumentReference room,
     DocumentReference heist,
     DateTime startedAt,
-    Set<DocumentReference> team,
+    Set<String> team,
     Map<dynamic, dynamic> bids,
     Map<dynamic, dynamic> gifts,
   }) {
@@ -328,7 +328,7 @@ class Round extends Document {
         room = json['room'],
         heist = json['heist'],
         startedAt = json['startedAt'],
-        team = new Set.from(json['team']?.cast<DocumentReference>() ?? []),
+        team = _boolMapToSet(json['team']?.cast<String, bool>()),
         bids = json['bids'],
         gifts = json['gifts'],
         super(id: id);

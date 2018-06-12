@@ -121,6 +121,7 @@ class Player extends Document {
   final String name;
   final int initialBalance;
   final String role;
+  final int order;
 
   Player(
       {id,
@@ -128,7 +129,8 @@ class Player extends Document {
       this.room,
       @required this.name,
       this.initialBalance,
-      this.role})
+      this.role,
+      this.order})
       : super(id: id);
 
   Player copyWith({
@@ -138,6 +140,7 @@ class Player extends Document {
     String name,
     int initialBalance,
     String role,
+    int order,
   }) {
     return new Player(
       id: id ?? this.id,
@@ -146,6 +149,7 @@ class Player extends Document {
       name: name ?? this.name,
       initialBalance: initialBalance ?? this.initialBalance,
       role: role ?? this.role,
+      order: order ?? this.order,
     );
   }
 
@@ -158,6 +162,7 @@ class Player extends Document {
         name = json['name'],
         initialBalance = json['initialBalance'],
         role = json['role'],
+        order = json['order'],
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -166,6 +171,7 @@ class Player extends Document {
         'name': name,
         'initialBalance': initialBalance,
         'role': role,
+        'order': order,
       };
 
   @override
@@ -182,7 +188,7 @@ class Player extends Document {
 
   @override
   String toString() {
-    return 'Player{id: $id, installId: $installId, room: $room, name: $name, initialBalance: $initialBalance, role: $role}';
+    return 'Player{installId: $installId, room: $room, name: $name, initialBalance: $initialBalance, role: $role, order: $order}';
   }
 }
 
@@ -302,7 +308,7 @@ Map<String, Value> _convertValues<Value>(Map<String, dynamic> map, Value transfo
 
 @immutable
 class Round extends Document {
-  final DocumentReference leader;
+  final String leader;
   final int order;
   final DocumentReference room;
   final DocumentReference heist;
@@ -325,7 +331,7 @@ class Round extends Document {
 
   Round copyWith({
     String id,
-    DocumentReference leader,
+    String leader,
     int order,
     DocumentReference room,
     DocumentReference heist,
@@ -360,10 +366,7 @@ class Round extends Document {
             (v) => new Bid.fromJson(v.cast<String, dynamic>())),
         gifts = _convertValues(json['gifts']?.cast<String, dynamic>(),
             (v) => new Gift.fromJson(v.cast<String, dynamic>())),
-        super(id: id) {
-    print(json['bids'].runtimeType);
-    print(json['bids']);
-  }
+        super(id: id);
 
   Map<String, dynamic> toJson() => {
         'leader': leader,

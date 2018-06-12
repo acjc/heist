@@ -2,8 +2,9 @@ part of heist;
 
 Widget _playerInfo(Store<GameModel> store) {
   return new StoreConnector<GameModel, PlayerInfoViewModel>(
+      distinct: true,
       converter: (store) =>
-      new PlayerInfoViewModel._(store.state.me(), store.state.getCurrentBalance()),
+          new PlayerInfoViewModel._(store.state.me(), store.state.getCurrentBalance()),
       builder: (context, viewModel) {
         if (!store.state.ready()) {
           return new Container();
@@ -39,14 +40,10 @@ class PlayerInfoViewModel {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is PlayerInfoViewModel &&
-              me == other.me &&
-              balance == other.balance;
+      other is PlayerInfoViewModel && me == other.me && balance == other.balance;
 
   @override
-  int get hashCode =>
-      me.hashCode ^
-      balance.hashCode;
+  int get hashCode => me.hashCode ^ balance.hashCode;
 
   @override
   String toString() {

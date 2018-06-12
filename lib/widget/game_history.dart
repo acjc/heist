@@ -2,6 +2,7 @@ part of heist;
 
 Widget _gameHistory(Store<GameModel> store) {
   return new StoreConnector<GameModel, List<Heist>>(
+      distinct: true,
       converter: (store) => store.state.heists,
       builder: (context, viewModel) {
         if (!store.state.ready()) {

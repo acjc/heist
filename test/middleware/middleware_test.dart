@@ -63,10 +63,10 @@ void main() {
             code: code,
             numPlayers: 2,
             roles: new Set.of(['KINGPIN', 'LEAD_AGENT'])),
-        players: new Set.of([
+        players: [
           new Player(id: _uuid(), installId: installId(), name: '_name', role: 'KINGPIN'),
           new Player(id: _uuid(), installId: _uuid(), name: '_player2', role: 'LEAD_AGENT'),
-        ]),
+        ],
         heists: [
           new Heist(id: heistId, price: 12, numPlayers: 2, order: 1, startedAt: now())
         ],

@@ -12,7 +12,7 @@ class Game extends StatelessWidget {
     ));
   }
 
-  Widget _mainBoardBody(Store<GameModel> store, GameModel viewModel) {
+  Widget _loadingScreen(GameModel viewModel) {
     if (!viewModel.roomIsAvailable()) {
       return _loading();
     }
@@ -33,10 +33,10 @@ class Game extends StatelessWidget {
       ));
     }
 
-    if (!viewModel.ready()) {
-      return _loading();
-    }
+    return _loading();
+  }
 
+  Widget _currentGameComponent(GameModel viewModel) {
     Player me = viewModel.me();
     return new ListTile(
       title: new Text(
@@ -54,11 +54,14 @@ class Game extends StatelessWidget {
     return new StoreConnector<GameModel, GameModel>(
         onInit: (store) => store.dispatch(new LoadGameAction()),
         onDispose: (store) => _resetGameStore(store),
+        distinct: true,
         converter: (store) => store.state,
         builder: (context, viewModel) => new Expanded(
               child: new Card(
                 elevation: 2.0,
-                child: _mainBoardBody(store, viewModel),
+                child: viewModel.ready()
+                    ? _currentGameComponent(viewModel)
+                    : _loadingScreen(viewModel),
               ),
             ));
   }
@@ -78,7 +81,7 @@ void _resetGameStore(Store<GameModel> store) {
   store.dispatch(new ClearAllPendingRequestsAction());
   store.dispatch(new CancelSubscriptionsAction());
   store.dispatch(new UpdateStateAction<Room>(new Room.initial()));
-  store.dispatch(new UpdateStateAction<Set<Player>>(new Set()));
+  store.dispatch(new UpdateStateAction<List<Player>>([]));
   store.dispatch(new UpdateStateAction<List<Heist>>([]));
   store.dispatch(new UpdateStateAction<Map<Heist, List<Round>>>({}));
 }

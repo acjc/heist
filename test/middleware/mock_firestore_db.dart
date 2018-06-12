@@ -5,19 +5,19 @@ import 'package:uuid/uuid.dart';
 
 class MockFirestoreDb implements FirestoreDb {
   Room room;
-  Set<Player> players;
+  List<Player> players;
   List<Heist> heists;
   Map<String, List<Round>> rounds;
 
   StreamController<Room> _roomStream;
-  StreamController<Set<Player>> _playerStream;
+  StreamController<List<Player>> _playerStream;
   StreamController<List<Heist>> _heistStream;
   Map<String, StreamController<List<Round>>> _roundStreams = new Map();
 
   MockFirestoreDb({this.room, this.players, this.heists, this.rounds});
 
   MockFirestoreDb.empty()
-      : this.players = new Set(),
+      : this.players = [],
         this.heists = [],
         this.rounds = {};
 
@@ -93,10 +93,10 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  StreamSubscription<Set<Player>> listenOnPlayers(
-      String roomRef, void onData(Set<Player> players)) {
+  StreamSubscription<List<Player>> listenOnPlayers(
+      String roomRef, void onData(List<Player> players)) {
     _playerStream = new StreamController(onCancel: () => _playerStream.close(), sync: true);
-    StreamSubscription<Set<Player>> subscription = _playerStream.stream.listen(onData);
+    StreamSubscription<List<Player>> subscription = _playerStream.stream.listen(onData);
     _postPlayers();
     return subscription;
   }

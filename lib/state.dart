@@ -11,7 +11,7 @@ class GameModel {
   final Set<Request> requests;
 
   final Room room;
-  final Set<Player> players;
+  final List<Player> players;
   final List<Heist> heists;
   final Map<String, List<Round>> rounds;
 
@@ -33,7 +33,7 @@ class GameModel {
       String playerName,
       Set<Request> requests,
       Room room,
-      Set<Player> players,
+        List<Player> players,
       List<Heist> heists,
       Map<String, List<Round>> rounds,
       int currentBalance}) {
@@ -55,13 +55,17 @@ class GameModel {
       playerName: null,
       requests: new Set(),
       room: new Room.initial(),
-      players: new Set(),
+      players: [],
       heists: [],
       rounds: {},
       currentBalance: 0);
 
   Player me() {
     return players.firstWhere((p) => p.installId == installId(), orElse: () => null);
+  }
+
+  String myPlayerId() {
+    return me().id;
   }
 
   bool haveJoinedGame() {
@@ -108,6 +112,18 @@ class GameModel {
 
   int getCurrentBalance() {
     return currentBalance;
+  }
+
+  bool isMyGo() {
+    return currentRound().leader == myPlayerId();
+  }
+
+  bool waitingForTeamSelection() {
+    return currentRound().team.isEmpty;
+  }
+
+  bool timeToBidOrGift() {
+    return currentRound().bids.length != players.length && currentRound().team.isNotEmpty;
   }
 
   @override

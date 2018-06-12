@@ -204,9 +204,9 @@ class LoadGameAction extends MiddlewareAction {
     });
   }
 
-  StreamSubscription<Set<Player>> _playerSubscription(Store<GameModel> store, String roomId) {
+  StreamSubscription<List<Player>> _playerSubscription(Store<GameModel> store, String roomId) {
     return store.state.db.listenOnPlayers(
-        roomId, (players) => store.dispatch(new UpdateStateAction<Set<Player>>(players)));
+        roomId, (players) => store.dispatch(new UpdateStateAction<List<Player>>(players)));
   }
 
   StreamSubscription<List<Heist>> _heistSubscription(Store<GameModel> store, String roomId) {

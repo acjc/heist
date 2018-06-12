@@ -39,6 +39,7 @@ class HomePage extends StatelessWidget {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
 
     Widget numPlayersText = new StoreConnector<GameModel, int>(
+        distinct: true,
         converter: (store) => store.state.room.numPlayers,
         builder: (context, int numPlayers) {
           return new Text(
@@ -50,6 +51,7 @@ class HomePage extends StatelessWidget {
         });
 
     Widget rolesText = new StoreConnector<GameModel, Set<String>>(
+        distinct: true,
         converter: (store) => store.state.room.roles,
         builder: (context, Set<String> roles) {
           return new Container(

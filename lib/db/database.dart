@@ -16,7 +16,7 @@ class FirestoreDb {
         .collection('rooms')
         .where('code', isEqualTo: code)
         .where('completed', isEqualTo: false)
-    // TODO: this is commented out during development
+        // TODO: this is commented out during development
 //        .where('createdAt',
 //            isGreaterThanOrEqualTo: now().add(new Duration(days: -1)))
         .getDocuments();
@@ -56,12 +56,13 @@ class FirestoreDb {
     return _firestore.document("rooms/$id");
   }
 
-  StreamSubscription<Set<Player>> listenOnPlayers(
-      String roomRef, void onData(Set<Player> players)) {
-    return _playerQuery(roomRef)
-        .snapshots()
-        .map((snapshot) => snapshot.documents.map((s) => new Player.fromSnapshot(s)).toSet())
-        .listen(onData);
+  StreamSubscription<List<Player>> listenOnPlayers(
+      String roomRef, void onData(List<Player> players)) {
+    return _playerQuery(roomRef).snapshots().map((snapshot) {
+      List<Player> players = snapshot.documents.map((s) => new Player.fromSnapshot(s)).toList();
+      players.sort((p1, p2) => p1.order.compareTo(p2.order));
+      return players;
+    }).listen(onData);
   }
 
   Query _playerQuery(String roomId) {

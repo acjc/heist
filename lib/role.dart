@@ -39,10 +39,8 @@ final Map<int, Set<Role>> numPlayersToRolesMap = {
                   LEAD_AGENT, AGENT_1, AGENT_2, AGENT_3]),
 };
 
-getRolesIds(Set<Role> roles) {
-  final Set<String> roleIds = new Set();
-  roles.forEach((role) => roleIds.add(role.roleId));
-  return roleIds;
+Set<String> getRolesIds(Set<Role> roles) {
+  return roles.map((r) => r.roleId).toSet();
 }
 
 @immutable

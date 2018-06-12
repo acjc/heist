@@ -1,7 +1,6 @@
 part of heist;
 
 class Game extends StatefulWidget {
-
   final Store<GameModel> store;
 
   Game(this.store);
@@ -10,7 +9,6 @@ class Game extends StatefulWidget {
   State<StatefulWidget> createState() {
     return new GameState(store);
   }
-
 }
 
 class GameState extends State<Game> {
@@ -41,7 +39,26 @@ class GameState extends State<Game> {
     ));
   }
 
-  Widget _mainBoardBody(Store<GameModel> store, GameModel viewModel) {
+  Widget _mainBoardBodyContent(GameModel viewModel) {
+    return new ListTile(
+      title: new Text(
+        "${viewModel.room.code} - ${viewModel.room.numPlayers} players",
+        style: _textStyle,
+      ),
+    );
+  }
+
+  Widget _secretBoardBodyContent(GameModel viewModel) {
+    Player me = viewModel.me();
+    return new ListTile(
+      title: new Text(
+        "${me.name} (${me.role})",
+        style: _textStyle,
+      ),
+    );
+  }
+
+  Widget _boardBody(Store<GameModel> store, GameModel viewModel, Widget boardBodyContent) {
     if (!viewModel.roomIsAvailable()) {
       return _loading();
     }
@@ -66,30 +83,31 @@ class GameState extends State<Game> {
       return _loading();
     }
 
-    Player me = viewModel.me();
-    return new ListTile(
-      title: new Text(
-        "${viewModel.room.code} - ${viewModel.room.numPlayers} players",
-        style: _textStyle,
-      ),
-      subtitle: new Text(
-        "${me.name} (${me.role})",
-        style: _textStyle,
-      ),
-    );
+    return boardBodyContent;
   }
 
   Widget _mainBoard(Store<GameModel> store) {
     return new StoreConnector<GameModel, GameModel>(
-      converter: (store) => store.state,
-      distinct: true,
-      builder: (context, viewModel) => new Expanded(
-        child: new Card(
-          elevation: 2.0,
-          child: _mainBoardBody(store, viewModel),
-        ),
-      )
-    );
+        converter: (store) => store.state,
+        distinct: true,
+        builder: (context, viewModel) => new Expanded(
+              child: new Card(
+                elevation: 2.0,
+                child: _boardBody(store, viewModel, _mainBoardBodyContent(viewModel)),
+              ),
+            ));
+  }
+
+  Widget _secretBoard(Store<GameModel> store) {
+    return new StoreConnector<GameModel, GameModel>(
+        converter: (store) => store.state,
+        distinct: true,
+        builder: (context, viewModel) => new Expanded(
+              child: new Card(
+                elevation: 2.0,
+                child: _boardBody(store, viewModel, _secretBoardBodyContent(viewModel)),
+              ),
+            ));
   }
 
   Widget _playerInfo(Store<GameModel> store) {
@@ -98,8 +116,7 @@ class GameState extends State<Game> {
             new _PlayerInfoViewModel(store.state.me(), store.state.getCurrentBalance()),
         distinct: true,
         builder: (context, viewModel) {
-          print('BUILDING PLAYER INFO');
-          if (!store.state.ready()) {
+          if (viewModel.me == null) {
             return new Container();
           }
           return new Card(
@@ -129,6 +146,9 @@ class GameState extends State<Game> {
         converter: (store) => store.state.heists,
         distinct: true,
         builder: (context, viewModel) {
+          if (viewModel.isEmpty) {
+            return new Container();
+          }
           return new Card(
               elevation: 2.0,
               child: new Row(
@@ -147,8 +167,8 @@ class GameState extends State<Game> {
   Widget _tabView(Store<GameModel> store) {
     return new TabBarView(
       children: [
-        new Column(children: [_playerInfo(store), _mainBoard(store), _gameHistory()]),
-        new Icon(Icons.directions_transit),
+        new Column(children: [_mainBoard(store), _gameHistory()]),
+        new Column(children: [_playerInfo(store), _secretBoard(store)]),
       ],
     );
   }

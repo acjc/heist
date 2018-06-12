@@ -55,7 +55,7 @@ class HomePage extends StatelessWidget {
           return new Container(
             padding: _padding,
             child: new Text(
-              'Roles: ' + roles?.toString(),
+              'Roles: ${roles?.toString()}',
               style: const TextStyle(
                 fontSize: 16.0,
               ),

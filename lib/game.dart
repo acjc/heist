@@ -1,8 +1,37 @@
 part of heist;
 
-class Game extends StatelessWidget {
+class Game extends StatefulWidget {
+
+  final Store<GameModel> store;
+
+  Game(this.store);
+
+  @override
+  State<StatefulWidget> createState() {
+    return new GameState(store);
+  }
+
+}
+
+class GameState extends State<Game> {
   static const EdgeInsets _padding = const EdgeInsets.all(24.0);
   static const TextStyle _textStyle = const TextStyle(fontSize: 16.0);
+
+  final Store<GameModel> store;
+
+  GameState(this.store);
+
+  @override
+  void initState() {
+    super.initState();
+    store.dispatch(new LoadGameAction());
+  }
+
+  @override
+  void dispose() {
+    _resetGameStore(store);
+    super.dispose();
+  }
 
   Widget _loading() {
     return new Center(
@@ -21,7 +50,7 @@ class Game extends StatelessWidget {
       return new Center(
           child: new Text(
         "Waiting for players: ${viewModel.players.length} / ${viewModel.room.numPlayers}",
-        style: Game._textStyle,
+        style: _textStyle,
       ));
     }
 
@@ -29,7 +58,7 @@ class Game extends StatelessWidget {
       return new Center(
           child: new Text(
         "Assigning roles...",
-        style: Game._textStyle,
+        style: _textStyle,
       ));
     }
 
@@ -52,22 +81,24 @@ class Game extends StatelessWidget {
 
   Widget _mainBoard(Store<GameModel> store) {
     return new StoreConnector<GameModel, GameModel>(
-        onInit: (store) => store.dispatch(new LoadGameAction()),
-        onDispose: (store) => _resetGameStore(store),
-        converter: (store) => store.state,
-        builder: (context, viewModel) => new Expanded(
-              child: new Card(
-                elevation: 2.0,
-                child: _mainBoardBody(store, viewModel),
-              ),
-            ));
+      converter: (store) => store.state,
+      distinct: true,
+      builder: (context, viewModel) => new Expanded(
+        child: new Card(
+          elevation: 2.0,
+          child: _mainBoardBody(store, viewModel),
+        ),
+      )
+    );
   }
 
   Widget _playerInfo(Store<GameModel> store) {
     return new StoreConnector<GameModel, _PlayerInfoViewModel>(
         converter: (store) =>
             new _PlayerInfoViewModel(store.state.me(), store.state.getCurrentBalance()),
+        distinct: true,
         builder: (context, viewModel) {
+          print('BUILDING PLAYER INFO');
           if (!store.state.ready()) {
             return new Container();
           }
@@ -96,6 +127,7 @@ class Game extends StatelessWidget {
   Widget _gameHistory() {
     return new StoreConnector<GameModel, List<Heist>>(
         converter: (store) => store.state.heists,
+        distinct: true,
         builder: (context, viewModel) {
           return new Card(
               elevation: 2.0,
@@ -112,14 +144,34 @@ class Game extends StatelessWidget {
         });
   }
 
+  Widget _tabView(Store<GameModel> store) {
+    return new TabBarView(
+      children: [
+        new Column(children: [_playerInfo(store), _mainBoard(store), _gameHistory()]),
+        new Icon(Icons.directions_transit),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
-    return new Scaffold(
+
+    return new DefaultTabController(
+      length: 2,
+      child: new Scaffold(
         appBar: new AppBar(
           title: new Text("Room: ${store.state.room.code}"),
+          bottom: new TabBar(
+            tabs: [
+              new Tab(text: 'GAME'),
+              new Tab(text: 'SECRET'),
+            ],
+          ),
         ),
-        body: new Column(children: [_playerInfo(store), _mainBoard(store), _gameHistory()]));
+        body: _tabView(store),
+      ),
+    );
   }
 }
 
@@ -141,14 +193,10 @@ class _PlayerInfoViewModel {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is _PlayerInfoViewModel &&
-              me == other.me &&
-              balance == other.balance;
+      other is _PlayerInfoViewModel && me == other.me && balance == other.balance;
 
   @override
-  int get hashCode =>
-      me.hashCode ^
-      balance.hashCode;
+  int get hashCode => me.hashCode ^ balance.hashCode;
 
   @override
   String toString() {

@@ -6,7 +6,7 @@ Widget _playerInfo(Store<GameModel> store) {
       converter: (store) =>
           new PlayerInfoViewModel._(store.state.me(), store.state.getCurrentBalance()),
       builder: (context, viewModel) {
-        if (!store.state.ready()) {
+        if (viewModel.me == null) {
           return new Container();
         }
         return new Card(

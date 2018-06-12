@@ -33,7 +33,7 @@ class GameModel {
       String playerName,
       Set<Request> requests,
       Room room,
-        List<Player> players,
+      List<Player> players,
       List<Heist> heists,
       Map<String, List<Round>> rounds,
       int currentBalance}) {
@@ -103,7 +103,11 @@ class GameModel {
   }
 
   bool ready() {
-    return roomIsAvailable() && !isNewGame() && heists.isNotEmpty && hasRounds();
+    return roomIsAvailable() &&
+        !waitingForPlayers() &&
+        !isNewGame() &&
+        heists.isNotEmpty &&
+        hasRounds();
   }
 
   bool requestInProcess(Request request) {
@@ -129,16 +133,16 @@ class GameModel {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is GameModel &&
-              db == other.db &&
-              subscriptions == other.subscriptions &&
-              playerName == other.playerName &&
-              requests == other.requests &&
-              room == other.room &&
-              players == other.players &&
-              heists == other.heists &&
-              rounds == other.rounds &&
-              currentBalance == other.currentBalance;
+      other is GameModel &&
+          db == other.db &&
+          subscriptions == other.subscriptions &&
+          playerName == other.playerName &&
+          requests == other.requests &&
+          room == other.room &&
+          players == other.players &&
+          heists == other.heists &&
+          rounds == other.rounds &&
+          currentBalance == other.currentBalance;
 
   @override
   int get hashCode =>
@@ -154,7 +158,7 @@ class GameModel {
 
   @override
   String toString() {
-    return 'GameModel{db: $db, subscriptions: $subscriptions, playerName: $playerName, requests: $requests, room: $room, players: $players, heists: $heists, rounds: $rounds, currentBalance: $currentBalance}';
+    return 'GameModel{\ndb: $db,\n\nsubscriptions: $subscriptions,\n\nplayerName: $playerName,\n\nrequests: $requests,\n\nroom: $room,\n\nplayers: $players,\n\nheists: $heists,\n\nrounds: $rounds,\n\ncurrentBalance: $currentBalance\n}';
   }
 }
 

@@ -11,6 +11,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_logging/redux_logging.dart';
+import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
+import 'package:redux_dev_tools/redux_dev_tools.dart';
 
 part 'db/database.dart';
 part 'db/database_model.dart';
@@ -36,6 +38,12 @@ const int maxPlayers = 10;
 
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
+bool isDebugMode() {
+  bool debugMode = false;
+  assert(debugMode = true);
+  return debugMode;
+}
+
 String installId() {
   return 'test_install_id';
 }
@@ -45,6 +53,14 @@ DateTime now() {
 }
 
 Store<GameModel> createStore(FirestoreDb db) {
+  if (isDebugMode()) {
+    return new DevToolsStore<GameModel>(
+      gameModelReducer,
+      initialState: new GameModel.initial(db, minPlayers),
+      middleware: createMiddleware(),
+      distinct: true,
+    );
+  }
   return new Store<GameModel>(
     gameModelReducer,
     initialState: new GameModel.initial(db, minPlayers),
@@ -60,7 +76,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new StoreProvider(
+    Widget widget =  new StoreProvider(
       store: store,
       child: new MaterialApp(
           navigatorKey: navigatorKey,
@@ -72,8 +88,12 @@ class MyApp extends StatelessWidget {
             appBar: new AppBar(
               title: new Text("Heist"),
             ),
+            endDrawer: isDebugMode()
+                ? new Drawer(child: new ReduxDevTools<GameModel>(store))
+                : null,
             body: new HomePage(),
           )),
     );
+    return widget;
   }
 }

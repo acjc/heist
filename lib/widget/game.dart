@@ -73,6 +73,9 @@ class Game extends StatelessWidget {
         appBar: new AppBar(
           title: new Text("Room: ${store.state.room.code}"),
         ),
+        endDrawer: isDebugMode()
+            ? new Drawer(child: new ReduxDevTools<GameModel>(store))
+            : null,
         body: new Column(children: [_playerInfo(store), _mainBoard(store), _gameHistory(store)]));
   }
 }

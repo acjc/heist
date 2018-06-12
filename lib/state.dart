@@ -87,24 +87,58 @@ class GameModel {
 
   /// A game is new if roles have not yet been assigned.
   bool isNewGame() {
-    return players.any((p) => p.role?.isEmpty) || heists.isEmpty || !hasRounds();
+    return players.any((p) => p.role == null || p.role.isEmpty) || heists.isEmpty || !hasRounds();
   }
 
   bool hasRounds() {
-    return rounds.values.any((rs) => rs.isNotEmpty);
+    return rounds.isNotEmpty && rounds.values.any((rs) => rs.isNotEmpty);
   }
 
-  /// Check to see if the game has loaded yet.
-  bool isLoading() {
-    return room.id == null;
+  bool roomIsAvailable() {
+    return room.id != null;
   }
 
-  bool isReady() {
-    return !isLoading() && !isNewGame() && heists.isNotEmpty && rounds.isNotEmpty && hasRounds();
+  bool ready() {
+    return roomIsAvailable() && !isNewGame() && heists.isNotEmpty && hasRounds();
   }
 
   bool requestInProcess(Request request) {
     return requests.contains(request);
+  }
+
+  int getCurrentBalance() {
+    return currentBalance;
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is GameModel &&
+              db == other.db &&
+              subscriptions == other.subscriptions &&
+              playerName == other.playerName &&
+              requests == other.requests &&
+              room == other.room &&
+              players == other.players &&
+              heists == other.heists &&
+              rounds == other.rounds &&
+              currentBalance == other.currentBalance;
+
+  @override
+  int get hashCode =>
+      db.hashCode ^
+      subscriptions.hashCode ^
+      playerName.hashCode ^
+      requests.hashCode ^
+      room.hashCode ^
+      players.hashCode ^
+      heists.hashCode ^
+      rounds.hashCode ^
+      currentBalance.hashCode;
+
+  @override
+  String toString() {
+    return 'GameModel{db: $db, subscriptions: $subscriptions, playerName: $playerName, requests: $requests, room: $room, players: $players, heists: $heists, rounds: $rounds, currentBalance: $currentBalance}';
   }
 }
 
@@ -119,7 +153,4 @@ class Subscriptions {
   }
 }
 
-enum Request {
-  CreatingNewRoom,
-  JoiningGame
-}
+enum Request { CreatingNewRoom, JoiningGame }

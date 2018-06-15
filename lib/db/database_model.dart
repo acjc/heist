@@ -314,6 +314,7 @@ class Round extends Document {
   final DocumentReference heist;
   final DateTime startedAt;
   final Set<String> team; // player IDs
+  final bool teamSubmitted;
   final Map<String, Bid> bids; // player ID -> Bid
   final Map<String, Gift> gifts; // player ID -> Gift
 
@@ -325,6 +326,7 @@ class Round extends Document {
       this.heist,
       @required this.startedAt,
       this.team,
+      this.teamSubmitted = false,
       this.bids,
       this.gifts})
       : super(id: id);
@@ -337,6 +339,7 @@ class Round extends Document {
     DocumentReference heist,
     DateTime startedAt,
     Set<String> team,
+    bool teamSubmitted,
     Map<String, Bid> bids,
     Map<String, Gift> gifts,
   }) {
@@ -348,6 +351,7 @@ class Round extends Document {
       heist: heist ?? this.heist,
       startedAt: startedAt ?? this.startedAt,
       team: team ?? this.team,
+      teamSubmitted: teamSubmitted ?? this.teamSubmitted,
       bids: bids ?? this.bids,
       gifts: gifts ?? this.gifts,
     );
@@ -362,6 +366,7 @@ class Round extends Document {
         heist = json['heist'],
         startedAt = json['startedAt'],
         team = _boolMapToSet(json['team'].cast<String, bool>()),
+        teamSubmitted = json['teamSubmitted'],
         bids = _convertValues(json['bids']?.cast<String, dynamic>(),
             (v) => new Bid.fromJson(v.cast<String, dynamic>())),
         gifts = _convertValues(json['gifts']?.cast<String, dynamic>(),
@@ -375,6 +380,7 @@ class Round extends Document {
         'heist': heist,
         'startedAt': startedAt,
         'team': team,
+        'teamSubmitted': teamSubmitted,
         'bids': bids,
         'gifts': gifts,
       };
@@ -393,6 +399,6 @@ class Round extends Document {
 
   @override
   String toString() {
-    return 'Round{id: $id, leader: $leader, order: $order, room: $room, heist: $heist, startedAt: $startedAt, team: $team, bids: $bids, gifts: $gifts}';
+    return 'Round{leader: $leader, order: $order, room: $room, heist: $heist, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts}';
   }
 }

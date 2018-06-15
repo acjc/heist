@@ -5,7 +5,7 @@ Widget _gameHistory(Store<GameModel> store) {
       distinct: true,
       converter: (store) => store.state.heists,
       builder: (context, viewModel) {
-        if (!store.state.ready()) {
+        if (!gameIsReady(store.state)) {
           return new Container();
         }
         return new Card(

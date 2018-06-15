@@ -10,7 +10,6 @@ GameModel gameModelReducer(GameModel gameModel, dynamic action) {
     heists: heistReducer(gameModel.heists, action),
     rounds: roundReducer(gameModel.rounds, action),
     playerName: playerNameReducer(gameModel.playerName, action),
-    currentBalance: gameModel.currentBalance,
   );
 }
 

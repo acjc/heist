@@ -13,6 +13,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_logging/redux_logging.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
 import 'package:redux_dev_tools/redux_dev_tools.dart';
+import 'package:reselect/reselect.dart';
 
 part 'db/database.dart';
 part 'db/database_model.dart';
@@ -28,6 +29,7 @@ part 'reducers/room_reducers.dart';
 part 'reducers/round_reducers.dart';
 part 'reducers/subscription_reducers.dart';
 part 'reducers/request_reducers.dart';
+part 'selectors/selectors.dart';
 part 'state.dart';
 part 'role.dart';
 

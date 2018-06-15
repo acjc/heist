@@ -15,8 +15,6 @@ class GameModel {
   final List<Heist> heists;
   final Map<String, List<Round>> rounds;
 
-  final int currentBalance;
-
   GameModel(
       {this.db,
       this.subscriptions,
@@ -25,8 +23,7 @@ class GameModel {
       this.room,
       this.players,
       this.heists,
-      this.rounds,
-      this.currentBalance});
+      this.rounds});
 
   GameModel copyWith(
       {Subscriptions subscriptions,
@@ -35,8 +32,7 @@ class GameModel {
       Room room,
       List<Player> players,
       List<Heist> heists,
-      Map<String, List<Round>> rounds,
-      int currentBalance}) {
+      Map<String, List<Round>> rounds}) {
     return new GameModel(
       db: this.db,
       subscriptions: subscriptions ?? this.subscriptions,
@@ -46,7 +42,6 @@ class GameModel {
       players: players ?? this.players,
       heists: heists ?? this.heists,
       rounds: rounds ?? this.rounds,
-      currentBalance: currentBalance ?? this.currentBalance,
     );
   }
 
@@ -57,78 +52,7 @@ class GameModel {
       room: new Room.initial(),
       players: [],
       heists: [],
-      rounds: {},
-      currentBalance: 0);
-
-  Player me() {
-    return players.firstWhere((p) => p.installId == installId(), orElse: () => null);
-  }
-
-  String myPlayerId() {
-    return me().id;
-  }
-
-  bool haveJoinedGame() {
-    Player myself = me();
-    return myself != null && myself.room?.documentID == room.id;
-  }
-
-  bool amOwner() {
-    return room.owner == installId();
-  }
-
-  Heist currentHeist() {
-    return heists.last;
-  }
-
-  Round currentRound() {
-    return rounds[currentHeist().id].last;
-  }
-
-  bool waitingForPlayers() {
-    return players.length < room.numPlayers;
-  }
-
-  /// A game is new if roles have not yet been assigned.
-  bool isNewGame() {
-    return players.any((p) => p.role == null || p.role.isEmpty) || heists.isEmpty || !hasRounds();
-  }
-
-  bool hasRounds() {
-    return rounds.isNotEmpty && rounds.values.any((rs) => rs.isNotEmpty);
-  }
-
-  bool roomIsAvailable() {
-    return room.id != null;
-  }
-
-  bool ready() {
-    return roomIsAvailable() &&
-        !waitingForPlayers() &&
-        !isNewGame() &&
-        heists.isNotEmpty &&
-        hasRounds();
-  }
-
-  bool requestInProcess(Request request) {
-    return requests.contains(request);
-  }
-
-  int getCurrentBalance() {
-    return currentBalance;
-  }
-
-  bool isMyGo() {
-    return currentRound().leader == myPlayerId();
-  }
-
-  bool waitingForTeamSelection() {
-    return currentRound().team.isEmpty;
-  }
-
-  bool timeToBidOrGift() {
-    return currentRound().bids.length != players.length && currentRound().team.isNotEmpty;
-  }
+      rounds: {});
 
   @override
   bool operator ==(Object other) =>
@@ -141,8 +65,7 @@ class GameModel {
           room == other.room &&
           players == other.players &&
           heists == other.heists &&
-          rounds == other.rounds &&
-          currentBalance == other.currentBalance;
+          rounds == other.rounds;
 
   @override
   int get hashCode =>
@@ -153,12 +76,11 @@ class GameModel {
       room.hashCode ^
       players.hashCode ^
       heists.hashCode ^
-      rounds.hashCode ^
-      currentBalance.hashCode;
+      rounds.hashCode;
 
   @override
   String toString() {
-    return 'GameModel{\ndb: $db,\n\nsubscriptions: $subscriptions,\n\nplayerName: $playerName,\n\nrequests: $requests,\n\nroom: $room,\n\nplayers: $players,\n\nheists: $heists,\n\nrounds: $rounds,\n\ncurrentBalance: $currentBalance\n}';
+    return 'GameModel{db: $db, subscriptions: $subscriptions, playerName: $playerName, requests: $requests, room: $room, players: $players, heists: $heists, rounds: $rounds}';
   }
 }
 

@@ -4,7 +4,7 @@ Widget _playerInfo(Store<GameModel> store) {
   return new StoreConnector<GameModel, PlayerInfoViewModel>(
       distinct: true,
       converter: (store) =>
-          new PlayerInfoViewModel._(store.state.me(), store.state.getCurrentBalance()),
+          new PlayerInfoViewModel._(getSelf(store.state), currentBalance(store.state)),
       builder: (context, viewModel) {
         if (viewModel.me == null) {
           return new Container();

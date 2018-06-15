@@ -13,11 +13,11 @@ class Game extends StatelessWidget {
   }
 
   Widget _loadingScreen(GameModel viewModel) {
-    if (!viewModel.roomIsAvailable()) {
+    if (!roomIsAvailable(viewModel)) {
       return _loading();
     }
 
-    if (viewModel.waitingForPlayers()) {
+    if (waitingForPlayers(viewModel)) {
       return new Center(
           child: new Text(
         "Waiting for players: ${viewModel.players.length} / ${viewModel.room.numPlayers}",
@@ -25,7 +25,7 @@ class Game extends StatelessWidget {
       ));
     }
 
-    if (viewModel.isNewGame()) {
+    if (isNewGame(viewModel)) {
       return new Center(
           child: new Text(
         "Assigning roles...",
@@ -37,7 +37,7 @@ class Game extends StatelessWidget {
   }
 
   Widget _currentGameComponent(GameModel viewModel) {
-    Player me = viewModel.me();
+    Player me = getSelf(viewModel);
     return new ListTile(
       title: new Text(
         "${viewModel.room.code} - ${viewModel.room.numPlayers} players",
@@ -59,7 +59,7 @@ class Game extends StatelessWidget {
         builder: (context, viewModel) => new Expanded(
               child: new Card(
                 elevation: 2.0,
-                child: viewModel.ready()
+                child: gameIsReady(viewModel)
                     ? _currentGameComponent(viewModel)
                     : _loadingScreen(viewModel),
               ),

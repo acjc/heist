@@ -42,12 +42,13 @@ void main() {
     expect(store.state.subscriptions.subs, isNotEmpty);
 
     await _handle(store, new JoinGameAction());
-    expect(store.state.me(), isNotNull);
+    expect(getSelf(store.state), isNotNull);
 
     await _addOtherPlayers(store);
 
     await _handle(store, new SetUpNewGameAction());
     expect(store.state.players.length, store.state.room.numPlayers);
+    expect(waitingForPlayers(store.state), false);
     for (Player player in store.state.players) {
       expect(player.role, isNotNull);
     }
@@ -88,8 +89,8 @@ void main() {
       expect(player.role, isNotNull);
       expect(true, store.state.room.roles.contains(player.role));
     }
-    expect(store.state.me(), isNotNull);
+    expect(getSelf(store.state), isNotNull);
     expect(store.state.heists.length, 1);
-    expect(store.state.hasRounds(), true);
+    expect(hasRounds(store.state), true);
   });
 }

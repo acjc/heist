@@ -32,9 +32,8 @@ void _reloadSubscriptions(Store<GameModel> store) {
 }
 
 class CreateRoomAction extends MiddlewareAction {
-
   Future<String> _createRoom(Store<GameModel> store, String code, String appVersion) {
-   return store.state.db.upsertRoom(new Room(
+    return store.state.db.upsertRoom(new Room(
         code: code,
         createdAt: now(),
         appVersion: appVersion,
@@ -96,7 +95,7 @@ class JoinGameAction extends MiddlewareAction {
     FirestoreDb db = store.state.db;
     String iid = installId();
 
-    if (!store.state.haveJoinedGame() && !(await db.playerExists(roomId, iid))) {
+    if (!haveJoinedGame(store.state) && !(await db.playerExists(roomId, iid))) {
       // TODO: initial balance may eventually depend on role
       return db.upsertPlayer(
           new Player(installId: iid, name: playerName, initialBalance: 8), roomId);
@@ -128,7 +127,7 @@ class SetUpNewGameAction extends MiddlewareAction {
   Future<void> _createFirstRound(Store<GameModel> store, String heistId) async {
     FirestoreDb db = store.state.db;
     String roomId = store.state.room.id;
-    if (!store.state.hasRounds() && !(await db.roundExists(roomId, heistId, 1))) {
+    if (!hasRounds(store.state) && !(await db.roundExists(roomId, heistId, 1))) {
       Round round = new Round(order: 1, startedAt: now());
       return db.upsertRound(round, roomId, heistId);
     }
@@ -152,7 +151,7 @@ class LoadGameAction extends MiddlewareAction {
   }
 
   void _completeRequest(Store<GameModel> store, Request request) {
-    if (store.state.requestInProcess(request)) {
+    if (requestInProcess(store.state, request)) {
       store.dispatch(new RequestCompleteAction(request));
     }
   }
@@ -163,20 +162,20 @@ class LoadGameAction extends MiddlewareAction {
   }
 
   void _setUpGame(Store<GameModel> store, GameModel gameModel) {
-    if (!gameModel.roomIsAvailable()) {
+    if (!roomIsAvailable(gameModel)) {
       return;
     }
 
-    if (gameModel.waitingForPlayers()) {
-      if (!gameModel.haveJoinedGame() && !gameModel.requestInProcess(Request.JoiningGame)) {
+    if (waitingForPlayers(gameModel)) {
+      if (!haveJoinedGame(gameModel) && !requestInProcess(gameModel, Request.JoiningGame)) {
         store.dispatch(new StartRequestAction(Request.JoiningGame));
         store.dispatch(new JoinGameAction());
       }
       return;
     }
 
-    if (gameModel.isNewGame()) {
-      if (gameModel.amOwner() && !gameModel.requestInProcess(Request.CreatingNewRoom)) {
+    if (isNewGame(gameModel)) {
+      if (amOwner(gameModel) && !requestInProcess(gameModel, Request.CreatingNewRoom)) {
         store.dispatch(new StartRequestAction(Request.CreatingNewRoom));
         store.dispatch(new SetUpNewGameAction());
       }
@@ -185,7 +184,7 @@ class LoadGameAction extends MiddlewareAction {
   }
 
   void _addGameSetUpListener(Store<GameModel> store) {
-    store.onChange.takeWhile((gameModel) => !gameModel.ready()).listen(
+    store.onChange.takeWhile((gameModel) => !gameIsReady(gameModel)).listen(
         (gameModel) => _setUpGame(store, gameModel),
         onDone: () => _clearSetUpRequests(store),
         onError: (e) => _clearSetUpRequests(store));

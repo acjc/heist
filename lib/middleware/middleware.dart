@@ -118,7 +118,7 @@ class SetUpNewGameAction extends MiddlewareAction {
     FirestoreDb db = store.state.db;
     String roomId = store.state.room.id;
     if (store.state.heists.isEmpty && !(await db.heistExists(roomId, 1))) {
-      Heist heist = new Heist(price: 12, numPlayers: 2, order: 1, startedAt: now());
+      Heist heist = new Heist(price: 12, numPlayers: 2, order: 1);
       return db.upsertHeist(heist, roomId);
     }
     return store.state.heists[0].id;
@@ -128,7 +128,7 @@ class SetUpNewGameAction extends MiddlewareAction {
     FirestoreDb db = store.state.db;
     String roomId = store.state.room.id;
     if (!hasRounds(store.state) && !(await db.roundExists(roomId, heistId, 1))) {
-      Round round = new Round(order: 1, startedAt: now());
+      Round round = new Round(order: 1);
       return db.upsertRound(round, roomId, heistId);
     }
   }
@@ -145,9 +145,9 @@ class SetUpNewGameAction extends MiddlewareAction {
 
 class LoadGameAction extends MiddlewareAction {
   @override
-  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
+    await loadGame(store);
     _addGameSetUpListener(store);
-    return loadGame(store);
   }
 
   void _completeRequest(Store<GameModel> store, Request request) {

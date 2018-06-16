@@ -210,9 +210,8 @@ class Heist extends Document {
       this.pot,
       @required this.numPlayers,
       @required this.order,
-      @required this.startedAt,
       this.decisions})
-      : super(id: id);
+      : startedAt = now(), super(id: id);
 
   Heist copyWith({
     String id,
@@ -231,7 +230,6 @@ class Heist extends Document {
       pot: pot ?? this.pot,
       numPlayers: numPlayers ?? this.numPlayers,
       order: order ?? this.order,
-      startedAt: startedAt ?? this.startedAt,
       decisions: decisions ?? this.decisions,
     );
   }
@@ -277,7 +275,7 @@ class Bid {
   final int amount;
   final DateTime timestamp;
 
-  Bid({this.amount, this.timestamp});
+  Bid({this.amount}) : timestamp = now();
 
   Bid.fromJson(Map<String, dynamic> json)
       : amount = json['amount'],
@@ -290,7 +288,7 @@ class Gift {
   final String recipient;
   final DateTime timestamp;
 
-  Gift({this.amount, this.recipient, this.timestamp});
+  Gift({this.amount, this.recipient}) : timestamp = now();
 
   Gift.fromJson(Map<String, dynamic> json)
       : amount = json['amount'],
@@ -324,12 +322,11 @@ class Round extends Document {
       @required this.order,
       this.room,
       this.heist,
-      @required this.startedAt,
       this.team,
       this.teamSubmitted = false,
       this.bids,
       this.gifts})
-      : super(id: id);
+      : startedAt = now(), super(id: id);
 
   Round copyWith({
     String id,
@@ -349,7 +346,6 @@ class Round extends Document {
       order: order ?? this.order,
       room: room ?? this.room,
       heist: heist ?? this.heist,
-      startedAt: startedAt ?? this.startedAt,
       team: team ?? this.team,
       teamSubmitted: teamSubmitted ?? this.teamSubmitted,
       bids: bids ?? this.bids,

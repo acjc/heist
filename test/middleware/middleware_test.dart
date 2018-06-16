@@ -3,23 +3,15 @@ import 'dart:async';
 import 'package:heist/main.dart';
 import 'package:redux/redux.dart';
 import 'package:test/test.dart';
-import 'package:uuid/uuid.dart';
 
-import 'mock_firestore_db.dart';
-
-Future<void> _handle(Store<GameModel> store, MiddlewareAction action) {
-  return action.handle(store, action, null);
-}
+import '../mock_firestore_db.dart';
+import '../test_utils.dart';
 
 Future<void> _addOtherPlayers(Store<GameModel> store) async {
   for (int i = 0; i < store.state.room.numPlayers - 1; i++) {
     await store.state.db.upsertPlayer(
-        new Player(installId: _uuid(), name: _uuid(), initialBalance: 8), store.state.room.id);
+        new Player(installId: uuid(), name: uuid(), initialBalance: 8), store.state.room.id);
   }
-}
-
-String _uuid() {
-  return new Uuid().v4();
 }
 
 void main() {
@@ -28,7 +20,7 @@ void main() {
     Store<GameModel> store = createStore(db);
     store.dispatch(new SetPlayerNameAction('_name'));
 
-    await _handle(store, new CreateRoomAction());
+    await handle(store, new CreateRoomAction());
     expect(store.state.room.code.length, 4);
     expect(store.state.room.appVersion, isNotNull);
     expect(store.state.room.numPlayers, minPlayers);
@@ -41,12 +33,12 @@ void main() {
     await new LoadGameAction().loadGame(store);
     expect(store.state.subscriptions.subs, isNotEmpty);
 
-    await _handle(store, new JoinGameAction());
+    await handle(store, new JoinGameAction());
     expect(getSelf(store.state), isNotNull);
 
     await _addOtherPlayers(store);
 
-    await _handle(store, new SetUpNewGameAction());
+    await handle(store, new SetUpNewGameAction());
     expect(store.state.players.length, store.state.room.numPlayers);
     expect(waitingForPlayers(store.state), false);
     for (Player player in store.state.players) {
@@ -57,22 +49,22 @@ void main() {
 
   test('join existing game', () async {
     String code = 'ABCD';
-    String heistId = _uuid();
+    String heistId = uuid();
     FirestoreDb db = new MockFirestoreDb(
         room: new Room(
-            id: _uuid(),
+            id: uuid(),
             code: code,
             numPlayers: 2,
             roles: new Set.of(['KINGPIN', 'LEAD_AGENT'])),
         players: [
-          new Player(id: _uuid(), installId: installId(), name: '_name', role: 'KINGPIN'),
-          new Player(id: _uuid(), installId: _uuid(), name: '_player2', role: 'LEAD_AGENT'),
+          new Player(id: uuid(), installId: installId(), name: '_name', role: 'KINGPIN'),
+          new Player(id: uuid(), installId: uuid(), name: '_player2', role: 'LEAD_AGENT'),
         ],
         heists: [
-          new Heist(id: heistId, price: 12, numPlayers: 2, order: 1, startedAt: now())
+          new Heist(id: heistId, price: 12, numPlayers: 2, order: 1)
         ],
         rounds: {
-          heistId: [new Round(id: _uuid(), order: 1, startedAt: now())]
+          heistId: [new Round(id: uuid(), order: 1)]
         });
     Store<GameModel> store = createStore(db);
 

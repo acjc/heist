@@ -55,7 +55,7 @@ final Selector<GameModel, int> currentBalance =
   heists.forEach((heist) {
     List<Round> rounds = allRounds[heist.id];
     if (heist.decisions.isNotEmpty) {
-      balance += rounds.last.bids[me.id].amount;
+      balance -= rounds.last.bids[me.id].amount;
     }
     rounds.forEach((round) => round.gifts.forEach((id, gift) {
           if (id == me.id) {

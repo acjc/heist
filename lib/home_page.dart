@@ -135,7 +135,7 @@ class HomePage extends StatelessWidget {
       if (enterRoomState.validate() && enterNameState.validate()) {
         enterRoomState.save();
         enterNameState.save();
-        Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Game()));
+        Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Game(store)));
       }
     }
 

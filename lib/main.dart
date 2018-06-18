@@ -85,6 +85,7 @@ class MyApp extends StatelessWidget {
           title: 'Heist',
           theme: new ThemeData(
             primaryColor: Colors.deepOrange,
+            indicatorColor: Colors.white,
           ),
           home: new Scaffold(
             appBar: new AppBar(

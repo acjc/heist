@@ -51,7 +51,7 @@ class CreateRoomAction extends MiddlewareAction {
 
     NavigatorState navigatorState = navigatorKey.currentState;
     if (navigatorState != null) {
-      navigatorState.push(new MaterialPageRoute(builder: (context) => new Game()));
+      navigatorState.push(new MaterialPageRoute(builder: (context) => new Game(store)));
     }
   }
 

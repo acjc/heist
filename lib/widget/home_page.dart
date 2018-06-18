@@ -57,7 +57,7 @@ class HomePage extends StatelessWidget {
           return new Container(
             padding: _padding,
             child: new Text(
-              'Roles: ' + roles?.toString(),
+              'Roles: ${roles?.toString()}',
               style: const TextStyle(
                 fontSize: 16.0,
               ),
@@ -139,7 +139,7 @@ class HomePage extends StatelessWidget {
       if (enterRoomState.validate() && enterNameState.validate()) {
         enterRoomState.save();
         enterNameState.save();
-        Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Game()));
+        Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Game(store)));
       }
     }
 

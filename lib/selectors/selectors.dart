@@ -4,6 +4,7 @@ final getRoom = (GameModel gameModel) => gameModel.room;
 final getPlayers = (GameModel gameModel) => gameModel.players;
 final getHeists = (GameModel gameModel) => gameModel.heists;
 final getRounds = (GameModel gameModel) => gameModel.rounds;
+final getBidAmount = (GameModel gameModel) => gameModel.bidAmount;
 final getRequests = (GameModel gameModel) => gameModel.requests;
 
 bool requestInProcess(GameModel gameModel, Request request) =>
@@ -78,5 +79,5 @@ final Selector<GameModel, bool> isMyGo =
 final Selector<GameModel, bool> waitingForTeam =
     createSelector1(currentRound, (currentRound) => !currentRound.teamSubmitted);
 
-final Selector<GameModel, bool> canBid = createSelector2(currentRound, getSelf,
-    (currentRound, me) => currentRound.bids.containsKey(me.id) && currentRound.teamSubmitted);
+final Selector<GameModel, Bid> currentBid = createSelector2(
+    currentRound, getSelf, (currentRound, me) => currentRound.bids[me.id] ?? new Bid(amount: -1));

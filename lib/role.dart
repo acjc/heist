@@ -39,9 +39,7 @@ final Map<int, Set<Role>> numPlayersToRolesMap = {
                   LEAD_AGENT, AGENT_1, AGENT_2, AGENT_3]),
 };
 
-Set<String> getRolesIds(Set<Role> roles) {
-  return roles.map((r) => r.roleId).toSet();
-}
+final getRolesIds = (Set<Role> roles) => roles.map((r) => r.roleId).toSet();
 
 @immutable
 class Role {

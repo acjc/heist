@@ -39,13 +39,14 @@ class GameState extends State<Game> {
     ));
   }
 
-  Widget _mainBoardBody(GameModel viewModel) {
-    return new ListTile(
-      title: new Text(
-        "${viewModel.room.code} - ${viewModel.room.numPlayers} players",
-        style: textStyle,
-      ),
-    );
+  Widget _mainBoardBody(Store<GameModel> store, GameModel viewModel) {
+    return new Bidding(store);
+//    return new ListTile(
+//      title: new Text(
+//        "${viewModel.room.code} - ${viewModel.room.numPlayers} players",
+//        style: textStyle,
+//      ),
+//    );
   }
 
   Widget _secretBoardBody(GameModel viewModel) {
@@ -90,7 +91,7 @@ class GameState extends State<Game> {
               child: new Card(
                   elevation: 2.0,
                   child: gameIsReady(viewModel)
-                      ? _mainBoardBody(viewModel)
+                      ? _mainBoardBody(store, viewModel)
                       : _loadingScreen(viewModel)),
             ));
   }

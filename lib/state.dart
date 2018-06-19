@@ -6,6 +6,7 @@ class GameModel {
   final Subscriptions subscriptions;
 
   final String playerName;
+  final int bidAmount;
 
   /// List of pending requests to avoid kicking off the same request multiple times.
   final Set<Request> requests;
@@ -19,6 +20,7 @@ class GameModel {
       {this.db,
       this.subscriptions,
       this.playerName,
+      this.bidAmount,
       this.requests,
       this.room,
       this.players,
@@ -28,6 +30,7 @@ class GameModel {
   GameModel copyWith(
       {Subscriptions subscriptions,
       String playerName,
+      int bidAmount,
       Set<Request> requests,
       Room room,
       List<Player> players,
@@ -37,6 +40,7 @@ class GameModel {
       db: this.db,
       subscriptions: subscriptions ?? this.subscriptions,
       playerName: playerName ?? this.playerName,
+      bidAmount: bidAmount ?? this.bidAmount,
       requests: requests ?? this.requests,
       room: room ?? this.room,
       players: players ?? this.players,
@@ -48,6 +52,7 @@ class GameModel {
   factory GameModel.initial(FirestoreDb db, int numPlayers) => GameModel(
       db: db,
       playerName: null,
+      bidAmount: 0,
       requests: new Set(),
       room: new Room.initial(),
       players: [],
@@ -61,6 +66,7 @@ class GameModel {
           db == other.db &&
           subscriptions == other.subscriptions &&
           playerName == other.playerName &&
+          bidAmount == other.bidAmount &&
           requests == other.requests &&
           room == other.room &&
           players == other.players &&
@@ -72,6 +78,7 @@ class GameModel {
       db.hashCode ^
       subscriptions.hashCode ^
       playerName.hashCode ^
+      bidAmount.hashCode ^
       requests.hashCode ^
       room.hashCode ^
       players.hashCode ^
@@ -80,7 +87,7 @@ class GameModel {
 
   @override
   String toString() {
-    return 'GameModel{db: $db, subscriptions: $subscriptions, playerName: $playerName, requests: $requests, room: $room, players: $players, heists: $heists, rounds: $rounds}';
+    return 'GameModel{db: $db, subscriptions: $subscriptions, playerName: $playerName, bidAmount: $bidAmount, requests: $requests, room: $room, players: $players, heists: $heists, rounds: $rounds}';
   }
 }
 
@@ -95,4 +102,4 @@ class Subscriptions {
   }
 }
 
-enum Request { CreatingNewRoom, JoiningGame }
+enum Request { CreatingNewRoom, JoiningGame, Bidding }

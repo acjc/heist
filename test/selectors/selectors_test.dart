@@ -27,7 +27,7 @@ void main() {
               numPlayers: 2,
               order: 1,
               decisions: {myId: 'SUCCEED'}),
-          new Heist(id: heistId2, price: 12, numPlayers: 2, order: 2, decisions: {})
+          new Heist(id: heistId2, price: 12, numPlayers: 2, order: 2)
         ],
         rounds: {
           heistId1: [

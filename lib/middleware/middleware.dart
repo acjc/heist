@@ -6,6 +6,7 @@ List<Middleware<GameModel>> createMiddleware() {
     new TypedMiddleware<GameModel, LoadGameAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, SetUpNewGameAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, JoinGameAction>(_dispatchMiddleware),
+    new TypedMiddleware<GameModel, SubmitBidAction>(_dispatchMiddleware),
   ];
 
   // asserts only work in debug mode
@@ -24,6 +25,19 @@ void _dispatchMiddleware(Store<GameModel> store, dynamic action, NextDispatcher 
 /// MiddlewareActions know how to handle themselves.
 abstract class MiddlewareAction {
   Future<void> handle(Store<GameModel> store, dynamic action, NextDispatcher next);
+}
+
+class SubmitBidAction extends MiddlewareAction {
+  final int amount;
+
+  SubmitBidAction(this.amount);
+
+  @override
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
+    store.dispatch(new StartRequestAction(Request.Bidding));
+    print('Submit bid');
+    store.dispatch(new RequestCompleteAction(Request.Bidding));
+  }
 }
 
 void _reloadSubscriptions(Store<GameModel> store) {

@@ -46,8 +46,8 @@ class Room extends Document {
       this.owner,
       this.completed = false,
       this.completedAt,
-      this.numPlayers,
-      this.roles})
+      @required this.numPlayers,
+      @required this.roles})
       : super(id: id);
 
   factory Room.initial() =>
@@ -210,8 +210,9 @@ class Heist extends Document {
       this.pot,
       @required this.numPlayers,
       @required this.order,
-      this.decisions})
-      : startedAt = now(), super(id: id);
+      this.decisions = const {}})
+      : startedAt = now(),
+        super(id: id);
 
   Heist copyWith({
     String id,
@@ -243,7 +244,7 @@ class Heist extends Document {
         numPlayers = json['numPlayers'],
         order = json['order'],
         startedAt = json['startedAt'],
-        decisions = json['decisions']?.cast<String, String>(),
+        decisions = json['decisions']?.cast<String, String>() ?? {},
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -280,6 +281,11 @@ class Bid {
   Bid.fromJson(Map<String, dynamic> json)
       : amount = json['amount'],
         timestamp = json['timestamp'];
+
+  @override
+  String toString() {
+    return 'Bid{amount: $amount, timestamp: $timestamp}';
+  }
 }
 
 @immutable
@@ -294,6 +300,11 @@ class Gift {
       : amount = json['amount'],
         recipient = json['recipient'],
         timestamp = json['timestamp'];
+
+  @override
+  String toString() {
+    return 'Gift{amount: $amount, recipient: $recipient, timestamp: $timestamp}';
+  }
 }
 
 Map<String, Value> _convertValues<Value>(Map<String, dynamic> map, Value transform(v)) {
@@ -324,9 +335,10 @@ class Round extends Document {
       this.heist,
       this.team,
       this.teamSubmitted = false,
-      this.bids,
-      this.gifts})
-      : startedAt = now(), super(id: id);
+      this.bids = const {},
+      this.gifts = const {}})
+      : startedAt = now(),
+        super(id: id);
 
   Round copyWith({
     String id,

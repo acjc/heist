@@ -17,10 +17,12 @@ class BiddingState extends State<Bidding> {
   BiddingState(this.store);
 
   Widget body(BuildContext context, BiddingViewModel viewModel) {
+    String currentBidAmount = viewModel.bid == null ? 'None' : viewModel.bid.amount.toString();
     return new Container(
         padding: padding,
         child: new Column(
           children: [
+            new Text('Current bid: $currentBidAmount', style: textStyle),
             new Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -37,9 +39,9 @@ class BiddingState extends State<Bidding> {
             new RaisedButton(
                 color: Theme.of(context).primaryColor,
                 child: const Text('SUBMIT BID', style: buttonTextStyle),
-                onPressed: () {
-                  store.dispatch(new SubmitBidAction(viewModel.bidAmount));
-                }),
+                onPressed: viewModel.loading
+                    ? null
+                    : () => store.dispatch(new SubmitBidAction(viewModel.bidAmount))),
           ],
         ));
   }

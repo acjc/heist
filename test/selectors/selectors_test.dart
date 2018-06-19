@@ -36,14 +36,14 @@ void main() {
                 order: 1,
                 bids: {},
                 gifts: {uuid(): new Gift(amount: 10, recipient: myId)}),
-            new Round(id: uuid(), order: 2, bids: {myId: new Bid(amount: 13)}, gifts: {})
+            new Round(id: uuid(), order: 2, bids: {myId: new Bid(13)}, gifts: {})
           ],
           heistId2: [
             new Round(
                 id: uuid(),
                 order: 1,
                 gifts: {myId: new Gift(amount: 3, recipient: uuid())},
-                bids: {myId: new Bid(amount: 11)})
+                bids: {myId: new Bid(11)})
           ]
         });
     Store<GameModel> store = createStore(db);

@@ -80,4 +80,4 @@ final Selector<GameModel, bool> waitingForTeam =
     createSelector1(currentRound, (currentRound) => !currentRound.teamSubmitted);
 
 final Selector<GameModel, Bid> currentBid = createSelector2(
-    currentRound, getSelf, (currentRound, me) => currentRound.bids[me.id] ?? new Bid(amount: -1));
+    currentRound, getSelf, (currentRound, me) => currentRound.bids[me.id]);

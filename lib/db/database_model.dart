@@ -103,10 +103,15 @@ class Room extends Document {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is Room && id == other.id && code == other.code;
+      identical(this, other) ||
+      other is Room &&
+          id == other.id &&
+          code == other.code &&
+          numPlayers == other.numPlayers &&
+          roles == other.roles;
 
   @override
-  int get hashCode => id.hashCode ^ code.hashCode;
+  int get hashCode => id.hashCode ^ code.hashCode ^ numPlayers.hashCode ^ roles.hashCode;
 
   @override
   String toString() {
@@ -181,10 +186,12 @@ class Player extends Document {
           id == other.id &&
           installId == other.installId &&
           room == other.room &&
-          name == other.name;
+          name == other.name &&
+          role == other.role;
 
   @override
-  int get hashCode => id.hashCode ^ installId.hashCode ^ room.hashCode ^ name.hashCode;
+  int get hashCode =>
+      id.hashCode ^ installId.hashCode ^ room.hashCode ^ name.hashCode ^ role.hashCode;
 
   @override
   String toString() {
@@ -260,10 +267,14 @@ class Heist extends Document {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Heist && id == other.id && room == other.room && order == other.order;
+      other is Heist &&
+          id == other.id &&
+          room == other.room &&
+          price == other.price &&
+          decisions == other.decisions;
 
   @override
-  int get hashCode => id.hashCode ^ room.hashCode ^ order.hashCode;
+  int get hashCode => id.hashCode ^ room.hashCode ^ price.hashCode ^ decisions.hashCode;
 
   @override
   String toString() {
@@ -276,11 +287,16 @@ class Bid {
   final int amount;
   final DateTime timestamp;
 
-  Bid({this.amount}) : timestamp = now();
+  Bid(this.amount) : timestamp = now();
 
   Bid.fromJson(Map<String, dynamic> json)
       : amount = json['amount'],
         timestamp = json['timestamp'];
+
+  Map<String, dynamic> toJson() => {
+        'amount': amount,
+        'timestamp': timestamp,
+      };
 
   @override
   String toString() {
@@ -300,6 +316,12 @@ class Gift {
       : amount = json['amount'],
         recipient = json['recipient'],
         timestamp = json['timestamp'];
+
+  Map<String, dynamic> toJson() => {
+        'amount': amount,
+        'recipient': recipient,
+        'timestamp': timestamp,
+      };
 
   @override
   String toString() {
@@ -398,12 +420,14 @@ class Round extends Document {
       identical(this, other) ||
       other is Round &&
           id == other.id &&
-          order == other.order &&
-          room == other.room &&
-          heist == other.heist;
+          team == other.team &&
+          teamSubmitted == other.teamSubmitted &&
+          bids == other.bids &&
+          gifts == other.gifts;
 
   @override
-  int get hashCode => id.hashCode ^ order.hashCode ^ room.hashCode ^ heist.hashCode;
+  int get hashCode =>
+      id.hashCode ^ team.hashCode ^ teamSubmitted.hashCode ^ bids.hashCode ^ gifts.hashCode;
 
   @override
   String toString() {

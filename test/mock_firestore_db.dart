@@ -174,4 +174,13 @@ class MockFirestoreDb implements FirestoreDb {
       _postRounds(heistId);
     });
   }
+
+  Round _getRound(String roundId) {
+    return rounds.values.expand((rs) => rs).firstWhere((r) => r.id == roundId);
+  }
+
+  @override
+  Future<void> submitBid(String roundId, String myPlayerId, Bid bid) async {
+    _getRound(roundId).bids[myPlayerId] = bid;
+  }
 }

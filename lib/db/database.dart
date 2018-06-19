@@ -134,4 +134,11 @@ class FirestoreDb {
     player = player.copyWith(room: roomRef);
     return _firestore.collection('players').document(player.id).setData(player.toJson());
   }
+
+  Future<void> submitBid(String roundId, String myPlayerId, Bid bid) {
+    Map<String, dynamic> data = {
+      'bids': {myPlayerId: bid.toJson()}
+    };
+    return _firestore.collection('rounds').document(roundId).setData(data, merge: true);
+  }
 }

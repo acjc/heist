@@ -183,4 +183,9 @@ class MockFirestoreDb implements FirestoreDb {
   Future<void> submitBid(String roundId, String myPlayerId, Bid bid) async {
     _getRound(roundId).bids[myPlayerId] = bid;
   }
+
+  @override
+  Future<void> cancelBid(String roundId, String myPlayerId) {
+    return submitBid(roundId, myPlayerId, null);
+  }
 }

@@ -137,8 +137,12 @@ class FirestoreDb {
 
   Future<void> submitBid(String roundId, String myPlayerId, Bid bid) {
     Map<String, dynamic> data = {
-      'bids': {myPlayerId: bid.toJson()}
+      'bids': {myPlayerId: bid?.toJson()}
     };
     return _firestore.collection('rounds').document(roundId).setData(data, merge: true);
+  }
+
+  Future<void> cancelBid(String roundId, String myPlayerId) {
+    return submitBid(roundId, myPlayerId, null);
   }
 }

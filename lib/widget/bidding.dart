@@ -22,7 +22,9 @@ class BiddingState extends State<Bidding> {
         padding: padding,
         child: new Column(
           children: [
-            new Text('Current bid: $currentBidAmount', style: textStyle),
+            new Text('Bids so far: ${viewModel.numBids} / ${viewModel.numPlayers}',
+                style: textStyle),
+            new Text('Your bid: $currentBidAmount', style: textStyle),
             new Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -32,8 +34,11 @@ class BiddingState extends State<Bidding> {
                     style: const TextStyle(
                       fontSize: 32.0,
                     )),
-                iconWidget(context, Icons.arrow_forward,
-                    () => store.dispatch(new IncrementBidAmountAction(viewModel.balance))),
+                iconWidget(
+                    context,
+                    Icons.arrow_forward,
+                    () =>
+                        store.dispatch(new IncrementBidAmountAction(currentBalance(store.state)))),
               ],
             ),
             new RaisedButton(
@@ -42,6 +47,12 @@ class BiddingState extends State<Bidding> {
                 onPressed: viewModel.loading
                     ? null
                     : () => store.dispatch(new SubmitBidAction(viewModel.bidAmount))),
+            new RaisedButton(
+                color: Theme.of(context).accentColor,
+                child: const Text('CANCEL BID', style: buttonTextStyle),
+                onPressed: viewModel.bid == null || viewModel.loading
+                    ? null
+                    : () => store.dispatch(new CancelBidAction()))
           ],
         ));
   }
@@ -50,10 +61,11 @@ class BiddingState extends State<Bidding> {
   Widget build(BuildContext context) {
     return new StoreConnector<GameModel, BiddingViewModel>(
       converter: (store) => new BiddingViewModel._(
-          currentBalance(store.state),
           getBidAmount(store.state),
           requestInProcess(store.state, Request.Bidding),
-          currentBid(store.state)),
+          currentBid(store.state),
+          numBids(store.state),
+          getRoom(store.state).numPlayers),
       distinct: true,
       builder: (context, viewModel) => body(context, viewModel),
     );
@@ -61,27 +73,30 @@ class BiddingState extends State<Bidding> {
 }
 
 class BiddingViewModel {
-  final int balance;
   final int bidAmount;
   final bool loading;
   final Bid bid;
+  final int numBids;
+  final int numPlayers;
 
-  BiddingViewModel._(this.balance, this.bidAmount, this.loading, this.bid);
+  BiddingViewModel._(this.bidAmount, this.loading, this.bid, this.numBids, this.numPlayers);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is BiddingViewModel &&
-          balance == other.balance &&
           bidAmount == other.bidAmount &&
           loading == other.loading &&
-          bid == other.bid;
+          bid == other.bid &&
+          numBids == other.numBids &&
+          numPlayers == other.numPlayers;
 
   @override
-  int get hashCode => balance.hashCode ^ bidAmount.hashCode ^ loading.hashCode ^ bid.hashCode;
+  int get hashCode =>
+      bidAmount.hashCode ^ loading.hashCode ^ bid.hashCode ^ numBids.hashCode ^ numPlayers.hashCode;
 
   @override
   String toString() {
-    return 'BiddingViewModel{balance: $balance, bidAmount: $bidAmount, loading: $loading, bid: $bid}';
+    return 'BiddingViewModel{bidAmount: $bidAmount, loading: $loading, bid: $bid, numBids: $numBids, numPlayers: $numPlayers}';
   }
 }

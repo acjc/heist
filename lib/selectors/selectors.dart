@@ -79,5 +79,8 @@ final Selector<GameModel, bool> isMyGo =
 final Selector<GameModel, bool> waitingForTeam =
     createSelector1(currentRound, (currentRound) => !currentRound.teamSubmitted);
 
-final Selector<GameModel, Bid> currentBid = createSelector2(
-    currentRound, getSelf, (currentRound, me) => currentRound.bids[me.id]);
+final Selector<GameModel, Bid> currentBid =
+    createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.bids[me.id]);
+
+final Selector<GameModel, int> numBids = createSelector1(
+    currentRound, (currentRound) => currentRound.bids.values.where((b) => b != null).length);

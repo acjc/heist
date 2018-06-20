@@ -1,22 +1,16 @@
 part of heist;
 
 class Bidding extends StatefulWidget {
-  final Store<GameModel> store;
-
-  Bidding(this.store);
-
   @override
   State<StatefulWidget> createState() {
-    return new BiddingState(store);
+    return new BiddingState();
   }
 }
 
 class BiddingState extends State<Bidding> {
-  final Store<GameModel> store;
-
-  BiddingState(this.store);
 
   Widget body(BuildContext context, BiddingViewModel viewModel) {
+    Store<GameModel> store = StoreProvider.of<GameModel>(context);
     String currentBidAmount = viewModel.bid == null ? 'None' : viewModel.bid.amount.toString();
     return new Container(
         padding: padding,
@@ -63,7 +57,7 @@ class BiddingState extends State<Bidding> {
       converter: (store) => new BiddingViewModel._(
           getBidAmount(store.state),
           requestInProcess(store.state, Request.Bidding),
-          currentBid(store.state),
+          myCurrentBid(store.state),
           numBids(store.state),
           getRoom(store.state).numPlayers),
       distinct: true,

@@ -13,7 +13,7 @@ bool requestInProcess(GameModel gameModel, Request request) =>
 final Selector<GameModel, bool> rolesAreAssigned =
     createSelector1(getPlayers, (players) => players.any((p) => p.role == null || p.role.isEmpty));
 
-/// A game is new if roles have not yet been assigned.
+/// A game is new if roles have not yet been assigned
 final Selector<GameModel, bool> isNewGame = createSelector3(rolesAreAssigned, getHeists, hasRounds,
     (rolesAreAssigned, heists, hasRounds) => rolesAreAssigned || heists.isEmpty || !hasRounds);
 
@@ -70,7 +70,7 @@ final Selector<GameModel, int> currentBalance =
   return balance;
 });
 
-final Selector<GameModel, bool> currentHeistIsFunded =
+final Selector<GameModel, bool> currentHeistFunded =
     createSelector1(currentHeist, (currentHeist) => currentHeist.pot >= currentHeist.price);
 
 final Selector<GameModel, bool> isMyGo =
@@ -79,8 +79,11 @@ final Selector<GameModel, bool> isMyGo =
 final Selector<GameModel, bool> waitingForTeam =
     createSelector1(currentRound, (currentRound) => !currentRound.teamSubmitted);
 
-final Selector<GameModel, Bid> currentBid =
-    createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.bids[me.id]);
-
 final Selector<GameModel, int> numBids = createSelector1(
     currentRound, (currentRound) => currentRound.bids.values.where((b) => b != null).length);
+
+final Selector<GameModel, bool> biddingComplete =
+    createSelector2(numBids, getRoom, (numBids, room) => numBids == room.numPlayers);
+
+final Selector<GameModel, Bid> myCurrentBid =
+    createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.bids[me.id]);

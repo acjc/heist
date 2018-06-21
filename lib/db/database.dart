@@ -43,8 +43,10 @@ class FirestoreDb {
   }
 
   Future<bool> roundExists(String roomId, String heistId, int order) async {
-    QuerySnapshot snapshot =
-        await _roundQuery(roomId, heistId).where('order', isEqualTo: order).getDocuments();
+    QuerySnapshot snapshot = await _roundQuery(roomId)
+        .where('heist', isEqualTo: heistId)
+        .where('order', isEqualTo: order)
+        .getDocuments();
     return snapshot.documents.isNotEmpty;
   }
 
@@ -90,22 +92,15 @@ class FirestoreDb {
     return _firestore.collection('heists').where('room', isEqualTo: room);
   }
 
-  StreamSubscription<List<Round>> listenOnRounds(
-      String roomRef, String heistRef, void onData(List<Round> rounds)) {
-    return _roundQuery(roomRef, heistRef).snapshots().map((snapshot) {
-      List<Round> rounds = snapshot.documents.map((s) => new Round.fromSnapshot(s)).toList();
-      rounds.sort((r1, r2) => r1.order.compareTo(r2.order));
-      return rounds;
+  StreamSubscription<List<Round>> listenOnRounds(String roomId, void onData(List<Round> rounds)) {
+    return _roundQuery(roomId).snapshots().map((snapshot) {
+      return snapshot.documents.map((s) => new Round.fromSnapshot(s)).toList();
     }).listen(onData);
   }
 
-  Query _roundQuery(String roomRef, String heistRef) {
-    DocumentReference room = _firestore.document("/rooms/$roomRef");
-    DocumentReference heist = _firestore.document("/heists/$heistRef");
-    return _firestore
-        .collection('rounds')
-        .where('room', isEqualTo: room)
-        .where('heist', isEqualTo: heist);
+  Query _roundQuery(String roomId) {
+    DocumentReference roomRef = _firestore.document("/rooms/$roomId");
+    return _firestore.collection('rounds').where('room', isEqualTo: roomRef);
   }
 
   Future<String> upsertRoom(Room room) async {
@@ -122,10 +117,9 @@ class FirestoreDb {
     return heistRef.documentID;
   }
 
-  Future<void> upsertRound(Round round, String roomId, String heistId) {
+  Future<void> upsertRound(Round round, String roomId) {
     DocumentReference roomRef = _firestore.document("/rooms/$roomId");
-    DocumentReference heistRef = _firestore.document("/heists/$heistId");
-    round = round.copyWith(room: roomRef, heist: heistRef);
+    round = round.copyWith(room: roomRef);
     return _firestore.collection('rounds').document(round.id).setData(round.toJson());
   }
 

@@ -12,7 +12,7 @@ class MockFirestoreDb implements FirestoreDb {
   StreamController<Room> _roomStream;
   StreamController<List<Player>> _playerStream;
   StreamController<List<Heist>> _heistStream;
-  Map<String, StreamController<List<Round>>> _roundStreams = new Map();
+  StreamController<List<Round>> _roundStream;
 
   MockFirestoreDb({this.room, this.players, this.heists, this.rounds});
 
@@ -74,13 +74,9 @@ class MockFirestoreDb implements FirestoreDb {
     }
   }
 
-  void _postRounds(String heistId) {
-    if (_roundStreams != null && rounds != null) {
-      // ignore: close_sinks
-      StreamController<List<Round>> roundStream = _roundStreams[heistId];
-      if (roundStream != null && !roundStream.isClosed) {
-        roundStream.add(rounds[heistId]);
-      }
+  void _postRounds() {
+    if (_roundStream != null && !_roundStream.isClosed && rounds != null) {
+      _roundStream.add(rounds.values.expand((rs) => rs).toList());
     }
   }
 
@@ -110,12 +106,10 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  StreamSubscription<List<Round>> listenOnRounds(
-      String roomId, String heistId, void onData(List<Round> rounds)) {
-    _roundStreams[heistId] =
-        new StreamController(onCancel: () => _roundStreams[heistId].close(), sync: true);
-    StreamSubscription<List<Round>> subscription = _roundStreams[heistId].stream.listen(onData);
-    _postRounds(heistId);
+  StreamSubscription<List<Round>> listenOnRounds(String roomId, void onData(List<Round> rounds)) {
+    _roundStream = new StreamController(onCancel: () => _roundStream.close(), sync: true);
+    StreamSubscription<List<Round>> subscription = _roundStream.stream.listen(onData);
+    _postRounds();
     return subscription;
   }
 
@@ -159,19 +153,19 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<void> upsertRound(Round round, String roomId, String heistId) {
+  Future<void> upsertRound(Round round, String roomId) {
     return new Future<void>(() {
       if (round.id == null) {
         round = round.copyWith(id: new Uuid().v4());
       }
-      if (rounds.containsKey(heistId)) {
-        rounds[heistId]
+      if (rounds.containsKey(round.heist)) {
+        rounds[round.heist]
           ..remove(round)
           ..add(round);
       } else {
-        rounds[heistId] = [round];
+        rounds[round.heist] = [round];
       }
-      _postRounds(heistId);
+      _postRounds();
     });
   }
 
@@ -181,7 +175,10 @@ class MockFirestoreDb implements FirestoreDb {
 
   @override
   Future<void> submitBid(String roundId, String myPlayerId, Bid bid) async {
-    _getRound(roundId).bids[myPlayerId] = bid;
+    Round round = _getRound(roundId);
+    Map<String, Bid> bids = new Map.from(round.bids);
+    bids[myPlayerId] = bid;
+    await upsertRound(round.copyWith(bids: bids), null);
   }
 
   @override

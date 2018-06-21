@@ -34,14 +34,16 @@ void main() {
             new Round(
                 id: uuid(),
                 order: 1,
+                heist: heistId1,
                 bids: {},
                 gifts: {uuid(): new Gift(amount: 10, recipient: myId)}),
-            new Round(id: uuid(), order: 2, bids: {myId: new Bid(13)}, gifts: {})
+            new Round(id: uuid(), order: 2, heist: heistId1, bids: {myId: new Bid(13)}, gifts: {})
           ],
           heistId2: [
             new Round(
                 id: uuid(),
                 order: 1,
+                heist: heistId2,
                 gifts: {myId: new Gift(amount: 3, recipient: uuid())},
                 bids: {myId: new Bid(11)})
           ]

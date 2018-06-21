@@ -11,10 +11,7 @@ void main() {
     String heistId = uuid();
     FirestoreDb db = new MockFirestoreDb(
         room: new Room(
-            id: uuid(),
-            code: code,
-            numPlayers: 2,
-            roles: new Set.of(['KINGPIN', 'LEAD_AGENT'])),
+            id: uuid(), code: code, numPlayers: 2, roles: new Set.of(['KINGPIN', 'LEAD_AGENT'])),
         players: [
           new Player(id: uuid(), installId: installId(), name: '_name', role: 'KINGPIN'),
           new Player(id: uuid(), installId: uuid(), name: '_player2', role: 'LEAD_AGENT'),
@@ -23,7 +20,7 @@ void main() {
           new Heist(id: heistId, price: 12, numPlayers: 2, order: 1)
         ],
         rounds: {
-          heistId: [new Round(id: uuid(), order: 1)]
+          heistId: [new Round(id: uuid(), order: 1, heist: heistId)]
         });
     Store<GameModel> store = createStore(db);
 

@@ -47,13 +47,13 @@ class GameState extends State<Game> {
         builder: (context, viewModel) {
           if (viewModel.currentHeistFunded) {
             // TODO: go on heist
-            return null;
+            return new Container();
           }
           if (!viewModel.biddingComplete) {
             return new Bidding();
           }
           // TODO: go to new round
-          return null;
+          return new Container();
         });
   }
 
@@ -151,6 +151,9 @@ class GameState extends State<Game> {
             ],
           ),
         ),
+        endDrawer: isDebugMode()
+            ? new Drawer(child: new ReduxDevTools<GameModel>(_store))
+            : null,
         body: _tabView(),
       ),
     );

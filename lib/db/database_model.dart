@@ -186,12 +186,10 @@ class Player extends Document {
           id == other.id &&
           installId == other.installId &&
           room == other.room &&
-          name == other.name &&
-          role == other.role;
+          name == other.name;
 
   @override
-  int get hashCode =>
-      id.hashCode ^ installId.hashCode ^ room.hashCode ^ name.hashCode ^ role.hashCode;
+  int get hashCode => id.hashCode ^ installId.hashCode ^ room.hashCode ^ name.hashCode;
 
   @override
   String toString() {
@@ -214,7 +212,7 @@ class Heist extends Document {
       {id,
       this.room,
       @required this.price,
-      this.pot,
+      this.pot = -1,
       @required this.numPlayers,
       @required this.order,
       this.decisions = const {}})
@@ -332,6 +330,7 @@ class Gift {
 Map<String, Value> _convertValues<Value>(Map<String, dynamic> map, Value transform(v)) {
   Map<String, Value> bidMap = {};
   if (map != null) {
+    map.removeWhere((k, v) => v == null);
     map.forEach((k, v) => bidMap[k] = transform(v));
   }
   return bidMap;
@@ -342,7 +341,7 @@ class Round extends Document {
   final String leader;
   final int order;
   final DocumentReference room;
-  final DocumentReference heist;
+  final String heist;
   final DateTime startedAt;
   final Set<String> team; // player IDs
   final bool teamSubmitted;
@@ -354,7 +353,7 @@ class Round extends Document {
       this.leader,
       @required this.order,
       this.room,
-      this.heist,
+      @required this.heist,
       this.team,
       this.teamSubmitted = false,
       this.bids = const {},
@@ -367,7 +366,7 @@ class Round extends Document {
     String leader,
     int order,
     DocumentReference room,
-    DocumentReference heist,
+    String heist,
     DateTime startedAt,
     Set<String> team,
     bool teamSubmitted,

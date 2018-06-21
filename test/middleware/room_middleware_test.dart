@@ -7,13 +7,6 @@ import 'package:test/test.dart';
 import '../mock_firestore_db.dart';
 import '../test_utils.dart';
 
-Future<void> _addOtherPlayers(Store<GameModel> store) async {
-  for (int i = 0; i < store.state.room.numPlayers - 1; i++) {
-    await store.state.db.upsertPlayer(
-        new Player(installId: uuid(), name: uuid(), initialBalance: 8), store.state.room.id);
-  }
-}
-
 void main() {
   test('test create and set up room', () async {
     FirestoreDb db = new MockFirestoreDb.empty();
@@ -36,7 +29,7 @@ void main() {
     await handle(store, new JoinGameAction());
     expect(getSelf(store.state), isNotNull);
 
-    await _addOtherPlayers(store);
+    await addOtherPlayers(store);
 
     await handle(store, new SetUpNewGameAction());
     expect(store.state.players.length, store.state.room.numPlayers);

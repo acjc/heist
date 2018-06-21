@@ -1,16 +1,11 @@
 part of heist;
 
-void _reloadSubscriptions(Store<GameModel> store) {
-  store.dispatch(new CancelSubscriptionsAction());
-  store.dispatch(new LoadGameAction());
-}
-
 class JoinGameAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
-    String roomId = store.state.room.id;
+    String roomId = getRoom(store.state).id;
     assert(roomId != null);
-    String playerName = store.state.playerName;
+    String playerName = getPlayerName(store.state);
     assert(playerName != null && playerName.isNotEmpty);
 
     FirestoreDb db = store.state.db;
@@ -26,31 +21,35 @@ class JoinGameAction extends MiddlewareAction {
 
 class SetUpNewGameAction extends MiddlewareAction {
   void _assignRoles(Store<GameModel> store) {
-    List<String> roles = new List.of(store.state.room.roles);
-    assert(roles.length == store.state.players.length);
+    Room room = getRoom(store.state);
+    List<String> roles = new List.of(room.roles);
+    List<Player> players = getPlayers(store.state);
+    assert(roles.length == players.length);
+
     Random random = new Random();
-    for (Player player in store.state.players.where((p) => p.role == null || p.role.isEmpty)) {
+    for (Player player in players.where((p) => p.role == null || p.role.isEmpty)) {
       String role = roles.removeAt(random.nextInt(roles.length));
-      store.state.db.upsertPlayer(player.copyWith(role: role), store.state.room.id);
+      store.state.db.upsertPlayer(player.copyWith(role: role), room.id);
     }
   }
 
   Future<String> _createFirstHeist(Store<GameModel> store) async {
     FirestoreDb db = store.state.db;
-    String roomId = store.state.room.id;
-    if (store.state.heists.isEmpty && !(await db.heistExists(roomId, 1))) {
+    String roomId = getRoom(store.state).id;
+    List<Heist> heists = getHeists(store.state);
+    if (heists.isEmpty && !(await db.heistExists(roomId, 1))) {
       Heist heist = new Heist(price: 12, numPlayers: 2, order: 1);
       return db.upsertHeist(heist, roomId);
     }
-    return store.state.heists[0].id;
+    return heists[0].id;
   }
 
   Future<void> _createFirstRound(Store<GameModel> store, String heistId) async {
     FirestoreDb db = store.state.db;
-    String roomId = store.state.room.id;
+    String roomId = getRoom(store.state).id;
     if (!hasRounds(store.state) && !(await db.roundExists(roomId, heistId, 1))) {
-      Round round = new Round(order: 1);
-      return db.upsertRound(round, roomId, heistId);
+      Round round = new Round(order: 1, heist: heistId);
+      return db.upsertRound(round, roomId);
     }
   }
 
@@ -58,9 +57,7 @@ class SetUpNewGameAction extends MiddlewareAction {
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
     _assignRoles(store);
     String heistId = await _createFirstHeist(store);
-    await _createFirstRound(store, heistId);
-
-    _reloadSubscriptions(store);
+    return _createFirstRound(store, heistId);
   }
 }
 
@@ -106,14 +103,15 @@ class LoadGameAction extends MiddlewareAction {
 
   void _addGameSetUpListener(Store<GameModel> store) {
     store.onChange.takeWhile((gameModel) => !gameIsReady(gameModel)).listen(
-            (gameModel) => _setUpGame(store, gameModel),
+        (gameModel) => _setUpGame(store, gameModel),
         onDone: () => _clearSetUpRequests(store),
         onError: (e) => _clearSetUpRequests(store));
   }
 
   Future<void> loadGame(Store<GameModel> store) async {
     FirestoreDb db = store.state.db;
-    String roomId = store.state.room.id ?? (await db.getRoomByCode(store.state.room.code)).id;
+    Room room = getRoom(store.state);
+    String roomId = room.id ?? (await db.getRoomByCode(room.code)).id;
     List<Heist> heists = await db.getHeists(roomId);
     _subscribe(store, roomId, heists);
   }
@@ -134,15 +132,11 @@ class LoadGameAction extends MiddlewareAction {
         roomId, (heists) => store.dispatch(new UpdateStateAction<List<Heist>>(heists)));
   }
 
-  List<StreamSubscription<List<Round>>> _roundSubscriptions(
-      Store<GameModel> store, String roomId, List<Heist> heists) {
-    return new List.generate(heists.length, (i) {
-      String heistRef = heists[i].id;
-      return store.state.db.listenOnRounds(
-          roomId,
-          heistRef,
-              (rounds) =>
-              store.dispatch(new UpdateMapEntryAction<String, List<Round>>(heistRef, rounds)));
+  StreamSubscription<List<Round>> _roundSubscriptions(Store<GameModel> store, String roomId) {
+    return store.state.db.listenOnRounds(roomId, (rounds) {
+      Map<String, List<Round>> roundMap = groupBy(rounds, (r) => r.heist);
+      roundMap.values.forEach((rs) => rs.sort((r1, r2) => r1.order.compareTo(r2.order)));
+      store.dispatch(new UpdateStateAction<Map<String, List<Round>>>(roundMap));
     });
   }
 
@@ -152,12 +146,9 @@ class LoadGameAction extends MiddlewareAction {
     List<StreamSubscription> subs = [
       _roomSubscription(store, roomId),
       _playerSubscription(store, roomId),
-      _heistSubscription(store, roomId)
+      _heistSubscription(store, roomId),
+      _roundSubscriptions(store, roomId)
     ];
-
-    if (heists != null && heists.isNotEmpty) {
-      subs += _roundSubscriptions(store, roomId, heists);
-    }
 
     Subscriptions subscriptions = new Subscriptions(subs: subs);
     store.dispatch(new AddSubscriptionsAction(subscriptions));

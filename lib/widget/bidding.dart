@@ -8,7 +8,6 @@ class Bidding extends StatefulWidget {
 }
 
 class BiddingState extends State<Bidding> {
-
   Widget body(BuildContext context, BiddingViewModel viewModel) {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
     String currentBidAmount = viewModel.bid == null ? 'None' : viewModel.bid.amount.toString();
@@ -35,12 +34,14 @@ class BiddingState extends State<Bidding> {
                         store.dispatch(new IncrementBidAmountAction(currentBalance(store.state)))),
               ],
             ),
-            new RaisedButton(
-                color: Theme.of(context).primaryColor,
-                child: const Text('SUBMIT BID', style: buttonTextStyle),
-                onPressed: viewModel.loading
-                    ? null
-                    : () => store.dispatch(new SubmitBidAction(viewModel.bidAmount))),
+            new Container(
+                padding: padding,
+                child: new RaisedButton(
+                    color: Theme.of(context).primaryColor,
+                    child: const Text('SUBMIT BID', style: buttonTextStyle),
+                    onPressed: viewModel.loading
+                        ? null
+                        : () => store.dispatch(new SubmitBidAction(viewModel.bidAmount)))),
             new RaisedButton(
                 color: Theme.of(context).accentColor,
                 child: const Text('CANCEL BID', style: buttonTextStyle),

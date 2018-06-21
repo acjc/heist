@@ -4,6 +4,7 @@ final getRoom = (GameModel gameModel) => gameModel.room;
 final getPlayers = (GameModel gameModel) => gameModel.players;
 final getHeists = (GameModel gameModel) => gameModel.heists;
 final getRounds = (GameModel gameModel) => gameModel.rounds;
+final getPlayerName = (GameModel gameModel) => gameModel.playerName;
 final getBidAmount = (GameModel gameModel) => gameModel.bidAmount;
 final getRequests = (GameModel gameModel) => gameModel.requests;
 

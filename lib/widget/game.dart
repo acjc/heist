@@ -32,110 +32,102 @@ class GameState extends State<Game> {
   }
 
   Widget _loading() {
-    return new Center(
-        child: new Text(
-      'Loading...',
-      style: textStyle,
-    ));
+    return centeredMessage('Loading...');
   }
 
-  Widget _mainBoardBody(Store<GameModel> store) {
-    return new StoreConnector<GameModel, MainBoardViewModel>(
-        converter: (store) =>
-            new MainBoardViewModel._(currentHeistFunded(store.state), biddingComplete(store.state)),
-        distinct: true,
-        builder: (context, viewModel) {
-          if (viewModel.currentHeistFunded) {
-            // TODO: go on heist
+  Widget _teamIsBeingPicked() => new StoreConnector<GameModel, Player>(
+      converter: (store) => roundLeader(store.state),
+      distinct: true,
+      builder: (context, roundLeader) => new Card(
+          elevation: 2.0,
+          child: new Container(
+              padding: padding,
+              child: centeredMessage('${roundLeader.name} is picking a team...'))));
+
+  Widget _mainBoardBody(Store<GameModel> store) =>
+      new StoreConnector<GameModel, MainBoardViewModel>(
+          converter: (store) => new MainBoardViewModel._(currentHeistFunded(store.state),
+              waitingForTeam(store.state), isMyGo(store.state), biddingComplete(store.state)),
+          distinct: true,
+          builder: (context, viewModel) {
+            if (viewModel.currentHeistFunded) {
+              // TODO: go on heist
+              return new Container();
+            }
+            if (viewModel.waitingForTeam) {
+              if (viewModel.isMyGo) {
+                return teamPicker(store);
+              }
+              return new Column(children: [
+                _teamIsBeingPicked(),
+                selectionBoard(),
+              ]);
+            }
+            if (!viewModel.biddingComplete) {
+              return bidding();
+            }
+            // TODO: go to new round
             return new Container();
-          }
-          if (!viewModel.biddingComplete) {
-            return new Bidding();
-          }
-          // TODO: go to new round
-          return new Container();
-        });
-  }
+          });
 
-  Widget _secretBoardBody() {
-    return new StoreConnector<GameModel, Player>(
-        converter: (store) => getSelf(store.state),
-        distinct: true,
-        builder: (context, me) {
-          return new ListTile(
+  Widget _secretBoardBody() => new StoreConnector<GameModel, Player>(
+      converter: (store) => getSelf(store.state),
+      distinct: true,
+      builder: (context, me) => new Card(
+          elevation: 2.0,
+          child: new ListTile(
             title: new Text(
               "${me.name} (${me.role})",
               style: textStyle,
             ),
-          );
-        });
-  }
+          )));
 
-  Widget _loadingScreen() {
-    return new StoreConnector<GameModel, LoadingScreenViewModel>(
-      converter: (store) => new LoadingScreenViewModel._(
-          roomIsAvailable(store.state),
-          waitingForPlayers(store.state),
-          isNewGame(store.state),
-          getPlayers(store.state).length,
-          getRoom(store.state).numPlayers),
-      distinct: true,
-      builder: (context, viewModel) {
-        if (!viewModel.roomIsAvailable) {
+  Widget _loadingScreen() => new StoreConnector<GameModel, LoadingScreenViewModel>(
+        converter: (store) => new LoadingScreenViewModel._(
+            roomIsAvailable(store.state),
+            waitingForPlayers(store.state),
+            isNewGame(store.state),
+            getPlayers(store.state).length,
+            getRoom(store.state).numPlayers),
+        distinct: true,
+        builder: (context, viewModel) {
+          if (!viewModel.roomIsAvailable) {
+            return _loading();
+          }
+
+          if (viewModel.waitingForPlayers) {
+            return centeredMessage(
+                'Waiting for players: ${viewModel.playersSoFar} / ${viewModel.numPlayers}');
+          }
+
+          if (viewModel.isNewGame) {
+            return centeredMessage('Assigning roles...');
+          }
+
           return _loading();
-        }
+        },
+      );
 
-        if (viewModel.waitingForPlayers) {
-          return new Center(
-              child: new Text(
-            "Waiting for players: ${viewModel.playersSoFar} / ${viewModel.numPlayers}",
-            style: textStyle,
+  Widget _mainBoard() => new StoreConnector<GameModel, bool>(
+      converter: (store) => gameIsReady(store.state),
+      distinct: true,
+      builder: (context, gameIsReady) => new Expanded(
+            child: gameIsReady ? _mainBoardBody(_store) : _loadingScreen(),
           ));
-        }
 
-        if (viewModel.isNewGame) {
-          return new Center(
-              child: new Text(
-            "Assigning roles...",
-            style: textStyle,
+  Widget _secretBoard() => new StoreConnector<GameModel, bool>(
+      converter: (store) => gameIsReady(store.state),
+      distinct: true,
+      builder: (context, gameIsReady) => new Expanded(
+            child: gameIsReady ? _secretBoardBody() : _loadingScreen(),
           ));
-        }
 
-        return _loading();
-      },
-    );
-  }
-
-  Widget _mainBoard() {
-    return new StoreConnector<GameModel, bool>(
-        converter: (store) => gameIsReady(store.state),
-        distinct: true,
-        builder: (context, gameIsReady) => new Expanded(
-              child: new Card(
-                  elevation: 2.0, child: gameIsReady ? _mainBoardBody(_store) : _loadingScreen()),
-            ));
-  }
-
-  Widget _secretBoard() {
-    return new StoreConnector<GameModel, bool>(
-        converter: (store) => gameIsReady(store.state),
-        distinct: true,
-        builder: (context, gameIsReady) => new Expanded(
-              child: new Card(
-                elevation: 2.0,
-                child: gameIsReady ? _secretBoardBody() : _loadingScreen(),
-              ),
-            ));
-  }
-
-  Widget _tabView() {
-    return new TabBarView(
-      children: [
-        new Column(children: [_mainBoard(), _gameHistory(_store)]),
-        new Column(children: [_playerInfo(_store), _secretBoard()]),
-      ],
-    );
-  }
+  Widget _tabView() => new TabBarView(
+        children: [
+          new Column(children: [_mainBoard(), _gameHistory(_store)]),
+          new Column(children: [_playerInfo(_store), _secretBoard()]),
+        ],
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -151,9 +143,7 @@ class GameState extends State<Game> {
             ],
           ),
         ),
-        endDrawer: isDebugMode()
-            ? new Drawer(child: new ReduxDevTools<GameModel>(_store))
-            : null,
+        endDrawer: isDebugMode() ? new Drawer(child: new ReduxDevTools<GameModel>(_store)) : null,
         body: _tabView(),
       ),
     );
@@ -196,24 +186,12 @@ class LoadingScreenViewModel {
 
 class MainBoardViewModel {
   final bool currentHeistFunded;
+  final bool waitingForTeam;
+  final bool isMyGo;
   final bool biddingComplete;
 
-  MainBoardViewModel._(this.currentHeistFunded, this.biddingComplete);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MainBoardViewModel &&
-          currentHeistFunded == other.currentHeistFunded &&
-          biddingComplete == other.biddingComplete;
-
-  @override
-  int get hashCode => currentHeistFunded.hashCode ^ biddingComplete.hashCode;
-
-  @override
-  String toString() {
-    return 'MainBoardViewModel{currentHeistFunded: $currentHeistFunded, biddingComplete: $biddingComplete}';
-  }
+  MainBoardViewModel._(
+      this.currentHeistFunded, this.isMyGo, this.waitingForTeam, this.biddingComplete);
 }
 
 void resetGameStore(Store<GameModel> store) {

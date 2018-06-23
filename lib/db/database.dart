@@ -21,7 +21,7 @@ class FirestoreDb {
 //            isGreaterThanOrEqualTo: now().add(new Duration(days: -1)))
         .getDocuments();
     if (snapshot.documents.isNotEmpty) {
-      return new Room.fromSnapshot(snapshot.documents[0]);
+      return new Room.fromSnapshot(snapshot.documents.first);
     }
     return null;
   }
@@ -36,10 +36,10 @@ class FirestoreDb {
     return snapshot.documents.isNotEmpty;
   }
 
-  Future<bool> heistExists(String roomId, int order) async {
+  Future<Heist> getHeist(String roomId, int order) async {
     QuerySnapshot snapshot =
         await _heistQuery(roomId).where('order', isEqualTo: order).getDocuments();
-    return snapshot.documents.isNotEmpty;
+    return snapshot.documents.isNotEmpty ? new Heist.fromSnapshot(snapshot.documents.first) : null;
   }
 
   Future<bool> roundExists(String roomId, String heistId, int order) async {

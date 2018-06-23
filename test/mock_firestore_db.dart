@@ -42,8 +42,8 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<bool> heistExists(String roomId, int order) {
-    return new Future<bool>.value(false);
+  Future<Heist> getHeist(String roomId, int order) {
+    return new Future<Heist>.value(heists.isNotEmpty ? heists.first : null);
   }
 
   @override

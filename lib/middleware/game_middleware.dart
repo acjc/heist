@@ -37,9 +37,13 @@ class SetUpNewGameAction extends MiddlewareAction {
     FirestoreDb db = store.state.db;
     String roomId = getRoom(store.state).id;
     List<Heist> heists = getHeists(store.state);
-    if (heists.isEmpty && !(await db.heistExists(roomId, 1))) {
-      Heist heist = new Heist(price: 12, numPlayers: 2, order: 1);
-      return db.upsertHeist(heist, roomId);
+    if (heists.isEmpty) {
+      Heist heist = await db.getHeist(roomId, 1);
+      if (heist != null) {
+        return heist.id;
+      }
+      Heist newHeist = new Heist(price: 12, numPlayers: 2, order: 1);
+      return db.upsertHeist(newHeist, roomId);
     }
     return heists[0].id;
   }

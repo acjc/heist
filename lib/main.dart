@@ -24,6 +24,8 @@ part 'widget/player_info.dart';
 part 'widget/game_history.dart';
 part 'widget/bidding.dart';
 part 'widget/common.dart';
+part 'widget/selection_board.dart';
+part 'widget/team_picker.dart';
 part 'middleware/middleware.dart';
 part 'middleware/room_middleware.dart';
 part 'middleware/game_middleware.dart';

@@ -327,10 +327,12 @@ packages:
   reselect:
     dependency: "direct main"
     description:
-      name: reselect
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.1"
+      path: "."
+      ref: dart-2
+      resolved-ref: "349bf201a2e3bf54fb2fc5579ce440516b4aea14"
+      url: "git://github.com/brianegan/reselect_dart.git"
+    source: git
+    version: "0.3.0"
   shelf:
     dependency: transitive
     description:

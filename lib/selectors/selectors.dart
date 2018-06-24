@@ -36,7 +36,7 @@ final Selector<GameModel, bool> gameIsReady = createSelector5(
     (roomIsAvailable, waitingForPlayers, isNewGame, heists, hasRounds) =>
         roomIsAvailable && !waitingForPlayers && !isNewGame && heists.isNotEmpty && hasRounds);
 
-/// Selectors do not work if you return null
+// Selectors do not work if you return null
 final getSelf = (GameModel gameModel) =>
     getPlayers(gameModel).singleWhere((p) => p.installId == installId(), orElse: () => null);
 
@@ -77,9 +77,6 @@ final Selector<GameModel, bool> currentHeistFunded =
 final Selector<GameModel, bool> isMyGo =
     createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.leader == me.id);
 
-final Selector<GameModel, bool> waitingForTeam =
-    createSelector1(currentRound, (currentRound) => !currentRound.teamSubmitted);
-
 final Selector<GameModel, Player> roundLeader = createSelector2(getPlayers, currentRound,
     (players, currentRound) => players.firstWhere((Player p) => p.id == currentRound.leader));
 
@@ -93,8 +90,11 @@ final Selector<GameModel, List<Player>> playersInTeam = createSelector2(
         }).toList());
 
 // Reselect could not handle Set<String>
-final teamSelection =
+final teamNames =
     (GameModel gameModel) => playersInTeam(gameModel).map((Player p) => p.name).toSet();
+
+// Reselect could not handle Set<String>
+final teamIds = (GameModel gameModel) => playersInTeam(gameModel).map((Player p) => p.id).toSet();
 
 final Selector<GameModel, int> numBids = createSelector1(
     currentRound, (currentRound) => currentRound.bids.values.where((b) => b != null).length);

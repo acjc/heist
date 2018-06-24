@@ -6,12 +6,12 @@ Widget body(BuildContext context, BiddingViewModel viewModel) {
   return new Card(
       elevation: 2.0,
       child: new Container(
-          padding: padding,
+          padding: paddingLarge,
           child: new Column(
             children: [
               new Text('Bids so far: ${viewModel.numBids} / ${viewModel.numPlayers}',
-                  style: textStyle),
-              new Text('Your bid: $currentBidAmount', style: textStyle),
+                  style: infoTextStyle),
+              new Text('Your bid: $currentBidAmount', style: infoTextStyle),
               new Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -29,7 +29,7 @@ Widget body(BuildContext context, BiddingViewModel viewModel) {
                 ],
               ),
               new Container(
-                  padding: padding,
+                  padding: paddingLarge,
                   child: new RaisedButton(
                       color: Theme.of(context).primaryColor,
                       child: const Text('SUBMIT BID', style: buttonTextStyle),

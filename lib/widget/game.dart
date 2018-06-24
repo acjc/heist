@@ -1,8 +1,5 @@
 part of heist;
 
-const EdgeInsets padding = const EdgeInsets.all(24.0);
-const TextStyle textStyle = const TextStyle(fontSize: 16.0);
-
 class Game extends StatefulWidget {
   final Store<GameModel> _store;
 
@@ -41,13 +38,16 @@ class GameState extends State<Game> {
       builder: (context, roundLeader) => new Card(
           elevation: 2.0,
           child: new Container(
-              padding: padding,
+              padding: paddingLarge,
               child: centeredMessage('${roundLeader.name} is picking a team...'))));
 
   Widget _mainBoardBody(Store<GameModel> store) =>
       new StoreConnector<GameModel, MainBoardViewModel>(
-          converter: (store) => new MainBoardViewModel._(currentHeistFunded(store.state),
-              waitingForTeam(store.state), isMyGo(store.state), biddingComplete(store.state)),
+          converter: (store) => new MainBoardViewModel._(
+              currentHeistFunded(store.state),
+              !currentRound(store.state).teamSubmitted,
+              isMyGo(store.state),
+              biddingComplete(store.state)),
           distinct: true,
           builder: (context, viewModel) {
             if (viewModel.currentHeistFunded) {
@@ -78,7 +78,7 @@ class GameState extends State<Game> {
           child: new ListTile(
             title: new Text(
               "${me.name} (${me.role})",
-              style: textStyle,
+              style: infoTextStyle,
             ),
           )));
 
@@ -191,7 +191,28 @@ class MainBoardViewModel {
   final bool biddingComplete;
 
   MainBoardViewModel._(
-      this.currentHeistFunded, this.isMyGo, this.waitingForTeam, this.biddingComplete);
+      this.currentHeistFunded, this.waitingForTeam, this.isMyGo, this.biddingComplete);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MainBoardViewModel &&
+          currentHeistFunded == other.currentHeistFunded &&
+          waitingForTeam == other.waitingForTeam &&
+          isMyGo == other.isMyGo &&
+          biddingComplete == other.biddingComplete;
+
+  @override
+  int get hashCode =>
+      currentHeistFunded.hashCode ^
+      waitingForTeam.hashCode ^
+      isMyGo.hashCode ^
+      biddingComplete.hashCode;
+
+  @override
+  String toString() {
+    return 'MainBoardViewModel{currentHeistFunded: $currentHeistFunded, waitingForTeam: $waitingForTeam, isMyGo: $isMyGo, biddingComplete: $biddingComplete}';
+  }
 }
 
 void resetGameStore(Store<GameModel> store) {

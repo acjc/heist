@@ -1,7 +1,5 @@
 part of heist;
 
-const TextStyle buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
-
 class HomePage extends StatelessWidget {
   static const EdgeInsets _padding = const EdgeInsets.all(16.0);
 

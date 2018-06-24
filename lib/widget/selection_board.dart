@@ -1,18 +1,16 @@
 part of heist;
 
-const EdgeInsets selectionBoardPadding = const EdgeInsets.all(16.0);
-
 Widget selectionBoard() => new StoreConnector<GameModel, Set<String>>(
-    converter: (store) => teamSelection(store.state),
+    converter: (store) => teamNames(store.state),
     distinct: true,
-    builder: (context, teamSelection) => new Card(
+    builder: (context, teamNames) => new Card(
           elevation: 2.0,
           child: new Container(
-              padding: selectionBoardPadding,
+              padding: paddingMedium,
               child: new Column(children: [
-                new Text('TEAM', style: textStyle),
+                new Text('TEAM (${teamNames.length})', style: infoTextStyle),
                 new GridView.count(
-                    padding: selectionBoardPadding,
+                    padding: paddingMedium,
                     shrinkWrap: true,
                     childAspectRatio: 6.0,
                     crossAxisCount: 2,
@@ -20,15 +18,15 @@ Widget selectionBoard() => new StoreConnector<GameModel, Set<String>>(
                     crossAxisSpacing: 10.0,
                     mainAxisSpacing: 10.0,
                     children: new List.generate(
-                        teamSelection.length,
+                        teamNames.length,
                         (i) => new Container(
                             alignment: Alignment.center,
                             decoration: new BoxDecoration(
-                              border: new Border.all(color: Theme.of(context).primaryColor),
+                              border: new Border.all(color: Theme.of(context).accentColor),
                             ),
                             child: new Text(
-                              teamSelection.elementAt(i),
-                              style: textStyle,
+                              teamNames.elementAt(i),
+                              style: infoTextStyle,
                             ))))
               ])),
         ));

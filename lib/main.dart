@@ -30,6 +30,7 @@ part 'middleware/middleware.dart';
 part 'middleware/room_middleware.dart';
 part 'middleware/game_middleware.dart';
 part 'middleware/bidding_middleware.dart';
+part 'middleware/team_picker_middleware.dart';
 part 'reducers/heist_reducers.dart';
 part 'reducers/player_reducers.dart';
 part 'reducers/reducers.dart';

@@ -12,17 +12,17 @@ Widget _playerInfo(Store<GameModel> store) {
         return new Card(
           elevation: 2.0,
           child: new Container(
-            padding: padding,
+            padding: paddingLarge,
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 new Text(
                   viewModel.me.name,
-                  style: textStyle,
+                  style: infoTextStyle,
                 ),
                 new Text(
                   viewModel.balance.toString(),
-                  style: textStyle,
+                  style: infoTextStyle,
                 ),
               ],
             ),

@@ -185,4 +185,22 @@ class MockFirestoreDb implements FirestoreDb {
   Future<void> cancelBid(String roundId, String myPlayerId) {
     return submitBid(roundId, myPlayerId, null);
   }
+
+  @override
+  Future<void> updateTeam(String roundId, String playerId, bool inTeam) {
+    Round round = _getRound(roundId);
+    Set<String> team = new Set.of(round.team ?? []);
+    if (inTeam) {
+      team.add(playerId);
+    } else {
+      team.remove(playerId);
+    }
+    return upsertRound(round.copyWith(team: team), null);
+  }
+
+  @override
+  Future<void> submitTeam(String roundId) {
+    Round round = _getRound(roundId);
+    return upsertRound(round.copyWith(teamSubmitted: true), null);
+  }
 }

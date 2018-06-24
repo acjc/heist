@@ -15,7 +15,7 @@ Widget _gameHistory(Store<GameModel> store) {
               children: new List.generate(5, (i) {
                 int price = i < viewModel.length ? viewModel[i].price : -1;
                 return new Container(
-                  padding: padding,
+                  padding: paddingLarge,
                   child: new Text("$price"),
                 );
               }),

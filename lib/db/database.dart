@@ -139,4 +139,18 @@ class FirestoreDb {
   Future<void> cancelBid(String roundId, String myPlayerId) {
     return submitBid(roundId, myPlayerId, null);
   }
+
+  Future<void> updateTeam(String roundId, String playerId, bool inTeam) {
+    Map<String, dynamic> data = {
+      'team': {playerId: inTeam}
+    };
+    return _firestore.collection('rounds').document(roundId).setData(data, merge: true);
+  }
+
+  Future<void> submitTeam(String roundId) {
+    Map<String, dynamic> data = {
+      'teamSubmitted': true
+    };
+    return _firestore.collection('rounds').document(roundId).setData(data, merge: true);
+  }
 }

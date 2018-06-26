@@ -51,7 +51,7 @@ class Room extends Document {
       : super(id: id);
 
   factory Room.initial() =>
-      Room(numPlayers: minPlayers, roles: getRolesIds(numPlayersToRolesMap[minPlayers]));
+      Room(numPlayers: minPlayers, roles: getRoleIds(numPlayersToRolesMap[minPlayers]));
 
   Room copyWith({
     String id,
@@ -98,7 +98,7 @@ class Room extends Document {
         'completed': completed,
         'completedAt': completedAt,
         'numPlayers': numPlayers,
-        'roles': _toBoolMap(roles, getRolesIds(allRoles)),
+        'roles': _toBoolMap(roles, getRoleIds(allRoles)),
       };
 
   @override

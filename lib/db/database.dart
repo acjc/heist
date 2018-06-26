@@ -133,7 +133,7 @@ class FirestoreDb {
     Map<String, dynamic> data = {
       'bids': {myPlayerId: bid?.toJson()}
     };
-    return _firestore.collection('rounds').document(roundId).setData(data, merge: true);
+    return _updateRound(roundId, data);
   }
 
   Future<void> cancelBid(String roundId, String myPlayerId) {
@@ -144,13 +144,28 @@ class FirestoreDb {
     Map<String, dynamic> data = {
       'team': {playerId: inTeam}
     };
-    return _firestore.collection('rounds').document(roundId).setData(data, merge: true);
+    return _updateRound(roundId, data);
   }
 
   Future<void> submitTeam(String roundId) {
     Map<String, dynamic> data = {
       'teamSubmitted': true
     };
+    return _updateRound(roundId, data);
+  }
+
+  Future<void> makeDecision(String heistId, String playerId, String decision) {
+    Map<String, dynamic> data = {
+      'decisions': {playerId: decision}
+    };
+    return _updateHeist(heistId, data);
+  }
+
+  Future<void> _updateHeist(String heistId, Map<String, dynamic> data) {
+    return _firestore.collection('heists').document(heistId).setData(data, merge: true);
+  }
+
+  Future<void> _updateRound(String roundId, Map<String, dynamic> data) {
     return _firestore.collection('rounds').document(roundId).setData(data, merge: true);
   }
 }

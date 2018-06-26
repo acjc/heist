@@ -1,6 +1,6 @@
 part of heist;
 
-Widget body(BuildContext context, BiddingViewModel viewModel) {
+Widget biddingBoard(BuildContext context, BiddingViewModel viewModel) {
   Store<GameModel> store = StoreProvider.of<GameModel>(context);
   String currentBidAmount = viewModel.bid == null ? 'None' : viewModel.bid.amount.toString();
   return new Card(
@@ -31,7 +31,6 @@ Widget body(BuildContext context, BiddingViewModel viewModel) {
               new Container(
                   padding: paddingLarge,
                   child: new RaisedButton(
-                      color: Theme.of(context).primaryColor,
                       child: const Text('SUBMIT BID', style: buttonTextStyle),
                       onPressed: viewModel.loading
                           ? null
@@ -56,7 +55,7 @@ Widget bidding() {
         getRoom(store.state).numPlayers),
     distinct: true,
     builder: (context, viewModel) => new Column(children: [
-          body(context, viewModel),
+          biddingBoard(context, viewModel),
           selectionBoard(),
         ]),
   );

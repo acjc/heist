@@ -60,7 +60,6 @@ class HomePage extends StatelessWidget {
           store.dispatch(new CreateRoomAction());
         }
       },
-      color: Theme.of(context).primaryColor,
     );
 
     Form enterNameForm = new Form(
@@ -132,7 +131,6 @@ class HomePage extends StatelessWidget {
     Widget enterRoomButton = new RaisedButton(
       child: const Text('ENTER ROOM', style: buttonTextStyle),
       onPressed: _enterRoom,
-      color: Theme.of(context).primaryColor,
     );
 
     Widget existingRoom = new Container(

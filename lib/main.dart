@@ -26,11 +26,13 @@ part 'widget/bidding.dart';
 part 'widget/common.dart';
 part 'widget/selection_board.dart';
 part 'widget/team_picker.dart';
+part 'widget/decision.dart';
 part 'middleware/middleware.dart';
 part 'middleware/room_middleware.dart';
 part 'middleware/game_middleware.dart';
 part 'middleware/bidding_middleware.dart';
 part 'middleware/team_picker_middleware.dart';
+part 'middleware/decision_middleware.dart';
 part 'reducers/heist_reducers.dart';
 part 'reducers/player_reducers.dart';
 part 'reducers/reducers.dart';
@@ -88,13 +90,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget widget =  new StoreProvider(
+    Color primaryColor = Colors.deepOrange;
+    return new StoreProvider(
       store: store,
       child: new MaterialApp(
           navigatorKey: navigatorKey,
           title: 'Heist',
           theme: new ThemeData(
-            primaryColor: Colors.deepOrange,
+            primaryColor: primaryColor,
+            buttonColor: primaryColor,
             indicatorColor: Colors.white,
           ),
           home: new Scaffold(
@@ -107,6 +111,5 @@ class MyApp extends StatelessWidget {
             body: new HomePage(),
           )),
     );
-    return widget;
   }
 }

@@ -32,39 +32,30 @@ class GameState extends State<Game> {
     return centeredMessage('Loading...');
   }
 
-  Widget _teamIsBeingPicked() => new StoreConnector<GameModel, Player>(
-      converter: (store) => roundLeader(store.state),
-      distinct: true,
-      builder: (context, roundLeader) => new Card(
-          elevation: 2.0,
-          child: new Container(
-              padding: paddingLarge,
-              child: centeredMessage('${roundLeader.name} is picking a team...'))));
-
   Widget _mainBoardBody(Store<GameModel> store) =>
       new StoreConnector<GameModel, MainBoardViewModel>(
           converter: (store) => new MainBoardViewModel._(
               currentHeistFunded(store.state),
+              haveBeenPicked(store.state),
               !currentRound(store.state).teamSubmitted,
               isMyGo(store.state),
               biddingComplete(store.state)),
           distinct: true,
           builder: (context, viewModel) {
-            if (viewModel.currentHeistFunded) {
-              // TODO: go on heist
-              return new Container();
+            if (viewModel.currentHeistFunded) { // TODO: handle auction
+              if (viewModel.haveBeenPicked) { // TODO: handle auction
+                return makeDecision(context, store);
+              }
+              return activeHeist();
             }
-            if (viewModel.waitingForTeam) {
+            if (viewModel.waitingForTeam) { // TODO: handle auction
               if (viewModel.isMyGo) {
                 return teamPicker(store);
               }
-              return new Column(children: [
-                _teamIsBeingPicked(),
-                selectionBoard(),
-              ]);
+              return teamIsBeingPicked();
             }
-            if (!viewModel.biddingComplete) {
-              return bidding();
+            if (!viewModel.biddingComplete) { // TODO: handle auction
+              return bidding(); // TODO: handle auction
             }
             // TODO: go to new round
             return new Container();
@@ -186,18 +177,21 @@ class LoadingScreenViewModel {
 
 class MainBoardViewModel {
   final bool currentHeistFunded;
+  final bool haveBeenPicked;
   final bool waitingForTeam;
   final bool isMyGo;
   final bool biddingComplete;
 
-  MainBoardViewModel._(
-      this.currentHeistFunded, this.waitingForTeam, this.isMyGo, this.biddingComplete);
+  MainBoardViewModel._(this.currentHeistFunded, this.haveBeenPicked, this.waitingForTeam,
+      this.isMyGo, this.biddingComplete);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is MainBoardViewModel &&
+          runtimeType == other.runtimeType &&
           currentHeistFunded == other.currentHeistFunded &&
+          haveBeenPicked == other.haveBeenPicked &&
           waitingForTeam == other.waitingForTeam &&
           isMyGo == other.isMyGo &&
           biddingComplete == other.biddingComplete;
@@ -205,13 +199,14 @@ class MainBoardViewModel {
   @override
   int get hashCode =>
       currentHeistFunded.hashCode ^
+      haveBeenPicked.hashCode ^
       waitingForTeam.hashCode ^
       isMyGo.hashCode ^
       biddingComplete.hashCode;
 
   @override
   String toString() {
-    return 'MainBoardViewModel{currentHeistFunded: $currentHeistFunded, waitingForTeam: $waitingForTeam, isMyGo: $isMyGo, biddingComplete: $biddingComplete}';
+    return 'MainBoardViewModel{currentHeistFunded: $currentHeistFunded, haveBeenPicked: $haveBeenPicked, waitingForTeam: $waitingForTeam, isMyGo: $isMyGo, biddingComplete: $biddingComplete}';
   }
 }
 

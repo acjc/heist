@@ -22,9 +22,8 @@ Widget teamPicker(Store<GameModel> store) {
                       primary: false,
                       crossAxisSpacing: 10.0,
                       mainAxisSpacing: 10.0,
-                      children: gridChildren(context, store, viewModel)),
+                      children: teamPickerChildren(context, store, viewModel)),
                   new RaisedButton(
-                    color: Theme.of(context).primaryColor,
                     onPressed: viewModel.teamIds.length == viewModel.playersRequired
                         ? () => store.dispatch(new SubmitTeamAction())
                         : null,
@@ -34,7 +33,7 @@ Widget teamPicker(Store<GameModel> store) {
       });
 }
 
-List<Widget> gridChildren(
+List<Widget> teamPickerChildren(
     BuildContext context, Store<GameModel> store, TeamPickerViewModel viewModel) {
   Color color = Theme.of(context).accentColor;
   return new List.generate(viewModel.players.length, (i) {

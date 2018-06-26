@@ -71,8 +71,11 @@ final Selector<GameModel, int> currentBalance =
   return balance;
 });
 
-final Selector<GameModel, bool> currentHeistFunded =
-    createSelector1(currentHeist, (currentHeist) => currentHeist.pot >= currentHeist.price);
+final Selector<GameModel, bool> currentHeistFunded = createSelector1(
+    currentHeist,
+    (Heist currentHeist) =>
+        currentHeist.pot >= currentHeist.price &&
+        currentHeist.decisions.length < currentHeist.numPlayers);
 
 final Selector<GameModel, bool> isMyGo =
     createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.leader == me.id);
@@ -80,14 +83,14 @@ final Selector<GameModel, bool> isMyGo =
 final Selector<GameModel, Player> roundLeader = createSelector2(getPlayers, currentRound,
     (players, currentRound) => players.firstWhere((Player p) => p.id == currentRound.leader));
 
-final Selector<GameModel, List<Player>> playersInTeam = createSelector2(
+final Selector<GameModel, Set<Player>> playersInTeam = createSelector2(
     getPlayers,
     currentRound,
     (players, currentRound) => players.where((Player p) {
           // Reselect needed this bool explicitly typed
           bool playerInTeam = currentRound.team.contains(p.id);
           return playerInTeam;
-        }).toList());
+        }).toSet());
 
 // Reselect could not handle Set<String>
 final teamNames =
@@ -104,3 +107,6 @@ final Selector<GameModel, bool> biddingComplete =
 
 final Selector<GameModel, Bid> myCurrentBid =
     createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.bids[me.id]);
+
+final Selector<GameModel, bool> haveBeenPicked = createSelector2(
+    currentRound, getSelf, (Round currentRound, Player me) => currentRound.team.contains(me.id));

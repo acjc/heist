@@ -1,15 +1,16 @@
 part of heist;
 
 class SubmitBidAction extends MiddlewareAction {
+  final String playerId;
   final int amount;
 
-  SubmitBidAction(this.amount);
+  SubmitBidAction(this.playerId, this.amount);
 
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
     store.dispatch(new StartRequestAction(Request.Bidding));
     await store.state.db
-        .submitBid(currentRound(store.state).id, getSelf(store.state).id, new Bid(amount));
+        .submitBid(currentRound(store.state).id, playerId, new Bid(amount));
     store.dispatch(new RequestCompleteAction(Request.Bidding));
   }
 }

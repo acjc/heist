@@ -36,7 +36,7 @@ final Selector<GameModel, bool> gameIsReady = createSelector5(
     (roomIsAvailable, waitingForPlayers, isNewGame, heists, hasRounds) =>
         roomIsAvailable && !waitingForPlayers && !isNewGame && heists.isNotEmpty && hasRounds);
 
-// Selectors do not work if you return null
+// Selectors do not seem to work if you ever return null
 final getSelf = (GameModel gameModel) =>
     getPlayers(gameModel).singleWhere((p) => p.installId == installId(), orElse: () => null);
 
@@ -46,7 +46,8 @@ final Selector<GameModel, bool> haveJoinedGame =
 final Selector<GameModel, bool> amOwner =
     createSelector1(getRoom, (room) => room.owner == installId());
 
-final Selector<GameModel, Heist> currentHeist = createSelector1(getHeists, (heists) => heists.last);
+// Reselect would not recognise changes to the current heist
+final currentHeist = (GameModel gameModel) => getHeists(gameModel).last;
 
 final Selector<GameModel, Round> currentRound = createSelector2(
     currentHeist, getRounds, (currentHeist, rounds) => rounds[currentHeist.id].last);
@@ -71,11 +72,17 @@ final Selector<GameModel, int> currentBalance =
   return balance;
 });
 
-final Selector<GameModel, bool> currentHeistFunded = createSelector1(
+final Selector<GameModel, bool> isAuction =
+    createSelector1((currentRound), (Round currentRound) => currentRound.order == 5);
+
+final Selector<GameModel, bool> heistIsActive = createSelector4(
     currentHeist,
-    (Heist currentHeist) =>
-        currentHeist.pot >= currentHeist.price &&
-        currentHeist.decisions.length < currentHeist.numPlayers);
+    biddingComplete,
+    isAuction,
+    heistComplete,
+    (Heist currentHeist, bool biddingComplete, bool isAuction, bool heistComplete) =>
+        ((isAuction && biddingComplete) || currentHeist.pot >= currentHeist.price) &&
+        !heistComplete);
 
 final Selector<GameModel, bool> isMyGo =
     createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.leader == me.id);
@@ -108,5 +115,8 @@ final Selector<GameModel, bool> biddingComplete =
 final Selector<GameModel, Bid> myCurrentBid =
     createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.bids[me.id]);
 
-final Selector<GameModel, bool> haveBeenPicked = createSelector2(
+final Selector<GameModel, bool> goingOnHeist = createSelector2(
     currentRound, getSelf, (Round currentRound, Player me) => currentRound.team.contains(me.id));
+
+final Selector<GameModel, bool> heistComplete = createSelector1(
+    currentHeist, (Heist currentHeist) => currentHeist.decisions.length == currentHeist.numPlayers);

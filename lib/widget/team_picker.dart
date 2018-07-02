@@ -1,18 +1,25 @@
 part of heist;
 
+Widget submitTeamButton(Store<GameModel> store, Set<String> teamIds, int playersRequired) {
+  return new RaisedButton(
+    onPressed:
+        teamIds.length == playersRequired ? () => store.dispatch(new SubmitTeamAction()) : null,
+    child: const Text('SUBMIT TEAM', style: buttonTextStyle),
+  );
+}
+
 Widget teamPicker(Store<GameModel> store) {
-  return new StoreConnector<GameModel, TeamPickerViewModel>(
-      converter: (store) => new TeamPickerViewModel._(currentRound(store.state).id,
-          currentHeist(store.state).numPlayers, getPlayers(store.state), teamIds(store.state)),
+  return new StoreConnector<GameModel, Set<String>>(
+      converter: (store) => teamIds(store.state),
       distinct: true,
-      builder: (context, viewModel) {
+      builder: (context, teamIds) {
+        int playersRequired = currentHeist(store.state).numPlayers;
         return new Card(
             elevation: 2.0,
             child: new Container(
                 padding: paddingMedium,
                 child: new Column(children: [
-                  new Text(
-                      'Pick a team: ${viewModel.teamIds.length} / ${viewModel.playersRequired}',
+                  new Text('Pick a team: ${teamIds.length} / $playersRequired',
                       style: infoTextStyle),
                   new GridView.count(
                       padding: paddingMedium,
@@ -22,25 +29,21 @@ Widget teamPicker(Store<GameModel> store) {
                       primary: false,
                       crossAxisSpacing: 10.0,
                       mainAxisSpacing: 10.0,
-                      children: teamPickerChildren(context, store, viewModel)),
-                  new RaisedButton(
-                    onPressed: viewModel.teamIds.length == viewModel.playersRequired
-                        ? () => store.dispatch(new SubmitTeamAction())
-                        : null,
-                    child: const Text('SUBMIT TEAM', style: buttonTextStyle),
-                  )
+                      children: teamPickerChildren(context, store, teamIds)),
+                  submitTeamButton(store, teamIds, playersRequired),
                 ])));
       });
 }
 
-List<Widget> teamPickerChildren(
-    BuildContext context, Store<GameModel> store, TeamPickerViewModel viewModel) {
+List<Widget> teamPickerChildren(BuildContext context, Store<GameModel> store, Set<String> teamIds) {
   Color color = Theme.of(context).accentColor;
-  return new List.generate(viewModel.players.length, (i) {
-    Player player = viewModel.players[i];
-    bool isInTeam = viewModel.teamIds.contains(player.id);
+  String roundId = currentRound(store.state).id;
+  List<Player> players = getPlayers(store.state);
+  return new List.generate(players.length, (i) {
+    Player player = players[i];
+    bool isInTeam = teamIds.contains(player.id);
     return new GestureDetector(
-        onTap: () => onTap(store, viewModel.roundId, player.id, isInTeam),
+        onTap: () => onTap(store, roundId, player.id, isInTeam),
         child: new Container(
             alignment: Alignment.center,
             decoration: new BoxDecoration(
@@ -48,7 +51,7 @@ List<Widget> teamPickerChildren(
               color: isInTeam ? color : null,
             ),
             child: new Text(
-              viewModel.players[i].name,
+              player.name,
               style: new TextStyle(
                 color: isInTeam ? Colors.white : Colors.black87,
                 fontSize: 16.0,
@@ -64,32 +67,5 @@ void onTap(Store<GameModel> store, String roundId, String playerId, bool isInTea
   } else {
     store.dispatch(new PickPlayerAction(roundId, playerId));
     store.dispatch(new PickPlayerMiddlewareAction(playerId));
-  }
-}
-
-class TeamPickerViewModel {
-  final String roundId;
-  final int playersRequired;
-  final List<Player> players;
-  final Set<String> teamIds;
-
-  TeamPickerViewModel._(this.roundId, this.playersRequired, this.players, this.teamIds);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TeamPickerViewModel &&
-          roundId == other.roundId &&
-          playersRequired == other.playersRequired &&
-          players == other.players &&
-          teamIds == other.teamIds;
-
-  @override
-  int get hashCode =>
-      roundId.hashCode ^ playersRequired.hashCode ^ players.hashCode ^ teamIds.hashCode;
-
-  @override
-  String toString() {
-    return 'TeamPickerViewModel{roundId: $roundId, playersRequired: $playersRequired, players: $players, teamIds: $teamIds}';
   }
 }

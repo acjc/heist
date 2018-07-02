@@ -1,16 +1,13 @@
 part of heist;
 
-Widget teamIsBeingPicked() => new StoreConnector<GameModel, Player>(
-    converter: (store) => roundLeader(store.state),
-    distinct: true,
-    builder: (context, roundLeader) => new Column(children: [
-          new Card(
-              elevation: 2.0,
-              child: new Container(
-                  padding: paddingLarge,
-                  child: centeredMessage('${roundLeader.name} is picking a team...'))),
-          selectionBoard(),
-        ]));
+Widget waitForTeam(Store<GameModel> store) => new Column(children: [
+    new Card(
+        elevation: 2.0,
+        child: new Container(
+            padding: paddingLarge,
+            child: centeredMessage('${roundLeader(store.state).name} is picking a team...'))),
+    selectionBoard(),
+  ]);
 
 Widget selectionBoard() => new StoreConnector<GameModel, Set<String>>(
     converter: (store) => teamNames(store.state),

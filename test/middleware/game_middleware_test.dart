@@ -17,10 +17,10 @@ void main() {
           new Player(id: uuid(), installId: uuid(), name: '_player2', role: 'LEAD_AGENT'),
         ],
         heists: [
-          new Heist(id: heistId, price: 12, numPlayers: 2, order: 1)
+          new Heist(id: heistId, price: 12, numPlayers: 2, order: 1, startedAt: now()),
         ],
         rounds: {
-          heistId: [new Round(id: uuid(), order: 1, heist: heistId)]
+          heistId: [new Round(id: uuid(), order: 1, heist: heistId, startedAt: now())]
         });
     Store<GameModel> store = createStore(db);
 

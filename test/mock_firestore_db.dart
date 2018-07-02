@@ -120,7 +120,7 @@ class MockFirestoreDb implements FirestoreDb {
         player = player.copyWith(id: new Uuid().v4());
       }
       players
-        ..remove(player)
+        ..removeWhere((p) => p.id == player.id)
         ..add(player);
       _postPlayers();
     });
@@ -145,7 +145,7 @@ class MockFirestoreDb implements FirestoreDb {
         heist = heist.copyWith(id: new Uuid().v4());
       }
       heists
-        ..remove(heist)
+        ..removeWhere((h) => h.id == heist.id)
         ..add(heist);
       _postHeists();
       return heist.id;
@@ -160,7 +160,7 @@ class MockFirestoreDb implements FirestoreDb {
       }
       if (rounds.containsKey(round.heist)) {
         rounds[round.heist]
-          ..remove(round)
+          ..removeWhere((r) => r.id == round.id)
           ..add(round);
       } else {
         rounds[round.heist] = [round];
@@ -170,7 +170,7 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   Round _getRound(String roundId) {
-    return rounds.values.expand((rs) => rs).firstWhere((r) => r.id == roundId);
+    return rounds.values.expand((rs) => rs).singleWhere((r) => r.id == roundId);
   }
 
   @override
@@ -202,5 +202,17 @@ class MockFirestoreDb implements FirestoreDb {
   Future<void> submitTeam(String roundId) {
     Round round = _getRound(roundId);
     return upsertRound(round.copyWith(teamSubmitted: true), null);
+  }
+
+  Heist _getHeist(String id) {
+    return heists.singleWhere((h) => h.id == id);
+  }
+
+  @override
+  Future<void> makeDecision(String heistId, String playerId, String decision) {
+    Heist heist = _getHeist(heistId);
+    Map<String, String> decisions = new Map.from(heist.decisions);
+    decisions[playerId] = decision;
+    return upsertHeist(heist.copyWith(decisions: decisions), null);
   }
 }

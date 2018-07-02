@@ -42,7 +42,7 @@ class SetUpNewGameAction extends MiddlewareAction {
       if (heist != null) {
         return heist.id;
       }
-      Heist newHeist = new Heist(price: 12, numPlayers: 2, order: 1);
+      Heist newHeist = new Heist(price: 12, numPlayers: 2, order: 1, startedAt: now());
       return db.upsertHeist(newHeist, roomId);
     }
     return heists[0].id;
@@ -52,7 +52,7 @@ class SetUpNewGameAction extends MiddlewareAction {
     FirestoreDb db = store.state.db;
     String roomId = getRoom(store.state).id;
     if (!hasRounds(store.state) && !(await db.roundExists(roomId, heistId, 1))) {
-      Round round = new Round(order: 1, heist: heistId);
+      Round round = new Round(order: 1, heist: heistId, startedAt: now());
       return db.upsertRound(round, roomId);
     }
   }

@@ -26,8 +26,9 @@ void main() {
               pot: 15,
               numPlayers: 2,
               order: 1,
-              decisions: {myId: 'SUCCEED'}),
-          new Heist(id: heistId2, price: 12, numPlayers: 2, order: 2)
+              decisions: {myId: 'SUCCEED'},
+              startedAt: now()),
+          new Heist(id: heistId2, price: 12, numPlayers: 2, order: 2, startedAt: now())
         ],
         rounds: {
           heistId1: [
@@ -36,8 +37,15 @@ void main() {
                 order: 1,
                 heist: heistId1,
                 bids: {},
-                gifts: {uuid(): new Gift(amount: 10, recipient: myId)}),
-            new Round(id: uuid(), order: 2, heist: heistId1, bids: {myId: new Bid(13)}, gifts: {})
+                gifts: {uuid(): new Gift(amount: 10, recipient: myId)},
+                startedAt: now()),
+            new Round(
+                id: uuid(),
+                order: 2,
+                heist: heistId1,
+                bids: {myId: new Bid(13)},
+                gifts: {},
+                startedAt: now())
           ],
           heistId2: [
             new Round(
@@ -45,7 +53,8 @@ void main() {
                 order: 1,
                 heist: heistId2,
                 gifts: {myId: new Gift(amount: 3, recipient: uuid())},
-                bids: {myId: new Bid(11)})
+                bids: {myId: new Bid(11)},
+                startedAt: now())
           ]
         });
     Store<GameModel> store = createStore(db);

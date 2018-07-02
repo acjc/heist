@@ -1,64 +1,76 @@
 part of heist;
 
-Widget biddingBoard(BuildContext context, BiddingViewModel viewModel) {
-  Store<GameModel> store = StoreProvider.of<GameModel>(context);
-  String currentBidAmount = viewModel.bid == null ? 'None' : viewModel.bid.amount.toString();
-  return new Card(
-      elevation: 2.0,
-      child: new Container(
-          padding: paddingLarge,
-          child: new Column(
-            children: [
-              new Text('Bids so far: ${viewModel.numBids} / ${viewModel.numPlayers}',
-                  style: infoTextStyle),
-              new Text('Your bid: $currentBidAmount', style: infoTextStyle),
-              new Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  iconWidget(context, Icons.arrow_back,
-                      () => store.dispatch(new DecrementBidAmountAction())),
-                  new Text('${viewModel.bidAmount}',
-                      style: const TextStyle(
-                        fontSize: 32.0,
-                      )),
-                  iconWidget(
-                      context,
-                      Icons.arrow_forward,
-                      () => store
-                          .dispatch(new IncrementBidAmountAction(currentBalance(store.state)))),
-                ],
-              ),
-              new Container(
-                  padding: paddingLarge,
-                  child: new RaisedButton(
-                      child: const Text('SUBMIT BID', style: buttonTextStyle),
-                      onPressed: viewModel.loading
-                          ? null
-                          : () => store.dispatch(new SubmitBidAction(viewModel.bidAmount)))),
-              new RaisedButton(
-                  color: Theme.of(context).accentColor,
-                  child: const Text('CANCEL BID', style: buttonTextStyle),
-                  onPressed: viewModel.bid == null || viewModel.loading
-                      ? null
-                      : () => store.dispatch(new CancelBidAction()))
-            ],
-          )));
+Widget bidAmount(BuildContext context, Store<GameModel> store, int bidAmount) => new Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        iconWidget(context, Icons.arrow_back, () => store.dispatch(new DecrementBidAmountAction())),
+        new Text(bidAmount.toString(),
+            style: const TextStyle(
+              fontSize: 32.0,
+            )),
+        iconWidget(context, Icons.arrow_forward,
+            () => store.dispatch(new IncrementBidAmountAction(currentBalance(store.state)))),
+      ],
+    );
+
+Widget submitButton(Store<GameModel> store, bool loading, int bidAmount) => new RaisedButton(
+    child: const Text('SUBMIT BID', style: buttonTextStyle),
+    onPressed: loading
+        ? null
+        : () => store.dispatch(new SubmitBidAction(getSelf(store.state).id, bidAmount)));
+
+Widget cancelButton(BuildContext context, Store<GameModel> store, bool loading, Bid bid) =>
+    new RaisedButton(
+        color: Theme.of(context).accentColor,
+        child: const Text('CANCEL BID', style: buttonTextStyle),
+        onPressed: loading || bid == null ? null : () => store.dispatch(new CancelBidAction()));
+
+Widget biddingBoard(Store<GameModel> store) {
+  return StoreConnector<GameModel, BiddingViewModel>(
+      converter: (store) => new BiddingViewModel._(
+          getBidAmount(store.state),
+          requestInProcess(store.state, Request.Bidding),
+          myCurrentBid(store.state),
+          numBids(store.state)),
+      distinct: true,
+      builder: (context, viewModel) {
+        String currentBidAmount = viewModel.bid == null ? 'None' : viewModel.bid.amount.toString();
+
+        List<Widget> children = isAuction(store.state)
+            ? [
+                new Text(
+                    'AUCTION! ${currentHeist(store.state).numPlayers} spots available! '
+                    'Highest, then fastest, bids win!',
+                    style: infoTextStyle)
+              ]
+            : [];
+        children.addAll([
+          new Text('Bids so far: ${viewModel.numBids} / ${getRoom(store.state).numPlayers}',
+              style: infoTextStyle),
+          new Text('Your bid: $currentBidAmount', style: infoTextStyle),
+          bidAmount(context, store, viewModel.bidAmount),
+          new Container(
+              padding: paddingLarge,
+              child: submitButton(store, viewModel.loading, viewModel.bidAmount)),
+          cancelButton(context, store, viewModel.loading, viewModel.bid),
+        ]);
+
+        return new Card(
+            elevation: 2.0,
+            child: new Container(
+                padding: paddingLarge,
+                child: new Column(
+                  children: children,
+                )));
+      });
 }
 
-Widget bidding() {
-  return new StoreConnector<GameModel, BiddingViewModel>(
-    converter: (store) => new BiddingViewModel._(
-        getBidAmount(store.state),
-        requestInProcess(store.state, Request.Bidding),
-        myCurrentBid(store.state),
-        numBids(store.state),
-        getRoom(store.state).numPlayers),
-    distinct: true,
-    builder: (context, viewModel) => new Column(children: [
-          biddingBoard(context, viewModel),
-          selectionBoard(),
-        ]),
-  );
+Widget bidding(Store<GameModel> store) {
+  List<Widget> children = [biddingBoard(store)];
+  if (!isAuction(store.state)) {
+    children.add(selectionBoard());
+  }
+  return new Column(children: children);
 }
 
 class BiddingViewModel {
@@ -66,9 +78,8 @@ class BiddingViewModel {
   final bool loading;
   final Bid bid;
   final int numBids;
-  final int numPlayers;
 
-  BiddingViewModel._(this.bidAmount, this.loading, this.bid, this.numBids, this.numPlayers);
+  BiddingViewModel._(this.bidAmount, this.loading, this.bid, this.numBids);
 
   @override
   bool operator ==(Object other) =>
@@ -77,15 +88,13 @@ class BiddingViewModel {
           bidAmount == other.bidAmount &&
           loading == other.loading &&
           bid == other.bid &&
-          numBids == other.numBids &&
-          numPlayers == other.numPlayers;
+          numBids == other.numBids;
 
   @override
-  int get hashCode =>
-      bidAmount.hashCode ^ loading.hashCode ^ bid.hashCode ^ numBids.hashCode ^ numPlayers.hashCode;
+  int get hashCode => bidAmount.hashCode ^ loading.hashCode ^ bid.hashCode ^ numBids.hashCode;
 
   @override
   String toString() {
-    return 'BiddingViewModel{bidAmount: $bidAmount, loading: $loading, bid: $bid, numBids: $numBids, numPlayers: $numPlayers}';
+    return 'BiddingViewModel{bidAmount: $bidAmount, loading: $loading, bid: $bid, numBids: $numBids}';
   }
 }

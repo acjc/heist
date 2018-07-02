@@ -215,9 +215,9 @@ class Heist extends Document {
       this.pot = -1,
       @required this.numPlayers,
       @required this.order,
+      @required this.startedAt,
       this.decisions = const {}})
-      : startedAt = now(),
-        super(id: id);
+      : super(id: id);
 
   Heist copyWith({
     String id,
@@ -236,6 +236,7 @@ class Heist extends Document {
       pot: pot ?? this.pot,
       numPlayers: numPlayers ?? this.numPlayers,
       order: order ?? this.order,
+      startedAt: startedAt ?? this.startedAt,
       decisions: decisions ?? this.decisions,
     );
   }
@@ -269,10 +270,12 @@ class Heist extends Document {
           id == other.id &&
           room == other.room &&
           price == other.price &&
+          pot == other.pot &&
           decisions == other.decisions;
 
   @override
-  int get hashCode => id.hashCode ^ room.hashCode ^ price.hashCode ^ decisions.hashCode;
+  int get hashCode =>
+      id.hashCode ^ room.hashCode ^ price.hashCode ^ pot.hashCode ^ decisions.hashCode;
 
   @override
   String toString() {
@@ -354,12 +357,12 @@ class Round extends Document {
       @required this.order,
       this.room,
       @required this.heist,
+      @required this.startedAt,
       this.team,
       this.teamSubmitted = false,
       this.bids = const {},
       this.gifts = const {}})
-      : startedAt = now(),
-        super(id: id);
+      : super(id: id);
 
   Round copyWith({
     String id,
@@ -379,6 +382,7 @@ class Round extends Document {
       order: order ?? this.order,
       room: room ?? this.room,
       heist: heist ?? this.heist,
+      startedAt: startedAt ?? this.startedAt,
       team: team ?? this.team,
       teamSubmitted: teamSubmitted ?? this.teamSubmitted,
       bids: bids ?? this.bids,

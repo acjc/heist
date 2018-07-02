@@ -102,4 +102,4 @@ class Subscriptions {
   }
 }
 
-enum Request { CreatingNewRoom, JoiningGame, Bidding }
+enum Request { CreatingNewRoom, JoiningGame, Bidding, ResolvingAuction }

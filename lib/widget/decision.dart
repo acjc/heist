@@ -1,11 +1,10 @@
 part of heist;
 
-Widget activeHeist() {
-  return new StoreConnector<GameModel, ActiveHeistViewModel>(
-      converter: (store) => new ActiveHeistViewModel._(
-          playersInTeam(store.state), currentHeist(store.state).decisions),
+Widget observeHeist(Store<GameModel> store) {
+  return new StoreConnector<GameModel, Map<String, String>>(
+      converter: (store) => currentHeist(store.state).decisions,
       distinct: true,
-      builder: (context, viewModel) {
+      builder: (context, decisions) {
         return new Card(
             elevation: 2.0,
             child: new Container(
@@ -20,51 +19,27 @@ Widget activeHeist() {
                     primary: false,
                     crossAxisSpacing: 10.0,
                     mainAxisSpacing: 10.0,
-                    children: activeHeistChildren(context, viewModel),
+                    children: activeHeistChildren(context, playersInTeam(store.state), decisions),
                   )
                 ])));
       });
 }
 
-List<Widget> activeHeistChildren(BuildContext context, ActiveHeistViewModel viewModel) {
+List<Widget> activeHeistChildren(
+    BuildContext context, Set<Player> team, Map<String, String> decisions) {
   Color color = Theme.of(context).accentColor;
-  return new List.generate(viewModel.playersInTeam.length, (i) {
-    Player player = viewModel.playersInTeam.elementAt(i);
-    bool decisionMade = viewModel.decisions[player.id] != null;
+  return new List.generate(team.length, (i) {
+    Player player = team.elementAt(i);
+    bool decisionMade = decisions[player.id] != null;
     return new Container(
         alignment: Alignment.center,
         decoration: new BoxDecoration(
-            border: new Border.all(color: color),
-            color: decisionMade ? color : null),
+            border: new Border.all(color: color), color: decisionMade ? color : null),
         child: new Text(
           player.name,
           style: new TextStyle(fontSize: 16.0, color: decisionMade ? Colors.white : null),
         ));
   });
-}
-
-class ActiveHeistViewModel {
-  final Set<Player> playersInTeam;
-  final Map<String, String> decisions;
-
-  ActiveHeistViewModel._(this.playersInTeam, this.decisions);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-          other is ActiveHeistViewModel &&
-              playersInTeam == other.playersInTeam &&
-              decisions == other.decisions;
-
-  @override
-  int get hashCode =>
-      playersInTeam.hashCode ^
-      decisions.hashCode;
-
-  @override
-  String toString() {
-    return 'ActiveHeistViewModel{playersInTeam: $playersInTeam, decisions: $decisions}';
-  }
 }
 
 Widget makeDecision(BuildContext context, Store<GameModel> store) {

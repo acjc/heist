@@ -161,6 +161,21 @@ class FirestoreDb {
     return _updateHeist(heistId, data);
   }
 
+  Future<void> updatePot(String heistId, int pot) {
+    Map<String, dynamic> data = {
+      'pot': pot
+    };
+    return _updateHeist(heistId, data);
+  }
+
+  Future<void> completeRound(String roundId) {
+    Map<String, dynamic> data = {
+      'completed': true,
+      'completedAt': now(),
+    };
+    return _updateRound(roundId, data);
+  }
+
   Future<void> _updateHeist(String heistId, Map<String, dynamic> data) {
     return _firestore.collection('heists').document(heistId).setData(data, merge: true);
   }

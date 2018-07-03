@@ -23,3 +23,10 @@ class CancelBidAction extends MiddlewareAction {
     store.dispatch(new RequestCompleteAction(Request.Bidding));
   }
 }
+
+class CompleteRoundAction extends MiddlewareAction {
+  @override
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
+    return store.state.db.completeRound(currentRound(store.state).id);
+  }
+}

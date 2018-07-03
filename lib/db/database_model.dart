@@ -133,7 +133,7 @@ class Player extends Document {
       @required this.installId,
       this.room,
       @required this.name,
-      this.initialBalance,
+      this.initialBalance = 8,
       this.role,
       this.order})
       : super(id: id);
@@ -201,7 +201,6 @@ class Player extends Document {
 class Heist extends Document {
   final DocumentReference room;
   final int price;
-  final int pot;
   final int numPlayers;
   final int order;
   final DateTime startedAt;
@@ -212,7 +211,6 @@ class Heist extends Document {
       {id,
       this.room,
       @required this.price,
-      this.pot = -1,
       @required this.numPlayers,
       @required this.order,
       @required this.startedAt,
@@ -233,7 +231,6 @@ class Heist extends Document {
       id: id ?? this.id,
       room: room ?? this.room,
       price: price ?? this.price,
-      pot: pot ?? this.pot,
       numPlayers: numPlayers ?? this.numPlayers,
       order: order ?? this.order,
       startedAt: startedAt ?? this.startedAt,
@@ -246,7 +243,6 @@ class Heist extends Document {
   Heist.fromJson(String id, Map<String, dynamic> json)
       : room = json['room'],
         price = json['price'],
-        pot = json['pot'],
         numPlayers = json['numPlayers'],
         order = json['order'],
         startedAt = json['startedAt'],
@@ -256,7 +252,6 @@ class Heist extends Document {
   Map<String, dynamic> toJson() => {
         'room': room,
         'price': price,
-        'pot': pot,
         'numPlayers': numPlayers,
         'order': order,
         'startedAt': startedAt,
@@ -270,16 +265,15 @@ class Heist extends Document {
           id == other.id &&
           room == other.room &&
           price == other.price &&
-          pot == other.pot &&
           decisions == other.decisions;
 
   @override
   int get hashCode =>
-      id.hashCode ^ room.hashCode ^ price.hashCode ^ pot.hashCode ^ decisions.hashCode;
+      id.hashCode ^ room.hashCode ^ price.hashCode ^ decisions.hashCode;
 
   @override
   String toString() {
-    return 'Heist{id: $id, room: $room, price: $price, pot: $pot, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions}';
+    return 'Heist{id: $id, room: $room, price: $price, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions}';
   }
 }
 
@@ -350,6 +344,8 @@ class Round extends Document {
   final bool teamSubmitted;
   final Map<String, Bid> bids; // player ID -> Bid
   final Map<String, Gift> gifts; // player ID -> Gift
+  final bool completed;
+  final DateTime completedAt;
 
   Round(
       {id,
@@ -361,7 +357,9 @@ class Round extends Document {
       this.team,
       this.teamSubmitted = false,
       this.bids = const {},
-      this.gifts = const {}})
+      this.gifts = const {},
+      this.completed,
+      this.completedAt})
       : super(id: id);
 
   Round copyWith({
@@ -375,6 +373,8 @@ class Round extends Document {
     bool teamSubmitted,
     Map<String, Bid> bids,
     Map<String, Gift> gifts,
+    bool completed,
+    DateTime completedAt,
   }) {
     return new Round(
       id: id ?? this.id,
@@ -387,6 +387,8 @@ class Round extends Document {
       teamSubmitted: teamSubmitted ?? this.teamSubmitted,
       bids: bids ?? this.bids,
       gifts: gifts ?? this.gifts,
+      completed: completed ?? this.completed,
+      completedAt: completedAt ?? this.completedAt,
     );
   }
 
@@ -404,6 +406,8 @@ class Round extends Document {
             (v) => new Bid.fromJson(v.cast<String, dynamic>())),
         gifts = _convertValues(json['gifts']?.cast<String, dynamic>(),
             (v) => new Gift.fromJson(v.cast<String, dynamic>())),
+        completed = json['completed'],
+        completedAt = json['completedAt'],
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -416,6 +420,8 @@ class Round extends Document {
         'teamSubmitted': teamSubmitted,
         'bids': bids,
         'gifts': gifts,
+        'completed': completed,
+        'completedAt': completedAt,
       };
 
   @override
@@ -426,14 +432,20 @@ class Round extends Document {
           team == other.team &&
           teamSubmitted == other.teamSubmitted &&
           bids == other.bids &&
-          gifts == other.gifts;
+          gifts == other.gifts &&
+          completed == other.completed;
 
   @override
   int get hashCode =>
-      id.hashCode ^ team.hashCode ^ teamSubmitted.hashCode ^ bids.hashCode ^ gifts.hashCode;
+      id.hashCode ^
+      team.hashCode ^
+      teamSubmitted.hashCode ^
+      bids.hashCode ^
+      gifts.hashCode ^
+      completed.hashCode;
 
   @override
   String toString() {
-    return 'Round{leader: $leader, order: $order, room: $room, heist: $heist, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts}';
+    return 'Round{leader: $leader, order: $order, room: $room, heist: $heist, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts, completed: $completed, completedAt: $completedAt}';
   }
 }

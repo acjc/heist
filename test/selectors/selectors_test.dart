@@ -8,6 +8,7 @@ import '../test_utils.dart';
 void main() {
   test('calculate balance', () async {
     String myId = uuid();
+    String otherId = uuid();
     String heistId1 = uuid();
     String heistId2 = uuid();
     FirestoreDb db = new MockFirestoreDb(
@@ -15,18 +16,17 @@ void main() {
             id: uuid(), code: 'ABCD', numPlayers: 2, roles: new Set.of(['KINGPIN', 'LEAD_AGENT'])),
         players: [
           new Player(
-              id: myId, installId: installId(), name: '_name', role: 'KINGPIN', initialBalance: 8),
+              id: myId, installId: installId(), name: '_name', role: 'KINGPIN'),
           new Player(
-              id: uuid(), installId: uuid(), name: '_other', role: 'LEAD_AGENT', initialBalance: 8),
+              id: otherId, installId: uuid(), name: '_other', role: 'LEAD_AGENT'),
         ],
         heists: [
           new Heist(
               id: heistId1,
               price: 12,
-              pot: 15,
               numPlayers: 2,
               order: 1,
-              decisions: {myId: 'SUCCEED'},
+              decisions: {myId: 'SUCCEED', otherId: 'SUCCEED'},
               startedAt: now()),
           new Heist(id: heistId2, price: 12, numPlayers: 2, order: 2, startedAt: now())
         ],

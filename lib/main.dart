@@ -27,6 +27,7 @@ part 'widget/common.dart';
 part 'widget/selection_board.dart';
 part 'widget/team_picker.dart';
 part 'widget/decision.dart';
+part 'widget/round_end.dart';
 part 'middleware/middleware.dart';
 part 'middleware/room_middleware.dart';
 part 'middleware/game_middleware.dart';

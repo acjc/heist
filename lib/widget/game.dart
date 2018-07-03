@@ -39,47 +39,48 @@ class GameState extends State<Game> {
     return centeredMessage('Resolving auction...');
   }
 
-  Widget _mainBoardBody() =>
-      new StoreConnector<GameModel, MainBoardViewModel>(
-          converter: (store) => new MainBoardViewModel._(
-              heistIsActive(store.state),
-              requestInProcess(store.state, Request.ResolvingAuction),
-              goingOnHeist(store.state),
-              !currentRound(store.state).teamSubmitted,
-              isMyGo(store.state),
-              biddingComplete(store.state),
-              heistComplete(store.state)),
-          distinct: true,
-          builder: (context, viewModel) {
+  Widget _mainBoardBody() => new StoreConnector<GameModel, MainBoardViewModel>(
+      converter: (store) => new MainBoardViewModel._(
+          waitingForTeam: !currentRound(store.state).teamSubmitted,
+          biddingComplete: biddingComplete(store.state),
+          resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
+          roundComplete: currentRound(store.state).completed,
+          heistIsActive: heistIsActive(store.state),
+          heistComplete: heistComplete(store.state)),
+      distinct: true,
+      builder: (context, viewModel) {
+        // team picking (not needed for auctions)
+        if (!isAuction(_store.state) && viewModel.waitingForTeam) {
+          return isMyGo(_store.state) ? teamPicker(_store) : waitForTeam(_store);
+        }
 
-            // team picking (not needed for auctions)
-            if (!isAuction(_store.state) && viewModel.waitingForTeam) {
-              return viewModel.isMyGo ? teamPicker(_store) : waitForTeam(_store);
-            }
+        // bidding
+        if (!viewModel.biddingComplete) {
+          return bidding(_store);
+        }
 
-            // bidding
-            if (!viewModel.biddingComplete) {
-              return bidding(_store);
-            }
+        // resolve round
+        if (!viewModel.roundComplete) {
+          return roundEnd(_store);
+        }
 
-            if (!viewModel.heistComplete) {
-              if (amOwner(_store.state)) {
-                // TODO: add up pot
-              }
-              return centeredMessage('Resolving bids...');
-            }
+        // resolve auction
+        if (isAuction(_store.state) && viewModel.waitingForTeam) {
+          return _resolveAuctionWinners(viewModel.resolvingAuction);
+        }
 
-            // active heist
-            if (viewModel.heistIsActive) {
-              if (isAuction(_store.state) && viewModel.waitingForTeam) {
-                return _resolveAuctionWinners(viewModel.resolvingAuction);
-              }
-              return viewModel.goingOnHeist ? makeDecision(context, _store) : observeHeist(_store);
-            }
+        // active heist
+        if (viewModel.heistIsActive) {
+          return goingOnHeist(_store.state) ? makeDecision(context, _store) : observeHeist(_store);
+        }
 
-            // TODO: go to new round
-            return new Container();
-          });
+        if (viewModel.heistComplete) {
+          // TODO: create new heist
+        }
+
+        // TODO: go to new round with new leader
+        return new Container();
+      });
 
   Widget _secretBoardBody() => new StoreConnector<GameModel, Player>(
       converter: (store) => getSelf(store.state),
@@ -94,11 +95,8 @@ class GameState extends State<Game> {
           )));
 
   Widget _loadingScreen() => new StoreConnector<GameModel, LoadingScreenViewModel>(
-        converter: (store) => new LoadingScreenViewModel._(
-            roomIsAvailable(store.state),
-            waitingForPlayers(store.state),
-            isNewGame(store.state),
-            getPlayers(store.state).length),
+        converter: (store) => new LoadingScreenViewModel._(roomIsAvailable(store.state),
+            waitingForPlayers(store.state), isNewGame(store.state), getPlayers(store.state).length),
         distinct: true,
         builder: (context, viewModel) {
           if (!viewModel.roomIsAvailable) {
@@ -166,8 +164,8 @@ class LoadingScreenViewModel {
   final bool isNewGame;
   final int playersSoFar;
 
-  LoadingScreenViewModel._(this.roomIsAvailable, this.waitingForPlayers, this.isNewGame,
-      this.playersSoFar);
+  LoadingScreenViewModel._(
+      this.roomIsAvailable, this.waitingForPlayers, this.isNewGame, this.playersSoFar);
 
   @override
   bool operator ==(Object other) =>
@@ -192,42 +190,44 @@ class LoadingScreenViewModel {
 }
 
 class MainBoardViewModel {
-  final bool heistIsActive;
-  final bool resolvingAuction;
-  final bool goingOnHeist;
   final bool waitingForTeam;
-  final bool isMyGo;
   final bool biddingComplete;
+  final bool resolvingAuction;
+  final bool roundComplete;
+  final bool heistIsActive;
   final bool heistComplete;
 
-  MainBoardViewModel._(this.heistIsActive, this.resolvingAuction, this.goingOnHeist,
-      this.waitingForTeam, this.isMyGo, this.biddingComplete, this.heistComplete);
+  MainBoardViewModel._(
+      {@required this.waitingForTeam,
+      @required this.biddingComplete,
+      @required this.resolvingAuction,
+      @required this.roundComplete,
+      @required this.heistIsActive,
+      @required this.heistComplete});
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is MainBoardViewModel &&
-              heistIsActive == other.heistIsActive &&
-              resolvingAuction == other.resolvingAuction &&
-              goingOnHeist == other.goingOnHeist &&
-              waitingForTeam == other.waitingForTeam &&
-              isMyGo == other.isMyGo &&
-              biddingComplete == other.biddingComplete &&
-              heistComplete == other.heistComplete;
+      other is MainBoardViewModel &&
+          waitingForTeam == other.waitingForTeam &&
+          biddingComplete == other.biddingComplete &&
+          resolvingAuction == other.resolvingAuction &&
+          roundComplete == other.roundComplete &&
+          heistIsActive == other.heistIsActive &&
+          heistComplete == other.heistComplete;
 
   @override
   int get hashCode =>
-      heistIsActive.hashCode ^
-      resolvingAuction.hashCode ^
-      goingOnHeist.hashCode ^
       waitingForTeam.hashCode ^
-      isMyGo.hashCode ^
       biddingComplete.hashCode ^
+      resolvingAuction.hashCode ^
+      roundComplete.hashCode ^
+      heistIsActive.hashCode ^
       heistComplete.hashCode;
 
   @override
   String toString() {
-    return 'MainBoardViewModel{heistIsActive: $heistIsActive, resolvingAuction: $resolvingAuction, goingOnHeist: $goingOnHeist, waitingForTeam: $waitingForTeam, isMyGo: $isMyGo, biddingComplete: $biddingComplete, heistComplete: $heistComplete}';
+    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, heistIsActive: $heistIsActive, heistComplete: $heistComplete}';
   }
 }
 

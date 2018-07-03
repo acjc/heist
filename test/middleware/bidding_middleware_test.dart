@@ -13,4 +13,12 @@ void main() {
     await handle(store, new CancelBidAction());
     expect(myCurrentBid(store.state), isNull);
   });
+
+  test('test complete round', () async {
+    Store<GameModel> store = await initGame();
+
+    await handle(store, new CompleteRoundAction());
+    expect(currentRound(store.state).completed, true);
+    expect(currentRound(store.state).completedAt, isNotNull);
+  });
 }

@@ -52,12 +52,12 @@ final currentHeist = (GameModel gameModel) => getHeists(gameModel).last;
 final Selector<GameModel, Round> currentRound = createSelector2(
     currentHeist, getRounds, (currentHeist, rounds) => rounds[currentHeist.id].last);
 
-final Selector<GameModel, int> currentBalance =
-    createSelector3(getSelf, getHeists, getRounds, (me, heists, allRounds) {
+final Selector<GameModel, int> currentBalance = createSelector3(getSelf, getHeists, getRounds,
+    (Player me, List<Heist> heists, Map<String, List<Round>> allRounds) {
   int balance = me.initialBalance;
   heists.forEach((heist) {
     List<Round> rounds = allRounds[heist.id];
-    if (heist.decisions.isNotEmpty) {
+    if (heist.decisions.length == heist.numPlayers) {
       balance -= rounds.last.bids[me.id].amount;
     }
     rounds.forEach((round) => round.gifts.forEach((id, gift) {
@@ -75,14 +75,15 @@ final Selector<GameModel, int> currentBalance =
 final Selector<GameModel, bool> isAuction =
     createSelector1((currentRound), (Round currentRound) => currentRound.order == 5);
 
-final Selector<GameModel, bool> heistIsActive = createSelector4(
+final Selector<GameModel, bool> heistIsActive = createSelector5(
+    currentPot,
     currentHeist,
     biddingComplete,
     isAuction,
     heistComplete,
-    (Heist currentHeist, bool biddingComplete, bool isAuction, bool heistComplete) =>
-        ((isAuction && biddingComplete) || currentHeist.pot >= currentHeist.price) &&
-        !heistComplete);
+    (int currentPot, Heist currentHeist, bool biddingComplete, bool isAuction,
+            bool heistComplete) =>
+        ((isAuction && biddingComplete) || currentPot >= currentHeist.price) && !heistComplete);
 
 final Selector<GameModel, bool> isMyGo =
     createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.leader == me.id);
@@ -120,3 +121,9 @@ final Selector<GameModel, bool> goingOnHeist = createSelector2(
 
 final Selector<GameModel, bool> heistComplete = createSelector1(
     currentHeist, (Heist currentHeist) => currentHeist.decisions.length == currentHeist.numPlayers);
+
+final Selector<GameModel, int> currentPot = createSelector1(
+    currentRound,
+    (Round currentRound) => currentRound.bids.isNotEmpty
+        ? currentRound.bids.values.fold(0, (previousValue, bid) => previousValue + bid.amount)
+        : -1);

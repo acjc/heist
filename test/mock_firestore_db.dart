@@ -215,4 +215,16 @@ class MockFirestoreDb implements FirestoreDb {
     decisions[playerId] = decision;
     return upsertHeist(heist.copyWith(decisions: decisions), null);
   }
+
+  @override
+  Future<void> completeRound(String roundId) {
+    Round round = _getRound(roundId);
+    return upsertRound(round.copyWith(completed: true, completedAt: now()), null);
+  }
+
+  @override
+  Future<void> updatePot(String heistId, int pot) {
+    Heist heist = _getHeist(heistId);
+    return upsertHeist(heist.copyWith(pot: pot), null);
+  }
 }

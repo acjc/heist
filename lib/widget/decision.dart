@@ -19,13 +19,13 @@ Widget observeHeist(Store<GameModel> store) {
                     primary: false,
                     crossAxisSpacing: 10.0,
                     mainAxisSpacing: 10.0,
-                    children: activeHeistChildren(context, playersInTeam(store.state), decisions),
+                    children: observeHeistChildren(context, playersInTeam(store.state), decisions),
                   )
                 ])));
       });
 }
 
-List<Widget> activeHeistChildren(
+List<Widget> observeHeistChildren(
     BuildContext context, Set<Player> team, Map<String, String> decisions) {
   Color color = Theme.of(context).accentColor;
   return new List.generate(team.length, (i) {
@@ -71,3 +71,27 @@ Widget decisionButton(BuildContext context, Store<GameModel> store, String decis
       onPressed: () => store.dispatch(new MakeDecisionAction(decision)),
       child: new Text(decision, style: buttonTextStyle),
     ));
+
+Widget heistContinueButton(Store<GameModel> store) {
+  return new RaisedButton(
+    child: const Text('CONTINUE', style: buttonTextStyle),
+    onPressed: () => store.dispatch(new CompleteHeistAction()),
+  );
+}
+
+Widget heistEnd(Store<GameModel> store) {
+  Set<Player> team = playersInTeam(store.state);
+  Map<String, String> decisions = currentHeist(store.state).decisions;
+  List<Widget> children = new List.generate(team.length, (i) {
+    Player player = team.elementAt(i);
+    return new Text('${player.name} -> ${decisions[player.id]}', style: infoTextStyle);
+  })
+    ..add(heistContinueButton(store));
+  return new Card(
+    elevation: 2.0,
+    child: new Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: children,
+    ),
+  );
+}

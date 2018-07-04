@@ -217,8 +217,8 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<void> completeRound(String roundId) {
-    Round round = _getRound(roundId);
+  Future<void> completeRound(String id) {
+    Round round = _getRound(id);
     return upsertRound(round.copyWith(completed: true, completedAt: now()), null);
   }
 
@@ -226,5 +226,11 @@ class MockFirestoreDb implements FirestoreDb {
   Future<void> updatePot(String heistId, int pot) {
     Heist heist = _getHeist(heistId);
     return upsertHeist(heist.copyWith(pot: pot), null);
+  }
+
+  @override
+  Future<void> completeHeist(String id) {
+    Heist heist = _getHeist(id);
+    return upsertHeist(heist.copyWith(completed: true, completedAt: now()), null);
   }
 }

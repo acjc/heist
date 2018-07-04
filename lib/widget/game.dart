@@ -46,7 +46,8 @@ class GameState extends State<Game> {
           resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
           roundComplete: currentRound(store.state).completed,
           heistIsActive: heistIsActive(store.state),
-          heistComplete: heistComplete(store.state)),
+          heistDecided: heistDecided(store.state),
+          heistComplete: currentHeist(store.state).completed),
       distinct: true,
       builder: (context, viewModel) {
         // team picking (not needed for auctions)
@@ -74,12 +75,13 @@ class GameState extends State<Game> {
           return goingOnHeist(_store.state) ? makeDecision(context, _store) : observeHeist(_store);
         }
 
-        if (viewModel.heistComplete) {
-          // TODO: create new heist
+        // heist has happened
+        if (heistDecided(_store.state)) {
+          return heistEnd(_store);
         }
 
         // TODO: go to new round with new leader
-        return new Container();
+        return centeredMessage('Loading next round...');
       });
 
   Widget _secretBoardBody() => new StoreConnector<GameModel, Player>(
@@ -195,6 +197,7 @@ class MainBoardViewModel {
   final bool resolvingAuction;
   final bool roundComplete;
   final bool heistIsActive;
+  final bool heistDecided;
   final bool heistComplete;
 
   MainBoardViewModel._(
@@ -203,6 +206,7 @@ class MainBoardViewModel {
       @required this.resolvingAuction,
       @required this.roundComplete,
       @required this.heistIsActive,
+      @required this.heistDecided,
       @required this.heistComplete});
 
   @override
@@ -214,6 +218,7 @@ class MainBoardViewModel {
           resolvingAuction == other.resolvingAuction &&
           roundComplete == other.roundComplete &&
           heistIsActive == other.heistIsActive &&
+          heistDecided == other.heistDecided &&
           heistComplete == other.heistComplete;
 
   @override
@@ -223,11 +228,12 @@ class MainBoardViewModel {
       resolvingAuction.hashCode ^
       roundComplete.hashCode ^
       heistIsActive.hashCode ^
+      heistDecided.hashCode ^
       heistComplete.hashCode;
 
   @override
   String toString() {
-    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, heistIsActive: $heistIsActive, heistComplete: $heistComplete}';
+    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, heistIsActive: $heistIsActive, heistDecided: $heistDecided, heistComplete: $heistComplete}';
   }
 }
 

@@ -14,6 +14,7 @@ List<Middleware<GameModel>> createMiddleware() {
     new TypedMiddleware<GameModel, MakeDecisionAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, ResolveAuctionWinnersAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, CompleteRoundAction>(_dispatchMiddleware),
+    new TypedMiddleware<GameModel, CompleteHeistAction>(_dispatchMiddleware),
   ];
 
   // asserts only work in debug mode

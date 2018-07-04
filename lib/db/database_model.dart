@@ -205,6 +205,9 @@ class Heist extends Document {
   final int order;
   final DateTime startedAt;
   final Map<String, String> decisions;
+  final bool completed;
+  final DateTime completedAt;
+
   // TODO: include Kingpin guesses
 
   Heist(
@@ -214,7 +217,9 @@ class Heist extends Document {
       @required this.numPlayers,
       @required this.order,
       @required this.startedAt,
-      this.decisions = const {}})
+      this.decisions = const {},
+      this.completed = false,
+      this.completedAt})
       : super(id: id);
 
   Heist copyWith({
@@ -226,6 +231,8 @@ class Heist extends Document {
     int order,
     DateTime startedAt,
     Map<String, String> decisions, // player ID -> { SUCCEED, FAIL, STEAL }
+    bool completed,
+    DateTime completedAt,
   }) {
     return new Heist(
       id: id ?? this.id,
@@ -235,6 +242,8 @@ class Heist extends Document {
       order: order ?? this.order,
       startedAt: startedAt ?? this.startedAt,
       decisions: decisions ?? this.decisions,
+      completed: completed ?? this.completed,
+      completedAt: completedAt ?? this.completedAt,
     );
   }
 
@@ -247,6 +256,8 @@ class Heist extends Document {
         order = json['order'],
         startedAt = json['startedAt'],
         decisions = json['decisions']?.cast<String, String>() ?? {},
+        completed = json['completed'],
+        completedAt = json['completedAt'],
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -256,6 +267,8 @@ class Heist extends Document {
         'order': order,
         'startedAt': startedAt,
         'decisions': decisions,
+        'completed': completed,
+        'completedAt': completedAt,
       };
 
   @override
@@ -265,15 +278,16 @@ class Heist extends Document {
           id == other.id &&
           room == other.room &&
           price == other.price &&
-          decisions == other.decisions;
+          decisions == other.decisions &&
+          completed == other.completed;
 
   @override
   int get hashCode =>
-      id.hashCode ^ room.hashCode ^ price.hashCode ^ decisions.hashCode;
+      id.hashCode ^ room.hashCode ^ price.hashCode ^ decisions.hashCode ^ completed.hashCode;
 
   @override
   String toString() {
-    return 'Heist{id: $id, room: $room, price: $price, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions}';
+    return 'Heist{room: $room, price: $price, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions, completed: $completed, completedAt: $completedAt}';
   }
 }
 
@@ -358,7 +372,7 @@ class Round extends Document {
       this.teamSubmitted = false,
       this.bids = const {},
       this.gifts = const {},
-      this.completed,
+      this.completed = false,
       this.completedAt})
       : super(id: id);
 

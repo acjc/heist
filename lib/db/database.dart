@@ -168,12 +168,20 @@ class FirestoreDb {
     return _updateHeist(heistId, data);
   }
 
-  Future<void> completeRound(String roundId) {
+  Future<void> completeRound(String id) {
     Map<String, dynamic> data = {
       'completed': true,
       'completedAt': now(),
     };
-    return _updateRound(roundId, data);
+    return _updateRound(id, data);
+  }
+
+  Future<void> completeHeist(String id) {
+    Map<String, dynamic> data = {
+      'completed': true,
+      'completedAt': now(),
+    };
+    return _updateHeist(id, data);
   }
 
   Future<void> _updateHeist(String heistId, Map<String, dynamic> data) {

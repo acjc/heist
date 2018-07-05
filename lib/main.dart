@@ -44,6 +44,7 @@ part 'reducers/bid_amount_reducers.dart';
 part 'selectors/selectors.dart';
 part 'state.dart';
 part 'role.dart';
+part 'heist_definitions.dart';
 
 void main() => runApp(new MyApp(Firestore.instance));
 

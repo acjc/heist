@@ -47,6 +47,7 @@ class GameState extends State<Game> {
           roundComplete: currentRound(store.state).completed,
           heistIsActive: heistIsActive(store.state),
           heistDecided: heistDecided(store.state),
+          completingHeist: requestInProcess(store.state, Request.CompletingHeist),
           heistComplete: currentHeist(store.state).completed),
       distinct: true,
       builder: (context, viewModel) {
@@ -76,7 +77,7 @@ class GameState extends State<Game> {
         }
 
         // heist has happened
-        if (heistDecided(_store.state)) {
+        if (heistDecided(_store.state) && !viewModel.heistComplete) {
           return heistEnd(_store);
         }
 
@@ -198,6 +199,7 @@ class MainBoardViewModel {
   final bool roundComplete;
   final bool heistIsActive;
   final bool heistDecided;
+  final bool completingHeist;
   final bool heistComplete;
 
   MainBoardViewModel._(
@@ -207,6 +209,7 @@ class MainBoardViewModel {
       @required this.roundComplete,
       @required this.heistIsActive,
       @required this.heistDecided,
+      @required this.completingHeist,
       @required this.heistComplete});
 
   @override
@@ -219,6 +222,7 @@ class MainBoardViewModel {
           roundComplete == other.roundComplete &&
           heistIsActive == other.heistIsActive &&
           heistDecided == other.heistDecided &&
+          completingHeist == other.completingHeist &&
           heistComplete == other.heistComplete;
 
   @override
@@ -229,11 +233,12 @@ class MainBoardViewModel {
       roundComplete.hashCode ^
       heistIsActive.hashCode ^
       heistDecided.hashCode ^
+      completingHeist.hashCode ^
       heistComplete.hashCode;
 
   @override
   String toString() {
-    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, heistIsActive: $heistIsActive, heistDecided: $heistDecided, heistComplete: $heistComplete}';
+    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, heistIsActive: $heistIsActive, heistDecided: $heistDecided, completingHeist: $completingHeist, heistComplete: $heistComplete}';
   }
 }
 

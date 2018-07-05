@@ -287,7 +287,7 @@ class Heist extends Document {
 
   @override
   String toString() {
-    return 'Heist{room: $room, price: $price, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions, completed: $completed, completedAt: $completedAt}';
+    return 'Heist{id: $id, room: $room, price: $price, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions, completed: $completed, completedAt: $completedAt}';
   }
 }
 

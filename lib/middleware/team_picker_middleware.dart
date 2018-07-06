@@ -45,14 +45,14 @@ class ResolveAuctionWinnersAction extends MiddlewareAction {
 
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
-    store.dispatch(new StartRequestAction(Request.ResolvingAuction));
-    Round round = currentRound(store.state);
-    int numPlayers = currentHeist(store.state).numPlayers;
-    List<String> winners = _winners(round.bids, numPlayers);
-    for (String playerId in winners) {
-      await store.state.db.updateTeam(round.id, playerId, true);
-    }
-    store.dispatch(new RequestCompleteAction(Request.ResolvingAuction));
+    return withRequest(Request.ResolvingAuction, store, (store) async {
+      Round round = currentRound(store.state);
+      int numPlayers = currentHeist(store.state).numPlayers;
+      List<String> winners = _winners(round.bids, numPlayers);
+      for (String playerId in winners) {
+        await store.state.db.updateTeam(round.id, playerId, true);
+      }
+    });
   }
 }
 

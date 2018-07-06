@@ -41,14 +41,16 @@ class GameState extends State<Game> {
 
   Widget _mainBoardBody() => new StoreConnector<GameModel, MainBoardViewModel>(
       converter: (store) => new MainBoardViewModel._(
-          waitingForTeam: !currentRound(store.state).teamSubmitted,
-          biddingComplete: biddingComplete(store.state),
-          resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
-          roundComplete: currentRound(store.state).completed,
-          heistIsActive: heistIsActive(store.state),
-          heistDecided: heistDecided(store.state),
-          completingHeist: requestInProcess(store.state, Request.CompletingHeist),
-          heistComplete: currentHeist(store.state).completed),
+            waitingForTeam: !currentRound(store.state).teamSubmitted,
+            biddingComplete: biddingComplete(store.state),
+            resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
+            roundComplete: currentRound(store.state).completed,
+            heistIsActive: heistIsActive(store.state),
+            heistDecided: heistDecided(store.state),
+            completingHeist: requestInProcess(store.state, Request.CompletingHeist),
+            heistComplete: currentHeist(store.state).completed,
+            creatingNewRound: requestInProcess(store.state, Request.CreatingNewRound),
+          ),
       distinct: true,
       builder: (context, viewModel) {
         // team picking (not needed for auctions)
@@ -76,12 +78,15 @@ class GameState extends State<Game> {
           return goingOnHeist(_store.state) ? makeDecision(context, _store) : observeHeist(_store);
         }
 
-        // heist has happened
+        // go to next heist
         if (heistDecided(_store.state) && !viewModel.heistComplete) {
           return heistEnd(_store);
         }
 
-        // TODO: go to new round with new leader
+        // go to next round
+        if (amOwner(_store.state) && !viewModel.creatingNewRound) {
+          _store.dispatch(new CreateNewRoundAction());
+        }
         return centeredMessage('Loading next round...');
       });
 
@@ -201,6 +206,7 @@ class MainBoardViewModel {
   final bool heistDecided;
   final bool completingHeist;
   final bool heistComplete;
+  final bool creatingNewRound;
 
   MainBoardViewModel._(
       {@required this.waitingForTeam,
@@ -210,7 +216,8 @@ class MainBoardViewModel {
       @required this.heistIsActive,
       @required this.heistDecided,
       @required this.completingHeist,
-      @required this.heistComplete});
+      @required this.heistComplete,
+      @required this.creatingNewRound});
 
   @override
   bool operator ==(Object other) =>
@@ -223,7 +230,8 @@ class MainBoardViewModel {
           heistIsActive == other.heistIsActive &&
           heistDecided == other.heistDecided &&
           completingHeist == other.completingHeist &&
-          heistComplete == other.heistComplete;
+          heistComplete == other.heistComplete &&
+          creatingNewRound == other.creatingNewRound;
 
   @override
   int get hashCode =>
@@ -234,11 +242,12 @@ class MainBoardViewModel {
       heistIsActive.hashCode ^
       heistDecided.hashCode ^
       completingHeist.hashCode ^
-      heistComplete.hashCode;
+      heistComplete.hashCode ^
+      creatingNewRound.hashCode;
 
   @override
   String toString() {
-    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, heistIsActive: $heistIsActive, heistDecided: $heistDecided, completingHeist: $completingHeist, heistComplete: $heistComplete}';
+    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, heistIsActive: $heistIsActive, heistDecided: $heistDecided, completingHeist: $completingHeist, heistComplete: $heistComplete, creatingNewRound: $creatingNewRound}';
   }
 }
 

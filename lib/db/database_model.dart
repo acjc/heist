@@ -133,7 +133,7 @@ class Player extends Document {
       @required this.installId,
       this.room,
       @required this.name,
-      this.initialBalance = 8,
+      this.initialBalance = 8, // TODO: initial balance may eventually depend on role
       this.role,
       this.order})
       : super(id: id);

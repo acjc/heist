@@ -15,6 +15,7 @@ List<Middleware<GameModel>> createMiddleware() {
     new TypedMiddleware<GameModel, ResolveAuctionWinnersAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, CompleteRoundAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, CompleteHeistAction>(_dispatchMiddleware),
+    new TypedMiddleware<GameModel, CreateNewRoundAction>(_dispatchMiddleware),
   ];
 
   // asserts only work in debug mode
@@ -33,4 +34,13 @@ void _dispatchMiddleware(Store<GameModel> store, dynamic action, NextDispatcher 
 /// MiddlewareActions know how to handle themselves.
 abstract class MiddlewareAction {
   Future<void> handle(Store<GameModel> store, dynamic action, NextDispatcher next);
+}
+
+/// Complete some asynchronous work using a request marker as a lock.
+Future<T> withRequest<T>(
+    Request request, Store<GameModel> store, Future<T> work(Store<GameModel> store)) async {
+  store.dispatch(new StartRequestAction(request));
+  T result = await work(store);
+  store.dispatch(new RequestCompleteAction(request));
+  return result;
 }

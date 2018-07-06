@@ -111,7 +111,9 @@ class FirestoreDb {
 
   Future<String> upsertHeist(Heist heist, String roomId) async {
     DocumentReference roomRef = _firestore.document("/rooms/$roomId");
-    heist = heist.copyWith(room: roomRef);
+    if (heist.room == null) {
+      heist = heist.copyWith(room: roomRef);
+    }
     DocumentReference heistRef = _firestore.collection('heists').document(heist.id);
     await heistRef.setData(heist.toJson());
     return heistRef.documentID;
@@ -119,13 +121,17 @@ class FirestoreDb {
 
   Future<void> upsertRound(Round round, String roomId) {
     DocumentReference roomRef = _firestore.document("/rooms/$roomId");
-    round = round.copyWith(room: roomRef);
+    if (round.room == null) {
+      round = round.copyWith(room: roomRef);
+    }
     return _firestore.collection('rounds').document(round.id).setData(round.toJson());
   }
 
   Future<void> upsertPlayer(Player player, String roomId) {
     DocumentReference roomRef = _firestore.document("/rooms/$roomId");
-    player = player.copyWith(room: roomRef);
+    if (player.room == null) {
+      player = player.copyWith(room: roomRef);
+    }
     return _firestore.collection('players').document(player.id).setData(player.toJson());
   }
 
@@ -148,9 +154,7 @@ class FirestoreDb {
   }
 
   Future<void> submitTeam(String roundId) {
-    Map<String, dynamic> data = {
-      'teamSubmitted': true
-    };
+    Map<String, dynamic> data = {'teamSubmitted': true};
     return _updateRound(roundId, data);
   }
 
@@ -162,9 +166,7 @@ class FirestoreDb {
   }
 
   Future<void> updatePot(String heistId, int pot) {
-    Map<String, dynamic> data = {
-      'pot': pot
-    };
+    Map<String, dynamic> data = {'pot': pot};
     return _updateHeist(heistId, data);
   }
 

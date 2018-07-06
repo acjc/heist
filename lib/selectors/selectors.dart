@@ -82,14 +82,16 @@ final Selector<GameModel, bool> heistIsActive = createSelector5(
     isAuction,
     heistDecided,
     (int currentPot, Heist currentHeist, bool biddingComplete, bool isAuction, bool heistDecided) =>
-        ((isAuction && biddingComplete) || currentPot >= currentHeist.price) &&
-        !heistDecided);
+        ((isAuction && biddingComplete) || currentPot >= currentHeist.price) && !heistDecided);
 
 final Selector<GameModel, bool> isMyGo =
     createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.leader == me.id);
 
-final Selector<GameModel, Player> roundLeader = createSelector2(getPlayers, currentRound,
-    (players, currentRound) => players.firstWhere((Player p) => p.id == currentRound.leader));
+final Selector<GameModel, Player> roundLeader = createSelector2(
+    getPlayers,
+    currentRound,
+    (List<Player> players, Round currentRound) =>
+        players.singleWhere((Player p) => p.id == currentRound.leader));
 
 final Selector<GameModel, Set<Player>> playersInTeam = createSelector2(
     getPlayers,

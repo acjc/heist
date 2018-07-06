@@ -16,7 +16,8 @@ String uuid() {
 Future<void> addOtherPlayers(Store<GameModel> store) async {
   for (int i = 0; i < store.state.room.numPlayers - 1; i++) {
     await store.state.db.upsertPlayer(
-        new Player(installId: uuid(), name: uuid(), initialBalance: 8), store.state.room.id);
+        new Player(installId: uuid(), name: uuid()),
+        store.state.room.id);
   }
 }
 

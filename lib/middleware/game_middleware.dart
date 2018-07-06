@@ -12,24 +12,41 @@ class JoinGameAction extends MiddlewareAction {
     String iid = installId();
 
     if (!haveJoinedGame(store.state) && !(await db.playerExists(roomId, iid))) {
-      // TODO: initial balance may eventually depend on role
-      return db.upsertPlayer(
-          new Player(installId: iid, name: playerName, initialBalance: 8), roomId);
+      return db.upsertPlayer(new Player(installId: iid, name: playerName), roomId);
     }
   }
 }
 
 class SetUpNewGameAction extends MiddlewareAction {
-  void _assignRoles(Store<GameModel> store) {
-    Room room = getRoom(store.state);
+  List<String> _getRemainingRoles(Room room, List<Player> players) {
     List<String> roles = new List.of(room.roles);
-    List<Player> players = getPlayers(store.state);
     assert(roles.length == players.length);
 
+    Set<String> assignedRoles =
+        players.where((p) => p.role != null && p.role.isNotEmpty).map((p) => p.role).toSet();
+    return roles.where((r) => !assignedRoles.contains(r)).toList();
+  }
+
+  List<int> _getRemainingOrders(List<Player> players) {
+    Set<int> assignedOrders = players.where((p) => p.order != null).map((p) => p.order).toSet();
+    List<int> remainingOrders = new List.generate(players.length, (i) => i + 1);
+    remainingOrders.retainWhere((o) => !assignedOrders.contains(o));
+    return remainingOrders;
+  }
+
+  void _assignRoles(Store<GameModel> store) {
+    Room room = getRoom(store.state);
+    List<Player> players = getPlayers(store.state);
+
+    List<String> remainingRoles = _getRemainingRoles(room, players);
+    List<int> remainingOrders = _getRemainingOrders(players);
+    List<Player> unassignedPlayers =
+        players.where((p) => p.order == null && (p.role == null || p.role.isEmpty)).toList();
     Random random = new Random();
-    for (Player player in players.where((p) => p.role == null || p.role.isEmpty)) {
-      String role = roles.removeAt(random.nextInt(roles.length));
-      store.state.db.upsertPlayer(player.copyWith(role: role), room.id);
+    for (Player player in unassignedPlayers) {
+      String role = remainingRoles.removeAt(random.nextInt(remainingRoles.length));
+      int order = remainingOrders.removeAt(random.nextInt(remainingOrders.length));
+      store.state.db.upsertPlayer(player.copyWith(role: role, order: order), room.id);
     }
   }
 
@@ -52,7 +69,8 @@ class SetUpNewGameAction extends MiddlewareAction {
     FirestoreDb db = store.state.db;
     String roomId = getRoom(store.state).id;
     if (!hasRounds(store.state) && !(await db.roundExists(roomId, heistId, 1))) {
-      Round round = new Round(order: 1, heist: heistId, startedAt: now());
+      String newLeader = getPlayers(store.state).singleWhere((p) => p.order == 1).id;
+      Round round = new Round(order: 1, heist: heistId, leader: newLeader, startedAt: now());
       return db.upsertRound(round, roomId);
     }
   }

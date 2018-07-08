@@ -15,6 +15,9 @@ bool requestInProcess(GameModel gameModel, Request request) =>
 final getSelf = (GameModel gameModel) =>
     getPlayers(gameModel).singleWhere((p) => p.installId == installId(), orElse: () => null);
 
+final getPlayerByRoleId =
+    (GameModel gameModel, String role) => getPlayers(gameModel).singleWhere((p) => p.role == role);
+
 final Selector<GameModel, bool> amOwner =
     createSelector1(getRoom, (room) => room.owner == installId());
 

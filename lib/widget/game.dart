@@ -63,9 +63,9 @@ class GameState extends State<Game> {
       distinct: true,
       builder: (context, viewModel) {
         // team picking (not needed for auctions)
-//        if (!isAuction(_store.state) && viewModel.waitingForTeam) {
-//          return isMyGo(_store.state) ? teamPicker(_store) : waitForTeam(_store);
-//        }
+        if (!isAuction(_store.state) && viewModel.waitingForTeam) {
+          return isMyGo(_store.state) ? teamPicker(_store) : waitForTeam(_store);
+        }
 
         // bidding
         if (!viewModel.biddingComplete) {

@@ -52,7 +52,7 @@ Widget makeDecision(BuildContext context, Store<GameModel> store) {
           decisionButton(context, store, 'SUCCEED'),
           decisionButton(context, store, 'STEAL'),
         ];
-        if (getTeam(me.role) == Team.Agents) {
+        if (getTeam(me.role) == Team.AGENTS) {
           choices.add(decisionButton(context, store, 'FAIL'));
         }
         return new Card(

@@ -95,12 +95,43 @@ class GameState extends State<Game> {
       distinct: true,
       builder: (context, me) => new Card(
           elevation: 2.0,
-          child: new ListTile(
-            title: new Text(
-              "${me.name} (${me.role})",
-              style: infoTextStyle,
-            ),
+          child: new Column(
+            children: [
+              new ListTile(
+                title: new Text(
+                  "You are in team ${getTeam(me.role).toString()}",
+                  style: infoTextStyle,
+                ),
+              ),
+              new ListTile(
+                title: new Text(
+                  "Your role is ${getDisplayName(me.role)}",
+                  style: infoTextStyle,
+                ),
+              ),
+              new ListTile(
+                title: new Text(
+                  "You also know these identities:",
+                  style: infoTextStyle,
+                ),
+              ),
+              new ListTile(
+                title: new Text(
+                  "${getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
+                  style: infoTextStyle,
+                ),
+              ),
+            ]
           )));
+
+  String getFormattedKnownIds(GameModel gameModel, Set<String> knownIds) {
+    String formattedKnownIds = "";
+    knownIds.forEach((roleId) {
+      formattedKnownIds += getPlayerByRoleId(gameModel, roleId).name
+          + " is the " + getDisplayName(roleId) + "\n";
+    });
+    return formattedKnownIds;
+  }
 
   Widget _loadingScreen() => new StoreConnector<GameModel, LoadingScreenViewModel>(
         converter: (store) => new LoadingScreenViewModel._(roomIsAvailable(store.state),

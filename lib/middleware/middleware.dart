@@ -8,6 +8,7 @@ List<Middleware<GameModel>> createMiddleware() {
     new TypedMiddleware<GameModel, JoinGameAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, SubmitBidAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, CancelBidAction>(_dispatchMiddleware),
+    new TypedMiddleware<GameModel, SendGiftAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, PickPlayerMiddlewareAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, RemovePlayerMiddlewareAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, SubmitTeamAction>(_dispatchMiddleware),

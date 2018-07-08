@@ -146,6 +146,13 @@ class FirestoreDb {
     return submitBid(roundId, myPlayerId, null);
   }
 
+  Future<void> sendGift(String roundId, String myPlayerId, Gift gift) {
+    Map<String, dynamic> data = {
+      'gifts': {myPlayerId: gift.toJson()}
+    };
+    return _updateRound(roundId, data);
+  }
+
   Future<void> updateTeam(String roundId, String playerId, bool inTeam) {
     Map<String, dynamic> data = {
       'team': {playerId: inTeam}

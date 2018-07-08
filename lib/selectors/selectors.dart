@@ -6,6 +6,7 @@ final getHeists = (GameModel gameModel) => gameModel.heists;
 final getRounds = (GameModel gameModel) => gameModel.rounds;
 final getPlayerName = (GameModel gameModel) => gameModel.playerName;
 final getBidAmount = (GameModel gameModel) => gameModel.bidAmount;
+final getGiftAmount = (GameModel gameModel) => gameModel.giftAmount;
 final getRequests = (GameModel gameModel) => gameModel.requests;
 
 bool requestInProcess(GameModel gameModel, Request request) =>
@@ -17,6 +18,12 @@ final getSelf = (GameModel gameModel) =>
 
 final getPlayerByRoleId =
     (GameModel gameModel, String role) => getPlayers(gameModel).singleWhere((p) => p.role == role);
+
+final getPlayerById =
+    (GameModel gameModel, String id) => getPlayers(gameModel).singleWhere((p) => p.id == id);
+
+final Selector<GameModel, List<Player>> getOtherPlayers = createSelector2(getPlayers, getSelf,
+    (List<Player> players, Player me) => players.where((Player p) => p.id != me.id).toList());
 
 final Selector<GameModel, bool> amOwner =
     createSelector1(getRoom, (room) => room.owner == installId());

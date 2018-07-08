@@ -6,6 +6,7 @@ GameModel gameModelReducer(GameModel gameModel, dynamic action) {
     subscriptions: subscriptionReducer(gameModel.subscriptions, action),
     playerName: playerNameReducer(gameModel.playerName, action),
     bidAmount: bidAmountReducer(gameModel.bidAmount, action),
+    giftAmount: giftAmountReducer(gameModel.giftAmount, action),
     requests: requestReducer(gameModel.requests, action),
     room: roomReducer(gameModel.room, action),
     players: playerReducer(gameModel.players, action),

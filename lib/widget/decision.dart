@@ -50,7 +50,7 @@ Widget makeDecision(BuildContext context, Store<GameModel> store) {
         var choices = [
           const Text('Make your choice', style: infoTextStyle),
           decisionButton(context, store, 'SUCCEED'),
-          decisionButton(context, store, 'STEAL'),
+          decisionButton(context, store, 'STEAL'), // TODO: Kingpin can't steal
         ];
         if (getTeam(me.role) == Team.AGENTS) {
           choices.add(decisionButton(context, store, 'FAIL'));

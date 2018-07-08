@@ -7,6 +7,7 @@ class GameModel {
 
   final String playerName;
   final int bidAmount;
+  final int giftAmount;
 
   /// List of pending requests to avoid kicking off the same request multiple times.
   final Set<Request> requests;
@@ -21,6 +22,7 @@ class GameModel {
       this.subscriptions,
       this.playerName,
       this.bidAmount,
+      this.giftAmount,
       this.requests,
       this.room,
       this.players,
@@ -31,6 +33,7 @@ class GameModel {
       {Subscriptions subscriptions,
       String playerName,
       int bidAmount,
+      int giftAmount,
       Set<Request> requests,
       Room room,
       List<Player> players,
@@ -41,6 +44,7 @@ class GameModel {
       subscriptions: subscriptions ?? this.subscriptions,
       playerName: playerName ?? this.playerName,
       bidAmount: bidAmount ?? this.bidAmount,
+      giftAmount: giftAmount ?? this.giftAmount,
       requests: requests ?? this.requests,
       room: room ?? this.room,
       players: players ?? this.players,
@@ -53,6 +57,7 @@ class GameModel {
       db: db,
       playerName: null,
       bidAmount: 0,
+      giftAmount: 0,
       requests: new Set(),
       room: new Room.initial(),
       players: [],
@@ -67,6 +72,7 @@ class GameModel {
           subscriptions == other.subscriptions &&
           playerName == other.playerName &&
           bidAmount == other.bidAmount &&
+          giftAmount == other.giftAmount &&
           requests == other.requests &&
           room == other.room &&
           players == other.players &&
@@ -79,6 +85,7 @@ class GameModel {
       subscriptions.hashCode ^
       playerName.hashCode ^
       bidAmount.hashCode ^
+      giftAmount.hashCode ^
       requests.hashCode ^
       room.hashCode ^
       players.hashCode ^
@@ -106,6 +113,7 @@ enum Request {
   CreatingNewRoom,
   JoiningGame,
   Bidding,
+  Gifting,
   ResolvingAuction,
   CompletingHeist,
   CreatingNewRound

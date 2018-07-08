@@ -19,7 +19,8 @@ class CompleteHeistAction extends MiddlewareAction {
 
     return withRequest(Request.CompletingHeist, store, (store) async {
       String currentHeistId = currentHeist(store.state).id;
-      String newLeader = nextRoundLeader(getPlayers(store.state), roundLeader(store.state).order);
+      String newLeader = nextRoundLeader(
+          getPlayers(store.state), roundLeader(store.state).order, isAuction(store.state));
 
       FirestoreDb db = store.state.db;
       Room room = getRoom(store.state);

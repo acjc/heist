@@ -28,8 +28,9 @@ void main() {
 
     expect(currentRound(store.state).leader, players.singleWhere((p) => p.order == 1).id);
 
-    expect(nextRoundLeader(players, 1), players.singleWhere((p) => p.order == 2).id);
-    expect(nextRoundLeader(players, players.length), players.singleWhere((p) => p.order == 1).id);
+    expect(nextRoundLeader(players, 1, false), players.singleWhere((p) => p.order == 2).id);
+    expect(nextRoundLeader(players, players.length, false), players.singleWhere((p) => p.order == 1).id);
+    expect(nextRoundLeader(players, 3, true), players.singleWhere((p) => p.order == 3).id);
   });
 
   test('test create new round', () async {

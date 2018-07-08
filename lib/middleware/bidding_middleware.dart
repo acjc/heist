@@ -38,16 +38,17 @@ class CreateNewRoundAction extends MiddlewareAction {
       String currentHeistId = currentHeist(store.state).id;
       int newOrder = currentRound(store.state).order + 1;
       assert(newOrder > 0 && newOrder <= 5);
-      String newLeader = nextRoundLeader(getPlayers(store.state), roundLeader(store.state).order);
+      String newLeader = nextRoundLeader(
+          getPlayers(store.state), roundLeader(store.state).order, isAuction(store.state));
 
       return createNewRound(store, currentHeistId, newOrder, newLeader);
     });
   }
 }
 
-String nextRoundLeader(List<Player> players, int currentOrder) {
-  int newOrder = currentOrder + 1;
-  if (newOrder > players.length) { // TODO: if it has been an auction, don't skip a player
+String nextRoundLeader(List<Player> players, int currentOrder, bool wasAuction) {
+  int newOrder = wasAuction ? currentOrder : currentOrder + 1;
+  if (newOrder > players.length) {
     newOrder = 1;
   }
   return players.singleWhere((p) => p.order == newOrder).id;

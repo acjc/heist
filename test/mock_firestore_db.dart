@@ -5,19 +5,19 @@ import 'package:uuid/uuid.dart';
 
 class MockFirestoreDb implements FirestoreDb {
   Room room;
-  Set<Player> players;
+  List<Player> players;
   List<Heist> heists;
   Map<String, List<Round>> rounds;
 
   StreamController<Room> _roomStream;
-  StreamController<Set<Player>> _playerStream;
+  StreamController<List<Player>> _playerStream;
   StreamController<List<Heist>> _heistStream;
-  Map<String, StreamController<List<Round>>> _roundStreams = new Map();
+  StreamController<List<Round>> _roundStream;
 
   MockFirestoreDb({this.room, this.players, this.heists, this.rounds});
 
   MockFirestoreDb.empty()
-      : this.players = new Set(),
+      : this.players = [],
         this.heists = [],
         this.rounds = {};
 
@@ -42,8 +42,8 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<bool> heistExists(String roomId, int order) {
-    return new Future<bool>.value(false);
+  Future<Heist> getHeist(String roomId, int order) {
+    return new Future<Heist>.value(heists.singleWhere((h) => h.order == order, orElse: () => null));
   }
 
   @override
@@ -74,13 +74,9 @@ class MockFirestoreDb implements FirestoreDb {
     }
   }
 
-  void _postRounds(String heistId) {
-    if (_roundStreams != null && rounds != null) {
-      // ignore: close_sinks
-      StreamController<List<Round>> roundStream = _roundStreams[heistId];
-      if (roundStream != null && !roundStream.isClosed) {
-        roundStream.add(rounds[heistId]);
-      }
+  void _postRounds() {
+    if (_roundStream != null && !_roundStream.isClosed && rounds != null) {
+      _roundStream.add(rounds.values.expand((rs) => rs).toList());
     }
   }
 
@@ -93,10 +89,10 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  StreamSubscription<Set<Player>> listenOnPlayers(
-      String roomRef, void onData(Set<Player> players)) {
+  StreamSubscription<List<Player>> listenOnPlayers(
+      String roomRef, void onData(List<Player> players)) {
     _playerStream = new StreamController(onCancel: () => _playerStream.close(), sync: true);
-    StreamSubscription<Set<Player>> subscription = _playerStream.stream.listen(onData);
+    StreamSubscription<List<Player>> subscription = _playerStream.stream.listen(onData);
     _postPlayers();
     return subscription;
   }
@@ -110,12 +106,10 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  StreamSubscription<List<Round>> listenOnRounds(
-      String roomId, String heistId, void onData(List<Round> rounds)) {
-    _roundStreams[heistId] =
-        new StreamController(onCancel: () => _roundStreams[heistId].close(), sync: true);
-    StreamSubscription<List<Round>> subscription = _roundStreams[heistId].stream.listen(onData);
-    _postRounds(heistId);
+  StreamSubscription<List<Round>> listenOnRounds(String roomId, void onData(List<Round> rounds)) {
+    _roundStream = new StreamController(onCancel: () => _roundStream.close(), sync: true);
+    StreamSubscription<List<Round>> subscription = _roundStream.stream.listen(onData);
+    _postRounds();
     return subscription;
   }
 
@@ -126,7 +120,7 @@ class MockFirestoreDb implements FirestoreDb {
         player = player.copyWith(id: new Uuid().v4());
       }
       players
-        ..remove(player)
+        ..removeWhere((p) => p.id == player.id)
         ..add(player);
       _postPlayers();
     });
@@ -151,7 +145,7 @@ class MockFirestoreDb implements FirestoreDb {
         heist = heist.copyWith(id: new Uuid().v4());
       }
       heists
-        ..remove(heist)
+        ..removeWhere((h) => h.id == heist.id)
         ..add(heist);
       _postHeists();
       return heist.id;
@@ -159,19 +153,84 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<void> upsertRound(Round round, String roomId, String heistId) {
+  Future<void> upsertRound(Round round, String roomId) {
     return new Future<void>(() {
       if (round.id == null) {
         round = round.copyWith(id: new Uuid().v4());
       }
-      if (rounds.containsKey(heistId)) {
-        rounds[heistId]
-          ..remove(round)
+      if (rounds.containsKey(round.heist)) {
+        rounds[round.heist]
+          ..removeWhere((r) => r.id == round.id)
           ..add(round);
       } else {
-        rounds[heistId] = [round];
+        rounds[round.heist] = [round];
       }
-      _postRounds(heistId);
+      _postRounds();
     });
+  }
+
+  Round _getRound(String roundId) {
+    return rounds.values.expand((rs) => rs).singleWhere((r) => r.id == roundId);
+  }
+
+  @override
+  Future<void> submitBid(String roundId, String myPlayerId, Bid bid) async {
+    Round round = _getRound(roundId);
+    Map<String, Bid> bids = new Map.from(round.bids);
+    bids[myPlayerId] = bid;
+    await upsertRound(round.copyWith(bids: bids), null);
+  }
+
+  @override
+  Future<void> cancelBid(String roundId, String myPlayerId) {
+    return submitBid(roundId, myPlayerId, null);
+  }
+
+  @override
+  Future<void> updateTeam(String roundId, String playerId, bool inTeam) {
+    Round round = _getRound(roundId);
+    Set<String> team = new Set.of(round.team ?? []);
+    if (inTeam) {
+      team.add(playerId);
+    } else {
+      team.remove(playerId);
+    }
+    return upsertRound(round.copyWith(team: team), null);
+  }
+
+  @override
+  Future<void> submitTeam(String roundId) {
+    Round round = _getRound(roundId);
+    return upsertRound(round.copyWith(teamSubmitted: true), null);
+  }
+
+  Heist _getHeist(String id) {
+    return heists.singleWhere((h) => h.id == id);
+  }
+
+  @override
+  Future<void> makeDecision(String heistId, String playerId, String decision) {
+    Heist heist = _getHeist(heistId);
+    Map<String, String> decisions = new Map.from(heist.decisions);
+    decisions[playerId] = decision;
+    return upsertHeist(heist.copyWith(decisions: decisions), null);
+  }
+
+  @override
+  Future<void> completeRound(String id) {
+    Round round = _getRound(id);
+    return upsertRound(round.copyWith(completed: true, completedAt: now()), null);
+  }
+
+  @override
+  Future<void> updatePot(String heistId, int pot) {
+    Heist heist = _getHeist(heistId);
+    return upsertHeist(heist.copyWith(pot: pot), null);
+  }
+
+  @override
+  Future<void> completeHeist(String id) {
+    Heist heist = _getHeist(id);
+    return upsertHeist(heist.copyWith(completed: true, completedAt: now()), null);
   }
 }

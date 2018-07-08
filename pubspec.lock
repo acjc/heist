@@ -102,6 +102,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.5.1"
+  flutter_redux_dev_tools:
+    dependency: "direct main"
+    description:
+      name: flutter_redux_dev_tools
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -114,6 +121,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.0-alpha.12"
+  func:
+    dependency: transitive
+    description:
+      name: func
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   glob:
     dependency: transitive
     description:
@@ -198,6 +212,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.2+1"
+  memoize:
+    dependency: transitive
+    description:
+      name: memoize
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.4.0"
   meta:
     dependency: transitive
     description:
@@ -289,12 +310,28 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.0"
+  redux_dev_tools:
+    dependency: "direct main"
+    description:
+      name: redux_dev_tools
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.0"
   redux_logging:
     dependency: "direct main"
     description:
       name: redux_logging
       url: "https://pub.dartlang.org"
     source: hosted
+    version: "0.3.0"
+  reselect:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: dart-2
+      resolved-ref: "349bf201a2e3bf54fb2fc5579ce440516b4aea14"
+      url: "git://github.com/brianegan/reselect_dart.git"
+    source: git
     version: "0.3.0"
   shelf:
     dependency: transitive

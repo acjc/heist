@@ -3,7 +3,7 @@ import 'package:heist/main.dart';
 
 void main() {
   test('increment numPlayers', () {
-    Room room = new Room(numPlayers: maxPlayers - 1);
+    Room room = new Room(numPlayers: maxPlayers - 1, roles: new Set());
     room = reduce(room, new IncrementNumPlayersAction());
     expect(room.numPlayers, maxPlayers);
     room = reduce(room, new IncrementNumPlayersAction());
@@ -11,7 +11,7 @@ void main() {
   });
 
   test('decrement numPlayers', () {
-    Room room = new Room(numPlayers: minPlayers + 1);
+    Room room = new Room(numPlayers: minPlayers + 1, roles: new Set());
     room = reduce(room, new DecrementNumPlayersAction());
     expect(room.numPlayers, minPlayers);
     room = reduce(room, new DecrementNumPlayersAction());
@@ -19,7 +19,7 @@ void main() {
   });
 
   test('set room code', () {
-    Room room = new Room(numPlayers: 5);
+    Room room = new Room(numPlayers: 5, roles: new Set());
     Room updatedRoom = reduce(room, new SetRoomCodeAction('ABCD'));
     expect(updatedRoom.code, 'ABCD');
   });

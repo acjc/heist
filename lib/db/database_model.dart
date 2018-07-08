@@ -1,7 +1,7 @@
 part of heist;
 
-Set<Key> _boolMapToSet<Key>(Map<Key, bool> boolMap) {
-  Set<Key> set = new Set();
+Set<String> _boolMapToSet(Map<String, bool> boolMap) {
+  Set<String> set = new Set();
   if (boolMap != null) {
     boolMap.forEach((key, b) {
       if (b) {
@@ -12,10 +12,10 @@ Set<Key> _boolMapToSet<Key>(Map<Key, bool> boolMap) {
   return set;
 }
 
-Map<String, bool> _setToBoolMap(Set<String> set, Set<String> allOptions) {
+Map<String, bool> _toBoolMap(Iterable<String> it, Set<String> allOptions) {
   Map<String, bool> boolMap = new Map();
-  if (set != null) {
-    allOptions.forEach((o) => boolMap[o] = set.contains(o));
+  if (it != null) {
+    allOptions.forEach((o) => boolMap[o] = it.contains(o));
   }
   return boolMap;
 }
@@ -46,13 +46,12 @@ class Room extends Document {
       this.owner,
       this.completed = false,
       this.completedAt,
-      this.numPlayers,
-      this.roles})
+      @required this.numPlayers,
+      @required this.roles})
       : super(id: id);
 
-  factory Room.initial() => Room(
-      numPlayers: minPlayers,
-      roles: getRolesIds(numPlayersToRolesMap[minPlayers]));
+  factory Room.initial() =>
+      Room(numPlayers: minPlayers, roles: getRoleIds(numPlayersToRolesMap[minPlayers]));
 
   Room copyWith({
     String id,
@@ -99,15 +98,20 @@ class Room extends Document {
         'completed': completed,
         'completedAt': completedAt,
         'numPlayers': numPlayers,
-        'roles': _setToBoolMap(roles, getRolesIds(allRoles)),
+        'roles': _toBoolMap(roles, getRoleIds(allRoles)),
       };
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is Room && id == other.id && code == other.code;
+      identical(this, other) ||
+      other is Room &&
+          id == other.id &&
+          code == other.code &&
+          numPlayers == other.numPlayers &&
+          roles == other.roles;
 
   @override
-  int get hashCode => id.hashCode ^ code.hashCode;
+  int get hashCode => id.hashCode ^ code.hashCode ^ numPlayers.hashCode ^ roles.hashCode;
 
   @override
   String toString() {
@@ -122,14 +126,16 @@ class Player extends Document {
   final String name;
   final int initialBalance;
   final String role;
+  final int order;
 
   Player(
       {id,
       @required this.installId,
       this.room,
       @required this.name,
-      this.initialBalance,
-      this.role})
+      this.initialBalance = 8, // TODO: initial balance may eventually depend on role
+      this.role,
+      this.order})
       : super(id: id);
 
   Player copyWith({
@@ -139,6 +145,7 @@ class Player extends Document {
     String name,
     int initialBalance,
     String role,
+    int order,
   }) {
     return new Player(
       id: id ?? this.id,
@@ -147,6 +154,7 @@ class Player extends Document {
       name: name ?? this.name,
       initialBalance: initialBalance ?? this.initialBalance,
       role: role ?? this.role,
+      order: order ?? this.order,
     );
   }
 
@@ -159,6 +167,7 @@ class Player extends Document {
         name = json['name'],
         initialBalance = json['initialBalance'],
         role = json['role'],
+        order = json['order'],
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -167,6 +176,7 @@ class Player extends Document {
         'name': name,
         'initialBalance': initialBalance,
         'role': role,
+        'order': order,
       };
 
   @override
@@ -183,7 +193,7 @@ class Player extends Document {
 
   @override
   String toString() {
-    return 'Player{id: $id, installId: $installId, room: $room, name: $name, initialBalance: $initialBalance, role: $role}';
+    return 'Player{installId: $installId, room: $room, name: $name, initialBalance: $initialBalance, role: $role, order: $order}';
   }
 }
 
@@ -191,22 +201,25 @@ class Player extends Document {
 class Heist extends Document {
   final DocumentReference room;
   final int price;
-  final int pot;
   final int numPlayers;
   final int order;
   final DateTime startedAt;
   final Map<String, String> decisions;
+  final bool completed;
+  final DateTime completedAt;
+
   // TODO: include Kingpin guesses
 
   Heist(
       {id,
       this.room,
       @required this.price,
-      this.pot,
       @required this.numPlayers,
       @required this.order,
       @required this.startedAt,
-      this.decisions})
+      this.decisions = const {},
+      this.completed = false,
+      this.completedAt})
       : super(id: id);
 
   Heist copyWith({
@@ -217,17 +230,20 @@ class Heist extends Document {
     int numPlayers,
     int order,
     DateTime startedAt,
-    Map<String, String> decisions,
+    Map<String, String> decisions, // player ID -> { SUCCEED, FAIL, STEAL }
+    bool completed,
+    DateTime completedAt,
   }) {
     return new Heist(
       id: id ?? this.id,
       room: room ?? this.room,
       price: price ?? this.price,
-      pot: pot ?? this.pot,
       numPlayers: numPlayers ?? this.numPlayers,
       order: order ?? this.order,
       startedAt: startedAt ?? this.startedAt,
       decisions: decisions ?? this.decisions,
+      completed: completed ?? this.completed,
+      completedAt: completedAt ?? this.completedAt,
     );
   }
 
@@ -236,21 +252,23 @@ class Heist extends Document {
   Heist.fromJson(String id, Map<String, dynamic> json)
       : room = json['room'],
         price = json['price'],
-        pot = json['pot'],
         numPlayers = json['numPlayers'],
         order = json['order'],
         startedAt = json['startedAt'],
-        decisions = json['decisions']?.cast<String, String>(),
+        decisions = json['decisions']?.cast<String, String>() ?? {},
+        completed = json['completed'],
+        completedAt = json['completedAt'],
         super(id: id);
 
   Map<String, dynamic> toJson() => {
         'room': room,
         'price': price,
-        'pot': pot,
         'numPlayers': numPlayers,
         'order': order,
         'startedAt': startedAt,
         'decisions': decisions,
+        'completed': completed,
+        'completedAt': completedAt,
       };
 
   @override
@@ -259,53 +277,118 @@ class Heist extends Document {
       other is Heist &&
           id == other.id &&
           room == other.room &&
-          order == other.order;
+          price == other.price &&
+          decisions == other.decisions &&
+          completed == other.completed;
 
   @override
   int get hashCode =>
-      id.hashCode ^
-      room.hashCode ^
-      order.hashCode;
+      id.hashCode ^ room.hashCode ^ price.hashCode ^ decisions.hashCode ^ completed.hashCode;
 
   @override
   String toString() {
-    return 'Heist{id: $id, room: $room, price: $price, pot: $pot, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions}';
+    return 'Heist{id: $id, room: $room, price: $price, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions, completed: $completed, completedAt: $completedAt}';
   }
 }
 
 @immutable
+class Bid {
+  final int amount;
+  final DateTime timestamp;
+
+  Bid(this.amount) : timestamp = now();
+
+  Bid.fromJson(Map<String, dynamic> json)
+      : amount = json['amount'],
+        timestamp = json['timestamp'];
+
+  Map<String, dynamic> toJson() => {
+        'amount': amount,
+        'timestamp': timestamp,
+      };
+
+  @override
+  String toString() {
+    return 'Bid{amount: $amount, timestamp: $timestamp}';
+  }
+}
+
+@immutable
+class Gift {
+  final int amount;
+  final String recipient;
+  final DateTime timestamp;
+
+  Gift({this.amount, this.recipient}) : timestamp = now();
+
+  Gift.fromJson(Map<String, dynamic> json)
+      : amount = json['amount'],
+        recipient = json['recipient'],
+        timestamp = json['timestamp'];
+
+  Map<String, dynamic> toJson() => {
+        'amount': amount,
+        'recipient': recipient,
+        'timestamp': timestamp,
+      };
+
+  @override
+  String toString() {
+    return 'Gift{amount: $amount, recipient: $recipient, timestamp: $timestamp}';
+  }
+}
+
+Map<String, Value> _convertValues<Value>(Map<String, dynamic> map, Value transform(v)) {
+  Map<String, Value> bidMap = {};
+  if (map != null) {
+    map.removeWhere((k, v) => v == null);
+    map.forEach((k, v) => bidMap[k] = transform(v));
+  }
+  return bidMap;
+}
+
+@immutable
 class Round extends Document {
-  final DocumentReference leader;
+  final String leader;
   final int order;
   final DocumentReference room;
-  final DocumentReference heist;
+  final String heist;
   final DateTime startedAt;
-  final Set<String> team;
-  final Map<dynamic, dynamic> bids; // TODO: convert to Map<String, Bid>
-  final Map<dynamic, dynamic> gifts; // TODO: convert to Map<String, Gift>
+  final Set<String> team; // player IDs
+  final bool teamSubmitted;
+  final Map<String, Bid> bids; // player ID -> Bid
+  final Map<String, Gift> gifts; // player ID -> Gift
+  final bool completed;
+  final DateTime completedAt;
 
   Round(
       {id,
       this.leader,
       @required this.order,
       this.room,
-      this.heist,
+      @required this.heist,
       @required this.startedAt,
       this.team,
-      this.bids,
-      this.gifts})
+      this.teamSubmitted = false,
+      this.bids = const {},
+      this.gifts = const {},
+      this.completed = false,
+      this.completedAt})
       : super(id: id);
 
   Round copyWith({
     String id,
-    DocumentReference leader,
+    String leader,
     int order,
     DocumentReference room,
-    DocumentReference heist,
+    String heist,
     DateTime startedAt,
     Set<String> team,
-    Map<dynamic, dynamic> bids,
-    Map<dynamic, dynamic> gifts,
+    bool teamSubmitted,
+    Map<String, Bid> bids,
+    Map<String, Gift> gifts,
+    bool completed,
+    DateTime completedAt,
   }) {
     return new Round(
       id: id ?? this.id,
@@ -315,8 +398,11 @@ class Round extends Document {
       heist: heist ?? this.heist,
       startedAt: startedAt ?? this.startedAt,
       team: team ?? this.team,
+      teamSubmitted: teamSubmitted ?? this.teamSubmitted,
       bids: bids ?? this.bids,
       gifts: gifts ?? this.gifts,
+      completed: completed ?? this.completed,
+      completedAt: completedAt ?? this.completedAt,
     );
   }
 
@@ -328,9 +414,14 @@ class Round extends Document {
         room = json['room'],
         heist = json['heist'],
         startedAt = json['startedAt'],
-        team = _boolMapToSet(json['team']?.cast<String, bool>()),
-        bids = json['bids'],
-        gifts = json['gifts'],
+        team = _boolMapToSet(json['team'].cast<String, bool>()),
+        teamSubmitted = json['teamSubmitted'],
+        bids = _convertValues(json['bids']?.cast<String, dynamic>(),
+            (v) => new Bid.fromJson(v.cast<String, dynamic>())),
+        gifts = _convertValues(json['gifts']?.cast<String, dynamic>(),
+            (v) => new Gift.fromJson(v.cast<String, dynamic>())),
+        completed = json['completed'],
+        completedAt = json['completedAt'],
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -340,8 +431,11 @@ class Round extends Document {
         'heist': heist,
         'startedAt': startedAt,
         'team': team,
+        'teamSubmitted': teamSubmitted,
         'bids': bids,
         'gifts': gifts,
+        'completed': completed,
+        'completedAt': completedAt,
       };
 
   @override
@@ -349,19 +443,23 @@ class Round extends Document {
       identical(this, other) ||
       other is Round &&
           id == other.id &&
-          order == other.order &&
-          room == other.room &&
-          heist == other.heist;
+          team == other.team &&
+          teamSubmitted == other.teamSubmitted &&
+          bids == other.bids &&
+          gifts == other.gifts &&
+          completed == other.completed;
 
   @override
   int get hashCode =>
       id.hashCode ^
-      order.hashCode ^
-      room.hashCode ^
-      heist.hashCode;
+      team.hashCode ^
+      teamSubmitted.hashCode ^
+      bids.hashCode ^
+      gifts.hashCode ^
+      completed.hashCode;
 
   @override
   String toString() {
-    return 'Round{id: $id, leader: $leader, order: $order, room: $room, heist: $heist, startedAt: $startedAt, team: $team, bids: $bids, gifts: $gifts}';
+    return 'Round{leader: $leader, order: $order, room: $room, heist: $heist, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts, completed: $completed, completedAt: $completedAt}';
   }
 }

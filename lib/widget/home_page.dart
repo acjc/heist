@@ -2,7 +2,6 @@ part of heist;
 
 class HomePage extends StatelessWidget {
   static const EdgeInsets _padding = const EdgeInsets.all(16.0);
-  static const TextStyle _buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
 
   final _enterNameFormKey = new GlobalKey<FormState>();
   final _enterRoomFormKey = new GlobalKey<FormState>();
@@ -17,19 +16,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Column _buildArrowColumn(BuildContext context, IconData icon, Function onPressed) {
-    Color color = Theme.of(context).primaryColor;
-    return new Column(
-      children: [
-        new IconButton(
-          iconSize: 64.0,
-          onPressed: onPressed,
-          icon: new Icon(icon, color: color),
-        )
-      ],
-    );
-  }
-
   static final _onlyLetters = new RegExp(r"[A-Za-z]");
   static final TextInputFormatter _capitalFormatter = TextInputFormatter
       .withFunction((oldValue, newValue) => newValue.copyWith(text: newValue.text.toUpperCase()));
@@ -39,6 +25,7 @@ class HomePage extends StatelessWidget {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
 
     Widget numPlayersText = new StoreConnector<GameModel, int>(
+        distinct: true,
         converter: (store) => store.state.room.numPlayers,
         builder: (context, int numPlayers) {
           return new Text(
@@ -50,6 +37,7 @@ class HomePage extends StatelessWidget {
         });
 
     Widget rolesText = new StoreConnector<GameModel, Set<String>>(
+        distinct: true,
         converter: (store) => store.state.room.roles,
         builder: (context, Set<String> roles) {
           return new Container(
@@ -64,7 +52,7 @@ class HomePage extends StatelessWidget {
         });
 
     Widget createRoomButton = new RaisedButton(
-      child: const Text('CREATE ROOM', style: _buttonTextStyle),
+      child: const Text('CREATE ROOM', style: buttonTextStyle),
       onPressed: () {
         FormState enterNameState = _enterNameFormKey.currentState;
         if (enterNameState.validate()) {
@@ -72,12 +60,12 @@ class HomePage extends StatelessWidget {
           store.dispatch(new CreateRoomAction());
         }
       },
-      color: Theme.of(context).primaryColor,
     );
 
     Form enterNameForm = new Form(
         key: _enterNameFormKey,
         child: new TextFormField(
+            initialValue: 'Mordred',
             decoration: new InputDecoration(
               labelText: 'Enter your name',
               isDense: true,
@@ -97,11 +85,11 @@ class HomePage extends StatelessWidget {
           new Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildArrowColumn(
+              iconWidget(
                   context, Icons.arrow_back, () => store.dispatch(new DecrementNumPlayersAction())),
               numPlayersText,
-              _buildArrowColumn(
-                  context, Icons.arrow_forward, () => store.dispatch(new IncrementNumPlayersAction()))
+              iconWidget(context, Icons.arrow_forward,
+                  () => store.dispatch(new IncrementNumPlayersAction()))
             ],
           ),
           rolesText,
@@ -113,6 +101,7 @@ class HomePage extends StatelessWidget {
     Form enterRoomForm = new Form(
         key: _enterRoomFormKey,
         child: new TextFormField(
+            initialValue: 'ABCD',
             decoration: new InputDecoration(
               labelText: 'Enter an existing room code',
               isDense: true,
@@ -140,9 +129,8 @@ class HomePage extends StatelessWidget {
     }
 
     Widget enterRoomButton = new RaisedButton(
-      child: const Text('ENTER ROOM', style: _buttonTextStyle),
+      child: const Text('ENTER ROOM', style: buttonTextStyle),
       onPressed: _enterRoom,
-      color: Theme.of(context).primaryColor,
     );
 
     Widget existingRoom = new Container(

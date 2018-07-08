@@ -12,7 +12,7 @@ class IncrementNumPlayersAction extends Action<Room> {
   Room reduce(Room room, action) {
     if (room.numPlayers < maxPlayers) {
       int newNumPlayers = room.numPlayers + 1;
-      Set<String> roles = getRolesIds(numPlayersToRolesMap[newNumPlayers]);
+      Set<String> roles = getRoleIds(numPlayersToRolesMap[newNumPlayers]);
       return room.copyWith(numPlayers: newNumPlayers, roles: roles);
     }
     return room;
@@ -24,7 +24,7 @@ class DecrementNumPlayersAction extends Action<Room> {
   Room reduce(Room room, action) {
     if (room.numPlayers > minPlayers) {
       int newNumPlayers = room.numPlayers - 1;
-      Set<String> roles = getRolesIds(numPlayersToRolesMap[newNumPlayers]);
+      Set<String> roles = getRoleIds(numPlayersToRolesMap[newNumPlayers]);
       return room.copyWith(numPlayers: newNumPlayers, roles: roles);
     }
     return room;

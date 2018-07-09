@@ -56,8 +56,8 @@ class GameState extends State<Game> {
             roundComplete: currentRound(store.state).completed,
             heistIsActive: heistIsActive(store.state),
             heistDecided: heistDecided(store.state),
-            completingHeist: requestInProcess(store.state, Request.CompletingHeist),
             heistComplete: currentHeist(store.state).completed,
+            gameOver: gameOver(store.state),
             creatingNewRound: requestInProcess(store.state, Request.CreatingNewRound),
           ),
       distinct: true,
@@ -89,8 +89,12 @@ class GameState extends State<Game> {
 
         // go to next heist
         if (heistDecided(_store.state) && !viewModel.heistComplete) {
-          // TODO: check if the game is over
           return heistEnd(_store);
+        }
+
+        // endgame
+        if (viewModel.gameOver) {
+          // TODO: show final screen
         }
 
         // go to next round
@@ -247,8 +251,8 @@ class MainBoardViewModel {
   final bool roundComplete;
   final bool heistIsActive;
   final bool heistDecided;
-  final bool completingHeist;
   final bool heistComplete;
+  final bool gameOver;
   final bool creatingNewRound;
 
   MainBoardViewModel._(
@@ -258,23 +262,23 @@ class MainBoardViewModel {
       @required this.roundComplete,
       @required this.heistIsActive,
       @required this.heistDecided,
-      @required this.completingHeist,
       @required this.heistComplete,
+      @required this.gameOver,
       @required this.creatingNewRound});
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MainBoardViewModel &&
-          waitingForTeam == other.waitingForTeam &&
-          biddingComplete == other.biddingComplete &&
-          resolvingAuction == other.resolvingAuction &&
-          roundComplete == other.roundComplete &&
-          heistIsActive == other.heistIsActive &&
-          heistDecided == other.heistDecided &&
-          completingHeist == other.completingHeist &&
-          heistComplete == other.heistComplete &&
-          creatingNewRound == other.creatingNewRound;
+          other is MainBoardViewModel &&
+              waitingForTeam == other.waitingForTeam &&
+              biddingComplete == other.biddingComplete &&
+              resolvingAuction == other.resolvingAuction &&
+              roundComplete == other.roundComplete &&
+              heistIsActive == other.heistIsActive &&
+              heistDecided == other.heistDecided &&
+              heistComplete == other.heistComplete &&
+              gameOver == other.gameOver &&
+              creatingNewRound == other.creatingNewRound;
 
   @override
   int get hashCode =>
@@ -284,13 +288,13 @@ class MainBoardViewModel {
       roundComplete.hashCode ^
       heistIsActive.hashCode ^
       heistDecided.hashCode ^
-      completingHeist.hashCode ^
       heistComplete.hashCode ^
+      gameOver.hashCode ^
       creatingNewRound.hashCode;
 
   @override
   String toString() {
-    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, heistIsActive: $heistIsActive, heistDecided: $heistDecided, completingHeist: $completingHeist, heistComplete: $heistComplete, creatingNewRound: $creatingNewRound}';
+    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, heistIsActive: $heistIsActive, heistDecided: $heistDecided, heistComplete: $heistComplete, gameOver: $gameOver, creatingNewRound: $creatingNewRound}';
   }
 }
 

@@ -20,3 +20,18 @@ final Selector<GameModel, int> currentPot = createSelector1(
     (Round currentRound) => currentRound.bids.isNotEmpty
         ? currentRound.bids.values.fold(0, (previousValue, bid) => previousValue + bid.amount)
         : -1);
+
+final Selector<GameModel, bool> gameOver = createSelector1(getHeists, (List<Heist> heists) {
+  int thiefScore = 0;
+  int agentScore = 0;
+  for (Heist heist in heists) {
+    List<String> decisions = heist.decisions.values;
+    int steals = decisions.where((d) => d == 'STEAL').length;
+    if (decisions.contains('FAIL') || steals >= 2) {
+      agentScore++;
+    } else {
+      thiefScore++;
+    }
+  }
+  return thiefScore >= 3 || agentScore >= 3;
+});

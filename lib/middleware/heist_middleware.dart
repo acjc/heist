@@ -19,21 +19,27 @@ class CompleteHeistAction extends MiddlewareAction {
 
     return withRequest(Request.CompletingHeist, store, (store) async {
       String currentHeistId = currentHeist(store.state).id;
-      String newLeader = nextRoundLeader(
-          getPlayers(store.state), roundLeader(store.state).order, isAuction(store.state));
-
-      FirestoreDb db = store.state.db;
-      Room room = getRoom(store.state);
-      List<Heist> heists = getHeists(store.state);
-      assert(heists.where((h) => !h.completed).length == 1);
-
-      int newOrder = heists.length + 1;
-      assert(await db.getHeist(room.id, newOrder) == null);
-
-      String newHeistId = await _createNewHeist(store, room, newOrder);
-      await createNewRound(store, newHeistId, 1, newLeader);
+      if (!gameOver(store.state)) {
+        await toNextHeist(store);
+      }
       return store.state.db.completeHeist(currentHeistId);
     });
+  }
+
+  Future<void> toNextHeist(Store<GameModel> store) async {
+    String newLeader = nextRoundLeader(
+        getPlayers(store.state), roundLeader(store.state).order, isAuction(store.state));
+
+    FirestoreDb db = store.state.db;
+    Room room = getRoom(store.state);
+    List<Heist> heists = getHeists(store.state);
+    assert(heists.where((h) => !h.completed).length == 1);
+
+    int newOrder = heists.length + 1;
+    assert(await db.getHeist(room.id, newOrder) == null);
+
+    String newHeistId = await _createNewHeist(store, room, newOrder);
+    return createNewRound(store, newHeistId, 1, newLeader);
   }
 
   Future<String> _createNewHeist(Store<GameModel> store, Room room, int newOrder) async {

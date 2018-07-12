@@ -15,23 +15,32 @@ final Selector<GameModel, bool> goingOnHeist = createSelector2(
 final Selector<GameModel, bool> heistDecided = createSelector1(
     currentHeist, (Heist currentHeist) => currentHeist.decisions.length == currentHeist.numPlayers);
 
-final Selector<GameModel, int> currentPot = createSelector1(
-    currentRound,
-    (Round currentRound) => currentRound.bids.isNotEmpty
-        ? currentRound.bids.values.fold(0, (previousValue, bid) => previousValue + bid.amount)
-        : -1);
+final Selector<GameModel, int> currentPot =
+    createSelector1(currentRound, (Round currentRound) => currentRound.pot);
+
+class Score {
+  int thiefScore;
+  int agentScore;
+
+  Score(this.thiefScore, this.agentScore);
+
+  Team get winner => thiefScore >= 3 ? Team.THIEVES : Team.AGENTS;
+}
 
 final Selector<GameModel, bool> gameOver = createSelector1(getHeists, (List<Heist> heists) {
+  Score score = calculateScore(heists);
+  return score.thiefScore >= 3 || score.agentScore >= 3;
+});
+
+Score calculateScore(List<Heist> heists) {
   int thiefScore = 0;
   int agentScore = 0;
   for (Heist heist in heists) {
-    List<String> decisions = heist.decisions.values;
-    int steals = decisions.where((d) => d == 'STEAL').length;
-    if (decisions.contains('FAIL') || steals >= 2) {
-      agentScore++;
-    } else {
+    if (heist.wasSuccess) {
       thiefScore++;
+    } else {
+      agentScore++;
     }
   }
-  return thiefScore >= 3 || agentScore >= 3;
-});
+  return new Score(thiefScore, agentScore);
+}

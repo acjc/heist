@@ -33,7 +33,7 @@ class CompleteHeistAction extends MiddlewareAction {
     FirestoreDb db = store.state.db;
     Room room = getRoom(store.state);
     List<Heist> heists = getHeists(store.state);
-    assert(heists.where((h) => !h.completed).length == 1);
+    assert(heists.where((h) => h.completedAt == null).length == 1);
 
     int newOrder = heists.length + 1;
     assert(await db.getHeist(room.id, newOrder) == null);

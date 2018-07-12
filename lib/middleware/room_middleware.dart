@@ -52,3 +52,11 @@ class CreateRoomAction extends MiddlewareAction {
     return new String.fromCharCodes(ordinals);
   }
 }
+
+class CompleteGameAction extends MiddlewareAction {
+  @override
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) => withRequest(
+      Request.CompletingGame,
+      store,
+      (store) => store.state.db.completeGame(getRoom(store.state).id));
+}

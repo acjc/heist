@@ -6,10 +6,10 @@ Widget waitForTeam(Store<GameModel> store) => new Column(children: [
         child: new Container(
             padding: paddingLarge,
             child: centeredMessage('${roundLeader(store.state).name} is picking a team...'))),
-    selectionBoard(),
+    selectionBoard(store),
   ]);
 
-Widget selectionBoard() => new StoreConnector<GameModel, Set<String>>(
+Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, Set<String>>(
     converter: (store) => teamNames(store.state),
     distinct: true,
     builder: (context, teamNames) => new Card(
@@ -17,7 +17,7 @@ Widget selectionBoard() => new StoreConnector<GameModel, Set<String>>(
           child: new Container(
               padding: paddingMedium,
               child: new Column(children: [
-                new Text('TEAM (${teamNames.length})', style: infoTextStyle),
+                new Text('TEAM (${currentHeist(store.state).numPlayers})', style: infoTextStyle),
                 new GridView.count(
                     padding: paddingMedium,
                     shrinkWrap: true,

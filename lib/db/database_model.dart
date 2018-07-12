@@ -33,7 +33,6 @@ class Room extends Document {
   final DateTime createdAt;
   final String appVersion;
   final String owner;
-  final bool completed;
   final DateTime completedAt;
   final int numPlayers;
   final Set<String> roles;
@@ -44,7 +43,6 @@ class Room extends Document {
       this.createdAt,
       this.appVersion,
       this.owner,
-      this.completed = false,
       this.completedAt,
       @required this.numPlayers,
       @required this.roles})
@@ -59,7 +57,6 @@ class Room extends Document {
     DateTime createdAt,
     String appVersion,
     String owner,
-    bool completed,
     DateTime completedAt,
     int numPlayers,
     Set<String> roles,
@@ -70,7 +67,6 @@ class Room extends Document {
       createdAt: createdAt ?? this.createdAt,
       appVersion: appVersion ?? this.appVersion,
       owner: owner ?? this.owner,
-      completed: completed ?? this.completed,
       completedAt: completedAt ?? this.completedAt,
       numPlayers: numPlayers ?? this.numPlayers,
       roles: roles ?? this.roles,
@@ -84,7 +80,6 @@ class Room extends Document {
         createdAt = json['createdAt'],
         appVersion = json['appVersion'],
         owner = json['owner'],
-        completed = json['completed'],
         completedAt = json['completedAt'],
         numPlayers = json['numPlayers'],
         roles = _boolMapToSet(json['roles']?.cast<String, bool>()),
@@ -95,7 +90,6 @@ class Room extends Document {
         'createdAt': createdAt,
         'appVersion': appVersion,
         'owner': owner,
-        'completed': completed,
         'completedAt': completedAt,
         'numPlayers': numPlayers,
         'roles': _toBoolMap(roles, getRoleIds(allRoles)),
@@ -108,14 +102,16 @@ class Room extends Document {
           id == other.id &&
           code == other.code &&
           numPlayers == other.numPlayers &&
-          roles == other.roles;
+          roles == other.roles &&
+          completedAt == other.completedAt;
 
   @override
-  int get hashCode => id.hashCode ^ code.hashCode ^ numPlayers.hashCode ^ roles.hashCode;
+  int get hashCode =>
+      id.hashCode ^ code.hashCode ^ numPlayers.hashCode ^ roles.hashCode ^ completedAt.hashCode;
 
   @override
   String toString() {
-    return 'Room{id: $id, code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completed: $completed, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles}';
+    return 'Room{id: $id, code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles}';
   }
 }
 
@@ -205,7 +201,6 @@ class Heist extends Document {
   final int order;
   final DateTime startedAt;
   final Map<String, String> decisions;
-  final bool completed;
   final DateTime completedAt;
 
   // TODO: include Kingpin guesses
@@ -218,7 +213,6 @@ class Heist extends Document {
       @required this.order,
       @required this.startedAt,
       this.decisions = const {},
-      this.completed = false,
       this.completedAt})
       : super(id: id);
 
@@ -231,7 +225,6 @@ class Heist extends Document {
     int order,
     DateTime startedAt,
     Map<String, String> decisions, // player ID -> { SUCCEED, FAIL, STEAL }
-    bool completed,
     DateTime completedAt,
   }) {
     return new Heist(
@@ -242,7 +235,6 @@ class Heist extends Document {
       order: order ?? this.order,
       startedAt: startedAt ?? this.startedAt,
       decisions: decisions ?? this.decisions,
-      completed: completed ?? this.completed,
       completedAt: completedAt ?? this.completedAt,
     );
   }
@@ -256,7 +248,6 @@ class Heist extends Document {
         order = json['order'],
         startedAt = json['startedAt'],
         decisions = json['decisions']?.cast<String, String>() ?? {},
-        completed = json['completed'],
         completedAt = json['completedAt'],
         super(id: id);
 
@@ -267,9 +258,15 @@ class Heist extends Document {
         'order': order,
         'startedAt': startedAt,
         'decisions': decisions,
-        'completed': completed,
         'completedAt': completedAt,
       };
+
+  bool get wasSuccess {
+    List<String> decisions = this.decisions.values.toList();
+//    assert(decisions.length == numPlayers);
+    int steals = decisions.where((d) => d == 'STEAL').length;
+    return !decisions.contains('FAIL') && steals < 2;
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -279,15 +276,15 @@ class Heist extends Document {
           room == other.room &&
           price == other.price &&
           decisions == other.decisions &&
-          completed == other.completed;
+          completedAt == other.completedAt;
 
   @override
   int get hashCode =>
-      id.hashCode ^ room.hashCode ^ price.hashCode ^ decisions.hashCode ^ completed.hashCode;
+      id.hashCode ^ room.hashCode ^ price.hashCode ^ decisions.hashCode ^ completedAt.hashCode;
 
   @override
   String toString() {
-    return 'Heist{id: $id, room: $room, price: $price, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions, completed: $completed, completedAt: $completedAt}';
+    return 'Heist{id: $id, room: $room, price: $price, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions, completedAt: $completedAt}';
   }
 }
 
@@ -358,7 +355,6 @@ class Round extends Document {
   final bool teamSubmitted;
   final Map<String, Bid> bids; // player ID -> Bid
   final Map<String, Gift> gifts; // player ID -> Gift
-  final bool completed;
   final DateTime completedAt;
 
   Round(
@@ -372,7 +368,6 @@ class Round extends Document {
       this.teamSubmitted = false,
       this.bids = const {},
       this.gifts = const {},
-      this.completed = false,
       this.completedAt})
       : super(id: id);
 
@@ -387,7 +382,6 @@ class Round extends Document {
     bool teamSubmitted,
     Map<String, Bid> bids,
     Map<String, Gift> gifts,
-    bool completed,
     DateTime completedAt,
   }) {
     return new Round(
@@ -401,7 +395,6 @@ class Round extends Document {
       teamSubmitted: teamSubmitted ?? this.teamSubmitted,
       bids: bids ?? this.bids,
       gifts: gifts ?? this.gifts,
-      completed: completed ?? this.completed,
       completedAt: completedAt ?? this.completedAt,
     );
   }
@@ -420,7 +413,6 @@ class Round extends Document {
             (v) => new Bid.fromJson(v.cast<String, dynamic>())),
         gifts = _convertValues(json['gifts']?.cast<String, dynamic>(),
             (v) => new Gift.fromJson(v.cast<String, dynamic>())),
-        completed = json['completed'],
         completedAt = json['completedAt'],
         super(id: id);
 
@@ -434,9 +426,12 @@ class Round extends Document {
         'teamSubmitted': teamSubmitted,
         'bids': bids,
         'gifts': gifts,
-        'completed': completed,
         'completedAt': completedAt,
       };
+
+  int get pot => bids.isNotEmpty
+      ? bids.values.fold(0, (previousValue, bid) => previousValue + bid.amount)
+      : -1;
 
   @override
   bool operator ==(Object other) =>
@@ -447,7 +442,7 @@ class Round extends Document {
           teamSubmitted == other.teamSubmitted &&
           bids == other.bids &&
           gifts == other.gifts &&
-          completed == other.completed;
+          completedAt == other.completedAt;
 
   @override
   int get hashCode =>
@@ -456,10 +451,10 @@ class Round extends Document {
       teamSubmitted.hashCode ^
       bids.hashCode ^
       gifts.hashCode ^
-      completed.hashCode;
+      completedAt.hashCode;
 
   @override
   String toString() {
-    return 'Round{leader: $leader, order: $order, room: $room, heist: $heist, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts, completed: $completed, completedAt: $completedAt}';
+    return 'Round{leader: $leader, order: $order, room: $room, heist: $heist, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts, completedAt: $completedAt}';
   }
 }

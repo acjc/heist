@@ -187,6 +187,14 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
+  Future<void> sendGift(String roundId, String myPlayerId, Gift gift) {
+    Round round = _getRound(roundId);
+    Map<String, Gift> gifts = new Map.from(round.gifts);
+    gifts[myPlayerId] = gift;
+    return upsertRound(round.copyWith(gifts: gifts), null);
+  }
+
+  @override
   Future<void> updateTeam(String roundId, String playerId, bool inTeam) {
     Round round = _getRound(roundId);
     Set<String> team = new Set.of(round.team ?? []);
@@ -219,7 +227,7 @@ class MockFirestoreDb implements FirestoreDb {
   @override
   Future<void> completeRound(String id) {
     Round round = _getRound(id);
-    return upsertRound(round.copyWith(completed: true, completedAt: now()), null);
+    return upsertRound(round.copyWith(completedAt: now()), null);
   }
 
   @override
@@ -231,14 +239,11 @@ class MockFirestoreDb implements FirestoreDb {
   @override
   Future<void> completeHeist(String id) {
     Heist heist = _getHeist(id);
-    return upsertHeist(heist.copyWith(completed: true, completedAt: now()), null);
+    return upsertHeist(heist.copyWith(completedAt: now()), null);
   }
 
   @override
-  Future<void> sendGift(String roundId, String myPlayerId, Gift gift) {
-    Round round = _getRound(roundId);
-    Map<String, Gift> gifts = new Map.from(round.gifts);
-    gifts[myPlayerId] = gift;
-    return upsertRound(round.copyWith(gifts: gifts), null);
+  Future<void> completeGame(String id) {
+    return upsertRoom(room.copyWith(completedAt: now()));
   }
 }

@@ -93,42 +93,50 @@ class GameState extends State<Game> {
   Widget _secretBoardBody() => new StoreConnector<GameModel, Player>(
       converter: (store) => getSelf(store.state),
       distinct: true,
-      builder: (context, me) => new Card(
-          elevation: 2.0,
-          child: new Column(
-            children: [
-              new ListTile(
-                title: new Text(
-                  "You are in team ${getTeam(me.role).toString()}",
-                  style: infoTextStyle,
-                ),
-              ),
-              new ListTile(
-                title: new Text(
-                  "Your role is ${getDisplayName(me.role)}",
-                  style: infoTextStyle,
-                ),
-              ),
-              new ListTile(
-                title: new Text(
-                  "You also know these identities:",
-                  style: infoTextStyle,
-                ),
-              ),
-              new ListTile(
-                title: new Text(
-                  "${getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
-                  style: infoTextStyle,
-                ),
-              ),
-            ]
-          )));
+      builder: (context, me) =>
+          new Card(elevation: 2.0, child: new Column(children: getSecretListTiles(me))));
+
+  List<ListTile> getSecretListTiles(Player me) {
+    List<ListTile> basicTiles = [
+      new ListTile(
+        title: new Text(
+          "You are in team ${getTeam(me.role).toString()}",
+          style: infoTextStyle,
+        ),
+      ),
+      new ListTile(
+        title: new Text(
+          "Your role is ${getDisplayName(me.role)}",
+          style: infoTextStyle,
+        ),
+      ),
+    ];
+
+    // show the identities the player knows, if any
+    if (getKnownIds(me.role) != null) {
+      basicTiles.add(new ListTile(
+        // TODO
+        title: new Text(
+          "You also know these identities:",
+          style: infoTextStyle,
+        ),
+      ));
+      basicTiles.add(new ListTile(
+        title: new Text(
+          "${getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
+          style: infoTextStyle,
+        ),
+      ));
+    }
+
+    return basicTiles;
+  }
 
   String getFormattedKnownIds(GameModel gameModel, Set<String> knownIds) {
     String formattedKnownIds = "";
-    knownIds.forEach((roleId) {
-      formattedKnownIds += getPlayerByRoleId(gameModel, roleId).name
-          + " is the " + getDisplayName(roleId) + "\n";
+    knownIds?.forEach((roleId) {
+      formattedKnownIds +=
+          getPlayerByRoleId(gameModel, roleId).name + " is the " + getDisplayName(roleId) + "\n";
     });
     return formattedKnownIds;
   }

@@ -174,11 +174,11 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<void> submitBid(String roundId, String myPlayerId, Bid bid) async {
+  Future<void> submitBid(String roundId, String myPlayerId, Bid bid) {
     Round round = _getRound(roundId);
     Map<String, Bid> bids = new Map.from(round.bids);
     bids[myPlayerId] = bid;
-    await upsertRound(round.copyWith(bids: bids), null);
+    return upsertRound(round.copyWith(bids: bids), null);
   }
 
   @override
@@ -232,5 +232,13 @@ class MockFirestoreDb implements FirestoreDb {
   Future<void> completeHeist(String id) {
     Heist heist = _getHeist(id);
     return upsertHeist(heist.copyWith(completed: true, completedAt: now()), null);
+  }
+
+  @override
+  Future<void> sendGift(String roundId, String myPlayerId, Gift gift) {
+    Round round = _getRound(roundId);
+    Map<String, Gift> gifts = new Map.from(round.gifts);
+    gifts[myPlayerId] = gift;
+    return upsertRound(round.copyWith(gifts: gifts), null);
   }
 }

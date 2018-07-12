@@ -39,6 +39,15 @@ class GameState extends State<Game> {
     return centeredMessage('Resolving auction...');
   }
 
+  Widget biddingAndGifting(Store<GameModel> store) {
+    List<Widget> children = [bidding(store)];
+    if (!isAuction(store.state)) {
+      children.add(selectionBoard());
+    }
+    children.add(gifting(store));
+    return new Column(children: children);
+  }
+
   Widget _mainBoardBody() => new StoreConnector<GameModel, MainBoardViewModel>(
       converter: (store) => new MainBoardViewModel._(
             waitingForTeam: !currentRound(store.state).teamSubmitted,
@@ -60,7 +69,7 @@ class GameState extends State<Game> {
 
         // bidding
         if (!viewModel.biddingComplete) {
-          return bidding(_store);
+          return biddingAndGifting(_store);
         }
 
         // resolve round
@@ -80,6 +89,7 @@ class GameState extends State<Game> {
 
         // go to next heist
         if (heistDecided(_store.state) && !viewModel.heistComplete) {
+          // TODO: check if the game is over
           return heistEnd(_store);
         }
 
@@ -166,7 +176,7 @@ class GameState extends State<Game> {
   Widget _mainBoard() => new StoreConnector<GameModel, bool>(
       converter: (store) => gameIsReady(store.state),
       distinct: true,
-      builder: (context, gameIsReady) => new Expanded(
+      builder: (context, gameIsReady) => new Container(
             child: gameIsReady ? _mainBoardBody() : _loadingScreen(),
           ));
 
@@ -179,7 +189,9 @@ class GameState extends State<Game> {
 
   Widget _tabView() => new TabBarView(
         children: [
-          new Column(children: [_mainBoard(), _gameHistory(_store)]),
+          new SingleChildScrollView(
+            child: new Column(children: [_mainBoard(), _gameHistory(_store)]),
+          ),
           new Column(children: [_playerInfo(_store), _secretBoard()]),
         ],
       );

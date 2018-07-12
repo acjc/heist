@@ -25,7 +25,7 @@ Widget cancelButton(BuildContext context, Store<GameModel> store, bool loading, 
         child: const Text('CANCEL BID', style: buttonTextStyle),
         onPressed: loading || bid == null ? null : () => store.dispatch(new CancelBidAction()));
 
-Widget biddingBoard(Store<GameModel> store) {
+Widget bidding(Store<GameModel> store) {
   return StoreConnector<GameModel, BiddingViewModel>(
       converter: (store) => new BiddingViewModel._(
           getBidAmount(store.state),
@@ -41,36 +41,31 @@ Widget biddingBoard(Store<GameModel> store) {
                 new Text(
                     'AUCTION! ${currentHeist(store.state).numPlayers} spots available! '
                     'Highest, then fastest, bids win!',
-                    style: infoTextStyle)
+                    style: infoTextStyle),
               ]
-            : [];
+            : [
+                const Text('BIDDING', style: infoTextStyle),
+              ];
         children.addAll([
           new Text('Bids so far: ${viewModel.numBids} / ${getRoom(store.state).numPlayers}',
               style: infoTextStyle),
           new Text('Your bid: $currentBidAmount', style: infoTextStyle),
           bidAmount(context, store, viewModel.bidAmount),
-          new Container(
-              padding: paddingLarge,
-              child: submitButton(store, viewModel.loading, viewModel.bidAmount)),
-          cancelButton(context, store, viewModel.loading, viewModel.bid),
+          new Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+            cancelButton(context, store, viewModel.loading, viewModel.bid),
+            submitButton(store, viewModel.loading, viewModel.bidAmount),
+          ]),
         ]);
 
         return new Card(
             elevation: 2.0,
             child: new Container(
                 padding: paddingLarge,
+                alignment: Alignment.center,
                 child: new Column(
                   children: children,
                 )));
       });
-}
-
-Widget bidding(Store<GameModel> store) {
-  List<Widget> children = [biddingBoard(store)];
-  if (!isAuction(store.state)) {
-    children.add(selectionBoard());
-  }
-  return new Column(children: children);
 }
 
 class BiddingViewModel {
@@ -100,9 +95,9 @@ class BiddingViewModel {
 }
 
 Widget continueRoundButton(Store<GameModel> store) => new RaisedButton(
-  child: const Text('CONTINUE', style: buttonTextStyle),
-  onPressed: () => store.dispatch(new CompleteRoundAction()),
-);
+      child: const Text('CONTINUE', style: buttonTextStyle),
+      onPressed: () => store.dispatch(new CompleteRoundAction()),
+    );
 
 Widget roundEnd(Store<GameModel> store) {
   List<Player> players = getPlayers(store.state);
@@ -121,9 +116,12 @@ Widget roundEnd(Store<GameModel> store) {
 
   return new Card(
     elevation: 2.0,
-    child: new Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: children,
+    child: new Container(
+      alignment: Alignment.center,
+      child: new Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: children,
+      ),
     ),
   );
 }

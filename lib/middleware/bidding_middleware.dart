@@ -47,7 +47,7 @@ class CreateNewRoundAction extends MiddlewareAction {
 
 String nextRoundLeader(List<Player> players, int currentOrder) {
   int newOrder = currentOrder + 1;
-  if (newOrder > players.length) {
+  if (newOrder > players.length) { // TODO: if it has been an auction, don't skip a player
     newOrder = 1;
   }
   return players.singleWhere((p) => p.order == newOrder).id;

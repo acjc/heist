@@ -231,12 +231,6 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<void> updatePot(String heistId, int pot) {
-    Heist heist = _getHeist(heistId);
-    return upsertHeist(heist.copyWith(pot: pot), null);
-  }
-
-  @override
   Future<void> completeHeist(String id) {
     Heist heist = _getHeist(id);
     return upsertHeist(heist.copyWith(completedAt: now()), null);

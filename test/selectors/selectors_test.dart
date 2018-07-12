@@ -15,20 +15,20 @@ void main() {
         room: new Room(
             id: uuid(), code: 'ABCD', numPlayers: 2, roles: new Set.of(['KINGPIN', 'LEAD_AGENT'])),
         players: [
-          new Player(
-              id: myId, installId: installId(), name: '_name', role: 'KINGPIN'),
-          new Player(
-              id: otherId, installId: uuid(), name: '_other', role: 'LEAD_AGENT'),
+          new Player(id: myId, installId: installId(), name: '_name', role: 'KINGPIN'),
+          new Player(id: otherId, installId: uuid(), name: '_other', role: 'LEAD_AGENT'),
         ],
         heists: [
           new Heist(
               id: heistId1,
               price: 12,
               numPlayers: 2,
+              maximumBid: 20,
               order: 1,
               decisions: {myId: 'SUCCEED', otherId: 'SUCCEED'},
               startedAt: now()),
-          new Heist(id: heistId2, price: 12, numPlayers: 2, order: 2, startedAt: now())
+          new Heist(
+              id: heistId2, price: 12, numPlayers: 2, maximumBid: 20, order: 2, startedAt: now())
         ],
         rounds: {
           heistId1: [

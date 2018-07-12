@@ -59,7 +59,8 @@ class SetUpNewGameAction extends MiddlewareAction {
       if (heist != null) {
         return heist.id;
       }
-      Heist newHeist = new Heist(price: 12, numPlayers: 2, order: 1, startedAt: now());
+      Heist newHeist =
+          new Heist(price: 12, numPlayers: 2, maximumBid: 5, order: 1, startedAt: now());
       return db.upsertHeist(newHeist, roomId);
     }
     return heists[0].id;

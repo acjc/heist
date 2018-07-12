@@ -8,8 +8,11 @@ Widget bidAmount(BuildContext context, Store<GameModel> store, int bidAmount) =>
             style: const TextStyle(
               fontSize: 32.0,
             )),
-        iconWidget(context, Icons.arrow_forward,
-            () => store.dispatch(new IncrementBidAmountAction(currentBalance(store.state)))),
+        iconWidget(
+            context,
+            Icons.arrow_forward,
+            () => store.dispatch(new IncrementBidAmountAction(
+                currentBalance(store.state), currentHeist(store.state).maximumBid))),
       ],
     );
 

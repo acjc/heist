@@ -198,6 +198,7 @@ class Heist extends Document {
   final DocumentReference room;
   final int price;
   final int numPlayers;
+  final int maximumBid;
   final int order;
   final DateTime startedAt;
   final Map<String, String> decisions;
@@ -210,6 +211,7 @@ class Heist extends Document {
       this.room,
       @required this.price,
       @required this.numPlayers,
+      @required this.maximumBid,
       @required this.order,
       @required this.startedAt,
       this.decisions = const {},
@@ -220,8 +222,8 @@ class Heist extends Document {
     String id,
     DocumentReference room,
     int price,
-    int pot,
     int numPlayers,
+    int maximumBid,
     int order,
     DateTime startedAt,
     Map<String, String> decisions, // player ID -> { SUCCEED, FAIL, STEAL }
@@ -232,6 +234,7 @@ class Heist extends Document {
       room: room ?? this.room,
       price: price ?? this.price,
       numPlayers: numPlayers ?? this.numPlayers,
+      maximumBid: maximumBid ?? this.maximumBid,
       order: order ?? this.order,
       startedAt: startedAt ?? this.startedAt,
       decisions: decisions ?? this.decisions,
@@ -245,6 +248,7 @@ class Heist extends Document {
       : room = json['room'],
         price = json['price'],
         numPlayers = json['numPlayers'],
+        maximumBid = json['maximumBid'],
         order = json['order'],
         startedAt = json['startedAt'],
         decisions = json['decisions']?.cast<String, String>() ?? {},
@@ -255,11 +259,16 @@ class Heist extends Document {
         'room': room,
         'price': price,
         'numPlayers': numPlayers,
+        'maximumBid': maximumBid,
         'order': order,
         'startedAt': startedAt,
         'decisions': decisions,
         'completedAt': completedAt,
       };
+
+  bool get allDecided {
+    return decisions.length == numPlayers;
+  }
 
   bool get wasSuccess {
     List<String> decisions = this.decisions.values.toList();
@@ -273,18 +282,16 @@ class Heist extends Document {
       identical(this, other) ||
       other is Heist &&
           id == other.id &&
-          room == other.room &&
-          price == other.price &&
           decisions == other.decisions &&
           completedAt == other.completedAt;
 
   @override
   int get hashCode =>
-      id.hashCode ^ room.hashCode ^ price.hashCode ^ decisions.hashCode ^ completedAt.hashCode;
+      id.hashCode ^ decisions.hashCode ^ completedAt.hashCode;
 
   @override
   String toString() {
-    return 'Heist{id: $id, room: $room, price: $price, numPlayers: $numPlayers, order: $order, startedAt: $startedAt, decisions: $decisions, completedAt: $completedAt}';
+    return 'Heist{room: $room, price: $price, numPlayers: $numPlayers, maximumBid: $maximumBid, order: $order, startedAt: $startedAt, decisions: $decisions, completedAt: $completedAt}';
   }
 }
 

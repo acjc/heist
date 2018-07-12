@@ -171,14 +171,8 @@ class FirestoreDb {
     return _updateHeist(heistId, data);
   }
 
-  Future<void> updatePot(String heistId, int pot) {
-    Map<String, dynamic> data = {'pot': pot};
-    return _updateHeist(heistId, data);
-  }
-
   Future<void> completeRound(String id) {
     Map<String, dynamic> data = {
-      'completed': true,
       'completedAt': now(),
     };
     return _updateRound(id, data);
@@ -186,7 +180,6 @@ class FirestoreDb {
 
   Future<void> completeHeist(String id) {
     Map<String, dynamic> data = {
-      'completed': true,
       'completedAt': now(),
     };
     return _updateHeist(id, data);

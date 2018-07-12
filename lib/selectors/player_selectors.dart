@@ -21,7 +21,7 @@ final Selector<GameModel, int> currentBalance = createSelector3(getSelf, getHeis
   int balance = me.initialBalance;
   heists.forEach((heist) {
     List<Round> rounds = allRounds[heist.id];
-    if (heist.decisions.length == heist.numPlayers) {
+    if (heist.allDecided) {
       balance -= rounds.last.bids[me.id].amount;
     }
     rounds.forEach((round) => round.gifts.forEach((id, gift) {

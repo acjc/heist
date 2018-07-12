@@ -47,6 +47,7 @@ class CompleteHeistAction extends MiddlewareAction {
     Heist newHeist = new Heist(
         price: heistDefinition.price,
         numPlayers: heistDefinition.numPlayers,
+        maximumBid: heistDefinition.maximumBid,
         order: newOrder,
         startedAt: now());
     return store.state.db.upsertHeist(newHeist, room.id);

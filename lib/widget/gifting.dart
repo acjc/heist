@@ -40,7 +40,10 @@ Widget gifting(Store<GameModel> store) => new StoreConnector<GameModel, GiftingV
     distinct: true,
     builder: (context, viewModel) {
       List<Widget> children = [
-        const Text('GIFTING', style: infoTextStyle),
+        new Container(
+          padding: paddingTitle,
+          child: const Text('GIFTING', style: titleTextStyle),
+        ),
       ];
 
       if (viewModel.gift != null) {

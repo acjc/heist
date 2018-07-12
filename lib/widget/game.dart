@@ -179,13 +179,18 @@ class GameState extends State<Game> {
         if (viewModel.gameOver) {
           return _resolveEndgame(viewModel.completingGame);
         }
-        return new SingleChildScrollView(
-          child: new Column(
-            children: [
-              _mainBoardBody(),
-              gameHistory(_store),
-            ],
-          ),
+        return new Stack(
+          children: [
+            new SingleChildScrollView(
+              child: _mainBoardBody(),
+            ),
+            new Positioned(
+              child: gameHistory(_store),
+              left: 0.0,
+              right: 0.0,
+              bottom: 0.0,
+            ),
+          ],
         );
       });
 

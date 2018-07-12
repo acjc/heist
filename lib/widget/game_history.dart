@@ -9,7 +9,7 @@ Widget gameHistory(Store<GameModel> store) {
           return new Container();
         }
         return new Card(
-            elevation: 2.0,
+            elevation: 10.0,
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: new List.generate(5, (i) {

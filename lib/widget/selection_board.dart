@@ -1,13 +1,13 @@
 part of heist;
 
 Widget waitForTeam(Store<GameModel> store) => new Column(children: [
-    new Card(
-        elevation: 2.0,
-        child: new Container(
-            padding: paddingLarge,
-            child: centeredMessage('${roundLeader(store.state).name} is picking a team...'))),
-    selectionBoard(store),
-  ]);
+      new Card(
+          elevation: 2.0,
+          child: new Container(
+              padding: paddingLarge,
+              child: centeredMessage('${roundLeader(store.state).name} is picking a team...'))),
+      selectionBoard(store),
+    ]);
 
 Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, Set<String>>(
     converter: (store) => teamNames(store.state),
@@ -17,7 +17,11 @@ Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, S
           child: new Container(
               padding: paddingMedium,
               child: new Column(children: [
-                new Text('TEAM (${currentHeist(store.state).numPlayers})', style: infoTextStyle),
+                new Container(
+                  padding: paddingTitle,
+                  child: new Text('TEAM (${currentHeist(store.state).numPlayers})',
+                      style: titleTextStyle),
+                ),
                 new GridView.count(
                     padding: paddingMedium,
                     shrinkWrap: true,
@@ -34,7 +38,7 @@ List<Widget> selectionBoardChildren(BuildContext context, Set<String> teamNames)
   Color color = Theme.of(context).accentColor;
   return new List.generate(
       teamNames.length,
-          (i) => new Container(
+      (i) => new Container(
           alignment: Alignment.center,
           decoration: new BoxDecoration(
             border: new Border.all(color: color),

@@ -44,7 +44,10 @@ Widget bidding(Store<GameModel> store) {
                     style: infoTextStyle),
               ]
             : [
-                const Text('BIDDING', style: infoTextStyle),
+                new Container(
+                  padding: paddingTitle,
+                  child: const Text('BIDDING', style: titleTextStyle),
+                ),
               ];
         children.addAll([
           new Text('Bids so far: ${viewModel.numBids} / ${getRoom(store.state).numPlayers}',
@@ -60,7 +63,7 @@ Widget bidding(Store<GameModel> store) {
         return new Card(
             elevation: 2.0,
             child: new Container(
-                padding: paddingLarge,
+                padding: paddingMedium,
                 alignment: Alignment.center,
                 child: new Column(
                   children: children,

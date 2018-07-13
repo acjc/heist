@@ -3,21 +3,19 @@ part of heist;
 class CompleteRoundAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
-    return store.state.db.completeRound(currentRound(store.state).id);
-  }
-}
+    return withRequest(Request.CompletingRound, store, (store) async {
+      Round round = currentRound(store.state);
 
-class CreateNewRoundAction extends MiddlewareAction {
-  @override
-  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
-    return withRequest(Request.CreatingNewRound, store, (store) {
-      String currentHeistId = currentHeist(store.state).id;
-      int newOrder = currentRound(store.state).order + 1;
-      assert(newOrder > 0 && newOrder <= 5);
-      String newLeader = nextRoundLeader(
-          getPlayers(store.state), roundLeader(store.state).order, isAuction(store.state));
+      if (!heistIsActive(store.state)) {
+        String currentHeistId = currentHeist(store.state).id;
+        int newOrder = round.order + 1;
+        assert(newOrder > 0 && newOrder <= 5);
 
-      return createNewRound(store, currentHeistId, newOrder, newLeader);
+        String newLeader = nextRoundLeader(
+            getPlayers(store.state), roundLeader(store.state).order, isAuction(store.state));
+        await createNewRound(store, currentHeistId, newOrder, newLeader);
+      }
+      return store.state.db.completeRound(round.id);
     });
   }
 }
@@ -36,6 +34,7 @@ Future<void> createNewRound(
   String roomId = getRoom(store.state).id;
   assert(!(await db.roundExists(roomId, heistId, order)));
 
-  Round newRound = new Round(leader: leader, order: order, heist: heistId, startedAt: now());
+  Round newRound =
+      new Round(leader: leader, order: order, heist: heistId, team: new Set(), startedAt: now());
   return db.upsertRound(newRound, roomId);
 }

@@ -266,9 +266,9 @@ class Heist extends Document {
         'completedAt': completedAt,
       };
 
-  bool get allDecided {
-    return decisions.length == numPlayers;
-  }
+  bool get complete => completedAt != null;
+
+  bool get allDecided => decisions.length == numPlayers;
 
   bool get wasSuccess {
     List<String> decisions = this.decisions.values.toList();
@@ -283,11 +283,10 @@ class Heist extends Document {
       other is Heist &&
           id == other.id &&
           decisions == other.decisions &&
-          completedAt == other.completedAt;
+          complete == other.complete;
 
   @override
-  int get hashCode =>
-      id.hashCode ^ decisions.hashCode ^ completedAt.hashCode;
+  int get hashCode => id.hashCode ^ decisions.hashCode ^ complete.hashCode;
 
   @override
   String toString() {
@@ -371,7 +370,7 @@ class Round extends Document {
       this.room,
       @required this.heist,
       @required this.startedAt,
-      this.team,
+      @required this.team,
       this.teamSubmitted = false,
       this.bids = const {},
       this.gifts = const {},
@@ -429,7 +428,7 @@ class Round extends Document {
         'room': room,
         'heist': heist,
         'startedAt': startedAt,
-        'team': team,
+        'team': _toBoolMap(team, team),
         'teamSubmitted': teamSubmitted,
         'bids': bids,
         'gifts': gifts,
@@ -439,6 +438,8 @@ class Round extends Document {
   int get pot => bids.isNotEmpty
       ? bids.values.fold(0, (previousValue, bid) => previousValue + bid.amount)
       : -1;
+
+  bool get complete => completedAt != null;
 
   @override
   bool operator ==(Object other) =>

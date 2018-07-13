@@ -116,6 +116,6 @@ enum Request {
   Gifting,
   ResolvingAuction,
   CompletingHeist,
-  CreatingNewRound,
+  CompletingRound,
   CompletingGame,
 }

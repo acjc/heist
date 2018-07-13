@@ -25,3 +25,7 @@ Widget centeredMessage(String text) {
     style: infoTextStyle,
   ));
 }
+
+Widget loading() {
+  return centeredMessage('Loading...');
+}

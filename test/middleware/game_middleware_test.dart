@@ -20,7 +20,7 @@ void main() {
           new Heist(id: heistId, price: 12, numPlayers: 2, maximumBid: 5, order: 1, startedAt: now()),
         ],
         rounds: {
-          heistId: [new Round(id: uuid(), order: 1, heist: heistId, startedAt: now())]
+          heistId: [new Round(id: uuid(), order: 1, heist: heistId, team: new Set(), startedAt: now())]
         });
     Store<GameModel> store = createStore(db);
 

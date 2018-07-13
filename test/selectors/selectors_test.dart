@@ -36,6 +36,7 @@ void main() {
                 id: uuid(),
                 order: 1,
                 heist: heistId1,
+                team: new Set(),
                 bids: {},
                 gifts: {uuid(): new Gift(amount: 10, recipient: myId)},
                 startedAt: now()),
@@ -43,6 +44,7 @@ void main() {
                 id: uuid(),
                 order: 2,
                 heist: heistId1,
+                team: new Set(),
                 bids: {myId: new Bid(13)},
                 gifts: {},
                 startedAt: now())
@@ -52,6 +54,7 @@ void main() {
                 id: uuid(),
                 order: 1,
                 heist: heistId2,
+                team: new Set(),
                 gifts: {myId: new Gift(amount: 3, recipient: uuid())},
                 bids: {myId: new Bid(11)},
                 startedAt: now())

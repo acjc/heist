@@ -71,7 +71,8 @@ class SetUpNewGameAction extends MiddlewareAction {
     String roomId = getRoom(store.state).id;
     if (!hasRounds(store.state) && !(await db.roundExists(roomId, heistId, 1))) {
       String newLeader = getPlayers(store.state).singleWhere((p) => p.order == 1).id;
-      Round round = new Round(order: 1, heist: heistId, leader: newLeader, startedAt: now());
+      Round round =
+          new Round(order: 1, heist: heistId, leader: newLeader, team: new Set(), startedAt: now());
       return db.upsertRound(round, roomId);
     }
   }

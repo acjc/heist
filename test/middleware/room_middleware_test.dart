@@ -19,8 +19,13 @@ void main() {
     expect(store.state.room.numPlayers, minPlayers);
     expect(
         store.state.room.roles,
-        new Set.of(['ACCOUNTANT', 'KINGPIN', 'THIEF_1', 'LEAD_AGENT', 'AGENT_1']));
-
+        new Set.of([
+          ACCOUNTANT.roleId,
+          KINGPIN.roleId,
+          THIEF_1.roleId,
+          LEAD_AGENT.roleId,
+          AGENT_1.roleId
+        ]));
 
     // Call loadGame() manually to avoid some async calls that we call manually later in the test
     await new LoadGameAction().loadGame(store);

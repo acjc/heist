@@ -9,8 +9,8 @@ void main() {
     Store<GameModel> store = await initGame();
     String myId = getSelf(store.state).id;
 
-    await handle(store, new MakeDecisionAction('STEAL'));
-    expect(currentHeist(store.state).decisions[myId], 'STEAL');
+    await handle(store, new MakeDecisionAction(Steal));
+    expect(currentHeist(store.state).decisions[myId], Steal);
   });
 
   test('test complete heist', () async {

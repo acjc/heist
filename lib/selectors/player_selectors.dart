@@ -21,8 +21,8 @@ final Selector<GameModel, int> currentBalance = createSelector4(
     getSelf,
     getHeists,
     getRounds,
-    (List<Player> players, Player me, List<Heist> heists, Map<String, List<Round>> allRounds) =>
-        calculateBalance(players, me, heists, allRounds));
+    (List<Player> players, Player me, List<Heist> heists, Map<String, List<Round>> rounds) =>
+        calculateBalance(players, me, heists, rounds));
 
 int calculateBalanceFromStore(Store<GameModel> store, Player player) => calculateBalance(
       getPlayers(store.state), player, getHeists(store.state), getRounds(store.state));
@@ -37,8 +37,7 @@ int calculateBalance(
 
     if (heist.allDecided) {
       balance -= rounds.last.bids[player.id].amount;
-      int pot = rounds.last.pot;
-      balance = resolveBalanceForHeistOutcome(players, player, heist, pot, balance);
+      balance = resolveBalanceForHeistOutcome(players, player, heist, rounds.last.pot, balance);
     }
   });
   assert(balance >= 0);
@@ -61,7 +60,7 @@ int resolveBalanceForHeistOutcome(
   Random random = new Random(heist.id.hashCode);
   int kingpinPayout = randomlySplit(random, pot, 2)[0];
   int leadAgentPayout = pot - kingpinPayout;
-  if (player.role == 'KINGPIN') {
+  if (player.role == KINGPIN.roleId) {
     balance += kingpinPayout;
   }
   int steals = heist.decisions.values.where((d) => d == Steal).length;
@@ -76,7 +75,7 @@ int resolveBalanceForHeistOutcome(
 }
 
 bool shouldPayoutLeadAgent(Player player, bool playerStole, int steals) {
-  return player.role == 'LEAD_AGENT' && (steals == 0 || steals == 1 && playerStole);
+  return player.role == LEAD_AGENT.roleId && (steals == 0 || steals == 1 && playerStole);
 }
 
 /// Split a number into approximately equal integer portions, using the given RNG to assign remainders.

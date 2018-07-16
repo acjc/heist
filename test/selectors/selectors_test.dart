@@ -16,19 +16,20 @@ void main() {
     String heistId1 = '#heist1';
     String heistId2 = '#heist2';
 
-    Player kingpin = new Player(id: kingpinId, installId: uuid(), name: '_other1', role: 'KINGPIN');
+    Player kingpin =
+        new Player(id: kingpinId, installId: uuid(), name: '_other1', role: KINGPIN.roleId);
 
     FirestoreDb db = new MockFirestoreDb(
         room: new Room(
             id: uuid(),
             code: 'ABCD',
             numPlayers: 2,
-            roles: new Set.of(['KINGPIN', 'LEAD_AGENT', 'AGENT_1', 'THIEF_1'])),
+            roles: new Set.of([KINGPIN.roleId, LEAD_AGENT.roleId, AGENT_1.roleId, THIEF_1.roleId])),
         players: [
-          new Player(id: myId, installId: installId(), name: '_name', role: 'AGENT_1'),
+          new Player(id: myId, installId: installId(), name: '_name', role: AGENT_1.roleId),
           kingpin,
-          new Player(id: otherPlayer2, installId: uuid(), name: '_other2', role: 'LEAD_AGENT'),
-          new Player(id: otherPlayer3, installId: uuid(), name: '_other3', role: 'THIEF_1'),
+          new Player(id: otherPlayer2, installId: uuid(), name: '_other2', role: LEAD_AGENT.roleId),
+          new Player(id: otherPlayer3, installId: uuid(), name: '_other3', role: THIEF_1.roleId),
         ],
         heists: [
           new Heist(

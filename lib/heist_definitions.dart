@@ -1,5 +1,9 @@
 part of heist;
 
+const String Succeed = 'SUCCEED';
+const String Steal = 'STEAL';
+const String Fail = 'FAIL';
+
 class HeistDefinition {
   final int numPlayers;
   final int price;

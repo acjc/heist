@@ -272,7 +272,7 @@ class Heist extends Document {
 
   bool get wasSuccess {
     List<String> decisions = this.decisions.values.toList();
-//    assert(decisions.length == numPlayers);
+    assert(decisions.length == numPlayers);
     int steals = decisions.where((d) => d == Steal).length;
     return !decisions.contains(Fail) && steals < 2;
   }

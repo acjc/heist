@@ -1,8 +1,8 @@
 part of heist;
 
 // Selectors do not seem to work if you ever return null
-final getSelf = (GameModel gameModel) =>
-    getPlayers(gameModel).singleWhere((p) => p.installId == installId(), orElse: () => null);
+final getSelf = (GameModel gameModel) => getPlayers(gameModel)
+    .singleWhere((p) => p.installId == getPlayerInstallId(gameModel), orElse: () => null);
 
 final getPlayerByRoleId =
     (GameModel gameModel, String role) => getPlayers(gameModel).singleWhere((p) => p.role == role);
@@ -13,8 +13,8 @@ final getPlayerById =
 final Selector<GameModel, List<Player>> getOtherPlayers = createSelector2(getPlayers, getSelf,
     (List<Player> players, Player me) => players.where((Player p) => p.id != me.id).toList());
 
-final Selector<GameModel, bool> amOwner =
-    createSelector1(getRoom, (room) => room.owner == installId());
+final Selector<GameModel, bool> amOwner = createSelector2(
+    getRoom, getPlayerInstallId, (Room room, String installId) => room.owner == installId);
 
 final Selector<GameModel, int> currentBalance = createSelector4(
     getPlayers,
@@ -25,7 +25,7 @@ final Selector<GameModel, int> currentBalance = createSelector4(
         calculateBalance(players, me, heists, rounds));
 
 int calculateBalanceFromStore(Store<GameModel> store, Player player) => calculateBalance(
-      getPlayers(store.state), player, getHeists(store.state), getRounds(store.state));
+    getPlayers(store.state), player, getHeists(store.state), getRounds(store.state));
 
 int calculateBalance(
     List<Player> players, Player player, List<Heist> heists, Map<String, List<Round>> allRounds) {

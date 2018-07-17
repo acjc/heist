@@ -41,9 +41,12 @@ Widget bidding(Store<GameModel> store) {
 
         List<Widget> children = isAuction(store.state)
             ? [
+                new Container(
+                  padding: paddingTitle,
+                  child: const Text('AUCTION!', style: titleTextStyle),
+                ),
                 new Text(
-                    'AUCTION! ${currentHeist(store.state).numPlayers} spots available! '
-                    'Highest, then fastest, bids win!',
+                    '${currentHeist(store.state).numPlayers} spots available! Highest, then fastest, bids win!',
                     style: infoTextStyle),
               ]
             : [

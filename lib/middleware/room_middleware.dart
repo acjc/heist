@@ -6,7 +6,7 @@ class CreateRoomAction extends MiddlewareAction {
         code: code,
         createdAt: now(),
         appVersion: appVersion,
-        owner: installId(),
+        owner: getPlayerInstallId(store.state),
         numPlayers: store.state.room.numPlayers,
         roles: store.state.room.roles));
   }

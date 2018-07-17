@@ -14,6 +14,7 @@ dependencies:
     git:
       url: git://github.com/brianegan/reselect_dart.git
       ref: dart-2
+  shared_preferences: ^0.4.2
   redux_dev_tools: ^0.4.0
   flutter_redux_dev_tools: ^0.3.0
 

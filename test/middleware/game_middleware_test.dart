@@ -16,7 +16,7 @@ void main() {
             numPlayers: 2,
             roles: new Set.of([KINGPIN.roleId, LEAD_AGENT.roleId])),
         players: [
-          new Player(id: uuid(), installId: installId(), name: '_name', role: KINGPIN.roleId),
+          new Player(id: uuid(), installId: DebugInstallId, name: '_name', role: KINGPIN.roleId),
           new Player(id: uuid(), installId: uuid(), name: '_player2', role: LEAD_AGENT.roleId),
         ],
         heists: [

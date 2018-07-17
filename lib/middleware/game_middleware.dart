@@ -9,10 +9,10 @@ class JoinGameAction extends MiddlewareAction {
     assert(playerName != null && playerName.isNotEmpty);
 
     FirestoreDb db = store.state.db;
-    String iid = installId();
+    String installId = getPlayerInstallId(store.state);
 
-    if (!haveJoinedGame(store.state) && !(await db.playerExists(roomId, iid))) {
-      return db.upsertPlayer(new Player(installId: iid, name: playerName), roomId);
+    if (!haveJoinedGame(store.state) && !(await db.playerExists(roomId, installId))) {
+      return db.upsertPlayer(new Player(installId: installId, name: playerName), roomId);
     }
   }
 }
@@ -132,11 +132,28 @@ class LoadGameAction extends MiddlewareAction {
         onError: (e) => _clearSetUpRequests(store));
   }
 
+  Future<String> _installId() async {
+    if (isDebugMode()) {
+      return DebugInstallId;
+    }
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String installId = preferences.getString(PrefInstallId);
+    if (installId == null) {
+      installId = new Uuid().v4();
+      await preferences.setString(PrefInstallId, installId);
+    }
+    return installId;
+  }
+
   Future<void> loadGame(Store<GameModel> store) async {
+    store.dispatch(new SetPlayerInstallIdAction(await _installId()));
+
     FirestoreDb db = store.state.db;
     Room room = getRoom(store.state);
     String roomId = room.id ?? (await db.getRoomByCode(room.code)).id;
     List<Heist> heists = await db.getHeists(roomId);
+
     _subscribe(store, roomId, heists);
   }
 

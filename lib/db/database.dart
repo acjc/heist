@@ -12,13 +12,11 @@ class FirestoreDb {
 
   Future<Room> getRoomByCode(String code) async {
     assert(code.length == 4);
-    QuerySnapshot snapshot = await _firestore
-        .collection('rooms')
-        .where('code', isEqualTo: code)
-        // TODO: this is commented out during development
-//        .where('createdAt',
-//            isGreaterThanOrEqualTo: now().add(new Duration(days: -1)))
-        .getDocuments();
+    Query query = _firestore.collection('rooms').where('code', isEqualTo: code);
+    if (!isDebugMode()) {
+      query = query.where('createdAt', isGreaterThanOrEqualTo: now().add(new Duration(days: -1)));
+    }
+    QuerySnapshot snapshot = await query.getDocuments();
     if (snapshot.documents.isNotEmpty) {
       return new Room.fromSnapshot(snapshot.documents.first);
     }

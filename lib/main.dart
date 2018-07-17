@@ -15,6 +15,8 @@ import 'package:redux_logging/redux_logging.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
 import 'package:redux_dev_tools/redux_dev_tools.dart';
 import 'package:reselect/reselect.dart';
+import 'package:uuid/uuid.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'db/database.dart';
 part 'db/database_model.dart';
@@ -64,16 +66,16 @@ void main() => runApp(new MyApp(Firestore.instance));
 const int minPlayers = 5;
 const int maxPlayers = 10;
 
+const String PrefInstallId = 'INSTALL_ID';
+
+const String DebugInstallId = 'test_install_id';
+
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
 bool isDebugMode() {
   bool debugMode = false;
   assert(debugMode = true);
   return debugMode;
-}
-
-String installId() {
-  return 'test_install_id';
 }
 
 DateTime now() {
@@ -84,7 +86,7 @@ Store<GameModel> createStore(FirestoreDb db) {
   if (isDebugMode()) {
     return new DevToolsStore<GameModel>(
       gameModelReducer,
-      initialState: new GameModel.initial(db, minPlayers),
+      initialState: new GameModel.initial(db, 2),
       middleware: createMiddleware(),
       distinct: true,
     );

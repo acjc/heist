@@ -48,8 +48,8 @@ class Room extends Document {
       @required this.roles})
       : super(id: id);
 
-  factory Room.initial() =>
-      Room(numPlayers: minPlayers, roles: getRoleIds(numPlayersToRolesMap[minPlayers]));
+  factory Room.initial(int numPlayers) =>
+      Room(numPlayers: numPlayers, roles: getRoleIds(numPlayersToRolesMap[minPlayers]));
 
   Room copyWith({
     String id,

@@ -64,7 +64,7 @@ class GameModel {
       bidAmount: 0,
       giftAmount: 0,
       requests: new Set(),
-      room: new Room.initial(),
+      room: new Room.initial(numPlayers),
       players: [],
       heists: [],
       rounds: {});

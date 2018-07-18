@@ -345,7 +345,7 @@ class GameActiveViewModel {
 void resetGameStore(Store<GameModel> store) {
   store.dispatch(new ClearAllPendingRequestsAction());
   store.dispatch(new CancelSubscriptionsAction());
-  store.dispatch(new UpdateStateAction<Room>(new Room.initial()));
+  store.dispatch(new UpdateStateAction<Room>(new Room.initial(isDebugMode() ? 2 : minPlayers)));
   store.dispatch(new UpdateStateAction<List<Player>>([]));
   store.dispatch(new UpdateStateAction<List<Heist>>([]));
   store.dispatch(new UpdateStateAction<Map<Heist, List<Round>>>({}));

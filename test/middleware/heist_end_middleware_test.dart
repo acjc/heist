@@ -1,4 +1,7 @@
-import 'package:heist/main.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/middleware/heist_middleware.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
 import 'package:test/test.dart';
 

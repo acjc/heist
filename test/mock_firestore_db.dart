@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:heist/db/database.dart';
+import 'package:heist/db/database_model.dart';
 import 'package:heist/main.dart';
 import 'package:uuid/uuid.dart';
 

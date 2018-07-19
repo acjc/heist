@@ -1,4 +1,11 @@
-part of heist;
+import 'dart:async';
+
+import 'package:heist/db/database_model.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'middleware.dart';
 
 class PickPlayerMiddlewareAction extends MiddlewareAction {
   final String playerId;
@@ -30,7 +37,6 @@ class AuctionBid {
 }
 
 class ResolveAuctionWinnersAction extends MiddlewareAction {
-
   List<String> _winners(Map<String, Bid> bids, int numPlayers) {
     List<AuctionBid> auctionBids = [];
     bids.forEach((playerId, bid) => auctionBids.add(new AuctionBid._(playerId, bid)));

@@ -1,4 +1,11 @@
-part of heist;
+import 'dart:async';
+
+import 'package:heist/db/database_model.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'middleware.dart';
 
 class SubmitBidAction extends MiddlewareAction {
   final String playerId;

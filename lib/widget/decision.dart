@@ -1,4 +1,13 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+import 'package:heist/role.dart';
+import 'package:heist/middleware/heist_middleware.dart';
+
+import 'common.dart';
 
 Widget observeHeist(Store<GameModel> store) {
   return new StoreConnector<GameModel, Map<String, String>>(

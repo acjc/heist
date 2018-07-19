@@ -1,4 +1,8 @@
-part of heist;
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/db/database.dart';
 
 @immutable
 class GameModel {

@@ -1,4 +1,13 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/middleware/gifting_middleware.dart';
+import 'package:heist/reducers/gift_amount_reducers.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'common.dart';
 
 Widget giftAmount(BuildContext context, Store<GameModel> store, int giftAmount) => new Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

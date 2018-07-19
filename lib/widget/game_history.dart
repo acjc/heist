@@ -1,4 +1,12 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/heist_definitions.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'common.dart';
 
 Widget heistDecisions(Heist heist) {
   List<String> decisions = heist.decisions.values.toList();

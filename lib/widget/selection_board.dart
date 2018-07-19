@@ -1,4 +1,10 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'common.dart';
 
 Widget waitForTeam(Store<GameModel> store) => new Column(children: [
       new Card(

@@ -1,4 +1,7 @@
-import 'package:heist/main.dart';
+import 'package:heist/middleware/bidding_middleware.dart';
+import 'package:heist/middleware/team_picker_middleware.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
 import 'package:test/test.dart';
 
@@ -22,10 +25,8 @@ void main() {
     Store<GameModel> store = await initGame();
     String myId = getSelf(store.state).id;
 
-    List<String> otherPlayers = getPlayers(store.state)
-        .where((p) => p.id != myId)
-        .map((p) => p.id)
-        .toList();
+    List<String> otherPlayers =
+        getPlayers(store.state).where((p) => p.id != myId).map((p) => p.id).toList();
     for (String playerId in otherPlayers) {
       await handle(store, new SubmitBidAction(playerId, 9));
     }

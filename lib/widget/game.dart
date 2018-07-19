@@ -1,4 +1,30 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/main.dart';
+import 'package:heist/middleware/game_middleware.dart';
+import 'package:heist/middleware/room_middleware.dart';
+import 'package:heist/middleware/team_picker_middleware.dart';
+import 'package:heist/reducers/reducers.dart';
+import 'package:heist/reducers/request_reducers.dart';
+import 'package:heist/role.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:heist/reducers/subscription_reducers.dart';
+import 'package:redux/redux.dart';
+
+import 'bidding.dart';
+import 'common.dart';
+import 'decision.dart';
+import 'endgame.dart';
+import 'game_history.dart';
+import 'gifting.dart';
+import 'heist_end.dart';
+import 'player_info.dart';
+import 'round_end.dart';
+import 'selection_board.dart';
+import 'team_picker.dart';
 
 class Game extends StatefulWidget {
   final Store<GameModel> _store;
@@ -232,7 +258,7 @@ class GameState extends State<Game> {
         body: new TabBarView(
           children: [
             _mainBoard(),
-            new Column(children: [_playerInfo(_store), _secretBoard()]),
+            new Column(children: [playerInfo(_store), _secretBoard()]),
           ],
         ),
       ),

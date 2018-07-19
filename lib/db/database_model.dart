@@ -1,4 +1,9 @@
-part of heist;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:heist/heist_definitions.dart';
+import 'package:heist/main.dart';
+import 'package:heist/role.dart';
 
 Set<String> _boolMapToSet(Map<String, bool> boolMap) {
   Set<String> set = new Set();

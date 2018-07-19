@@ -1,4 +1,13 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/middleware/team_picker_middleware.dart';
+import 'package:heist/reducers/round_reducers.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'common.dart';
 
 Widget submitTeamButton(Store<GameModel> store, Set<String> teamIds, int playersRequired) {
   return new RaisedButton(

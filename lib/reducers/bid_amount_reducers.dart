@@ -1,4 +1,8 @@
-part of heist;
+import 'dart:math';
+
+import 'package:redux/redux.dart';
+
+import 'reducers.dart';
 
 final bidAmountReducer = combineReducers<int>([
   new TypedReducer<int, IncrementBidAmountAction>(reduce),

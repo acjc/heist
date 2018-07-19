@@ -1,4 +1,13 @@
-part of heist;
+import 'package:heist/state.dart';
+
+import 'bid_amount_reducers.dart';
+import 'gift_amount_reducers.dart';
+import 'heist_reducers.dart';
+import 'player_reducers.dart';
+import 'request_reducers.dart';
+import 'room_reducers.dart';
+import 'round_reducers.dart';
+import 'subscription_reducers.dart';
 
 GameModel gameModelReducer(GameModel gameModel, dynamic action) {
   return new GameModel(

@@ -1,4 +1,8 @@
-part of heist;
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/main.dart';
 
 class FirestoreDb {
   final Firestore _firestore;

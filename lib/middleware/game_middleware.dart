@@ -1,4 +1,21 @@
-part of heist;
+import 'dart:async';
+import 'dart:math';
+
+import 'package:collection/collection.dart';
+import 'package:heist/db/database.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/main.dart';
+import 'package:heist/reducers/player_reducers.dart';
+import 'package:heist/reducers/reducers.dart';
+import 'package:heist/reducers/request_reducers.dart';
+import 'package:heist/reducers/subscription_reducers.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
+
+import 'middleware.dart';
 
 class JoinGameAction extends MiddlewareAction {
   @override

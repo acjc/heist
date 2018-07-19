@@ -1,4 +1,6 @@
-import 'package:heist/main.dart';
+import 'package:heist/middleware/bidding_middleware.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
 import 'package:test/test.dart';
 

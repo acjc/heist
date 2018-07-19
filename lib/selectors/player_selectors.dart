@@ -1,4 +1,13 @@
-part of heist;
+import 'dart:math';
+
+import 'package:heist/db/database_model.dart';
+import 'package:heist/heist_definitions.dart';
+import 'package:heist/role.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+import 'package:reselect/reselect.dart';
+
+import 'selectors.dart';
 
 // Selectors do not seem to work if you ever return null
 final getSelf = (GameModel gameModel) => getPlayers(gameModel)

@@ -1,4 +1,9 @@
-part of heist;
+import 'package:heist/db/database_model.dart';
+import 'package:heist/role.dart';
+import 'package:heist/state.dart';
+import 'package:reselect/reselect.dart';
+
+import 'selectors.dart';
 
 final Selector<GameModel, bool> heistIsActive = createSelector4(
     currentRound,
@@ -9,8 +14,8 @@ final Selector<GameModel, bool> heistIsActive = createSelector4(
         ((isAuction && biddingComplete) || currentRound.pot >= currentHeist.price) &&
         !currentHeist.allDecided);
 
-final Selector<GameModel, bool> goingOnHeist = createSelector2(
-    currentRound, getSelf, (Round currentRound, Player me) => currentRound.team.contains(me.id));
+final Selector<GameModel, bool> goingOnHeist =
+    createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.team.contains(me.id));
 
 class Score {
   int thiefScore;

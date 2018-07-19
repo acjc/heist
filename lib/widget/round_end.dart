@@ -1,17 +1,25 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'common.dart';
+import 'package:heist/middleware/round_end_middleware.dart';
 
 Widget roundContinueButton(Store<GameModel> store) => new StoreConnector<GameModel, bool>(
-      converter: (store) => requestInProcess(store.state, Request.CompletingRound),
-      distinct: true,
-      builder: (context, completingGame) {
-        return new Container(
-          padding: paddingSmall,
-          child: new RaisedButton(
-            child: const Text('CONTINUE', style: buttonTextStyle),
-            onPressed: completingGame ? null : () => store.dispatch(new CompleteRoundAction()),
-          ),
-        );
-      });
+    converter: (store) => requestInProcess(store.state, Request.CompletingRound),
+    distinct: true,
+    builder: (context, completingGame) {
+      return new Container(
+        padding: paddingSmall,
+        child: new RaisedButton(
+          child: const Text('CONTINUE', style: buttonTextStyle),
+          onPressed: completingGame ? null : () => store.dispatch(new CompleteRoundAction()),
+        ),
+      );
+    });
 
 Widget roundEnd(Store<GameModel> store) {
   List<Player> players = getPlayers(store.state);

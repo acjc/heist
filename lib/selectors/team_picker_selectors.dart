@@ -1,4 +1,8 @@
-part of heist;
+import 'package:heist/db/database_model.dart';
+import 'package:heist/state.dart';
+import 'package:reselect/reselect.dart';
+
+import 'selectors.dart';
 
 final Selector<GameModel, bool> isMyGo = createSelector2(
     currentRound, getSelf, (Round currentRound, Player me) => currentRound.leader == me.id);

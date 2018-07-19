@@ -1,4 +1,11 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/role.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'common.dart';
 
 List<Widget> playerDecisions(Store<GameModel> store, Heist heist) {
   List<Widget> heistDecisions = [];

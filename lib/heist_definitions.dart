@@ -1,4 +1,4 @@
-part of heist;
+import 'package:flutter/foundation.dart';
 
 const String Succeed = 'SUCCEED';
 const String Steal = 'STEAL';

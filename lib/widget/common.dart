@@ -1,4 +1,4 @@
-part of heist;
+import 'package:flutter/material.dart';
 
 const EdgeInsets paddingLarge = const EdgeInsets.all(24.0);
 const EdgeInsets paddingMedium = const EdgeInsets.all(16.0);

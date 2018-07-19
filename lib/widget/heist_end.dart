@@ -1,4 +1,11 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/middleware/heist_middleware.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'common.dart';
 
 Widget heistContinueButton(Store<GameModel> store) {
   return new StoreConnector<GameModel, bool>(
@@ -20,8 +27,8 @@ Widget heistEnd(Store<GameModel> store) {
     return new Container(
       alignment: Alignment.center,
       padding: paddingSmall,
-      child: new Text(decision,
-          style: new TextStyle(fontSize: 16.0, color: decisionColour(decision))),
+      child:
+          new Text(decision, style: new TextStyle(fontSize: 16.0, color: decisionColour(decision))),
     );
   });
 

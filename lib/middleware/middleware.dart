@@ -1,4 +1,17 @@
-part of heist;
+import 'dart:async';
+
+import 'package:heist/reducers/request_reducers.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_logging/redux_logging.dart';
+
+import 'bidding_middleware.dart';
+import 'game_middleware.dart';
+import 'gifting_middleware.dart';
+import 'heist_middleware.dart';
+import 'room_middleware.dart';
+import 'round_end_middleware.dart';
+import 'team_picker_middleware.dart';
 
 List<Middleware<GameModel>> createMiddleware() {
   List<Middleware<GameModel>> middleware = [

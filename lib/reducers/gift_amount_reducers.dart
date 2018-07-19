@@ -1,4 +1,6 @@
-part of heist;
+import 'package:redux/redux.dart';
+
+import 'reducers.dart';
 
 final giftAmountReducer = combineReducers<int>([
   new TypedReducer<int, IncrementGiftAmountAction>(reduce),

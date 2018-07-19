@@ -1,4 +1,13 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/middleware/bidding_middleware.dart';
+import 'package:heist/reducers/bid_amount_reducers.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'common.dart';
 
 Widget bidAmount(BuildContext context, Store<GameModel> store, int bidAmount) => new Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,

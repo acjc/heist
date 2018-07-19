@@ -1,15 +1,16 @@
-part of heist;
+import 'package:heist/db/database_model.dart';
+import 'package:redux/redux.dart';
+
+import 'reducers.dart';
 
 final playerReducer = combineReducers<List<Player>>([
   new TypedReducer<List<Player>, UpdateStateAction<List<Player>>>(reduce),
 ]);
 
-final playerNameReducer = combineReducers<String>([
-  new TypedReducer<String, SetPlayerNameAction>(reduce)
-]);
+final playerNameReducer =
+    combineReducers<String>([new TypedReducer<String, SetPlayerNameAction>(reduce)]);
 
 class SetPlayerNameAction extends Action<String> {
-
   final String _playerName;
 
   SetPlayerNameAction(this._playerName);
@@ -20,12 +21,10 @@ class SetPlayerNameAction extends Action<String> {
   }
 }
 
-final playerInstallIdReducer = combineReducers<String>([
-  new TypedReducer<String, SetPlayerInstallIdAction>(reduce)
-]);
+final playerInstallIdReducer =
+    combineReducers<String>([new TypedReducer<String, SetPlayerInstallIdAction>(reduce)]);
 
 class SetPlayerInstallIdAction extends Action<String> {
-
   final String _installId;
 
   SetPlayerInstallIdAction(this._installId);

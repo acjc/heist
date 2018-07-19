@@ -1,5 +1,6 @@
+import 'package:heist/reducers/bid_amount_reducers.dart';
+import 'package:heist/reducers/reducers.dart';
 import 'package:test/test.dart';
-import 'package:heist/main.dart';
 
 void main() {
   test('increment bidAmount', () {

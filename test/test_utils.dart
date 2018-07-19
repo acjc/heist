@@ -23,7 +23,7 @@ Future<void> addOtherPlayers(Store<GameModel> store) async {
 
 Future<Store<GameModel>> initGame() async {
   FirestoreDb db = new MockFirestoreDb.empty();
-  Store<GameModel> store = createStore(db);
+  Store<GameModel> store = createStore(db, minPlayers);
   store.dispatch(new SetPlayerNameAction('_name'));
   await handle(store, new CreateRoomAction());
   await new LoadGameAction().loadGame(store);

@@ -1,25 +1,25 @@
 part of heist;
 
-Color decisionColour(String decision) {
-  switch (decision) {
-    case 'SUCCEED':
-      return Colors.green;
-    case 'FAIL':
-      return Colors.red;
-    case 'STEAL':
-      return Colors.blue;
-  }
-  throw new ArgumentError.value(decision, 'decision', 'Unknown decision');
-}
-
 List<Widget> playerDecisions(Store<GameModel> store, Heist heist) {
   List<Widget> heistDecisions = [];
   heist.decisions.forEach((playerId, decision) {
     Player player = getPlayerById(store.state, playerId);
-    List<Widget> children = [new Text('${player.name} (${player.role}) ->', style: infoTextStyle)];
+    List<Widget> children = [
+      new Text(
+        '${player.name} (${player.role}) ->',
+        style: infoTextStyle,
+      ),
+    ];
     children.add(new Text(' $decision',
-        style: new TextStyle(fontSize: 16.0, color: decisionColour(decision))));
-    heistDecisions.add(new Row(mainAxisAlignment: MainAxisAlignment.center, children: children));
+        style: new TextStyle(
+          fontSize: 16.0,
+          color: decisionColour(decision),
+          fontWeight: FontWeight.bold,
+        )));
+    heistDecisions.add(new Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: children,
+    ));
   });
   return heistDecisions;
 }

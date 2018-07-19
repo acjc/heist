@@ -10,7 +10,7 @@ import '../test_utils.dart';
 void main() {
   test('test create and set up room', () async {
     FirestoreDb db = new MockFirestoreDb.empty();
-    Store<GameModel> store = createStore(db);
+    Store<GameModel> store = createStore(db, minPlayers);
     store.dispatch(new SetPlayerNameAction('_name'));
 
     await handle(store, new CreateRoomAction());

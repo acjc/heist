@@ -82,11 +82,11 @@ DateTime now() {
   return new DateTime.now().toUtc();
 }
 
-Store<GameModel> createStore(FirestoreDb db) {
+Store<GameModel> createStore(FirestoreDb db, [int numPlayers]) {
   if (isDebugMode()) {
     return new DevToolsStore<GameModel>(
       gameModelReducer,
-      initialState: new GameModel.initial(db, 2),
+      initialState: new GameModel.initial(db, numPlayers ?? 2),
       middleware: createMiddleware(),
       distinct: true,
     );

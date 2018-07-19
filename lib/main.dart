@@ -86,7 +86,7 @@ Store<GameModel> createStore(FirestoreDb db, [int numPlayers]) {
   if (isDebugMode()) {
     return new DevToolsStore<GameModel>(
       gameModelReducer,
-      initialState: new GameModel.initial(db, numPlayers ?? 2),
+      initialState: new GameModel.initial(db, numPlayers ?? F2),
       middleware: createMiddleware(),
       distinct: true,
     );

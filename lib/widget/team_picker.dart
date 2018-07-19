@@ -42,7 +42,7 @@ List<Widget> teamPickerChildren(BuildContext context, Store<GameModel> store, Se
   return new List.generate(players.length, (i) {
     Player player = players[i];
     bool isInTeam = teamIds.contains(player.id);
-    return new GestureDetector(
+    return new InkWell(
         onTap: () => onTap(store, roundId, player.id, isInTeam),
         child: new Container(
             alignment: Alignment.center,

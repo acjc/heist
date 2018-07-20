@@ -20,15 +20,19 @@ Widget heistContinueButton(Store<GameModel> store) {
 Widget heistEnd(Store<GameModel> store) {
   List<String> decisions = currentHeist(store.state).decisions.values.toList();
   if (decisions.isEmpty) {
-    return loading();
+    return null;
   }
   List<Widget> children = new List.generate(decisions.length, (i) {
     String decision = decisions[i];
     return new Container(
       alignment: Alignment.center,
       padding: paddingSmall,
-      child:
-          new Text(decision, style: new TextStyle(fontSize: 16.0, color: decisionColour(decision))),
+      child: new Text(decision,
+          style: new TextStyle(
+            fontSize: 16.0,
+            color: decisionColour(decision),
+            fontWeight: FontWeight.bold,
+          )),
     );
   });
 

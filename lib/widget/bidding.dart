@@ -20,8 +20,8 @@ Widget bidAmount(BuildContext context, Store<GameModel> store, int bidAmount) =>
         iconWidget(
             context,
             Icons.arrow_forward,
-            () => store.dispatch(new IncrementBidAmountAction(
-                currentBalance(store.state), currentHeist(store.state).maximumBid))),
+            () => store.dispatch(new IncrementBidAmountAction(currentBalance(store.state),
+                isAuction(store.state) ? 999 : currentHeist(store.state).maximumBid))),
       ],
     );
 
@@ -47,15 +47,16 @@ Widget bidding(Store<GameModel> store) {
       distinct: true,
       builder: (context, viewModel) {
         String currentBidAmount = viewModel.bid == null ? 'None' : viewModel.bid.amount.toString();
+        Heist heist = currentHeist(store.state);
+        bool auction = isAuction(store.state);
 
-        List<Widget> children = isAuction(store.state)
+        List<Widget> children = auction
             ? [
                 new Container(
                   padding: paddingTitle,
                   child: const Text('AUCTION!', style: titleTextStyle),
                 ),
-                new Text(
-                    '${currentHeist(store.state).numPlayers} spots available! Highest, then fastest, bids win!',
+                new Text('${heist.numPlayers} spots available! Highest, then fastest, bids win!',
                     style: infoTextStyle),
               ]
             : [
@@ -64,10 +65,13 @@ Widget bidding(Store<GameModel> store) {
                   child: const Text('BIDDING', style: titleTextStyle),
                 ),
               ];
+
+        String maximumBid = auction ? 'Unlimited' : heist.maximumBid.toString();
         children.addAll([
           new Text('Bids so far: ${viewModel.numBids} / ${getRoom(store.state).numPlayers}',
               style: infoTextStyle),
           new Text('Your bid: $currentBidAmount', style: infoTextStyle),
+          new Text('Maximum bid: $maximumBid', style: infoTextStyle),
           bidAmount(context, store, viewModel.bidAmount),
           new Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
             cancelButton(context, store, viewModel.loading, viewModel.bid),

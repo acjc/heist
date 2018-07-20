@@ -41,9 +41,9 @@ Future<void> createNewRound(
     Store<GameModel> store, String heistId, int order, String leader) async {
   FirestoreDb db = store.state.db;
   String roomId = getRoom(store.state).id;
-  assert(!(await db.roundExists(roomId, heistId, order)));
-
-  Round newRound =
-      new Round(leader: leader, order: order, heist: heistId, team: new Set(), startedAt: now());
-  return db.upsertRound(newRound, roomId);
+  if (!(await db.roundExists(roomId, heistId, order))) {
+    Round newRound =
+        new Round(leader: leader, order: order, heist: heistId, team: new Set(), startedAt: now());
+    return db.upsertRound(newRound, roomId);
+  }
 }

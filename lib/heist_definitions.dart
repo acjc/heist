@@ -22,6 +22,13 @@ const Map<int, Map<int, HeistDefinition>> heistDefinitions = {
     4: const HeistDefinition(numPlayers: 2, price: 8, maximumBid: 5),
     5: const HeistDefinition(numPlayers: 2, price: 8, maximumBid: 5),
   },
+  3: {
+    1: const HeistDefinition(numPlayers: 3, price: 8, maximumBid: 5),
+    2: const HeistDefinition(numPlayers: 3, price: 8, maximumBid: 5),
+    3: const HeistDefinition(numPlayers: 3, price: 8, maximumBid: 5),
+    4: const HeistDefinition(numPlayers: 3, price: 8, maximumBid: 5),
+    5: const HeistDefinition(numPlayers: 3, price: 8, maximumBid: 5),
+  },
   5: {
     1: const HeistDefinition(numPlayers: 2, price: 12, maximumBid: 5),
     2: const HeistDefinition(numPlayers: 3, price: 16, maximumBid: 6),

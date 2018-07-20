@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:heist/db/database.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/heist_definitions.dart';
 import 'package:heist/main.dart';
@@ -42,19 +41,21 @@ class CompleteHeistAction extends MiddlewareAction {
     String newLeader = nextRoundLeader(
         getPlayers(store.state), roundLeader(store.state).order, isAuction(store.state));
 
-    FirestoreDb db = store.state.db;
-    Room room = getRoom(store.state);
     List<Heist> heists = getHeists(store.state);
     assert(heists.where((h) => h.completedAt == null).length == 1);
 
+    // TODO: create all heists up front
     int newOrder = heists.length + 1;
-    assert(await db.getHeist(room.id, newOrder) == null);
-
-    String newHeistId = await _createNewHeist(store, room, newOrder);
+    String newHeistId = await _createNewHeist(store, newOrder);
     return createNewRound(store, newHeistId, 1, newLeader);
   }
 
-  Future<String> _createNewHeist(Store<GameModel> store, Room room, int newOrder) async {
+  Future<String> _createNewHeist(Store<GameModel> store, int newOrder) async {
+    Room room = getRoom(store.state);
+    Heist existingHeist = await store.state.db.getHeist(room.id, newOrder);
+    if (existingHeist != null) {
+      return existingHeist.id;
+    }
     HeistDefinition heistDefinition = heistDefinitions[room.numPlayers][newOrder];
     Heist newHeist = new Heist(
         price: heistDefinition.price,

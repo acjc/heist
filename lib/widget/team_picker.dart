@@ -44,6 +44,21 @@ Widget teamPicker(Store<GameModel> store) {
       });
 }
 
+Widget playerTile(String playerName, bool isInTeam, Color color) => new Container(
+    alignment: Alignment.center,
+    decoration: new BoxDecoration(
+      border: new Border.all(color: color),
+      borderRadius: BorderRadius.circular(5.0),
+      color: isInTeam ? color : null,
+    ),
+    child: new Text(
+      playerName,
+      style: new TextStyle(
+        color: isInTeam ? Colors.white : Colors.black87,
+        fontSize: 16.0,
+      ),
+    ));
+
 List<Widget> teamPickerChildren(BuildContext context, Store<GameModel> store, Set<String> teamIds) {
   Color color = Theme.of(context).accentColor;
   String roundId = currentRound(store.state).id;
@@ -53,19 +68,7 @@ List<Widget> teamPickerChildren(BuildContext context, Store<GameModel> store, Se
     bool isInTeam = teamIds.contains(player.id);
     return new InkWell(
         onTap: () => onTap(store, roundId, player.id, isInTeam),
-        child: new Container(
-            alignment: Alignment.center,
-            decoration: new BoxDecoration(
-              border: new Border.all(color: color),
-              color: isInTeam ? color : null,
-            ),
-            child: new Text(
-              player.name,
-              style: new TextStyle(
-                color: isInTeam ? Colors.white : Colors.black87,
-                fontSize: 16.0,
-              ),
-            )));
+        child: playerTile(player.name, isInTeam, color));
   });
 }
 

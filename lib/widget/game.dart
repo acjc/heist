@@ -8,10 +8,10 @@ import 'package:heist/middleware/room_middleware.dart';
 import 'package:heist/middleware/team_picker_middleware.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/reducers/request_reducers.dart';
+import 'package:heist/reducers/subscription_reducers.dart';
 import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
-import 'package:heist/reducers/subscription_reducers.dart';
 import 'package:redux/redux.dart';
 
 import 'bidding.dart';

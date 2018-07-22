@@ -194,6 +194,13 @@ class FirestoreDb {
     return _updateRoom(id, data);
   }
 
+  Future<void> addVisibleToAccountant(String id, String playerId) {
+    Map<String, dynamic> data = {
+      'visibleToAccountant': {playerId: true},
+    };
+    return _updateRoom(id, data);
+  }
+
   Future<void> _updateHeist(String heistId, Map<String, dynamic> data) {
     return _firestore.collection('heists').document(heistId).setData(data, merge: true);
   }

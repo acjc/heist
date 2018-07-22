@@ -50,4 +50,17 @@ void main() {
     }
     expect(store.state.heists.length, 1);
   });
+
+  test('add visible to accountant player', () async {
+    Store<GameModel> store = await initGame();
+    expect(store.state.room.visibleToAccountant, null);
+
+    await handle(store, new AddVisibleToAccountantAction("player1"));
+    expect(store.state.room.visibleToAccountant.length, 1);
+    expect(store.state.room.visibleToAccountant.contains("player1"), true);
+
+    await handle(store, new AddVisibleToAccountantAction("player2"));
+    expect(store.state.room.visibleToAccountant.length, 2);
+    expect(store.state.room.visibleToAccountant.containsAll(["player1", "player2"]), true);
+  });
 }

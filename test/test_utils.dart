@@ -1,7 +1,15 @@
 import 'dart:async';
+
+import 'package:heist/db/database.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/main.dart';
+import 'package:heist/middleware/game_middleware.dart';
+import 'package:heist/middleware/middleware.dart';
+import 'package:heist/middleware/room_middleware.dart';
+import 'package:heist/reducers/player_reducers.dart';
+import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
 import 'package:uuid/uuid.dart';
-import 'package:heist/main.dart';
 
 import 'mock_firestore_db.dart';
 
@@ -15,15 +23,14 @@ String uuid() {
 
 Future<void> addOtherPlayers(Store<GameModel> store) async {
   for (int i = 0; i < store.state.room.numPlayers - 1; i++) {
-    await store.state.db.upsertPlayer(
-        new Player(installId: uuid(), name: uuid()),
-        store.state.room.id);
+    await store.state.db
+        .upsertPlayer(new Player(installId: uuid(), name: uuid()), store.state.room.id);
   }
 }
 
 Future<Store<GameModel>> initGame() async {
   FirestoreDb db = new MockFirestoreDb.empty();
-  Store<GameModel> store = createStore(db);
+  Store<GameModel> store = createStore(db, minPlayers);
   store.dispatch(new SetPlayerNameAction('_name'));
   await handle(store, new CreateRoomAction());
   await new LoadGameAction().loadGame(store);

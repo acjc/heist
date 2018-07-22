@@ -1,4 +1,9 @@
-part of heist;
+import 'package:heist/db/database_model.dart';
+import 'package:heist/main.dart';
+import 'package:heist/role.dart';
+import 'package:redux/redux.dart';
+
+import 'reducers.dart';
 
 final roomReducer = combineReducers<Room>([
   new TypedReducer<Room, IncrementNumPlayersAction>(reduce),

@@ -1,4 +1,13 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+import 'package:heist/role.dart';
+import 'package:heist/middleware/heist_middleware.dart';
+
+import 'common.dart';
 
 Widget observeHeist(Store<GameModel> store) {
   return new StoreConnector<GameModel, Map<String, String>>(
@@ -42,63 +51,43 @@ List<Widget> observeHeistChildren(
   });
 }
 
-Widget makeDecision(BuildContext context, Store<GameModel> store) {
-  return new StoreConnector<GameModel, Player>(
-      converter: (store) => getSelf(store.state),
-      distinct: true,
-      builder: (context, me) {
-        var choices = [
-          const Text('Make your choice', style: infoTextStyle),
-          decisionButton(context, store, 'SUCCEED'),
-          decisionButton(context, store, 'STEAL'), // TODO: Kingpin can't steal
-        ];
-        if (getTeam(me.role) == Team.AGENTS) {
-          choices.add(decisionButton(context, store, 'FAIL'));
-        }
-        return new Card(
-            elevation: 2.0,
-            child: new Container(
-                padding: paddingMedium,
-                alignment: Alignment.center,
-                child: new Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: choices)));
-      });
-}
+Widget makeDecision(BuildContext context, Store<GameModel> store) =>
+    new StoreConnector<GameModel, Map<String, String>>(
+        converter: (store) => currentHeist(store.state).decisions,
+        distinct: true,
+        builder: (context, decisions) {
+          Player me = getSelf(store.state);
+          List<Widget> children = [];
+          if (decisions.containsKey(me.id)) {
+            return observeHeist(store);
+          } else {
+            children.addAll([
+              new Container(
+                padding: paddingSmall,
+                child: const Text('Make your choice', style: titleTextStyle),
+              ),
+              decisionButton(context, store, 'SUCCEED'),
+            ]);
+            if (me.role != 'KINGPIN') {
+              children.add(decisionButton(context, store, 'STEAL'));
+            }
+            if (getTeam(me.role) == Team.AGENTS) {
+              children.add(decisionButton(context, store, 'FAIL'));
+            }
+          }
+          return new Card(
+              elevation: 2.0,
+              child: new Container(
+                  padding: paddingMedium,
+                  alignment: Alignment.center,
+                  child: new Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: children)));
+        });
 
 Widget decisionButton(BuildContext context, Store<GameModel> store, String decision) =>
     new Container(
+        padding: paddingSmall,
         child: new RaisedButton(
-      onPressed: () => store.dispatch(new MakeDecisionAction(decision)),
-      child: new Text(decision, style: buttonTextStyle),
-    ));
-
-Widget heistContinueButton(Store<GameModel> store) {
-  return new StoreConnector<GameModel, bool>(
-      converter: (store) => requestInProcess(store.state, Request.CompletingHeist),
-      distinct: true,
-      builder: (context, completingHeist) => new RaisedButton(
-            child: const Text('CONTINUE', style: buttonTextStyle),
-            onPressed: completingHeist ? null : () => store.dispatch(new CompleteHeistAction()),
-          ));
-}
-
-Widget heistEnd(Store<GameModel> store) {
-  Set<Player> team = playersInTeam(store.state);
-  Map<String, String> decisions = currentHeist(store.state).decisions;
-  List<Widget> children = new List.generate(team.length, (i) {
-    Player player = team.elementAt(i);
-    return new Text('${player.name} -> ${decisions[player.id]}', style: infoTextStyle);
-  });
-
-  if (amOwner(store.state)) {
-    children.add(heistContinueButton(store));
-  }
-
-  return new Card(
-    elevation: 2.0,
-    child: new Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: children,
-    ),
-  );
-}
+          onPressed: () => store.dispatch(new MakeDecisionAction(decision)),
+          child: new Text(decision, style: buttonTextStyle),
+        ));

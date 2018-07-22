@@ -1,6 +1,13 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
 
-Widget _playerInfo(Store<GameModel> store) {
+import 'common.dart';
+
+Widget playerInfo(Store<GameModel> store) {
   return new StoreConnector<GameModel, PlayerInfoViewModel>(
       distinct: true,
       converter: (store) =>

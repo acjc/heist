@@ -1,4 +1,13 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/middleware/bidding_middleware.dart';
+import 'package:heist/reducers/bid_amount_reducers.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'common.dart';
 
 Widget bidAmount(BuildContext context, Store<GameModel> store, int bidAmount) => new Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -8,8 +17,11 @@ Widget bidAmount(BuildContext context, Store<GameModel> store, int bidAmount) =>
             style: const TextStyle(
               fontSize: 32.0,
             )),
-        iconWidget(context, Icons.arrow_forward,
-            () => store.dispatch(new IncrementBidAmountAction(currentBalance(store.state)))),
+        iconWidget(
+            context,
+            Icons.arrow_forward,
+            () => store.dispatch(new IncrementBidAmountAction(currentBalance(store.state),
+                isAuction(store.state) ? 999 : currentHeist(store.state).maximumBid))),
       ],
     );
 
@@ -35,21 +47,31 @@ Widget bidding(Store<GameModel> store) {
       distinct: true,
       builder: (context, viewModel) {
         String currentBidAmount = viewModel.bid == null ? 'None' : viewModel.bid.amount.toString();
+        Heist heist = currentHeist(store.state);
+        bool auction = isAuction(store.state);
 
-        List<Widget> children = isAuction(store.state)
+        List<Widget> children = auction
             ? [
-                new Text(
-                    'AUCTION! ${currentHeist(store.state).numPlayers} spots available! '
-                    'Highest, then fastest, bids win!',
+                new Container(
+                  padding: paddingTitle,
+                  child: const Text('AUCTION!', style: titleTextStyle),
+                ),
+                new Text('${heist.numPlayers} spots available! Highest, then fastest, bids win!',
                     style: infoTextStyle),
               ]
             : [
-                const Text('BIDDING', style: infoTextStyle),
+                new Container(
+                  padding: paddingTitle,
+                  child: const Text('BIDDING', style: titleTextStyle),
+                ),
               ];
+
+        String maximumBid = auction ? 'Unlimited' : heist.maximumBid.toString();
         children.addAll([
           new Text('Bids so far: ${viewModel.numBids} / ${getRoom(store.state).numPlayers}',
               style: infoTextStyle),
           new Text('Your bid: $currentBidAmount', style: infoTextStyle),
+          new Text('Maximum bid: $maximumBid', style: infoTextStyle),
           bidAmount(context, store, viewModel.bidAmount),
           new Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
             cancelButton(context, store, viewModel.loading, viewModel.bid),
@@ -60,7 +82,7 @@ Widget bidding(Store<GameModel> store) {
         return new Card(
             elevation: 2.0,
             child: new Container(
-                padding: paddingLarge,
+                padding: paddingMedium,
                 alignment: Alignment.center,
                 child: new Column(
                   children: children,
@@ -92,36 +114,4 @@ class BiddingViewModel {
   String toString() {
     return 'BiddingViewModel{bidAmount: $bidAmount, loading: $loading, bid: $bid, numBids: $numBids}';
   }
-}
-
-Widget continueRoundButton(Store<GameModel> store) => new RaisedButton(
-      child: const Text('CONTINUE', style: buttonTextStyle),
-      onPressed: () => store.dispatch(new CompleteRoundAction()),
-    );
-
-Widget roundEnd(Store<GameModel> store) {
-  List<Player> players = getPlayers(store.state);
-  Map<String, Bid> bids = currentRound(store.state).bids;
-  assert(players.length == bids.length);
-
-  List<Widget> children = new List.generate(players.length, (i) {
-    Player player = players[i];
-    return new Text('${player.name} bid ${bids[player.id].amount}', style: infoTextStyle);
-  })
-    ..add(new Text('Total pot = ${currentPot(store.state)}', style: infoTextStyle));
-
-  if (amOwner(store.state)) {
-    children.add(continueRoundButton(store));
-  }
-
-  return new Card(
-    elevation: 2.0,
-    child: new Container(
-      alignment: Alignment.center,
-      child: new Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: children,
-      ),
-    ),
-  );
 }

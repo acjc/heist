@@ -1,10 +1,15 @@
-part of heist;
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/db/database.dart';
 
 @immutable
 class GameModel {
   final FirestoreDb db;
   final Subscriptions subscriptions;
 
+  final String playerInstallId;
   final String playerName;
   final int bidAmount;
   final int giftAmount;
@@ -20,6 +25,7 @@ class GameModel {
   GameModel(
       {this.db,
       this.subscriptions,
+      this.playerInstallId,
       this.playerName,
       this.bidAmount,
       this.giftAmount,
@@ -31,6 +37,7 @@ class GameModel {
 
   GameModel copyWith(
       {Subscriptions subscriptions,
+      String playerInstallId,
       String playerName,
       int bidAmount,
       int giftAmount,
@@ -42,6 +49,7 @@ class GameModel {
     return new GameModel(
       db: this.db,
       subscriptions: subscriptions ?? this.subscriptions,
+      playerInstallId: playerInstallId ?? this.playerInstallId,
       playerName: playerName ?? this.playerName,
       bidAmount: bidAmount ?? this.bidAmount,
       giftAmount: giftAmount ?? this.giftAmount,
@@ -55,11 +63,12 @@ class GameModel {
 
   factory GameModel.initial(FirestoreDb db, int numPlayers) => GameModel(
       db: db,
+      playerInstallId: null,
       playerName: null,
       bidAmount: 0,
       giftAmount: 0,
       requests: new Set(),
-      room: new Room.initial(),
+      room: new Room.initial(numPlayers),
       players: [],
       heists: [],
       rounds: {});
@@ -68,8 +77,8 @@ class GameModel {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is GameModel &&
-          db == other.db &&
           subscriptions == other.subscriptions &&
+          playerInstallId == other.playerInstallId &&
           playerName == other.playerName &&
           bidAmount == other.bidAmount &&
           giftAmount == other.giftAmount &&
@@ -81,8 +90,8 @@ class GameModel {
 
   @override
   int get hashCode =>
-      db.hashCode ^
       subscriptions.hashCode ^
+      playerInstallId.hashCode ^
       playerName.hashCode ^
       bidAmount.hashCode ^
       giftAmount.hashCode ^
@@ -94,7 +103,7 @@ class GameModel {
 
   @override
   String toString() {
-    return 'GameModel{db: $db, subscriptions: $subscriptions, playerName: $playerName, bidAmount: $bidAmount, requests: $requests, room: $room, players: $players, heists: $heists, rounds: $rounds}';
+    return 'GameModel{db: $db, subscriptions: $subscriptions, playerInstallId: $playerInstallId, playerName: $playerName, bidAmount: $bidAmount, giftAmount: $giftAmount, requests: $requests, room: $room, players: $players, heists: $heists, rounds: $rounds}';
   }
 }
 
@@ -116,5 +125,6 @@ enum Request {
   Gifting,
   ResolvingAuction,
   CompletingHeist,
-  CreatingNewRound
+  CompletingRound,
+  CompletingGame,
 }

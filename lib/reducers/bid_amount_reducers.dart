@@ -1,4 +1,8 @@
-part of heist;
+import 'dart:math';
+
+import 'package:redux/redux.dart';
+
+import 'reducers.dart';
 
 final bidAmountReducer = combineReducers<int>([
   new TypedReducer<int, IncrementBidAmountAction>(reduce),
@@ -7,12 +11,13 @@ final bidAmountReducer = combineReducers<int>([
 
 class IncrementBidAmountAction extends Action<int> {
   final int balance;
+  final int maximumBid;
 
-  IncrementBidAmountAction(this.balance);
+  IncrementBidAmountAction(this.balance, this.maximumBid);
 
   @override
   int reduce(int bidAmount, action) {
-    return bidAmount < balance ? bidAmount + 1 : bidAmount;
+    return bidAmount < min(balance, maximumBid) ? bidAmount + 1 : bidAmount;
   }
 }
 

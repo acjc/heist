@@ -1,4 +1,10 @@
-part of heist;
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'reducers.dart';
 
 final subscriptionReducer = combineReducers<Subscriptions>([
   new TypedReducer<Subscriptions, AddSubscriptionsAction>(reduce),

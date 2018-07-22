@@ -1,4 +1,8 @@
-part of heist;
+import 'package:heist/db/database_model.dart';
+import 'package:heist/state.dart';
+import 'package:reselect/reselect.dart';
 
-final Selector<GameModel, Gift> myCurrentGift = createSelector2(
-    currentRound, getSelf, (Round currentRound, Player me) => currentRound.gifts[me.id]);
+import 'selectors.dart';
+
+final Selector<GameModel, Gift> myCurrentGift =
+    createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.gifts[me.id]);

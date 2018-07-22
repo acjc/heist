@@ -1,11 +1,14 @@
+import 'package:heist/reducers/bid_amount_reducers.dart';
+import 'package:heist/reducers/reducers.dart';
 import 'package:test/test.dart';
-import 'package:heist/main.dart';
 
 void main() {
   test('increment bidAmount', () {
-    int bidAmount = reduce(4, new IncrementBidAmountAction(5));
+    int bidAmount = reduce(4, new IncrementBidAmountAction(5, 10));
     expect(bidAmount, 5);
-    bidAmount = reduce(bidAmount, new IncrementBidAmountAction(5));
+    bidAmount = reduce(bidAmount, new IncrementBidAmountAction(5, 10));
+    expect(bidAmount, 5);
+    bidAmount = reduce(bidAmount, new IncrementBidAmountAction(10, 5));
     expect(bidAmount, 5);
   });
 

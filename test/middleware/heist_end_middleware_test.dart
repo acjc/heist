@@ -1,5 +1,4 @@
 import 'package:heist/db/database_model.dart';
-import 'package:heist/heist_definitions.dart';
 import 'package:heist/middleware/heist_middleware.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -9,14 +8,6 @@ import 'package:test/test.dart';
 import '../test_utils.dart';
 
 void main() {
-  test('test make decision', () async {
-    Store<GameModel> store = await initGame();
-    String myId = getSelf(store.state).id;
-
-    await handle(store, new MakeDecisionAction(Steal));
-    expect(currentHeist(store.state).decisions[myId], Steal);
-  });
-
   test('test complete heist', () async {
     Store<GameModel> store = await initGame();
 

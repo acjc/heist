@@ -1,4 +1,8 @@
-part of heist;
+import 'package:heist/db/database_model.dart';
+import 'package:heist/state.dart';
+import 'package:reselect/reselect.dart';
+
+import 'selectors.dart';
 
 final Selector<GameModel, int> numBids = createSelector1(
     currentRound, (currentRound) => currentRound.bids.values.where((b) => b != null).length);

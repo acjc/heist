@@ -1,5 +1,9 @@
-import 'package:test/test.dart';
+import 'package:heist/db/database_model.dart';
 import 'package:heist/main.dart';
+import 'package:heist/reducers/player_reducers.dart';
+import 'package:heist/reducers/reducers.dart';
+import 'package:heist/reducers/room_reducers.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('increment numPlayers', () {
@@ -27,5 +31,10 @@ void main() {
   test('set player name', () {
     String playerName = reduce(null, new SetPlayerNameAction('_name'));
     expect(playerName, '_name');
+  });
+
+  test('set install ID', () {
+    String installId = reduce(null, new SetPlayerInstallIdAction('_id'));
+    expect(installId, '_id');
   });
 }

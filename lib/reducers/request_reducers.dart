@@ -1,4 +1,7 @@
-part of heist;
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'reducers.dart';
 
 final requestReducer = combineReducers<Set<Request>>([
   new TypedReducer<Set<Request>, StartRequestAction>(reduce),
@@ -7,7 +10,6 @@ final requestReducer = combineReducers<Set<Request>>([
 ]);
 
 class StartRequestAction extends Action<Set<Request>> {
-
   final Request request;
 
   StartRequestAction(this.request);

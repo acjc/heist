@@ -1,4 +1,21 @@
-part of heist;
+import 'dart:async';
+import 'dart:math';
+
+import 'package:collection/collection.dart';
+import 'package:heist/db/database.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/main.dart';
+import 'package:heist/reducers/player_reducers.dart';
+import 'package:heist/reducers/reducers.dart';
+import 'package:heist/reducers/request_reducers.dart';
+import 'package:heist/reducers/subscription_reducers.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
+
+import 'middleware.dart';
 
 class JoinGameAction extends MiddlewareAction {
   @override
@@ -9,10 +26,10 @@ class JoinGameAction extends MiddlewareAction {
     assert(playerName != null && playerName.isNotEmpty);
 
     FirestoreDb db = store.state.db;
-    String iid = installId();
+    String installId = getPlayerInstallId(store.state);
 
-    if (!haveJoinedGame(store.state) && !(await db.playerExists(roomId, iid))) {
-      return db.upsertPlayer(new Player(installId: iid, name: playerName), roomId);
+    if (!haveJoinedGame(store.state) && !(await db.playerExists(roomId, installId))) {
+      return db.upsertPlayer(new Player(installId: installId, name: playerName), roomId);
     }
   }
 }
@@ -59,7 +76,8 @@ class SetUpNewGameAction extends MiddlewareAction {
       if (heist != null) {
         return heist.id;
       }
-      Heist newHeist = new Heist(price: 12, numPlayers: 2, order: 1, startedAt: now());
+      Heist newHeist =
+          new Heist(price: 12, numPlayers: 2, maximumBid: 5, order: 1, startedAt: now());
       return db.upsertHeist(newHeist, roomId);
     }
     return heists[0].id;
@@ -70,7 +88,8 @@ class SetUpNewGameAction extends MiddlewareAction {
     String roomId = getRoom(store.state).id;
     if (!hasRounds(store.state) && !(await db.roundExists(roomId, heistId, 1))) {
       String newLeader = getPlayers(store.state).singleWhere((p) => p.order == 1).id;
-      Round round = new Round(order: 1, heist: heistId, leader: newLeader, startedAt: now());
+      Round round =
+          new Round(order: 1, heist: heistId, leader: newLeader, team: new Set(), startedAt: now());
       return db.upsertRound(round, roomId);
     }
   }
@@ -130,11 +149,28 @@ class LoadGameAction extends MiddlewareAction {
         onError: (e) => _clearSetUpRequests(store));
   }
 
+  Future<String> _installId() async {
+    if (isDebugMode()) {
+      return DebugInstallId;
+    }
+
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String installId = preferences.getString(PrefInstallId);
+    if (installId == null) {
+      installId = new Uuid().v4();
+      await preferences.setString(PrefInstallId, installId);
+    }
+    return installId;
+  }
+
   Future<void> loadGame(Store<GameModel> store) async {
+    store.dispatch(new SetPlayerInstallIdAction(await _installId()));
+
     FirestoreDb db = store.state.db;
     Room room = getRoom(store.state);
     String roomId = room.id ?? (await db.getRoomByCode(room.code)).id;
     List<Heist> heists = await db.getHeists(roomId);
+
     _subscribe(store, roomId, heists);
   }
 

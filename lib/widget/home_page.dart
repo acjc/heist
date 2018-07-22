@@ -1,4 +1,14 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/middleware/room_middleware.dart';
+import 'package:heist/reducers/player_reducers.dart';
+import 'package:heist/reducers/room_reducers.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'common.dart';
+import 'game.dart';
 
 class HomePage extends StatelessWidget {
   static const EdgeInsets _padding = const EdgeInsets.all(16.0);

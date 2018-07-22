@@ -1,4 +1,8 @@
-part of heist;
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/main.dart';
 
 class FirestoreDb {
   final Firestore _firestore;
@@ -12,14 +16,11 @@ class FirestoreDb {
 
   Future<Room> getRoomByCode(String code) async {
     assert(code.length == 4);
-    QuerySnapshot snapshot = await _firestore
-        .collection('rooms')
-        .where('code', isEqualTo: code)
-        .where('completed', isEqualTo: false)
-        // TODO: this is commented out during development
-//        .where('createdAt',
-//            isGreaterThanOrEqualTo: now().add(new Duration(days: -1)))
-        .getDocuments();
+    Query query = _firestore.collection('rooms').where('code', isEqualTo: code);
+    if (!isDebugMode()) {
+      query = query.where('createdAt', isGreaterThanOrEqualTo: now().add(new Duration(days: -1)));
+    }
+    QuerySnapshot snapshot = await query.getDocuments();
     if (snapshot.documents.isNotEmpty) {
       return new Room.fromSnapshot(snapshot.documents.first);
     }
@@ -172,14 +173,8 @@ class FirestoreDb {
     return _updateHeist(heistId, data);
   }
 
-  Future<void> updatePot(String heistId, int pot) {
-    Map<String, dynamic> data = {'pot': pot};
-    return _updateHeist(heistId, data);
-  }
-
   Future<void> completeRound(String id) {
     Map<String, dynamic> data = {
-      'completed': true,
       'completedAt': now(),
     };
     return _updateRound(id, data);
@@ -187,10 +182,16 @@ class FirestoreDb {
 
   Future<void> completeHeist(String id) {
     Map<String, dynamic> data = {
-      'completed': true,
       'completedAt': now(),
     };
     return _updateHeist(id, data);
+  }
+
+  Future<void> completeGame(String id) {
+    Map<String, dynamic> data = {
+      'completedAt': now(),
+    };
+    return _updateRoom(id, data);
   }
 
   Future<void> _updateHeist(String heistId, Map<String, dynamic> data) {
@@ -199,5 +200,9 @@ class FirestoreDb {
 
   Future<void> _updateRound(String roundId, Map<String, dynamic> data) {
     return _firestore.collection('rounds').document(roundId).setData(data, merge: true);
+  }
+
+  Future<void> _updateRoom(String roomId, Map<String, dynamic> data) {
+    return _firestore.collection('rooms').document(roomId).setData(data, merge: true);
   }
 }

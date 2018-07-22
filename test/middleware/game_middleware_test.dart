@@ -1,6 +1,13 @@
-import 'package:test/test.dart';
+import 'package:heist/db/database.dart';
+import 'package:heist/db/database_model.dart';
 import 'package:heist/main.dart';
+import 'package:heist/middleware/game_middleware.dart';
+import 'package:heist/reducers/room_reducers.dart';
+import 'package:heist/role.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
+import 'package:test/test.dart';
 
 import '../mock_firestore_db.dart';
 import '../test_utils.dart';
@@ -11,16 +18,22 @@ void main() {
     String heistId = uuid();
     FirestoreDb db = new MockFirestoreDb(
         room: new Room(
-            id: uuid(), code: code, numPlayers: 2, roles: new Set.of(['KINGPIN', 'LEAD_AGENT'])),
+            id: uuid(),
+            code: code,
+            numPlayers: 2,
+            roles: new Set.of([KINGPIN.roleId, LEAD_AGENT.roleId])),
         players: [
-          new Player(id: uuid(), installId: installId(), name: '_name', role: 'KINGPIN'),
-          new Player(id: uuid(), installId: uuid(), name: '_player2', role: 'LEAD_AGENT'),
+          new Player(id: uuid(), installId: DebugInstallId, name: '_name', role: KINGPIN.roleId),
+          new Player(id: uuid(), installId: uuid(), name: '_player2', role: LEAD_AGENT.roleId),
         ],
         heists: [
-          new Heist(id: heistId, price: 12, numPlayers: 2, order: 1, startedAt: now()),
+          new Heist(
+              id: heistId, price: 12, numPlayers: 2, maximumBid: 5, order: 1, startedAt: now()),
         ],
         rounds: {
-          heistId: [new Round(id: uuid(), order: 1, heist: heistId, startedAt: now())]
+          heistId: [
+            new Round(id: uuid(), order: 1, heist: heistId, team: new Set(), startedAt: now())
+          ]
         });
     Store<GameModel> store = createStore(db);
 

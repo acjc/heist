@@ -1,4 +1,13 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/middleware/team_picker_middleware.dart';
+import 'package:heist/reducers/round_reducers.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'common.dart';
 
 Widget submitTeamButton(Store<GameModel> store, Set<String> teamIds, int playersRequired) {
   return new RaisedButton(
@@ -35,6 +44,21 @@ Widget teamPicker(Store<GameModel> store) {
       });
 }
 
+Widget playerTile(String playerName, bool isInTeam, Color color) => new Container(
+    alignment: Alignment.center,
+    decoration: new BoxDecoration(
+      border: new Border.all(color: color),
+      borderRadius: BorderRadius.circular(5.0),
+      color: isInTeam ? color : null,
+    ),
+    child: new Text(
+      playerName,
+      style: new TextStyle(
+        color: isInTeam ? Colors.white : Colors.black87,
+        fontSize: 16.0,
+      ),
+    ));
+
 List<Widget> teamPickerChildren(BuildContext context, Store<GameModel> store, Set<String> teamIds) {
   Color color = Theme.of(context).accentColor;
   String roundId = currentRound(store.state).id;
@@ -42,21 +66,9 @@ List<Widget> teamPickerChildren(BuildContext context, Store<GameModel> store, Se
   return new List.generate(players.length, (i) {
     Player player = players[i];
     bool isInTeam = teamIds.contains(player.id);
-    return new GestureDetector(
+    return new InkWell(
         onTap: () => onTap(store, roundId, player.id, isInTeam),
-        child: new Container(
-            alignment: Alignment.center,
-            decoration: new BoxDecoration(
-              border: new Border.all(color: color),
-              color: isInTeam ? color : null,
-            ),
-            child: new Text(
-              player.name,
-              style: new TextStyle(
-                color: isInTeam ? Colors.white : Colors.black87,
-                fontSize: 16.0,
-              ),
-            )));
+        child: playerTile(player.name, isInTeam, color));
   });
 }
 

@@ -1,4 +1,30 @@
-part of heist;
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/main.dart';
+import 'package:heist/middleware/game_middleware.dart';
+import 'package:heist/middleware/room_middleware.dart';
+import 'package:heist/middleware/team_picker_middleware.dart';
+import 'package:heist/reducers/reducers.dart';
+import 'package:heist/reducers/request_reducers.dart';
+import 'package:heist/reducers/subscription_reducers.dart';
+import 'package:heist/role.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:redux/redux.dart';
+
+import 'bidding.dart';
+import 'common.dart';
+import 'decision.dart';
+import 'endgame.dart';
+import 'game_history.dart';
+import 'gifting.dart';
+import 'heist_end.dart';
+import 'player_info.dart';
+import 'round_end.dart';
+import 'selection_board.dart';
+import 'team_picker.dart';
 
 class Game extends StatefulWidget {
   final Store<GameModel> _store;
@@ -28,8 +54,11 @@ class GameState extends State<Game> {
     super.dispose();
   }
 
-  Widget _loading() {
-    return centeredMessage('Loading...');
+  Widget _resolveEndgame(bool completingGame) {
+    if (!(getRoom(_store.state).completedAt == null) && !completingGame) {
+      _store.dispatch(new CompleteGameAction());
+    }
+    return endgame(_store);
   }
 
   Widget _resolveAuctionWinners(bool resolvingAuction) {
@@ -39,65 +68,72 @@ class GameState extends State<Game> {
     return centeredMessage('Resolving auction...');
   }
 
-  Widget biddingAndGifting(Store<GameModel> store) {
+  Widget _biddingAndGifting(Store<GameModel> store) {
     List<Widget> children = [bidding(store)];
     if (!isAuction(store.state)) {
-      children.add(selectionBoard());
+      children.add(selectionBoard(_store));
     }
     children.add(gifting(store));
     return new Column(children: children);
   }
 
+  Widget _gameLoop(MainBoardViewModel viewModel) {
+    // team picking (not needed for auctions)
+    if (!isAuction(_store.state) && viewModel.waitingForTeam) {
+      return isMyGo(_store.state) ? teamPicker(_store) : waitForTeam(_store);
+    }
+
+    // bidding
+    if (!viewModel.biddingComplete) {
+      return _biddingAndGifting(_store);
+    }
+
+    // resolve round
+    if (!viewModel.roundComplete) {
+      return roundEnd(_store);
+    }
+
+    // resolve auction
+    if (isAuction(_store.state) && viewModel.waitingForTeam) {
+      return _resolveAuctionWinners(viewModel.resolvingAuction);
+    }
+
+    // active heist
+    if (viewModel.heistIsActive) {
+      return goingOnHeist(_store.state) ? makeDecision(context, _store) : observeHeist(_store);
+    }
+
+    // go to next heist
+    if (viewModel.heistDecided && !viewModel.heistComplete) {
+      return heistEnd(_store);
+    }
+
+    return null;
+  }
+
   Widget _mainBoardBody() => new StoreConnector<GameModel, MainBoardViewModel>(
-      converter: (store) => new MainBoardViewModel._(
-            waitingForTeam: !currentRound(store.state).teamSubmitted,
-            biddingComplete: biddingComplete(store.state),
-            resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
-            roundComplete: currentRound(store.state).completed,
-            heistIsActive: heistIsActive(store.state),
-            heistDecided: heistDecided(store.state),
-            completingHeist: requestInProcess(store.state, Request.CompletingHeist),
-            heistComplete: currentHeist(store.state).completed,
-            creatingNewRound: requestInProcess(store.state, Request.CreatingNewRound),
-          ),
+      converter: (store) {
+        Heist heist = currentHeist(store.state);
+        Round round = currentRound(store.state);
+        return new MainBoardViewModel._(
+          waitingForTeam: !round.teamSubmitted,
+          biddingComplete: biddingComplete(store.state),
+          resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
+          roundComplete: round.complete,
+          heistIsActive: heistIsActive(store.state),
+          heistDecided: heist.allDecided,
+          heistComplete: heist.complete,
+        );
+      },
       distinct: true,
       builder: (context, viewModel) {
-        // team picking (not needed for auctions)
-        if (!isAuction(_store.state) && viewModel.waitingForTeam) {
-          return isMyGo(_store.state) ? teamPicker(_store) : waitForTeam(_store);
+        Widget child = _gameLoop(viewModel);
+        if (child == null) {
+          return loading();
         }
-
-        // bidding
-        if (!viewModel.biddingComplete) {
-          return biddingAndGifting(_store);
-        }
-
-        // resolve round
-        if (!viewModel.roundComplete) {
-          return roundEnd(_store);
-        }
-
-        // resolve auction
-        if (isAuction(_store.state) && viewModel.waitingForTeam) {
-          return _resolveAuctionWinners(viewModel.resolvingAuction);
-        }
-
-        // active heist
-        if (viewModel.heistIsActive) {
-          return goingOnHeist(_store.state) ? makeDecision(context, _store) : observeHeist(_store);
-        }
-
-        // go to next heist
-        if (heistDecided(_store.state) && !viewModel.heistComplete) {
-          // TODO: check if the game is over
-          return heistEnd(_store);
-        }
-
-        // go to next round
-        if (amOwner(_store.state) && !viewModel.creatingNewRound) {
-          _store.dispatch(new CreateNewRoundAction());
-        }
-        return centeredMessage('Loading next round...');
+        return new SingleChildScrollView(
+          child: child,
+        );
       });
 
   Widget _secretBoardBody() => new StoreConnector<GameModel, Player>(
@@ -133,7 +169,7 @@ class GameState extends State<Game> {
       ));
       basicTiles.add(new ListTile(
         title: new Text(
-          "${getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
+          "${_getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
           style: infoTextStyle,
         ),
       ));
@@ -142,7 +178,7 @@ class GameState extends State<Game> {
     return basicTiles;
   }
 
-  String getFormattedKnownIds(GameModel gameModel, Set<String> knownIds) {
+  String _getFormattedKnownIds(GameModel gameModel, Set<String> knownIds) {
     String formattedKnownIds = "";
     knownIds?.forEach((roleId) {
       formattedKnownIds +=
@@ -157,7 +193,7 @@ class GameState extends State<Game> {
         distinct: true,
         builder: (context, viewModel) {
           if (!viewModel.roomIsAvailable) {
-            return _loading();
+            return loading();
           }
 
           if (viewModel.waitingForPlayers) {
@@ -169,16 +205,33 @@ class GameState extends State<Game> {
             return centeredMessage('Assigning roles...');
           }
 
-          return _loading();
+          return loading();
         },
       );
 
-  Widget _mainBoard() => new StoreConnector<GameModel, bool>(
-      converter: (store) => gameIsReady(store.state),
+  Widget _mainBoard() => new StoreConnector<GameModel, GameActiveViewModel>(
+      converter: (store) => new GameActiveViewModel._(gameIsReady(store.state),
+          gameOver(store.state), requestInProcess(store.state, Request.CompletingGame)),
       distinct: true,
-      builder: (context, gameIsReady) => new Container(
-            child: gameIsReady ? _mainBoardBody() : _loadingScreen(),
-          ));
+      builder: (context, viewModel) {
+        if (!viewModel.gameIsReady) {
+          return _loadingScreen();
+        }
+        if (viewModel.gameOver) {
+          return _resolveEndgame(viewModel.completingGame);
+        }
+        return new Stack(
+          children: [
+            _mainBoardBody(),
+            new Positioned(
+              child: gameHistory(_store),
+              left: 0.0,
+              right: 0.0,
+              bottom: 0.0,
+            ),
+          ],
+        );
+      });
 
   Widget _secretBoard() => new StoreConnector<GameModel, bool>(
       converter: (store) => gameIsReady(store.state),
@@ -186,15 +239,6 @@ class GameState extends State<Game> {
       builder: (context, gameIsReady) => new Expanded(
             child: gameIsReady ? _secretBoardBody() : _loadingScreen(),
           ));
-
-  Widget _tabView() => new TabBarView(
-        children: [
-          new SingleChildScrollView(
-            child: new Column(children: [_mainBoard(), _gameHistory(_store)]),
-          ),
-          new Column(children: [_playerInfo(_store), _secretBoard()]),
-        ],
-      );
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +255,12 @@ class GameState extends State<Game> {
           ),
         ),
         endDrawer: isDebugMode() ? new Drawer(child: new ReduxDevTools<GameModel>(_store)) : null,
-        body: _tabView(),
+        body: new TabBarView(
+          children: [
+            _mainBoard(),
+            new Column(children: [playerInfo(_store), _secretBoard()]),
+          ],
+        ),
       ),
     );
   }
@@ -255,9 +304,7 @@ class MainBoardViewModel {
   final bool roundComplete;
   final bool heistIsActive;
   final bool heistDecided;
-  final bool completingHeist;
   final bool heistComplete;
-  final bool creatingNewRound;
 
   MainBoardViewModel._(
       {@required this.waitingForTeam,
@@ -266,23 +313,20 @@ class MainBoardViewModel {
       @required this.roundComplete,
       @required this.heistIsActive,
       @required this.heistDecided,
-      @required this.completingHeist,
-      @required this.heistComplete,
-      @required this.creatingNewRound});
+      @required this.heistComplete});
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is MainBoardViewModel &&
+          runtimeType == other.runtimeType &&
           waitingForTeam == other.waitingForTeam &&
           biddingComplete == other.biddingComplete &&
           resolvingAuction == other.resolvingAuction &&
           roundComplete == other.roundComplete &&
           heistIsActive == other.heistIsActive &&
           heistDecided == other.heistDecided &&
-          completingHeist == other.completingHeist &&
-          heistComplete == other.heistComplete &&
-          creatingNewRound == other.creatingNewRound;
+          heistComplete == other.heistComplete;
 
   @override
   int get hashCode =>
@@ -292,20 +336,42 @@ class MainBoardViewModel {
       roundComplete.hashCode ^
       heistIsActive.hashCode ^
       heistDecided.hashCode ^
-      completingHeist.hashCode ^
-      heistComplete.hashCode ^
-      creatingNewRound.hashCode;
+      heistComplete.hashCode;
 
   @override
   String toString() {
-    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, heistIsActive: $heistIsActive, heistDecided: $heistDecided, completingHeist: $completingHeist, heistComplete: $heistComplete, creatingNewRound: $creatingNewRound}';
+    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, heistIsActive: $heistIsActive, heistDecided: $heistDecided, heistComplete: $heistComplete}';
+  }
+}
+
+class GameActiveViewModel {
+  final bool gameIsReady;
+  final bool gameOver;
+  final bool completingGame;
+
+  GameActiveViewModel._(this.gameIsReady, this.gameOver, this.completingGame);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GameActiveViewModel &&
+          gameIsReady == other.gameIsReady &&
+          gameOver == other.gameOver &&
+          completingGame == other.completingGame;
+
+  @override
+  int get hashCode => gameIsReady.hashCode ^ gameOver.hashCode ^ completingGame.hashCode;
+
+  @override
+  String toString() {
+    return 'GameActiveViewModel{gameIsReady: $gameIsReady, gameOver: $gameOver, completingGame: $completingGame}';
   }
 }
 
 void resetGameStore(Store<GameModel> store) {
   store.dispatch(new ClearAllPendingRequestsAction());
   store.dispatch(new CancelSubscriptionsAction());
-  store.dispatch(new UpdateStateAction<Room>(new Room.initial()));
+  store.dispatch(new UpdateStateAction<Room>(new Room.initial(isDebugMode() ? 2 : minPlayers)));
   store.dispatch(new UpdateStateAction<List<Player>>([]));
   store.dispatch(new UpdateStateAction<List<Heist>>([]));
   store.dispatch(new UpdateStateAction<Map<Heist, List<Round>>>({}));

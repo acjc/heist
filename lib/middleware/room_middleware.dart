@@ -1,4 +1,17 @@
-part of heist;
+import 'dart:async';
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:heist/db/database_model.dart';
+import 'package:heist/main.dart';
+import 'package:heist/reducers/reducers.dart';
+import 'package:heist/selectors/selectors.dart';
+import 'package:heist/state.dart';
+import 'package:heist/widget/game.dart';
+import 'package:package_info/package_info.dart';
+import 'package:redux/redux.dart';
+
+import 'middleware.dart';
 
 class CreateRoomAction extends MiddlewareAction {
   Future<String> _createRoom(Store<GameModel> store, String code, String appVersion) {
@@ -6,7 +19,7 @@ class CreateRoomAction extends MiddlewareAction {
         code: code,
         createdAt: now(),
         appVersion: appVersion,
-        owner: installId(),
+        owner: getPlayerInstallId(store.state),
         numPlayers: store.state.room.numPlayers,
         roles: store.state.room.roles));
   }
@@ -51,4 +64,12 @@ class CreateRoomAction extends MiddlewareAction {
         new List.generate(4, (i) => _getCapitalLetterOrdinal(random), growable: false);
     return new String.fromCharCodes(ordinals);
   }
+}
+
+class CompleteGameAction extends MiddlewareAction {
+  @override
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) => withRequest(
+      Request.CompletingGame,
+      store,
+      (store) => store.state.db.completeGame(getRoom(store.state).id));
 }

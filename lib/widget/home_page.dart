@@ -14,7 +14,7 @@ class HomePage extends StatelessWidget {
   static const EdgeInsets _padding = const EdgeInsets.all(16.0);
 
   final _enterNameFormKey = new GlobalKey<FormState>();
-  final _enterRoomFormKey = new GlobalKey<FormState>();
+  final _enterCodeFormKey = new GlobalKey<FormState>();
 
   Widget _buildTitle(String title) {
     return new Container(
@@ -108,8 +108,8 @@ class HomePage extends StatelessWidget {
       ),
     );
 
-    Form enterRoomForm = new Form(
-        key: _enterRoomFormKey,
+    Form enterCodeForm = new Form(
+        key: _enterCodeFormKey,
         child: new TextFormField(
             initialValue: 'ABCD',
             decoration: new InputDecoration(
@@ -124,15 +124,15 @@ class HomePage extends StatelessWidget {
               new WhitelistingTextInputFormatter(_onlyLetters),
               _capitalFormatter,
             ],
-            // TODO: validate room exists and player was in it
             validator: (value) => value.length != 4 ? 'Invalid code' : null,
             onSaved: (value) => store.dispatch(new SetRoomCodeAction(value))));
 
     void _enterRoom() {
-      FormState enterRoomState = _enterRoomFormKey.currentState;
+      FormState enterCodeState = _enterCodeFormKey.currentState;
       FormState enterNameState = _enterNameFormKey.currentState;
-      if (enterRoomState.validate() && enterNameState.validate()) {
-        enterRoomState.save();
+      // TODO: Validate room exists and if the player was in the room before, else require a name
+      if (enterCodeState.validate() && enterNameState.validate()) {
+        enterCodeState.save();
         enterNameState.save();
         Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Game(store)));
       }
@@ -147,7 +147,7 @@ class HomePage extends StatelessWidget {
       padding: _padding,
       child: new Column(
         children: [
-          enterRoomForm,
+          enterCodeForm,
           enterRoomButton,
         ],
       ),

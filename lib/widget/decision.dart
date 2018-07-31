@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/db/database_model.dart';
+import 'package:heist/heist_definitions.dart';
+import 'package:heist/middleware/heist_middleware.dart';
+import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
-import 'package:heist/role.dart';
-import 'package:heist/middleware/heist_middleware.dart';
 
 import 'common.dart';
 
@@ -64,15 +65,15 @@ Widget makeDecision(BuildContext context, Store<GameModel> store) =>
             children.addAll([
               new Container(
                 padding: paddingSmall,
-                child: const Text('Make your choice', style: titleTextStyle),
+                child: const Text('Make your choice...', style: titleTextStyle),
               ),
-              decisionButton(context, store, 'SUCCEED'),
+              decisionButton(context, store, Succeed),
             ]);
-            if (me.role != 'KINGPIN') {
-              children.add(decisionButton(context, store, 'STEAL'));
+            if (me.role != KINGPIN.roleId) {
+              children.add(decisionButton(context, store, Steal));
             }
             if (getTeam(me.role) == Team.AGENTS) {
-              children.add(decisionButton(context, store, 'FAIL'));
+              children.add(decisionButton(context, store, Fail));
             }
           }
           return new Card(

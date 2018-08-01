@@ -31,6 +31,11 @@ class FirestoreDb {
     return await getRoomByCode(code) != null;
   }
 
+  Future<int> getNumPlayers(String roomId) async {
+    QuerySnapshot snapshot = await _playerQuery(roomId).getDocuments();
+    return snapshot.documents.length;
+  }
+
   Future<bool> playerExists(String roomId, String installId) async {
     QuerySnapshot snapshot =
         await _playerQuery(roomId).where('installId', isEqualTo: installId).getDocuments();

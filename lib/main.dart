@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
 import 'package:heist/db/database.dart';
 import 'package:heist/keys.dart';
 import 'package:heist/middleware/middleware.dart';
@@ -76,21 +75,15 @@ class MyApp extends StatelessWidget {
     return new StoreProvider(
       store: store,
       child: new MaterialApp(
-          navigatorKey: Keys.navigatorKey,
-          title: 'Heist',
-          theme: new ThemeData(
-            primaryColor: primaryColor,
-            buttonColor: primaryColor,
-            indicatorColor: Colors.white,
-          ),
-          home: new Scaffold(
-            appBar: new AppBar(
-              title: new Text("Heist"),
-            ),
-            endDrawer:
-                isDebugMode() ? new Drawer(child: new ReduxDevTools<GameModel>(store)) : null,
-            body: new HomePage(),
-          )),
+        navigatorKey: Keys.navigatorKey,
+        title: 'Heist',
+        theme: new ThemeData(
+          primaryColor: primaryColor,
+          buttonColor: primaryColor,
+          indicatorColor: Colors.white,
+        ),
+        home: new HomePage(),
+      ),
     );
   }
 }

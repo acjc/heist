@@ -9,3 +9,4 @@ ios/.generated/
 packages
 .flutter-plugins
 android/app/google-services.json
+android/key.properties

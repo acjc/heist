@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/main.dart';
 import 'package:heist/middleware/room_middleware.dart';
 import 'package:heist/reducers/player_reducers.dart';
 import 'package:heist/reducers/room_reducers.dart';
+import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
 
 import 'common.dart';
-import 'game.dart';
 
 class HomePage extends StatelessWidget {
-  static const EdgeInsets _padding = const EdgeInsets.all(16.0);
-
   final _enterNameFormKey = new GlobalKey<FormState>();
   final _enterCodeFormKey = new GlobalKey<FormState>();
 
   Widget _buildTitle(String title) {
     return new Container(
-      padding: _padding,
+      padding: paddingMedium,
       child: new Text(
         title,
         style: const TextStyle(fontSize: 16.0),
@@ -51,12 +50,10 @@ class HomePage extends StatelessWidget {
         converter: (store) => store.state.room.roles,
         builder: (context, Set<String> roles) {
           return new Container(
-            padding: _padding,
+            padding: paddingMedium,
             child: new Text(
               'Roles: ${roles?.toString()}',
-              style: const TextStyle(
-                fontSize: 16.0,
-              ),
+              style: infoTextStyle,
             ),
           );
         });
@@ -75,7 +72,7 @@ class HomePage extends StatelessWidget {
     Form enterNameForm = new Form(
         key: _enterNameFormKey,
         child: new TextFormField(
-            initialValue: 'Mordred',
+            initialValue: isDebugMode() ? 'Mordred' : null,
             decoration: new InputDecoration(
               labelText: 'Enter your name',
               isDense: true,
@@ -87,7 +84,7 @@ class HomePage extends StatelessWidget {
             onSaved: (value) => store.dispatch(new SetPlayerNameAction(value))));
 
     Widget createRoom = new Container(
-      padding: _padding,
+      padding: paddingMedium,
       child: new Column(
         children: [
           enterNameForm,
@@ -111,7 +108,7 @@ class HomePage extends StatelessWidget {
     Form enterCodeForm = new Form(
         key: _enterCodeFormKey,
         child: new TextFormField(
-            initialValue: 'ABCD',
+            initialValue: isDebugMode() ? 'ABCD' : null,
             decoration: new InputDecoration(
               labelText: 'Enter an existing room code',
               isDense: true,
@@ -130,11 +127,10 @@ class HomePage extends StatelessWidget {
     void _enterRoom() {
       FormState enterCodeState = _enterCodeFormKey.currentState;
       FormState enterNameState = _enterNameFormKey.currentState;
-      // TODO: Validate room exists and if the player was in the room before, else require a name
-      if (enterCodeState.validate() && enterNameState.validate()) {
+      if (enterCodeState.validate()) {
         enterCodeState.save();
         enterNameState.save();
-        Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Game(store)));
+        store.dispatch(new ValidateRoomAction(context));
       }
     }
 
@@ -144,7 +140,7 @@ class HomePage extends StatelessWidget {
     );
 
     Widget existingRoom = new Container(
-      padding: _padding,
+      padding: paddingMedium,
       child: new Column(
         children: [
           enterCodeForm,
@@ -153,8 +149,18 @@ class HomePage extends StatelessWidget {
       ),
     );
 
-    return new Column(
-      children: [createRoom, existingRoom],
+    return new StoreConnector<GameModel, bool>(
+      converter: (store) => requestInProcess(store.state, Request.ValidatingRoom),
+      distinct: true,
+      builder: (context, validatingRoom) {
+        if (validatingRoom) {
+          return loading();
+        }
+
+        return new Column(
+          children: [createRoom, existingRoom],
+        );
+      },
     );
   }
 }

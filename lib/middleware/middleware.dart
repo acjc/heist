@@ -15,6 +15,7 @@ import 'team_picker_middleware.dart';
 
 List<Middleware<GameModel>> createMiddleware() {
   List<Middleware<GameModel>> middleware = [
+    new TypedMiddleware<GameModel, ValidateRoomAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, CreateRoomAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, LoadGameAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, SetUpNewGameAction>(_dispatchMiddleware),

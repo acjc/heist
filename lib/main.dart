@@ -1,15 +1,19 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
+import 'package:heist/db/database.dart';
+import 'package:heist/keys.dart';
+import 'package:heist/middleware/middleware.dart';
+import 'package:heist/reducers/reducers.dart';
+import 'package:heist/state.dart';
+import 'package:heist/widget/home_page.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_dev_tools/redux_dev_tools.dart';
-
-import 'package:heist/state.dart';
-import 'package:heist/reducers/reducers.dart';
-import 'package:heist/middleware/middleware.dart';
-import 'package:heist/db/database.dart';
-import 'package:heist/widget/home_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 void main() => runApp(new MyApp(Firestore.instance));
 
@@ -20,8 +24,6 @@ const String PrefInstallId = 'INSTALL_ID';
 
 const String DebugInstallId = 'test_install_id';
 
-final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
-
 bool isDebugMode() {
   bool debugMode = false;
   assert(debugMode = true);
@@ -30,6 +32,20 @@ bool isDebugMode() {
 
 DateTime now() {
   return new DateTime.now().toUtc();
+}
+
+Future<String> installId() async {
+  if (isDebugMode()) {
+    return DebugInstallId;
+  }
+
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  String installId = preferences.getString(PrefInstallId);
+  if (installId == null) {
+    installId = new Uuid().v4();
+    await preferences.setString(PrefInstallId, installId);
+  }
+  return installId;
 }
 
 Store<GameModel> createStore(FirestoreDb db, [int numPlayers]) {
@@ -60,7 +76,7 @@ class MyApp extends StatelessWidget {
     return new StoreProvider(
       store: store,
       child: new MaterialApp(
-          navigatorKey: navigatorKey,
+          navigatorKey: Keys.navigatorKey,
           title: 'Heist',
           theme: new ThemeData(
             primaryColor: primaryColor,

@@ -17,6 +17,7 @@ final getPlayerInstallId = (GameModel gameModel) => gameModel.playerInstallId;
 final getPlayerName = (GameModel gameModel) => gameModel.playerName;
 final getBidAmount = (GameModel gameModel) => gameModel.bidAmount;
 final getGiftAmount = (GameModel gameModel) => gameModel.giftAmount;
+final getSubscriptions = (GameModel gameModel) => gameModel.subscriptions;
 final getRequests = (GameModel gameModel) => gameModel.requests;
 
 bool requestInProcess(GameModel gameModel, Request request) =>

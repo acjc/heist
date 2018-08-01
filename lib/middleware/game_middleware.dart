@@ -12,8 +12,6 @@ import 'package:heist/reducers/subscription_reducers.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 
 import 'middleware.dart';
 
@@ -143,28 +141,15 @@ class LoadGameAction extends MiddlewareAction {
   }
 
   void _addGameSetUpListener(Store<GameModel> store) {
-    store.onChange.takeWhile((gameModel) => !gameIsReady(gameModel)).listen(
-        (gameModel) => _setUpGame(store, gameModel),
-        onDone: () => _clearSetUpRequests(store),
-        onError: (e) => _clearSetUpRequests(store));
-  }
-
-  Future<String> _installId() async {
-    if (isDebugMode()) {
-      return DebugInstallId;
-    }
-
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String installId = preferences.getString(PrefInstallId);
-    if (installId == null) {
-      installId = new Uuid().v4();
-      await preferences.setString(PrefInstallId, installId);
-    }
-    return installId;
+    store.onChange
+        .takeWhile(
+            (gameModel) => getSubscriptions(gameModel).subs.isNotEmpty && !gameIsReady(gameModel))
+        .listen((gameModel) => _setUpGame(store, gameModel),
+            onDone: () => _clearSetUpRequests(store), onError: (e) => _clearSetUpRequests(store));
   }
 
   Future<void> loadGame(Store<GameModel> store) async {
-    store.dispatch(new SetPlayerInstallIdAction(await _installId()));
+    store.dispatch(new SetPlayerInstallIdAction(await installId()));
 
     FirestoreDb db = store.state.db;
     Room room = getRoom(store.state);

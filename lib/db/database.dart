@@ -37,6 +37,12 @@ class FirestoreDb {
     return snapshot.documents.isNotEmpty;
   }
 
+  Future<bool> playerExistsWithName(String roomId, String name) async {
+    QuerySnapshot snapshot =
+        await _playerQuery(roomId).where('name', isEqualTo: name).getDocuments();
+    return snapshot.documents.isNotEmpty;
+  }
+
   Future<Heist> getHeist(String roomId, int order) async {
     QuerySnapshot snapshot =
         await _heistQuery(roomId).where('order', isEqualTo: order).getDocuments();
@@ -63,7 +69,15 @@ class FirestoreDb {
       String roomRef, void onData(List<Player> players)) {
     return _playerQuery(roomRef).snapshots().map((snapshot) {
       List<Player> players = snapshot.documents.map((s) => new Player.fromSnapshot(s)).toList();
-      players.sort((p1, p2) => p1.order.compareTo(p2.order));
+      players.sort((p1, p2) {
+        if (p1.order == null) {
+          return -1;
+        }
+        if (p2.order == null) {
+          return 1;
+        }
+        return p1.order.compareTo(p2.order);
+      });
       return players;
     }).listen(onData);
   }

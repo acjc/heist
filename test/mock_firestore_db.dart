@@ -58,6 +58,11 @@ class MockFirestoreDb implements FirestoreDb {
     return new Future<bool>.value(false);
   }
 
+  @override
+  Future<bool> playerExistsWithName(String roomId, String name) {
+    return new Future<bool>.value(false);
+  }
+
   void _postRoom() {
     if (_roomStream != null && !_roomStream.isClosed && room != null) {
       _roomStream.add(room);

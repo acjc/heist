@@ -242,4 +242,13 @@ class MockFirestoreDb implements FirestoreDb {
   Future<void> completeGame(String id) {
     return upsertRoom(room.copyWith(completedAt: now()));
   }
+
+  @override
+  Future<void> addVisibleToAccountant(String id, String playerId) {
+    final Set<String> visibleToAccountant = room.visibleToAccountant != null
+        ? room.visibleToAccountant
+        : new Set();
+    visibleToAccountant.add(playerId);
+    return upsertRoom(room.copyWith(visibleToAccountant: visibleToAccountant));
+  }
 }

@@ -38,6 +38,8 @@ final Set<Role> allRoles = new Set.of([
 
 final Map<int, Set<Role>> numPlayersToRolesMap = {
   2: new Set.of([KINGPIN, LEAD_AGENT]),
+  3: new Set.of([KINGPIN, LEAD_AGENT, ACCOUNTANT]),
+  4: new Set.of([KINGPIN, LEAD_AGENT, ACCOUNTANT, AGENT_1]),
   5: new Set.of([ACCOUNTANT, KINGPIN, THIEF_1, LEAD_AGENT, AGENT_1]),
   6: new Set.of([ACCOUNTANT, KINGPIN, THIEF_1, THIEF_2, LEAD_AGENT, AGENT_1]),
   7: new Set.of([ACCOUNTANT, KINGPIN, THIEF_1, THIEF_2, LEAD_AGENT, AGENT_1, AGENT_2]),

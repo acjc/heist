@@ -77,6 +77,7 @@ class CreateRoomAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
     await withRequest(Request.ValidatingRoom, store, (store) async {
+      store.dispatch(new SetPlayerInstallIdAction(await installId()));
       String appVersion = await _getAppVersion();
       String code = await _newRoomCode(store);
       await _createRoom(store, code, appVersion);

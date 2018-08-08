@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:heist/db/database.dart';
 import 'package:heist/db/database_model.dart';
+import 'package:heist/heist_definitions.dart';
 import 'package:heist/main.dart';
 import 'package:heist/reducers/player_reducers.dart';
 import 'package:heist/reducers/reducers.dart';
@@ -67,16 +68,21 @@ class SetUpNewGameAction extends MiddlewareAction {
 
   Future<String> _createFirstHeist(Store<GameModel> store) async {
     FirestoreDb db = store.state.db;
-    String roomId = getRoom(store.state).id;
+    Room room = getRoom(store.state);
     List<Heist> heists = getHeists(store.state);
     if (heists.isEmpty) {
-      Heist heist = await db.getHeist(roomId, 1);
+      Heist heist = await db.getHeist(room.id, 1);
       if (heist != null) {
         return heist.id;
       }
-      Heist newHeist =
-          new Heist(price: 12, numPlayers: 2, maximumBid: 5, order: 1, startedAt: now());
-      return db.upsertHeist(newHeist, roomId);
+      HeistDefinition heistDefinition = heistDefinitions[room.numPlayers][1];
+      Heist newHeist = new Heist(
+          price: heistDefinition.price,
+          numPlayers: heistDefinition.numPlayers,
+          maximumBid: heistDefinition.maximumBid,
+          order: 1,
+          startedAt: now());
+      return db.upsertHeist(newHeist, room.id);
     }
     return heists[0].id;
   }
@@ -95,6 +101,7 @@ class SetUpNewGameAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
     _assignRoles(store);
+    // TODO: create all heists now to minimise how often we have to create new documents in the database
     String heistId = await _createFirstHeist(store);
     return _createFirstRound(store, heistId);
   }

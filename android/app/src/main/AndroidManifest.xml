@@ -14,7 +14,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="Heist"
+        android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
         android:isGame="true">
         <activity

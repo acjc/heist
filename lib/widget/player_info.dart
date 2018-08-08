@@ -18,15 +18,16 @@ Widget playerInfo(Store<GameModel> store) {
         }
         return new Card(
           elevation: 2.0,
-          child: new Container(
-            padding: paddingLarge,
+          child: new Padding(
+            padding: paddingMedium,
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 new Text(
-                  viewModel.me.name,
+                  '${viewModel.me.name} (${viewModel.me.order})',
                   style: infoTextStyle,
                 ),
+                new VerticalDivider(),
                 new Text(
                   viewModel.balance.toString(),
                   style: infoTextStyle,

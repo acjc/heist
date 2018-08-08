@@ -19,7 +19,7 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     lintOptions {
         disable 'InvalidPackage'
@@ -28,7 +28,7 @@ android {
     defaultConfig {
         applicationId "com.acjc.heist"
         minSdkVersion 19
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
         versionName "0.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -45,6 +45,19 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
+        }
+    }
+
+    flavorDimensions 'version'
+
+    productFlavors {
+        development {
+            dimension 'version'
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-debug'
+        }
+        production {
+            dimension 'version'
         }
     }
 }

@@ -5,6 +5,7 @@ import 'package:heist/keys.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/room_middleware.dart';
 import 'package:heist/reducers/room_reducers.dart';
+import 'package:heist/role.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
 import 'package:heist/widget/home_page.dart';
@@ -29,12 +30,14 @@ class CreateRoomPage extends StatelessWidget {
       builder: (context, Set<String> roles) => new Padding(
             padding: paddingMedium,
             child: new Column(
-              children: new List.generate(
-                  roles.length,
-                  (i) => new Text(
-                        roles.elementAt(i),
-                        style: infoTextStyle,
-                      )),
+              children: new List.generate(roles.length, (i) {
+                String roleId = roles.elementAt(i);
+                Color color = getTeam(roleId) == Team.THIEVES ? Colors.green : Colors.red;
+                return new Text(
+                  roleId,
+                  style: new TextStyle(fontSize: 16.0, color: color, fontWeight: FontWeight.bold),
+                );
+              }),
             ),
           ));
 

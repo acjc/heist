@@ -31,9 +31,11 @@ void main() {
             id: uuid(),
             code: 'ABCD',
             numPlayers: 2,
-            roles: new Set.of([KINGPIN.roleId, LEAD_AGENT.roleId, AGENT_1.roleId, THIEF_1.roleId])),
+            roles: new Set.of(
+                [KINGPIN.roleId, LEAD_AGENT.roleId, UNDERCOVER_AGENT_1.roleId, THIEF_1.roleId])),
         players: [
-          new Player(id: myId, installId: DebugInstallId, name: '_name', role: AGENT_1.roleId),
+          new Player(
+              id: myId, installId: DebugInstallId, name: '_name', role: UNDERCOVER_AGENT_1.roleId),
           kingpin,
           new Player(id: otherPlayer2, installId: uuid(), name: '_other2', role: LEAD_AGENT.roleId),
           new Player(id: otherPlayer3, installId: uuid(), name: '_other3', role: THIEF_1.roleId),

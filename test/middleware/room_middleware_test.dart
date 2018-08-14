@@ -30,7 +30,7 @@ void main() {
           KINGPIN.roleId,
           THIEF_1.roleId,
           LEAD_AGENT.roleId,
-          AGENT_1.roleId
+          UNDERCOVER_AGENT_1.roleId
         ]));
 
     // Call loadGame() manually to avoid some async calls that we call manually later in the test

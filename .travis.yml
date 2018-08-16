@@ -52,6 +52,7 @@ deploy:
   skip_cleanup: true
   on:
     all_branches: true
+    repo: acjc/heist
 
 cache:
   directories:

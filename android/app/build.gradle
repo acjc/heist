@@ -60,11 +60,11 @@ android {
             signingConfig signingConfigs.release
         }
     }
-    applicationVariants.all { variant ->
-        variant.outputs.all {
-            outputFileName = "heist-${variant.buildType.name}-${defaultConfig.versionName}-${commitId}.apk"
-        }
-    }
+//    applicationVariants.all { variant ->
+//        variant.outputs.all {
+//            outputFileName = "heist-${variant.buildType.name}-${defaultConfig.versionName}-${commitId}.apk"
+//        }
+//    }
 }
 
 flutter {

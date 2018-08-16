@@ -43,6 +43,9 @@ script:
   - ./flutter/bin/flutter test
   - ./flutter/bin/flutter build apk
 
+before_deploy:
+  - gem install dpl
+
 deploy:
   provider: script
   script: deploy.sh

@@ -18,7 +18,7 @@ int major = 0
 int minor = 0
 int patch = 1
 
-String commitId = System.getenv('TRAVIS_COMMIT') ?: 'local'
+String version = "$major.$minor.$patch"
 
 File keystorePropertiesFile = rootProject.file("key.properties")
 Properties keystoreProperties = new Properties()
@@ -38,7 +38,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         versionCode major * 1000000 + minor * 10000 + patch * 100
-        versionName "$major.$minor.$patch"
+        versionName version
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -60,11 +60,6 @@ android {
             signingConfig signingConfigs.release
         }
     }
-//    applicationVariants.all { variant ->
-//        variant.outputs.all {
-//            outputFileName = "heist-${variant.buildType.name}-${defaultConfig.versionName}-${commitId}.apk"
-//        }
-//    }
 }
 
 flutter {

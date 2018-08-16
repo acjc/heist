@@ -45,6 +45,7 @@ script:
 
 before_deploy:
   - gem install dpl
+  - ls ./build/app/outputs/apk/release
 
 deploy:
   provider: script

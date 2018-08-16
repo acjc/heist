@@ -18,9 +18,13 @@ int major = 0
 int minor = 0
 int patch = 1
 
+String commitId = System.getenv('TRAVIS_COMMIT') ?: 'local'
+
 File keystorePropertiesFile = rootProject.file("key.properties")
 Properties keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
 android {
     compileSdkVersion 28
@@ -33,35 +37,32 @@ android {
         applicationId "com.acjc.heist"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode (major * 1000000) + (minor * 10000) + (patch * 100)
+        versionCode major * 1000000 + minor * 10000 + patch * 100
         versionName "$major.$minor.$patch"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties.getProperty('keyAlias', System.getenv('ANDROID_KEY_ALIAS'))
+            keyPassword keystoreProperties.getProperty('keyPassword', System.getenv('ANDROID_KEY_PASSWORD'))
+            storeFile file(keystoreProperties.getProperty('storeFile', 'key.jks'))
+            storePassword keystoreProperties.getProperty('storePassword', System.getenv('ANDROID_KEY_PASSWORD'))
         }
     }
     buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-debug'
+            debuggable true
+        }
         release {
             signingConfig signingConfigs.release
         }
     }
-
-    flavorDimensions 'version'
-
-    productFlavors {
-        debug {
-            dimension 'version'
-            applicationIdSuffix '.debug'
-            versionNameSuffix '-debug'
-        }
-        production {
-            dimension 'version'
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "heist-${variant.buildType.name}-${defaultConfig.versionName}-${commitId}.apk"
         }
     }
 }
@@ -72,8 +73,8 @@ flutter {
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
 
 apply plugin: 'com.google.gms.google-services'

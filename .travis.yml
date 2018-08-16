@@ -51,6 +51,8 @@ deploy:
     secure: TjfPCdBv6SY/ljAMOKH8UJY8rQf9zDomDdPV0K96FVWbwm0X9oOeGC6Q3S3gI4QCzbeE/wnQa86oE6QMLDcVpMsq9iaXAKGvuQXbcxENFhAdGXmIAX4UhEk2uz/5R901iwY85t5MbrNuhZ4Swt0i80sHtTkueL03/wXpEWWFTzO0TJ6VN/Tzn8mm2EgPZlCOzGSTWeQ9ZPWovb88H8lWBmChw1cT5Zo6GPrbMO2uDpg1UwRQdMpp23NfIfJnKDeI8FhjNS0+6ODNLT+adNwqytwP4C0q1AaEubg3fZcAtk/2scofP7vOh7U1Hc4PSor7e+M6eyFOe4v4SCz6+sXwYSq8+0lfRPD5/uc7nNbc0gTXbwMb1RGkY+TqUPIYiXU/paAd/J2eEGXFXaMOwSt9RzO2In2Oa5yyChTaoj7g1Za6vAbX9EFH0R2D+p4PAfWDaoUQUKLUCVZ2kvaSoca7b7QsL4HNpTFuWvaRPYrQllHNGHz/vwMLn/jzMzglBbXCKcvhe3XIVbg/iSHs9peg/CgrJHf2zDCZSkwvhyg8fVL5/c89cyNKUq/6OcVj/cyFQYTXe4/HCGlLcdutpPt8L5CovlJDrGS3FNVhtjETixZwFrcph9GQloFcHHxE1SVCHvYDYErdYKiiXOtU/O2r2FjIj9fq23bKeKwtgQ+V1Bg=
   skip_cleanup: true
   local-dir: build/app/outputs/apk/release/
+  on:
+    all_branches: true
 
 cache:
   directories:

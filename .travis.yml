@@ -48,12 +48,12 @@ before_deploy:
   - ls ./build/app/outputs/apk/release
 
 deploy:
-  provider: script
-  script: bash deploy.sh
-  skip_cleanup: true
-  on:
-    all_branches: true
-    repo: acjc/heist
+  - provider: script
+    skip_cleanup: true
+    script: bash deploy.sh
+    on:
+      all_branches: true
+      repo: acjc/heist
 
 cache:
   directories:

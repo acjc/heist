@@ -12,13 +12,35 @@ addons:
       - libstdc++6
       - fonts-droid
 
+before_install:
+  - openssl aes-256-cbc -K $encrypted_c7a4618bb56c_key -iv $encrypted_c7a4618bb56c_iv -in secrets/google-services.json.enc -out android/app/google-services.json -d
+  - openssl aes-256-cbc -K $encrypted_c7a4618bb56c_key -iv $encrypted_c7a4618bb56c_iv -in secrets/GoogleService-Info.plist.enc -out ios/Runner/GoogleService-Info.plist -d
+  - openssl aes-256-cbc -K $encrypted_c7a4618bb56c_key -iv $encrypted_c7a4618bb56c_iv -in secrets/key.jks.enc -out android/key.jks -d
+
 before_script:
   - git clone https://github.com/flutter/flutter.git -b beta
   - ./flutter/bin/flutter doctor
 
 script:
   - ./flutter/bin/flutter test
+  - ./flutter/bin/flutter build apk
+
+deploy:
+  provider: gcs
+  access_key_id:
+    secure: r/C3yfbltQLrV7LprhxKet0G32JiWrPmGHnc/iNserjG57TJNBYC4tH0smNLb6cAPvEICbnIG2Hd7QttVAIrvWMrvqmuCQitvIVAtV0o5DjiqiLBjzz7HrhRHwSihwoPR+bZ+KFiHtZrEkBqOcsw/HtwyqeAHor+v3ivqacJhwcu2r3abaFY7RH+PGuXthLdCdnPQuedogyY9dSK62zqTmX/zuyWC+Y3umCr6K6sy/SAzpdNOdPW20v7DVdAqBr0yDePznDXW0ZKDO4TQKwPbbSJ1R5YL5SI6z+k7q3Z4FcUbn0IFCfJXJckiA0diULz86mAzV0UQ4adNX3m+G6v/xRJ3o2xJ3D3ufThK9Ts6ijIHpGiheRxUBOvkmca3g2wm0YbhExNWn+uzPdBeA3+rDYQK+zBR/M/Tq2zvUxSbCVQyup0fl94jVUxC40ZMT1dxuWJiuHeMDZwATG8nCRrDySq8f2Qd/FFpdfkNkwWCzNvV6Ld/fVowyQEcKbYxrQ+rqdbGbGqzfGdHsjj82G8WKyXRArapEUlvaQCIHXHOEQ4SkHBXqdXTB9CtpH6WJrZzcKiXXKEoHcWkB3fsL7Tx0a9tMPgVK02OfFZo1rTil7Vl46GPDIJKBjD8v8Rnsz/fKKxnWoNv6fVe1yUiIbsOvreb0topKrPNEPiNAWeji8=
+  secret_access_key:
+    secure: TjfPCdBv6SY/ljAMOKH8UJY8rQf9zDomDdPV0K96FVWbwm0X9oOeGC6Q3S3gI4QCzbeE/wnQa86oE6QMLDcVpMsq9iaXAKGvuQXbcxENFhAdGXmIAX4UhEk2uz/5R901iwY85t5MbrNuhZ4Swt0i80sHtTkueL03/wXpEWWFTzO0TJ6VN/Tzn8mm2EgPZlCOzGSTWeQ9ZPWovb88H8lWBmChw1cT5Zo6GPrbMO2uDpg1UwRQdMpp23NfIfJnKDeI8FhjNS0+6ODNLT+adNwqytwP4C0q1AaEubg3fZcAtk/2scofP7vOh7U1Hc4PSor7e+M6eyFOe4v4SCz6+sXwYSq8+0lfRPD5/uc7nNbc0gTXbwMb1RGkY+TqUPIYiXU/paAd/J2eEGXFXaMOwSt9RzO2In2Oa5yyChTaoj7g1Za6vAbX9EFH0R2D+p4PAfWDaoUQUKLUCVZ2kvaSoca7b7QsL4HNpTFuWvaRPYrQllHNGHz/vwMLn/jzMzglBbXCKcvhe3XIVbg/iSHs9peg/CgrJHf2zDCZSkwvhyg8fVL5/c89cyNKUq/6OcVj/cyFQYTXe4/HCGlLcdutpPt8L5CovlJDrGS3FNVhtjETixZwFrcph9GQloFcHHxE1SVCHvYDYErdYKiiXOtU/O2r2FjIj9fq23bKeKwtgQ+V1Bg=
+  skip_cleanup: true
+  local-dir: build/app/outputs/apk/release/
 
 cache:
   directories:
     - $HOME/.pub-cache
+
+env:
+  global:
+    # ANDROID_KEY_ALIAS
+    - secure: urbeGxpBLJMXjdhQ539Mh5PuJr8G3GXhWgn+aYDNWrlKbNUNb5DJKM5TyHiHtCIzlvPcOGFpPJDLkYJlyT/xd5Fq2o+IXGz18QOeidgJA/2r0IhbbEdzr/SgjQDyJrS4RffwHA6wY6THbof2YBVTf1ZB0H0n2xvkAZDwttV0pMPupFHioskb1j5DAvf3U/lhki+avQXIvdPoOU3yk/1WFZZowYbMDEkt5mzU3dc3XB0YncakDyQ0CCgzT66YbfnR0X3uLFo9Tbgvv9adrL+tHqziUW/q0j4gqp4N6ObTtkLK6//E003PFhG6manDUkA1mLtgmvxGsBVLZAS1ptx1lEgxm4dI2q+WhhLAsaU5n+F+EI3p2qBg0h5zbaaXdxaXiE+V7Y3zXkln8T3+Dp9BLByB7BQ2MDiYFrGANdZ+7TKWYupprTa79RHE5die/zmIz4HzoQeNcgQKoL5+253SbjWAZcI+qWYv7LT1bV8knPkku3Qk5/agKmrC+U+vevSDVkusLs/BcT68ahJTuiEqipPHMz9uJ7CMdmJ4O284HRb0/zTFdwQIL+Ayoms8OeG9dXIfNmSN80XKWUXWpjx5RlZXfdynhxGg4eno4UV5nSi+eB2ghPcLRDHNn9MNHuguWjK539VOPYIlJre7hDOYBJg6jQpxbJksz/CZTWDIzMc=
+    # ANDROID_KEY_PASSWORD
+    - secure: ilE3vr3e+hyG55BnFkTDopd8z38+gTOoYXz7FFYwjj0ykTQBvyGe83iSsJQb3QwIDTV+145f/APhwfVxpP4Wo+1+qyAZUP9P9oQL09ZfxnOItSadPel0QFQt0B5xOhHObMGRbipZh69kfoXOh+vAMtxoZvNDj5wMrfm+X72+JEXB0oAAo3Tr/D0pg2aPIA25PVqbs13hdnq99wlVWGMxdLYUDzBIRiqjTNpBFb/vl8NmJ8sSSw7C4J2W3vtUUeItoTMl+rM740OpeP8nHG5ukuBVF8vNgvWRcDSDrZ1rRiAg8c79yrLkNJrnFO4exMDkP3EfeNhir7C3ppLdNR52O5egw2vktdaEtK2RN5Ll9HcvtcaE9JxGiMbDXzssT5UwzkER9Fsfsya0YmZzfF9TiK/e4m8wUGcmyYnYUcc+voWr1Dw+p6SLjEacmribRMkCH0DvDLpTC04xJ5fLZaMI+IDBfIVSmlJTj+hBfJ/XE6bZ1sov9joE2HxSq/cf36p0YC1t/UG2M/s23hCZCBCKQ1FBePgAtH8uofYK28qonOIfgdNcI86PS8Aix8FoACX1LnG6iqnx4kx3Ku02x3mvACPPu66yNlxmDoMR90YCqwJ1d/Jqbu369/Jn4cM96sGuI+SKKG1maPcVWjOs28fAKVULRcK9R3VR5xCzJZ9VUC0=

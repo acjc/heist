@@ -18,9 +18,13 @@ int major = 0
 int minor = 0
 int patch = 1
 
+String commitId = System.getenv('TRAVIS_COMMIT') ?: 'local'
+
 File keystorePropertiesFile = rootProject.file("key.properties")
-Properties keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+if (keystorePropertiesFile.exists()) {
+    Properties keystoreProperties = new Properties()
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
 android {
     compileSdkVersion 28
@@ -33,35 +37,27 @@ android {
         applicationId "com.acjc.heist"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode (major * 1000000) + (minor * 10000) + (patch * 100)
+        versionCode major * 1000000 + minor * 10000 + patch * 100
         versionName "$major.$minor.$patch"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties ? keystoreProperties['keyAlias'] : System.getenv('ANDROID_KEY_ALIAS')
+            keyPassword keystoreProperties ? keystoreProperties['keyPassword'] : System.getenv('ANDROID_KEY_PASSWORD')
+            storeFile keystoreProperties ? file(keystoreProperties['storeFile']) : 'key.jks'
+            storePassword keystoreProperties ? keystoreProperties['storePassword'] : System.getenv('ANDROID_KEY_PASSWORD')
         }
     }
     buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
-    }
-
-    flavorDimensions 'version'
-
-    productFlavors {
         debug {
-            dimension 'version'
             applicationIdSuffix '.debug'
             versionNameSuffix '-debug'
+            debuggable true
         }
-        production {
-            dimension 'version'
+        release {
+            signingConfig signingConfigs.release
         }
     }
 }
@@ -72,8 +68,8 @@ flutter {
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
 
 apply plugin: 'com.google.gms.google-services'

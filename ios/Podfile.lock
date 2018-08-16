@@ -97,7 +97,7 @@ PODS:
 DEPENDENCIES:
   - cloud_firestore (from `Pods/.symlinks/plugins/cloud_firestore/ios`)
   - firebase_core (from `Pods/.symlinks/plugins/firebase_core/ios`)
-  - Flutter (from `Pods/.symlinks/flutter/ios`)
+  - Flutter (from `Pods/.symlinks/flutter/ios-release`)
   - package_info (from `Pods/.symlinks/plugins/package_info/ios`)
   - shared_preferences (from `Pods/.symlinks/plugins/shared_preferences/ios`)
 
@@ -127,7 +127,7 @@ EXTERNAL SOURCES:
   firebase_core:
     :path: Pods/.symlinks/plugins/firebase_core/ios
   Flutter:
-    :path: Pods/.symlinks/flutter/ios
+    :path: Pods/.symlinks/flutter/ios-release
   package_info:
     :path: Pods/.symlinks/plugins/package_info/ios
   shared_preferences:

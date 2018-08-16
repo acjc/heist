@@ -21,8 +21,8 @@ int patch = 1
 String commitId = System.getenv('TRAVIS_COMMIT') ?: 'local'
 
 File keystorePropertiesFile = rootProject.file("key.properties")
+Properties keystoreProperties = new Properties()
 if (keystorePropertiesFile.exists()) {
-    Properties keystoreProperties = new Properties()
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
@@ -44,10 +44,10 @@ android {
 
     signingConfigs {
         release {
-            keyAlias keystoreProperties ? keystoreProperties['keyAlias'] : System.getenv('ANDROID_KEY_ALIAS')
-            keyPassword keystoreProperties ? keystoreProperties['keyPassword'] : System.getenv('ANDROID_KEY_PASSWORD')
-            storeFile keystoreProperties ? file(keystoreProperties['storeFile']) : 'key.jks'
-            storePassword keystoreProperties ? keystoreProperties['storePassword'] : System.getenv('ANDROID_KEY_PASSWORD')
+            keyAlias keystoreProperties['keyAlias'] ?: System.getenv('ANDROID_KEY_ALIAS')
+            keyPassword keystoreProperties['keyPassword'] ?: System.getenv('ANDROID_KEY_PASSWORD')
+            storeFile file(keystoreProperties['storeFile'] ?: 'key.jks')
+            storePassword keystoreProperties['storePassword'] ?: System.getenv('ANDROID_KEY_PASSWORD')
         }
     }
     buildTypes {

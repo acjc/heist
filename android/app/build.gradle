@@ -44,10 +44,10 @@ android {
 
     signingConfigs {
         release {
-            keyAlias keystoreProperties['keyAlias'] ?: System.getenv('ANDROID_KEY_ALIAS')
-            keyPassword keystoreProperties['keyPassword'] ?: System.getenv('ANDROID_KEY_PASSWORD')
-            storeFile file(keystoreProperties['storeFile'] ?: 'key.jks')
-            storePassword keystoreProperties['storePassword'] ?: System.getenv('ANDROID_KEY_PASSWORD')
+            keyAlias keystoreProperties.getProperty('keyAlias', System.getenv('ANDROID_KEY_ALIAS'))
+            keyPassword keystoreProperties.getProperty('keyPassword', System.getenv('ANDROID_KEY_PASSWORD'))
+            storeFile file(keystoreProperties.getProperty('storeFile', 'key.jks'))
+            storePassword keystoreProperties.getProperty('storePassword', System.getenv('ANDROID_KEY_PASSWORD'))
         }
     }
     buildTypes {

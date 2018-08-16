@@ -13,9 +13,8 @@ addons:
       - fonts-droid
 
 before_install:
-  - openssl aes-256-cbc -K $encrypted_c7a4618bb56c_key -iv $encrypted_c7a4618bb56c_iv -in secrets/google-services.json.enc -out android/app/google-services.json -d
-  - openssl aes-256-cbc -K $encrypted_c7a4618bb56c_key -iv $encrypted_c7a4618bb56c_iv -in secrets/GoogleService-Info.plist.enc -out ios/Runner/GoogleService-Info.plist -d
-  - openssl aes-256-cbc -K $encrypted_c7a4618bb56c_key -iv $encrypted_c7a4618bb56c_iv -in secrets/key.jks.enc -out android/key.jks -d
+  - openssl aes-256-cbc -K $encrypted_c7a4618bb56c_key -iv $encrypted_c7a4618bb56c_iv -in secrets.tar.enc -out secrets.tar -d
+  - tar xvf secrets.tar
 
 before_script:
   - git clone https://github.com/flutter/flutter.git -b beta

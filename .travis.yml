@@ -50,7 +50,7 @@ deploy:
     skip_cleanup: true
     script: bash deploy.sh
     on:
-      all_branches: true
+      branch: master
       repo: acjc/heist
 
 cache:

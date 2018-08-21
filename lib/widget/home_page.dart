@@ -17,7 +17,7 @@ import 'common.dart';
 Widget enterNameForm(Store<GameModel> store, GlobalKey<FormState> key) => new Form(
     key: key,
     child: new TextFormField(
-        initialValue: isDebugMode() ? 'Mordred' : null,
+        initialValue: isDebugMode() ? 'Mordred' : getPlayerName(store.state),
         decoration: new InputDecoration(
           labelText: 'Enter your name',
           isDense: true,

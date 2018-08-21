@@ -84,6 +84,7 @@ Widget winner(Score score) => new Card(
       ),
     );
 
+// TODO: fix scrolling
 Widget endgame(Store<GameModel> store) {
   List<Heist> heists = getHeists(store.state);
   Score score = calculateScore(heists);

@@ -58,6 +58,7 @@ class ResolveAuctionWinnersAction extends MiddlewareAction {
       for (String playerId in winners) {
         await store.state.db.updateTeam(round.id, playerId, true);
       }
+      await store.state.db.submitTeam(round.id);
     });
   }
 }

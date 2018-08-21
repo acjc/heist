@@ -27,7 +27,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 27
 
     lintOptions {
         disable 'InvalidPackage'
@@ -36,7 +36,7 @@ android {
     defaultConfig {
         applicationId "com.acjc.heist"
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 27
         versionCode major * 1000000 + minor * 10000 + patch * 100
         versionName version
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

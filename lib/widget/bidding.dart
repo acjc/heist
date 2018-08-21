@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/db/database_model.dart';
@@ -9,7 +11,8 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget bidAmount(BuildContext context, Store<GameModel> store, int bidAmount) => new Row(
+Widget bidAmount(BuildContext context, Store<GameModel> store, int bidAmount, int balance) =>
+    new Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         iconWidget(context, Icons.arrow_back, () => store.dispatch(new DecrementBidAmountAction())),
@@ -20,8 +23,8 @@ Widget bidAmount(BuildContext context, Store<GameModel> store, int bidAmount) =>
         iconWidget(
             context,
             Icons.arrow_forward,
-            () => store.dispatch(new IncrementBidAmountAction(currentBalance(store.state),
-                isAuction(store.state) ? 999 : currentHeist(store.state).maximumBid))),
+            () => store.dispatch(new IncrementBidAmountAction(
+                balance, isAuction(store.state) ? 999 : currentHeist(store.state).maximumBid))),
       ],
     );
 
@@ -40,13 +43,16 @@ Widget cancelButton(BuildContext context, Store<GameModel> store, bool loading, 
 Widget bidding(Store<GameModel> store) {
   return StoreConnector<GameModel, BiddingViewModel>(
       converter: (store) => new BiddingViewModel._(
+          currentBalance(store.state),
           getBidAmount(store.state),
           requestInProcess(store.state, Request.Bidding),
           myCurrentBid(store.state),
           numBids(store.state)),
       distinct: true,
       builder: (context, viewModel) {
-        String currentBidAmount = viewModel.bid == null ? 'None' : viewModel.bid.amount.toString();
+        String currentBidAmount = viewModel.bid == null
+            ? 'None'
+            : min(viewModel.bid.amount, viewModel.balance).toString();
         Heist heist = currentHeist(store.state);
         bool auction = isAuction(store.state);
 
@@ -72,7 +78,7 @@ Widget bidding(Store<GameModel> store) {
               style: infoTextStyle),
           new Text('Your bid: $currentBidAmount', style: infoTextStyle),
           new Text('Maximum bid: $maximumBid', style: infoTextStyle),
-          bidAmount(context, store, viewModel.bidAmount),
+          bidAmount(context, store, viewModel.bidAmount, viewModel.balance),
           new Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
             cancelButton(context, store, viewModel.loading, viewModel.bid),
             submitButton(store, viewModel.loading, viewModel.bidAmount),
@@ -91,27 +97,31 @@ Widget bidding(Store<GameModel> store) {
 }
 
 class BiddingViewModel {
+  final int balance;
   final int bidAmount;
   final bool loading;
   final Bid bid;
   final int numBids;
 
-  BiddingViewModel._(this.bidAmount, this.loading, this.bid, this.numBids);
+  BiddingViewModel._(this.balance, this.bidAmount, this.loading, this.bid, this.numBids);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is BiddingViewModel &&
+          runtimeType == other.runtimeType &&
+          balance == other.balance &&
           bidAmount == other.bidAmount &&
           loading == other.loading &&
           bid == other.bid &&
           numBids == other.numBids;
 
   @override
-  int get hashCode => bidAmount.hashCode ^ loading.hashCode ^ bid.hashCode ^ numBids.hashCode;
+  int get hashCode =>
+      balance.hashCode ^ bidAmount.hashCode ^ loading.hashCode ^ bid.hashCode ^ numBids.hashCode;
 
   @override
   String toString() {
-    return 'BiddingViewModel{bidAmount: $bidAmount, loading: $loading, bid: $bid, numBids: $numBids}';
+    return 'BiddingViewModel{balance: $balance, bidAmount: $bidAmount, loading: $loading, bid: $bid, numBids: $numBids}';
   }
 }

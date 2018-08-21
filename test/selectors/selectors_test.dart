@@ -81,7 +81,7 @@ void main() {
                 heist: heistId2,
                 team: new Set(),
                 gifts: {myId: new Gift(amount: 3, recipient: kingpinId)},
-                bids: {myId: new Bid(11)},
+                bids: {myId: new Bid(2)},
                 startedAt: now())
           ]
         });
@@ -89,7 +89,7 @@ void main() {
 
     await handle(store, new LoadGameAction());
 
-    expect(currentBalance(store.state), 5);
+    expect(currentBalance(store.state), 3);
     expect(calculateBalanceFromStore(store, kingpin), 7);
   });
 

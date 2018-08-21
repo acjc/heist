@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/db/database_model.dart';
@@ -9,7 +11,8 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget giftAmount(BuildContext context, Store<GameModel> store, int giftAmount) => new Row(
+Widget giftAmount(BuildContext context, Store<GameModel> store, int giftAmount, int balance) =>
+    new Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         iconWidget(
@@ -19,7 +22,7 @@ Widget giftAmount(BuildContext context, Store<GameModel> store, int giftAmount) 
               fontSize: 32.0,
             )),
         iconWidget(context, Icons.arrow_forward,
-            () => store.dispatch(new IncrementGiftAmountAction(currentBalance(store.state)))),
+            () => store.dispatch(new IncrementGiftAmountAction(balance))),
       ],
     );
 
@@ -44,8 +47,11 @@ Widget recipientSelection(Store<GameModel> store, int giftAmount, bool loading) 
 }
 
 Widget gifting(Store<GameModel> store) => new StoreConnector<GameModel, GiftingViewModel>(
-    converter: (store) => new GiftingViewModel._(myCurrentGift(store.state),
-        getGiftAmount(store.state), requestInProcess(store.state, Request.Gifting)),
+    converter: (store) => new GiftingViewModel._(
+        currentBalance(store.state),
+        myCurrentGift(store.state),
+        getGiftAmount(store.state),
+        requestInProcess(store.state, Request.Gifting)),
     distinct: true,
     builder: (context, viewModel) {
       List<Widget> children = [
@@ -64,7 +70,8 @@ Widget gifting(Store<GameModel> store) => new StoreConnector<GameModel, GiftingV
                 style: infoTextStyle)));
       } else {
         children.addAll([
-          giftAmount(context, store, viewModel.giftAmount),
+          giftAmount(
+              context, store, min(viewModel.giftAmount, viewModel.balance), viewModel.balance),
           const Text('Choose a player to send a gift to:', style: infoTextStyle),
           recipientSelection(store, viewModel.giftAmount, viewModel.loading),
         ]);
@@ -81,25 +88,28 @@ Widget gifting(Store<GameModel> store) => new StoreConnector<GameModel, GiftingV
     });
 
 class GiftingViewModel {
+  final int balance;
   final Gift gift;
   final int giftAmount;
   final bool loading;
 
-  GiftingViewModel._(this.gift, this.giftAmount, this.loading);
+  GiftingViewModel._(this.balance, this.gift, this.giftAmount, this.loading);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is GiftingViewModel &&
+          runtimeType == other.runtimeType &&
+          balance == other.balance &&
           gift == other.gift &&
           giftAmount == other.giftAmount &&
           loading == other.loading;
 
   @override
-  int get hashCode => gift.hashCode ^ giftAmount.hashCode ^ loading.hashCode;
+  int get hashCode => balance.hashCode ^ gift.hashCode ^ giftAmount.hashCode ^ loading.hashCode;
 
   @override
   String toString() {
-    return 'GiftingViewModel{gift: $gift, giftAmount: $giftAmount, loading: $loading}';
+    return 'GiftingViewModel{balance: $balance, gift: $gift, giftAmount: $giftAmount, loading: $loading}';
   }
 }

@@ -28,13 +28,14 @@ Widget heistDecisions(Heist heist) {
   );
 }
 
+// TODO: for current heist, show which round it is
 Widget heistPopup(Store<GameModel> store, Heist heist, int order) {
   int totalPlayers = getRoom(store.state).numPlayers;
   int price = heist?.price ?? heistDefinitions[totalPlayers][order].price;
   int numPlayers = heist?.numPlayers ?? heistDefinitions[totalPlayers][order].numPlayers;
   int maximumBid = heist?.maximumBid ?? heistDefinitions[totalPlayers][order].maximumBid;
   Round lastRound = heist != null ? getRounds(store.state)[heist.id].last : null;
-  int pot = lastRound?.pot ?? null;
+  int pot = lastRound != null && lastRound.bids.length == numPlayers ? lastRound.pot : null;
 
   List<Widget> heistDetails = [
     new Chip(
@@ -121,7 +122,7 @@ Widget gameHistory(Store<GameModel> store) {
                 return new InkWell(
                   onTap: () {
                     return showModalBottomSheet(
-                        context: context, builder: (context) => heistPopup(store, heist, i));
+                        context: context, builder: (context) => heistPopup(store, heist, i + 1));
                   },
                   child: new Container(
                     padding: paddingMedium,

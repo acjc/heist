@@ -42,18 +42,20 @@ class Room extends Document {
   final int numPlayers;
   final Set<String> roles;
   final Set<String> visibleToAccountant;
+  final bool kingpinGuessed;
 
-  Room(
-      {id,
-      this.code,
-      this.createdAt,
-      this.appVersion,
-      this.owner,
-      this.completedAt,
-      @required this.numPlayers,
-      @required this.roles,
-      this.visibleToAccountant})
-      : super(id: id);
+  Room({
+    id,
+    this.code,
+    this.createdAt,
+    this.appVersion,
+    this.owner,
+    this.completedAt,
+    @required this.numPlayers,
+    @required this.roles,
+    this.visibleToAccountant,
+    this.kingpinGuessed,
+  }) : super(id: id);
 
   factory Room.initial(int numPlayers) =>
       Room(numPlayers: numPlayers, roles: getRoleIds(numPlayersToRolesMap[numPlayers]));
@@ -68,6 +70,7 @@ class Room extends Document {
     int numPlayers,
     Set<String> roles,
     Set<String> visibleToAccountant,
+    bool kingpinGuessed,
   }) {
     return new Room(
       id: id ?? this.id,
@@ -79,6 +82,7 @@ class Room extends Document {
       numPlayers: numPlayers ?? this.numPlayers,
       roles: roles ?? this.roles,
       visibleToAccountant: visibleToAccountant ?? this.visibleToAccountant,
+      kingpinGuessed: kingpinGuessed ?? this.kingpinGuessed,
     );
   }
 
@@ -93,6 +97,7 @@ class Room extends Document {
         numPlayers = json['numPlayers'],
         roles = _boolMapToSet(json['roles']?.cast<String, bool>()),
         visibleToAccountant = _boolMapToSet(json['visibleToAccountant']?.cast<String, bool>()),
+        kingpinGuessed = json['kingpinGuessed'],
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -104,6 +109,7 @@ class Room extends Document {
         'numPlayers': numPlayers,
         'roles': _toBoolMap(roles, getRoleIds(allRoles)),
         'visibleToAccountant': _toBoolMap(visibleToAccountant, visibleToAccountant),
+        'kingpinGuessed': kingpinGuessed,
       };
 
   @override
@@ -115,15 +121,22 @@ class Room extends Document {
           numPlayers == other.numPlayers &&
           roles == other.roles &&
           completedAt == other.completedAt &&
-          visibleToAccountant == other.visibleToAccountant;
+          visibleToAccountant == other.visibleToAccountant &&
+          kingpinGuessed == other.kingpinGuessed;
 
   @override
   int get hashCode =>
-      id.hashCode ^ code.hashCode ^ numPlayers.hashCode ^ roles.hashCode ^ completedAt.hashCode ^ visibleToAccountant.hashCode;
+      id.hashCode ^
+      code.hashCode ^
+      numPlayers.hashCode ^
+      roles.hashCode ^
+      completedAt.hashCode ^
+      visibleToAccountant.hashCode ^
+      kingpinGuessed.hashCode;
 
   @override
   String toString() {
-    return 'Room{id: $id, code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles, visibleToAccountant: $visibleToAccountant}';
+    return 'Room{code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles, visibleToAccountant: $visibleToAccountant, kingpinGuessed: $kingpinGuessed}';
   }
 }
 
@@ -215,8 +228,6 @@ class Heist extends Document {
   final DateTime startedAt;
   final Map<String, String> decisions;
   final DateTime completedAt;
-
-  // TODO: include Kingpin guesses
 
   Heist(
       {id,

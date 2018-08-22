@@ -220,6 +220,13 @@ class FirestoreDb {
     return _updateRoom(id, data);
   }
 
+  Future<void> guessKingpin(String id, bool correct) {
+    Map<String, dynamic> data = {
+      'kingpinGuessed': correct,
+    };
+    return _updateRoom(id, data);
+  }
+
   Future<void> _updateHeist(String heistId, Map<String, dynamic> data) {
     return _firestore.collection('heists').document(heistId).setData(data, merge: true);
   }

@@ -32,6 +32,7 @@ List<Middleware<GameModel>> createMiddleware() {
     new TypedMiddleware<GameModel, CompleteHeistAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, CompleteGameAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, AddVisibleToAccountantAction>(_dispatchMiddleware),
+    new TypedMiddleware<GameModel, GuessKingpinAction>(_dispatchMiddleware),
   ];
 
   // asserts only work in debug mode

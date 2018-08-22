@@ -137,3 +137,15 @@ class AddVisibleToAccountantAction extends MiddlewareAction {
     return store.state.db.addVisibleToAccountant(getRoom(store.state).id, playerId);
   }
 }
+
+class GuessKingpinAction extends MiddlewareAction {
+  final bool correct;
+
+  GuessKingpinAction(this.correct);
+
+  @override
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
+    return withRequest(Request.GuessingKingpin, store,
+        (store) => store.state.db.guessKingpin(getRoom(store.state).id, correct));
+  }
+}

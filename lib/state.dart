@@ -128,4 +128,5 @@ enum Request {
   CompletingHeist,
   CompletingRound,
   CompletingGame,
+  GuessingKingpin,
 }

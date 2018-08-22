@@ -13,4 +13,4 @@ final Selector<GameModel, bool> biddingComplete =
 final Selector<GameModel, Bid> myCurrentBid =
     createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.bids[me.id]);
 
-final isAuction = (GameModel gameModel) => currentRound(gameModel).order == 5;
+final isAuction = (GameModel gameModel) => currentRound(gameModel).isAuction;

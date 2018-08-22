@@ -40,8 +40,9 @@ Widget recipientSelection(Store<GameModel> store, int giftAmount, bool loading) 
         Player player = otherPlayers[i];
         return new RaisedButton(
           child: new Text(player.name, style: buttonTextStyle),
-          onPressed:
-              loading ? null : () => store.dispatch(new SendGiftAction(player.id, giftAmount)),
+          onPressed: loading || giftAmount <= 0
+              ? null
+              : () => store.dispatch(new SendGiftAction(player.id, giftAmount)),
         );
       }));
 }

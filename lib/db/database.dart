@@ -220,9 +220,9 @@ class FirestoreDb {
     return _updateRoom(id, data);
   }
 
-  Future<void> guessKingpin(String id, bool correct) {
+  Future<void> guessKingpin(String id, String playerId) {
     Map<String, dynamic> data = {
-      'kingpinGuessed': correct,
+      'kingpinGuessed': playerId,
     };
     return _updateRoom(id, data);
   }

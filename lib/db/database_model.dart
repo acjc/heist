@@ -42,7 +42,7 @@ class Room extends Document {
   final int numPlayers;
   final Set<String> roles;
   final Set<String> visibleToAccountant;
-  final bool kingpinGuessed;
+  final String kingpinGuess; // player ID
 
   Room({
     id,
@@ -54,7 +54,7 @@ class Room extends Document {
     @required this.numPlayers,
     @required this.roles,
     this.visibleToAccountant,
-    this.kingpinGuessed,
+    this.kingpinGuess,
   }) : super(id: id);
 
   factory Room.initial(int numPlayers) =>
@@ -70,7 +70,7 @@ class Room extends Document {
     int numPlayers,
     Set<String> roles,
     Set<String> visibleToAccountant,
-    bool kingpinGuessed,
+    String kingpinGuess,
   }) {
     return new Room(
       id: id ?? this.id,
@@ -82,7 +82,7 @@ class Room extends Document {
       numPlayers: numPlayers ?? this.numPlayers,
       roles: roles ?? this.roles,
       visibleToAccountant: visibleToAccountant ?? this.visibleToAccountant,
-      kingpinGuessed: kingpinGuessed ?? this.kingpinGuessed,
+      kingpinGuess: kingpinGuess ?? this.kingpinGuess,
     );
   }
 
@@ -97,7 +97,7 @@ class Room extends Document {
         numPlayers = json['numPlayers'],
         roles = _boolMapToSet(json['roles']?.cast<String, bool>()),
         visibleToAccountant = _boolMapToSet(json['visibleToAccountant']?.cast<String, bool>()),
-        kingpinGuessed = json['kingpinGuessed'],
+        kingpinGuess = json['kingpinGuess'],
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -109,7 +109,7 @@ class Room extends Document {
         'numPlayers': numPlayers,
         'roles': _toBoolMap(roles, getRoleIds(allRoles)),
         'visibleToAccountant': _toBoolMap(visibleToAccountant, visibleToAccountant),
-        'kingpinGuessed': kingpinGuessed,
+        'kingpinGuessed': kingpinGuess,
       };
 
   @override
@@ -122,7 +122,7 @@ class Room extends Document {
           roles == other.roles &&
           completedAt == other.completedAt &&
           visibleToAccountant == other.visibleToAccountant &&
-          kingpinGuessed == other.kingpinGuessed;
+          kingpinGuess == other.kingpinGuess;
 
   @override
   int get hashCode =>
@@ -132,11 +132,11 @@ class Room extends Document {
       roles.hashCode ^
       completedAt.hashCode ^
       visibleToAccountant.hashCode ^
-      kingpinGuessed.hashCode;
+      kingpinGuess.hashCode;
 
   @override
   String toString() {
-    return 'Room{code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles, visibleToAccountant: $visibleToAccountant, kingpinGuessed: $kingpinGuessed}';
+    return 'Room{code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles, visibleToAccountant: $visibleToAccountant, kingpinGuess: $kingpinGuess}';
   }
 }
 

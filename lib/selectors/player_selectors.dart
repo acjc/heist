@@ -28,8 +28,8 @@ final Selector<GameModel, List<Player>> getOtherPlayers = createSelector2(getPla
 final Selector<GameModel, bool> amOwner = createSelector2(
     getRoom, getPlayerInstallId, (Room room, String installId) => room.owner == installId);
 
-final getKingpin = (GameModel gameModel) =>
-    getPlayers(gameModel).singleWhere((p) => p.role == KINGPIN.roleId, orElse: null);
+final getKingpin =
+    (GameModel gameModel) => getPlayers(gameModel).singleWhere((p) => p.role == KINGPIN.roleId);
 
 final Selector<GameModel, bool> haveGuessedKingpin = createSelector3(
     getSelf,

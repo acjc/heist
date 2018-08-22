@@ -117,7 +117,7 @@ final getTeam = (String roleId) => allRoles.singleWhere((r) => r.roleId == roleI
 
 final getKnownIds = (String roleId) => allRoles.singleWhere((r) => r.roleId == roleId).knownIds;
 
-final getDisplayName =
+final getRoleDisplayName =
     (String roleId) => allRoles.singleWhere((r) => r.roleId == roleId).displayName;
 
 @immutable

@@ -153,7 +153,7 @@ class GameState extends State<Game> {
       ),
       new ListTile(
         title: new Text(
-          "Your role is ${getDisplayName(me.role)}",
+          "Your role is ${getRoleDisplayName(me.role)}",
           style: infoTextStyle,
         ),
       ),
@@ -182,8 +182,10 @@ class GameState extends State<Game> {
   String _getFormattedKnownIds(GameModel gameModel, Set<String> knownIds) {
     String formattedKnownIds = "";
     knownIds?.forEach((roleId) {
-      formattedKnownIds +=
-          getPlayerByRoleId(gameModel, roleId).name + " is the " + getDisplayName(roleId) + "\n";
+      formattedKnownIds += getPlayerByRoleId(gameModel, roleId).name +
+          " is the " +
+          getRoleDisplayName(roleId) +
+          "\n";
     });
     return formattedKnownIds;
   }

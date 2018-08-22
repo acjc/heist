@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 const EdgeInsets paddingLarge = const EdgeInsets.all(24.0);
 const EdgeInsets paddingMedium = const EdgeInsets.all(16.0);
 const EdgeInsets paddingSmall = const EdgeInsets.all(12.0);
+const EdgeInsets paddingTiny = const EdgeInsets.all(8.0);
 const EdgeInsets paddingTitle = const EdgeInsets.only(bottom: 12.0);
 
 const TextStyle infoTextStyle = const TextStyle(fontSize: 16.0);
 const TextStyle titleTextStyle = const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
+const TextStyle subtitleTextStyle = const TextStyle(color: Colors.black54);
 const TextStyle buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
 const TextStyle chipTextStyle = const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
 

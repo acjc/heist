@@ -41,6 +41,7 @@ class Game extends StatefulWidget {
 
 class GameState extends State<Game> {
   final Store<GameModel> _store;
+  String _kingpinGuess;
 
   GameState(this._store);
 
@@ -144,12 +145,15 @@ class GameState extends State<Game> {
 
   Widget _secretBoardBody() => new StoreConnector<GameModel, SecretBoardModel>(
       converter: (store) => new SecretBoardModel._(
-          getSelf(store.state), getRoom(_store.state).visibleToAccountant, getRounds(_store.state)),
+          getSelf(store.state),
+          getRoom(_store.state).visibleToAccountant,
+          getRounds(_store.state),
+          requestInProcess(store.state, Request.GuessingKingpin)),
       distinct: true,
       builder: (context, me) =>
-          new Card(elevation: 2.0, child: new Column(children: getSecretListTiles(me.player))));
+          new Card(elevation: 2.0, child: new Column(children: getSecretListTiles(me.player, me.guessingKingpin))));
 
-  List<Widget> getSecretListTiles(Player me) {
+  List<Widget> getSecretListTiles(Player me, bool guessingKingpin) {
     List<Widget> basicTiles = [
       new ListTile(
         title: new Text(
@@ -183,6 +187,9 @@ class GameState extends State<Game> {
 
     // show the balances the accountant knows, if needed
     _addAccountantTiles(me, basicTiles);
+
+    // show the UI to guess the kingpin, if needed
+    _addLeadAgentTiles(me, basicTiles, guessingKingpin);
 
     return basicTiles;
   }
@@ -237,6 +244,60 @@ class GameState extends State<Game> {
                     new AddVisibleToAccountantAction(getPlayerByName(_store.state, newValue).id));
               });
             }));
+      }
+    }
+  }
+
+  _addLeadAgentTiles(final Player me, final List<Widget> basicTiles, final bool guessingKingpin) {
+    if (me.role == LEAD_AGENT.roleId) {
+      // the lead agent can try to guess who the kingpin is once during a game
+      basicTiles.add(
+        new ListTile(
+          title: new Text(
+                'You can try to guess who the kingpin is once during the game.'
+                ' If you get it right, your bids can be higher than the maximum'
+                ' bid from then on.',
+            style: infoTextStyle,
+          ),
+        ),
+      );
+
+      if (getRoom(_store.state).kingpinGuess == null) {
+        List<String> pickablePlayers = getPlayers(_store.state)
+            .where((p) => p.id != me.id)
+            .map((p) => p.name)
+            .toList();
+        basicTiles.add(new DropdownButton<String>(
+            hint: new Text('SELECT YOUR KINGPIN GUESS', style: infoTextStyle),
+            value: _kingpinGuess,
+            items: pickablePlayers.map((String value) {
+              return new DropdownMenuItem<String>(
+                value: value,
+                child: new Text(value),
+              );
+            }).toList(),
+            onChanged: (String newValue) {
+              setState(() {
+                _kingpinGuess = newValue;
+              });
+            }));
+        basicTiles.add(new RaisedButton(
+            child: const Text('CONFIRM GUESS', style: buttonTextStyle),
+            onPressed: guessingKingpin
+                ? null
+                : () => _store.dispatch(new GuessKingpinAction(getPlayerByName(_store.state, _kingpinGuess).id))));
+      } else {
+        final String kingpinGuessId = getRoom(_store.state).kingpinGuess;
+        final String kingpinGuessName = getPlayerById(_store.state, kingpinGuessId).name;
+        final String result = haveGuessedKingpin(_store.state) ? 'RIGHT!!!' : 'WRONG :(';
+        basicTiles.add(
+          new ListTile(
+            title: new Text(
+              'You checked if $kingpinGuessName is the kingpin. This is $result',
+              style: infoTextStyle,
+            ),
+          ),
+        );
       }
     }
   }
@@ -436,8 +497,9 @@ class SecretBoardModel {
   final Player player;
   final Set<String> visibleToAccountant;
   final Map<String, List<Round>> rounds;
+  final bool guessingKingpin;
 
-  SecretBoardModel._(this.player, this.visibleToAccountant, this.rounds);
+  SecretBoardModel._(this.player, this.visibleToAccountant, this.rounds, this.guessingKingpin);
 
   @override
   bool operator ==(Object other) =>

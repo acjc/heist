@@ -222,7 +222,7 @@ class FirestoreDb {
 
   Future<void> guessKingpin(String id, String playerId) {
     Map<String, dynamic> data = {
-      'kingpinGuessed': playerId,
+      'kingpinGuess': playerId,
     };
     return _updateRoom(id, data);
   }

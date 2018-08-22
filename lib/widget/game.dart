@@ -84,7 +84,6 @@ class GameState extends State<Game> {
     return new Column(children: children);
   }
 
-  // TODO: for current heist, show which round it is
   Widget _gameLoop(MainBoardViewModel viewModel) {
     // team picking (not needed for auctions)
     if (!isAuction(_store.state) && viewModel.waitingForTeam) {

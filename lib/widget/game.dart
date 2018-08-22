@@ -152,62 +152,84 @@ class GameState extends State<Game> {
           requestInProcess(store.state, Request.GuessingKingpin),
           requestInProcess(store.state, Request.SelectingVisibleToAccountant)),
       distinct: true,
-      builder: (context, me) =>
-          new Card(
-              elevation: 2.0,
-              child: new Column(
-                  children: getSecretListTiles(me.player, me.guessingKingpin, me.selectingVisibleToAccountant))));
+      builder: (context, me) {
+        List<Widget> children = [
+          _getTeamAndRoleCard(me.player),
+        ];
 
-  List<Widget> getSecretListTiles(Player me, bool guessingKingpin, bool selectingVisibleToAccountant) {
-    List<Widget> basicTiles = [
-      new ListTile(
-        title: new Text(
-          "You are in team ${getTeam(me.role).toString()}",
-          style: infoTextStyle,
-        ),
-      ),
-      new ListTile(
-        title: new Text(
-          "Your role is ${getRoleDisplayName(me.role)}",
-          style: infoTextStyle,
-        ),
-      ),
-    ];
+        _addExtraIdsCardIfNeeded(me.player, children);
+        _addAccountantCardIfNeeded(me.player, children, me.selectingVisibleToAccountant);
+        _addLeadAgentCardIfNeeded(me.player, children, me.guessingKingpin);
 
-    // show the identities the player knows, if any
-    if (getKnownIds(me.role) != null) {
-      basicTiles.add(new ListTile(
-        title: new Text(
-          "You also know these identities:",
-          style: infoTextStyle,
-        ),
-      ));
-      basicTiles.add(new ListTile(
-        title: new Text(
-          "${_getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
-          style: infoTextStyle,
-        ),
-      ));
-    }
+        return new Column(children: children);
+      }
+  );
 
-    // show the balances the accountant knows, if needed
-    _addAccountantTiles(me, basicTiles, selectingVisibleToAccountant);
-
-    // show the UI to guess the kingpin, if needed
-    _addLeadAgentTiles(me, basicTiles, guessingKingpin);
-
-    return basicTiles;
+  Card _getTeamAndRoleCard(Player me) {
+    return new Card(
+        elevation: 2.0,
+        child: new Column(
+            children: [
+                new ListTile(
+                  title: new Text(
+                    "You are in team ${getTeam(me.role).toString()}",
+                    style: infoTextStyle,
+                  ),
+                ),
+                new ListTile(
+                  title: new Text(
+                    "Your role is ${getRoleDisplayName(me.role)}",
+                    style: infoTextStyle,
+                  ),
+                ),
+              ]));
   }
 
-  _addAccountantTiles(final Player me, final List<Widget> basicTiles, final bool selectingVisibleToAccountant) {
+  // show the identities the player knows, if any
+  _addExtraIdsCardIfNeeded(final Player me, final List<Widget> children) {
+    if (getKnownIds(me.role) != null) {
+      children.add(new Card(
+          elevation: 2.0,
+          child: new Column(
+              children: [
+                new ListTile(
+                  title: new Text(
+                    "You also know these identities:",
+                    style: infoTextStyle,
+                  ),
+                ),
+                new ListTile(
+                  title: new Text(
+                    "${_getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
+                    style: infoTextStyle,
+                  ),
+                ),
+              ])));
+    }
+  }
+
+  String _getFormattedKnownIds(GameModel gameModel, Set<String> knownIds) {
+    String formattedKnownIds = "";
+    knownIds?.forEach((roleId) {
+      formattedKnownIds += getPlayerByRoleId(gameModel, roleId).name +
+          " is the " +
+          getRoleDisplayName(roleId) +
+          "\n";
+    });
+    return formattedKnownIds;
+  }
+
+  // show the balances the accountant knows, if needed
+  _addAccountantCardIfNeeded(final Player me, final List<Widget> children, final bool selectingVisibleToAccountant) {
     if (me.role == ACCOUNTANT.roleId) {
+      final List<Widget> tiles = [];
       // the accountant can reveal a balance per completed heist up to a maximum
       // of half the number of players rounded down
       int completedHeists =
           getHeists(_store.state).where((heist) => heist.completedAt != null).length;
       int numPlayers = getRoom(_store.state).numPlayers;
       int maxBalances = min(completedHeists, (numPlayers / 2).floor());
-      basicTiles.add(
+      tiles.add(
         new ListTile(
           title: new Text(
             'You can also see the balance of up to $maxBalances people:',
@@ -220,7 +242,7 @@ class GameState extends State<Game> {
 
       visibleToAccountant?.forEach((String playerId) {
         Player player = getPlayerById(_store.state, playerId);
-        basicTiles.add(
+        tiles.add(
           new ListTile(
             title: new Text(
               '${player.name}: ${calculateBalanceFromStore(_store, player)}',
@@ -235,7 +257,7 @@ class GameState extends State<Game> {
             .where((p) => !visibleToAccountant.contains(p.id))
             .map((p) => p.name)
             .toList();
-        basicTiles.add(new DropdownButton<String>(
+        tiles.add(new DropdownButton<String>(
             hint: new Text('PICK BALANCE TO SEE', style: infoTextStyle),
             value: _accountantSelection,
             items: pickablePlayers.map((String value) {
@@ -249,35 +271,38 @@ class GameState extends State<Game> {
                 _accountantSelection = newValue;
               });
             }));
-        basicTiles.add(new RaisedButton(
+        tiles.add(new RaisedButton(
             child: const Text('CONFIRM SELECTION', style: buttonTextStyle),
             onPressed: selectingVisibleToAccountant
                 ? null
                 : () => _store.dispatch(
                     new AddVisibleToAccountantAction(getPlayerByName(_store.state, _accountantSelection).id))));
       }
+
+      children.add(new Card(
+          elevation: 2.0,
+          child: new Column(children: tiles)));
     }
   }
 
-  _addLeadAgentTiles(final Player me, final List<Widget> basicTiles, final bool guessingKingpin) {
+  // show the UI to guess the kingpin, if needed
+  _addLeadAgentCardIfNeeded(final Player me, final List<Widget> children, final bool guessingKingpin) {
     if (me.role == LEAD_AGENT.roleId) {
       // the lead agent can try to guess who the kingpin is once during a game
-      basicTiles.add(
-        new ListTile(
-          title: new Text(
-                'You can try to guess who the kingpin is once during the game.'
-                ' If you get it right, your bids can be higher than the maximum'
-                ' bid from then on.',
-            style: infoTextStyle,
-          ),
+      List<Widget> tiles = [new ListTile(
+        title: new Text(
+          'You can try to guess who the kingpin is once during the game.'
+              ' If you get it right, your bids can be higher than the maximum'
+              ' bid from then on.',
+          style: infoTextStyle,
         ),
-      );
+      )];
 
       if (getRoom(_store.state).kingpinGuess == null) {
         List<String> pickablePlayers = getOtherPlayers(_store.state)
             .map((p) => p.name)
             .toList();
-        basicTiles.add(new DropdownButton<String>(
+        tiles.add(new DropdownButton<String>(
             hint: new Text('SELECT YOUR KINGPIN GUESS', style: infoTextStyle),
             value: _kingpinGuess,
             items: pickablePlayers.map((String value) {
@@ -291,7 +316,7 @@ class GameState extends State<Game> {
                 _kingpinGuess = newValue;
               });
             }));
-        basicTiles.add(new RaisedButton(
+        tiles.add(new RaisedButton(
             child: const Text('CONFIRM GUESS', style: buttonTextStyle),
             onPressed: guessingKingpin
                 ? null
@@ -300,7 +325,7 @@ class GameState extends State<Game> {
         final String kingpinGuessId = getRoom(_store.state).kingpinGuess;
         final String kingpinGuessName = getPlayerById(_store.state, kingpinGuessId).name;
         final String result = haveGuessedKingpin(_store.state) ? 'RIGHT!!!' : 'WRONG :(';
-        basicTiles.add(
+        tiles.add(
           new ListTile(
             title: new Text(
               'You checked if $kingpinGuessName is the kingpin. This is $result',
@@ -309,18 +334,11 @@ class GameState extends State<Game> {
           ),
         );
       }
-    }
-  }
 
-  String _getFormattedKnownIds(GameModel gameModel, Set<String> knownIds) {
-    String formattedKnownIds = "";
-    knownIds?.forEach((roleId) {
-      formattedKnownIds += getPlayerByRoleId(gameModel, roleId).name +
-          " is the " +
-          getRoleDisplayName(roleId) +
-          "\n";
-    });
-    return formattedKnownIds;
+      children.add(new Card(
+          elevation: 2.0,
+          child: new Column(children: tiles)));
+    }
   }
 
   Widget _loadingScreen() => new StoreConnector<GameModel, LoadingScreenViewModel>(

@@ -11,22 +11,26 @@ Widget heistContinueButton(Store<GameModel> store) {
   return new StoreConnector<GameModel, bool>(
       converter: (store) => requestInProcess(store.state, Request.CompletingHeist),
       distinct: true,
-      builder: (context, completingHeist) => new RaisedButton(
-            child: const Text('CONTINUE', style: buttonTextStyle),
-            onPressed: completingHeist ? null : () => store.dispatch(new CompleteHeistAction()),
+      builder: (context, completingHeist) => new Padding(
+            padding: paddingSmall,
+            child: new RaisedButton(
+              child: const Text('CONTINUE', style: buttonTextStyle),
+              onPressed: completingHeist ? null : () => store.dispatch(new CompleteHeistAction()),
+            ),
           ));
 }
 
 Widget heistEnd(Store<GameModel> store) {
-  List<String> decisions = currentHeist(store.state).decisions.values.toList();
+  List<String> decisions = new List.of(currentHeist(store.state).decisions.values.toList());
   if (decisions.isEmpty) {
     return null;
   }
+  decisions.shuffle();
   List<Widget> children = new List.generate(decisions.length, (i) {
     String decision = decisions[i];
     return new Container(
       alignment: Alignment.center,
-      padding: paddingSmall,
+      padding: paddingTiny,
       child: new Text(decision,
           style: new TextStyle(
             fontSize: 16.0,

@@ -42,14 +42,16 @@ int calculateBalance(
   heists.forEach((heist) {
     List<Round> rounds = allRounds[heist.id];
 
-    balance = resolveBalanceForGifts(player.id, rounds, balance);
+    if (rounds.isNotEmpty) {
+      balance = resolveBalanceForGifts(player.id, rounds, balance);
 
-    Map<String, Bid> mostRecentBids = rounds.last.bids;
-    if (heist.allDecided) {
-      balance -= mostRecentBids[player.id].amount;
-      balance = resolveBalanceForHeistOutcome(players, player, heist, rounds.last.pot, balance);
-    } else if (hasProposedBid(player.id, mostRecentBids, players.length)) {
-      balance -= mostRecentBids[player.id].amount;
+      Map<String, Bid> mostRecentBids = rounds.last.bids;
+      if (heist.allDecided) {
+        balance -= mostRecentBids[player.id].amount;
+        balance = resolveBalanceForHeistOutcome(players, player, heist, rounds.last.pot, balance);
+      } else if (hasProposedBid(player.id, mostRecentBids, players.length)) {
+        balance -= mostRecentBids[player.id].amount;
+      }
     }
   });
   assert(balance >= 0);

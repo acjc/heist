@@ -7,14 +7,16 @@ import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
 
 import 'common.dart';
+import 'selection_board.dart';
 
 Widget heistDecisions(Heist heist) {
-  List<String> decisions = heist.decisions.values.toList();
+  List<String> decisions = new List.of(heist.decisions.values.toList());
+  decisions.shuffle();
   List<Widget> children = new List.generate(decisions.length, (i) {
     String decision = decisions[i];
     return new Container(
       alignment: Alignment.center,
-      padding: paddingSmall,
+      padding: paddingTiny,
       child: new Text(decision,
           style: new TextStyle(
             fontSize: 16.0,
@@ -28,8 +30,7 @@ Widget heistDecisions(Heist heist) {
   );
 }
 
-// TODO: for current heist, show which round it is
-Widget heistPopup(Store<GameModel> store, Heist heist, int order) {
+Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int order) {
   int totalPlayers = getRoom(store.state).numPlayers;
   int price = heist?.price ?? heistDefinitions[totalPlayers][order].price;
   int numPlayers = heist?.numPlayers ?? heistDefinitions[totalPlayers][order].numPlayers;
@@ -37,49 +38,66 @@ Widget heistPopup(Store<GameModel> store, Heist heist, int order) {
   Round lastRound = heist != null ? getRounds(store.state)[heist.id].last : null;
   int pot = lastRound != null && lastRound.bids.length == numPlayers ? lastRound.pot : null;
 
-  List<Widget> heistDetails = [
-    new Chip(
-      label: new Text(
-        'Price: $price',
-        style: chipTextStyle,
-      ),
-      backgroundColor: Colors.orange,
-    ),
-    new Chip(
-      label: new Text(
-        'Maximum bid: $maximumBid',
-        style: chipTextStyle,
-      ),
-      backgroundColor: Colors.orange,
+  List<Widget> title = [
+    new Text(
+      'Heist $order',
+      style: new TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
     ),
   ];
-  if (pot != null) {
-    heistDetails.add(
-      new Chip(
-        label: new Text(
-          'Pot: $pot',
-          style: chipTextStyle,
-        ),
-        backgroundColor: Colors.orange,
-      ),
-    );
+
+  if (heist != null) {
+    title.add(new Text(
+      getHeistStatus(heist, lastRound),
+      style: subtitleTextStyle,
+    ));
   }
 
   List<Widget> children = [
     new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      new Text('Heist ${order + 1} ($numPlayers players)',
-          style: new TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+      new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: title,
+      ),
       getIcon(heist),
     ]),
     new Divider(),
     new Container(
       padding: paddingSmall,
-      child: new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: heistDetails),
+      child: new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          new Text('Players: $numPlayers', style: subtitleTextStyle),
+          new Text('Price: $price', style: subtitleTextStyle),
+          new Text('Maximum bid: $maximumBid', style: subtitleTextStyle),
+        ],
+      ),
     ),
   ];
 
+  if (pot != null) {
+    children.add(
+      new Container(
+        padding: paddingSmall,
+        child: new Chip(
+          label: new Text(
+            'Pot: $pot',
+            style: chipTextStyle,
+          ),
+          backgroundColor: Colors.deepOrange,
+        ),
+      ),
+    );
+  }
+
   if (heist != null && heist.complete) {
-    children.add(heistDecisions(heist));
+    List<Player> players = getPlayers(store.state);
+    Set<String> teamNames =
+        players.where((p) => lastRound.team.contains(p.id)).map((p) => p.name).toSet();
+    children.addAll([
+      new Divider(),
+      selectionGrid(context, players, teamNames),
+      heistDecisions(heist),
+    ]);
   }
 
   return new Container(
@@ -90,6 +108,19 @@ Widget heistPopup(Store<GameModel> store, Heist heist, int order) {
       children: children,
     ),
   );
+}
+
+String getHeistStatus(Heist heist, Round lastRound) {
+  if (heist.complete) {
+    return heist.wasSuccess ? 'Success' : 'Fail';
+  }
+  if (lastRound == null) {
+    return 'Round 1';
+  }
+  if (lastRound.order == 5) {
+    return 'Auction!';
+  }
+  return 'Round ${lastRound.order}';
 }
 
 Icon getIcon(Heist heist) {
@@ -122,7 +153,8 @@ Widget gameHistory(Store<GameModel> store) {
                 return new InkWell(
                   onTap: () {
                     return showModalBottomSheet(
-                        context: context, builder: (context) => heistPopup(store, heist, i + 1));
+                        context: context,
+                        builder: (context) => heistPopup(context, store, heist, i + 1));
                   },
                   child: new Container(
                     padding: paddingMedium,

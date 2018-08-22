@@ -13,7 +13,7 @@ List<Widget> playerDecisions(Store<GameModel> store, Heist heist) {
     Player player = getPlayerById(store.state, playerId);
     List<Widget> children = [
       new Text(
-        '${player.name} (${player.role}) ->',
+        '${player.name} (${getRoleDisplayName(player.role)}) ->',
         style: infoTextStyle,
       ),
     ];
@@ -84,7 +84,6 @@ Widget winner(Score score) => new Card(
       ),
     );
 
-// TODO: fix scrolling
 Widget endgame(Store<GameModel> store) {
   List<Heist> heists = getHeists(store.state);
   Score score = calculateScore(heists);
@@ -99,7 +98,7 @@ Widget endgame(Store<GameModel> store) {
     children.add(heistSummary(store, heist, lastRound.pot));
   }
 
-  return new Column(
+  return new ListView(
     children: children,
   );
 }

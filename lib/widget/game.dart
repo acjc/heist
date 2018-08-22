@@ -42,6 +42,7 @@ class Game extends StatefulWidget {
 class GameState extends State<Game> {
   final Store<GameModel> _store;
   String _kingpinGuess;
+  String _accountantSelection;
 
   GameState(this._store);
 
@@ -148,12 +149,16 @@ class GameState extends State<Game> {
           getSelf(store.state),
           getRoom(_store.state).visibleToAccountant,
           getRounds(_store.state),
-          requestInProcess(store.state, Request.GuessingKingpin)),
+          requestInProcess(store.state, Request.GuessingKingpin),
+          requestInProcess(store.state, Request.SelectingVisibleToAccountant)),
       distinct: true,
       builder: (context, me) =>
-          new Card(elevation: 2.0, child: new Column(children: getSecretListTiles(me.player, me.guessingKingpin))));
+          new Card(
+              elevation: 2.0,
+              child: new Column(
+                  children: getSecretListTiles(me.player, me.guessingKingpin, me.selectingVisibleToAccountant))));
 
-  List<Widget> getSecretListTiles(Player me, bool guessingKingpin) {
+  List<Widget> getSecretListTiles(Player me, bool guessingKingpin, bool selectingVisibleToAccountant) {
     List<Widget> basicTiles = [
       new ListTile(
         title: new Text(
@@ -186,7 +191,7 @@ class GameState extends State<Game> {
     }
 
     // show the balances the accountant knows, if needed
-    _addAccountantTiles(me, basicTiles);
+    _addAccountantTiles(me, basicTiles, selectingVisibleToAccountant);
 
     // show the UI to guess the kingpin, if needed
     _addLeadAgentTiles(me, basicTiles, guessingKingpin);
@@ -194,7 +199,7 @@ class GameState extends State<Game> {
     return basicTiles;
   }
 
-  _addAccountantTiles(final Player me, final List<Widget> basicTiles) {
+  _addAccountantTiles(final Player me, final List<Widget> basicTiles, final bool selectingVisibleToAccountant) {
     if (me.role == ACCOUNTANT.roleId) {
       // the accountant can reveal a balance per completed heist up to a maximum
       // of half the number of players rounded down
@@ -232,6 +237,7 @@ class GameState extends State<Game> {
             .toList();
         basicTiles.add(new DropdownButton<String>(
             hint: new Text('PICK BALANCE TO SEE', style: infoTextStyle),
+            value: _accountantSelection,
             items: pickablePlayers.map((String value) {
               return new DropdownMenuItem<String>(
                 value: value,
@@ -240,10 +246,15 @@ class GameState extends State<Game> {
             }).toList(),
             onChanged: (String newValue) {
               setState(() {
-                _store.dispatch(
-                    new AddVisibleToAccountantAction(getPlayerByName(_store.state, newValue).id));
+                _accountantSelection = newValue;
               });
             }));
+        basicTiles.add(new RaisedButton(
+            child: const Text('CONFIRM SELECTION', style: buttonTextStyle),
+            onPressed: selectingVisibleToAccountant
+                ? null
+                : () => _store.dispatch(
+                    new AddVisibleToAccountantAction(getPlayerByName(_store.state, _accountantSelection).id))));
       }
     }
   }
@@ -498,8 +509,14 @@ class SecretBoardModel {
   final Set<String> visibleToAccountant;
   final Map<String, List<Round>> rounds;
   final bool guessingKingpin;
+  final bool selectingVisibleToAccountant;
 
-  SecretBoardModel._(this.player, this.visibleToAccountant, this.rounds, this.guessingKingpin);
+  SecretBoardModel._(
+      this.player,
+      this.visibleToAccountant,
+      this.rounds,
+      this.guessingKingpin,
+      this.selectingVisibleToAccountant);
 
   @override
   bool operator ==(Object other) =>

@@ -69,7 +69,10 @@ class GameState extends State<Game> {
   }
 
   Widget _biddingAndGifting(Store<GameModel> store) {
-    List<Widget> children = [bidding(store)];
+    List<Widget> children = [
+      roundTitle(store),
+      bidding(store),
+    ];
     if (!isAuction(store.state)) {
       children.add(selectionBoard(_store));
     }

@@ -58,37 +58,38 @@ Widget makeDecision(BuildContext context, Store<GameModel> store) =>
         distinct: true,
         builder: (context, decisions) {
           Player me = getSelf(store.state);
-          List<Widget> children = [];
           if (decisions.containsKey(me.id)) {
             return observeHeist(store);
           } else {
-            children.addAll([
-              new Container(
+            List<Widget> children = [
+              roundTitle(store),
+              new Padding(
                 padding: paddingSmall,
                 child: const Text('Make your choice...', style: titleTextStyle),
               ),
-              decisionButton(context, store, Succeed),
-            ]);
-            if (me.role != KINGPIN.roleId) {
-              children.add(decisionButton(context, store, Steal));
-            }
-            if (getTeam(me.role) == Team.AGENTS) {
-              children.add(decisionButton(context, store, Fail));
-            }
+              new Text('You are going on a heist with:', style: infoTextStyle),
+              new Column(
+                children: [],
+              ),
+              decisionButton(context, store, Succeed, true),
+              decisionButton(context, store, Steal, me.role != KINGPIN.roleId),
+              decisionButton(context, store, Fail, getTeam(me.role) == Team.AGENTS),
+            ];
+            return new Card(
+                elevation: 2.0,
+                child: new Container(
+                    padding: paddingMedium,
+                    alignment: Alignment.center,
+                    child: new Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: children)));
           }
-          return new Card(
-              elevation: 2.0,
-              child: new Container(
-                  padding: paddingMedium,
-                  alignment: Alignment.center,
-                  child: new Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: children)));
         });
 
-Widget decisionButton(BuildContext context, Store<GameModel> store, String decision) =>
+Widget decisionButton(
+        BuildContext context, Store<GameModel> store, String decision, bool enabled) =>
     new Container(
         padding: paddingSmall,
         child: new RaisedButton(
-          onPressed: () => store.dispatch(new MakeDecisionAction(decision)),
+          onPressed: enabled ? () => store.dispatch(new MakeDecisionAction(decision)) : null,
           child: new Text(decision, style: buttonTextStyle),
         ));

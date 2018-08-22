@@ -58,7 +58,7 @@ Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int
         crossAxisAlignment: CrossAxisAlignment.start,
         children: title,
       ),
-      getIcon(heist),
+      getHeistIcon(heist),
     ]),
     new Divider(),
     new Container(
@@ -117,13 +117,13 @@ String getHeistStatus(Heist heist, Round lastRound) {
   if (lastRound == null) {
     return 'Round 1';
   }
-  if (lastRound.order == 5) {
+  if (lastRound.isAuction) {
     return 'Auction!';
   }
   return 'Round ${lastRound.order}';
 }
 
-Icon getIcon(Heist heist) {
+Icon getHeistIcon(Heist heist) {
   if (heist == null) {
     return const Icon(Icons.remove, size: 32.0);
   }
@@ -158,7 +158,7 @@ Widget gameHistory(Store<GameModel> store) {
                   },
                   child: new Container(
                     padding: paddingMedium,
-                    child: getIcon(heist),
+                    child: getHeistIcon(heist),
                   ),
                 );
               }),

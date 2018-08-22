@@ -9,6 +9,7 @@ import 'common.dart';
 import 'team_picker.dart';
 
 Widget waitForTeam(Store<GameModel> store) => new Column(children: [
+      roundTitle(store),
       new Card(
           elevation: 2.0,
           child: new Container(

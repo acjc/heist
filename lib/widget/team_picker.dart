@@ -23,24 +23,29 @@ Widget teamPicker(Store<GameModel> store) {
       distinct: true,
       builder: (context, teamIds) {
         int playersRequired = currentHeist(store.state).numPlayers;
-        return new Card(
-            elevation: 2.0,
-            child: new Container(
-                padding: paddingMedium,
-                child: new Column(children: [
-                  new Text('Pick a team: ${teamIds.length} / $playersRequired',
-                      style: infoTextStyle),
-                  new GridView.count(
-                      padding: paddingMedium,
-                      shrinkWrap: true,
-                      childAspectRatio: 4.0,
-                      crossAxisCount: 2,
-                      primary: false,
-                      crossAxisSpacing: 10.0,
-                      mainAxisSpacing: 10.0,
-                      children: teamPickerChildren(context, store, teamIds)),
-                  submitTeamButton(store, teamIds, playersRequired),
-                ])));
+        return new Column(
+          children: [
+            roundTitle(store),
+            new Card(
+                elevation: 2.0,
+                child: new Container(
+                    padding: paddingMedium,
+                    child: new Column(children: [
+                      new Text('Pick a team: ${teamIds.length} / $playersRequired',
+                          style: infoTextStyle),
+                      new GridView.count(
+                          padding: paddingMedium,
+                          shrinkWrap: true,
+                          childAspectRatio: 4.0,
+                          crossAxisCount: 2,
+                          primary: false,
+                          crossAxisSpacing: 10.0,
+                          mainAxisSpacing: 10.0,
+                          children: teamPickerChildren(context, store, teamIds, playersRequired)),
+                      submitTeamButton(store, teamIds, playersRequired),
+                    ])))
+          ],
+        );
       });
 }
 
@@ -59,15 +64,17 @@ Widget playerTile(String playerName, bool isInTeam, Color color) => new Containe
       ),
     ));
 
-List<Widget> teamPickerChildren(BuildContext context, Store<GameModel> store, Set<String> teamIds) {
+List<Widget> teamPickerChildren(
+    BuildContext context, Store<GameModel> store, Set<String> teamIds, int playersRequired) {
   Color color = Theme.of(context).accentColor;
   String roundId = currentRound(store.state).id;
   List<Player> players = getPlayers(store.state);
   return new List.generate(players.length, (i) {
     Player player = players[i];
     bool isInTeam = teamIds.contains(player.id);
+    bool pickedEnough = !isInTeam && teamIds.length == playersRequired;
     return new InkWell(
-        onTap: () => onTap(store, roundId, player.id, isInTeam),
+        onTap: pickedEnough ? null : () => onTap(store, roundId, player.id, isInTeam),
         child: playerTile(player.name, isInTeam, color));
   });
 }

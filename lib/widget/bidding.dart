@@ -88,7 +88,7 @@ Widget bidding(Store<GameModel> store) {
         return new Card(
             elevation: 2.0,
             child: new Container(
-                padding: paddingMedium,
+                padding: paddingLarge,
                 alignment: Alignment.center,
                 child: new Column(
                   children: children,

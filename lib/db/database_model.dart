@@ -440,6 +440,8 @@ class Round extends Document {
         'completedAt': completedAt,
       };
 
+  bool get isAuction => order == 5;
+
   int get pot => bids.isNotEmpty
       ? bids.values.fold(0, (previousValue, bid) => previousValue + bid.amount)
       : -1;

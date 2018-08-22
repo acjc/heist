@@ -255,10 +255,14 @@ class MockFirestoreDb implements FirestoreDb {
 
   @override
   Future<void> addVisibleToAccountant(String id, String playerId) {
-    final Set<String> visibleToAccountant = room.visibleToAccountant != null
-        ? room.visibleToAccountant
-        : new Set();
+    final Set<String> visibleToAccountant =
+        room.visibleToAccountant != null ? room.visibleToAccountant : new Set();
     visibleToAccountant.add(playerId);
     return upsertRoom(room.copyWith(visibleToAccountant: visibleToAccountant));
+  }
+
+  @override
+  Future<void> guessKingpin(String id, String playerId) {
+    return upsertRoom(room.copyWith(kingpinGuess: playerId));
   }
 }

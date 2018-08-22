@@ -28,15 +28,17 @@ final Selector<GameModel, List<Player>> getOtherPlayers = createSelector2(getPla
 final Selector<GameModel, bool> amOwner = createSelector2(
     getRoom, getPlayerInstallId, (Room room, String installId) => room.owner == installId);
 
-final Selector<GameModel, Player> getKingpin = createSelector1(
-    getPlayers, (List<Player> players) => players.singleWhere((p) => p.role == KINGPIN.roleId));
+final getKingpin = (GameModel gameModel) =>
+    getPlayers(gameModel).singleWhere((p) => p.role == KINGPIN.roleId, orElse: null);
 
 final Selector<GameModel, bool> haveGuessedKingpin = createSelector3(
     getSelf,
     getKingpin,
     getRoom,
     (Player me, Player kingpin, Room room) =>
-        room.kingpinGuess == kingpin.id && me.role == LEAD_AGENT.roleId);
+        room.kingpinGuess != null &&
+        room.kingpinGuess == kingpin.id &&
+        me.role == LEAD_AGENT.roleId);
 
 final Selector<GameModel, int> currentBalance = createSelector4(
     getPlayers,

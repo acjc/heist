@@ -129,4 +129,5 @@ enum Request {
   CompletingRound,
   CompletingGame,
   GuessingKingpin,
+  SelectingVisibleToAccountant,
 }

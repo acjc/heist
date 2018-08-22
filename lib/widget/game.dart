@@ -373,8 +373,9 @@ class GameState extends State<Game> {
       converter: (store) => gameIsReady(store.state),
       distinct: true,
       builder: (context, gameIsReady) => new Expanded(
-            child: gameIsReady ? _secretBoardBody() : _loadingScreen(),
-          ));
+          child: new SingleChildScrollView(
+              child: gameIsReady ? _secretBoardBody() : _loadingScreen(),
+          )));
 
   @override
   Widget build(BuildContext context) {

@@ -8,4 +8,9 @@ build/
 ios/.generated/
 packages
 .flutter-plugins
-android/app/google-services.json
+*.iml
+
+google-services.json
+key.properties
+GoogleService-Info.plist
+*.jks

@@ -54,7 +54,17 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
+  Future<int> getNumPlayers(String roomId) {
+    return new Future<int>.value(players.length);
+  }
+
+  @override
   Future<bool> playerExists(String roomId, String installId) {
+    return new Future<bool>.value(false);
+  }
+
+  @override
+  Future<bool> playerExistsWithName(String roomId, String name) {
     return new Future<bool>.value(false);
   }
 

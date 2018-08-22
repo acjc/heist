@@ -12,18 +12,18 @@ class Team {
 
 // agent roles
 final Role LEAD_AGENT =
-    new Role(roleId: 'LEAD_AGENT', displayName: 'LEAD AGENT', team: Team.AGENTS);
+    new Role(roleId: 'LEAD_AGENT', displayName: 'Lead Agent', team: Team.AGENTS);
 final Role AGENT_1 = new Agent(roleId: 'AGENT_1');
 final Role AGENT_2 = new Agent(roleId: 'AGENT_2');
 final Role AGENT_3 = new Agent(roleId: 'AGENT_3');
 // thief roles
 final Role KINGPIN = new Role(
     roleId: 'KINGPIN',
-    displayName: 'KINGPIN',
+    displayName: 'Kingpin',
     team: Team.THIEVES,
     knownIds: new Set.of(['LEAD_AGENT']));
 final Role ACCOUNTANT =
-    new Role(roleId: 'ACCOUNTANT', displayName: 'ACCOUNTANT', team: Team.THIEVES);
+    new Role(roleId: 'ACCOUNTANT', displayName: 'Accountant', team: Team.THIEVES);
 final Role THIEF_1 = new Thief(roleId: 'THIEF_1');
 final Role THIEF_2 = new Thief(roleId: 'THIEF_2');
 final Role THIEF_3 = new Thief(roleId: 'THIEF_3');
@@ -37,13 +37,66 @@ final Set<Role> allRoles = new Set.of([
 ]);
 
 final Map<int, Set<Role>> numPlayersToRolesMap = {
-  2: new Set.of([KINGPIN, LEAD_AGENT]),
-  5: new Set.of([ACCOUNTANT, KINGPIN, THIEF_1, LEAD_AGENT, AGENT_1]),
-  6: new Set.of([ACCOUNTANT, KINGPIN, THIEF_1, THIEF_2, LEAD_AGENT, AGENT_1]),
-  7: new Set.of([ACCOUNTANT, KINGPIN, THIEF_1, THIEF_2, LEAD_AGENT, AGENT_1, AGENT_2]),
-  8: new Set.of([ACCOUNTANT, KINGPIN, THIEF_1, THIEF_2, THIEF_3, LEAD_AGENT, AGENT_1, AGENT_2]),
-  9: new Set.of(
-      [ACCOUNTANT, KINGPIN, THIEF_1, THIEF_2, THIEF_3, LEAD_AGENT, AGENT_1, AGENT_2, AGENT_3]),
+  2: new Set.of([
+    KINGPIN,
+    LEAD_AGENT,
+  ]),
+  3: new Set.of([
+    KINGPIN,
+    ACCOUNTANT,
+    LEAD_AGENT,
+  ]),
+  4: new Set.of([
+    KINGPIN,
+    ACCOUNTANT,
+    LEAD_AGENT,
+    AGENT_1,
+  ]),
+  5: new Set.of([
+    ACCOUNTANT,
+    KINGPIN,
+    THIEF_1,
+    LEAD_AGENT,
+    AGENT_1,
+  ]),
+  6: new Set.of([
+    ACCOUNTANT,
+    KINGPIN,
+    THIEF_1,
+    THIEF_2,
+    LEAD_AGENT,
+    AGENT_1,
+  ]),
+  7: new Set.of([
+    ACCOUNTANT,
+    KINGPIN,
+    THIEF_1,
+    THIEF_2,
+    LEAD_AGENT,
+    AGENT_1,
+    AGENT_2,
+  ]),
+  8: new Set.of([
+    ACCOUNTANT,
+    KINGPIN,
+    THIEF_1,
+    THIEF_2,
+    THIEF_3,
+    LEAD_AGENT,
+    AGENT_1,
+    AGENT_2,
+  ]),
+  9: new Set.of([
+    ACCOUNTANT,
+    KINGPIN,
+    THIEF_1,
+    THIEF_2,
+    THIEF_3,
+    LEAD_AGENT,
+    AGENT_1,
+    AGENT_2,
+    AGENT_3,
+  ]),
   10: new Set.of([
     ACCOUNTANT,
     KINGPIN,
@@ -54,7 +107,7 @@ final Map<int, Set<Role>> numPlayersToRolesMap = {
     LEAD_AGENT,
     AGENT_1,
     AGENT_2,
-    AGENT_3
+    AGENT_3,
   ]),
 };
 
@@ -64,7 +117,7 @@ final getTeam = (String roleId) => allRoles.singleWhere((r) => r.roleId == roleI
 
 final getKnownIds = (String roleId) => allRoles.singleWhere((r) => r.roleId == roleId).knownIds;
 
-final getDisplayName =
+final getRoleDisplayName =
     (String roleId) => allRoles.singleWhere((r) => r.roleId == roleId).displayName;
 
 @immutable
@@ -81,10 +134,11 @@ class Role {
 class Agent extends Role {
   Agent({roleId})
       : super(
-            roleId: roleId,
-            displayName: 'AGENT',
-            team: Team.AGENTS,
-            knownIds: new Set.of(['LEAD_AGENT']));
+          roleId: roleId,
+          displayName: 'Agent',
+          team: Team.AGENTS,
+          knownIds: new Set.of(['LEAD_AGENT']),
+        );
 }
 
 @immutable

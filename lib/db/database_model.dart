@@ -56,7 +56,7 @@ class Room extends Document {
       : super(id: id);
 
   factory Room.initial(int numPlayers) =>
-      Room(numPlayers: numPlayers, roles: getRoleIds(numPlayersToRolesMap[minPlayers]));
+      Room(numPlayers: numPlayers, roles: getRoleIds(numPlayersToRolesMap[numPlayers]));
 
   Room copyWith({
     String id,
@@ -446,6 +446,8 @@ class Round extends Document {
         'gifts': gifts,
         'completedAt': completedAt,
       };
+
+  bool get isAuction => order == 5;
 
   int get pot => bids.isNotEmpty
       ? bids.values.fold(0, (previousValue, bid) => previousValue + bid.amount)

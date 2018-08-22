@@ -71,7 +71,10 @@ class GameState extends State<Game> {
   }
 
   Widget _biddingAndGifting(Store<GameModel> store) {
-    List<Widget> children = [bidding(store)];
+    List<Widget> children = [
+      roundTitle(store),
+      bidding(store),
+    ];
     if (!isAuction(store.state)) {
       children.add(selectionBoard(_store));
     }
@@ -79,6 +82,7 @@ class GameState extends State<Game> {
     return new Column(children: children);
   }
 
+  // TODO: for current heist, show which round it is
   Widget _gameLoop(MainBoardViewModel viewModel) {
     // team picking (not needed for auctions)
     if (!isAuction(_store.state) && viewModel.waitingForTeam) {
@@ -102,9 +106,7 @@ class GameState extends State<Game> {
 
     // active heist
     if (viewModel.heistIsActive) {
-      return goingOnHeist(_store.state)
-          ? makeDecision(context, _store)
-          : observeHeist(_store);
+      return goingOnHeist(_store.state) ? makeDecision(context, _store) : observeHeist(_store);
     }
 
     // go to next heist
@@ -122,8 +124,7 @@ class GameState extends State<Game> {
         return new MainBoardViewModel._(
           waitingForTeam: !round.teamSubmitted,
           biddingComplete: biddingComplete(store.state),
-          resolvingAuction:
-              requestInProcess(store.state, Request.ResolvingAuction),
+          resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
           roundComplete: round.complete,
           heistIsActive: heistIsActive(store.state),
           heistDecided: heist.allDecided,
@@ -142,12 +143,11 @@ class GameState extends State<Game> {
       });
 
   Widget _secretBoardBody() => new StoreConnector<GameModel, SecretBoardModel>(
-      converter: (store) => new SecretBoardModel._(getSelf(store.state),
-          getRoom(_store.state).visibleToAccountant, getRounds(_store.state)),
+      converter: (store) => new SecretBoardModel._(
+          getSelf(store.state), getRoom(_store.state).visibleToAccountant, getRounds(_store.state)),
       distinct: true,
-      builder: (context, me) => new Card(
-          elevation: 2.0,
-          child: new Column(children: getSecretListTiles(me.player))));
+      builder: (context, me) =>
+          new Card(elevation: 2.0, child: new Column(children: getSecretListTiles(me.player))));
 
   List<Widget> getSecretListTiles(Player me) {
     List<Widget> basicTiles = [
@@ -159,7 +159,7 @@ class GameState extends State<Game> {
       ),
       new ListTile(
         title: new Text(
-          "Your role is ${getDisplayName(me.role)}",
+          "Your role is ${getRoleDisplayName(me.role)}",
           style: infoTextStyle,
         ),
       ),
@@ -191,9 +191,8 @@ class GameState extends State<Game> {
     if (me.role == ACCOUNTANT.roleId) {
       // the accountant can reveal a balance per completed heist up to a maximum
       // of half the number of players rounded down
-      int completedHeists = getHeists(_store.state)
-          .where((heist) => heist.completedAt != null)
-          .length;
+      int completedHeists =
+          getHeists(_store.state).where((heist) => heist.completedAt != null).length;
       int numPlayers = getRoom(_store.state).numPlayers;
       int maxBalances = min(completedHeists, (numPlayers / 2).floor());
       basicTiles.add(
@@ -205,8 +204,7 @@ class GameState extends State<Game> {
         ),
       );
 
-      Set<String> visibleToAccountant =
-          getRoom(_store.state).visibleToAccountant;
+      Set<String> visibleToAccountant = getRoom(_store.state).visibleToAccountant;
 
       visibleToAccountant?.forEach((String playerId) {
         Player player = getPlayerById(_store.state, playerId);
@@ -235,8 +233,8 @@ class GameState extends State<Game> {
             }).toList(),
             onChanged: (String newValue) {
               setState(() {
-                _store.dispatch(new AddVisibleToAccountantAction(
-                    getPlayerByName(_store.state, newValue).id));
+                _store.dispatch(
+                    new AddVisibleToAccountantAction(getPlayerByName(_store.state, newValue).id));
               });
             }));
       }
@@ -248,19 +246,15 @@ class GameState extends State<Game> {
     knownIds?.forEach((roleId) {
       formattedKnownIds += getPlayerByRoleId(gameModel, roleId).name +
           " is the " +
-          getDisplayName(roleId) +
+          getRoleDisplayName(roleId) +
           "\n";
     });
     return formattedKnownIds;
   }
 
-  Widget _loadingScreen() =>
-      new StoreConnector<GameModel, LoadingScreenViewModel>(
-        converter: (store) => new LoadingScreenViewModel._(
-            roomIsAvailable(store.state),
-            waitingForPlayers(store.state),
-            isNewGame(store.state),
-            getPlayers(store.state).length),
+  Widget _loadingScreen() => new StoreConnector<GameModel, LoadingScreenViewModel>(
+        converter: (store) => new LoadingScreenViewModel._(roomIsAvailable(store.state),
+            waitingForPlayers(store.state), isNewGame(store.state), getPlayers(store.state).length),
         distinct: true,
         builder: (context, viewModel) {
           if (!viewModel.roomIsAvailable) {
@@ -281,10 +275,8 @@ class GameState extends State<Game> {
       );
 
   Widget _mainBoard() => new StoreConnector<GameModel, GameActiveViewModel>(
-      converter: (store) => new GameActiveViewModel._(
-          gameIsReady(store.state),
-          gameOver(store.state),
-          requestInProcess(store.state, Request.CompletingGame)),
+      converter: (store) => new GameActiveViewModel._(gameIsReady(store.state),
+          gameOver(store.state), requestInProcess(store.state, Request.CompletingGame)),
       distinct: true,
       builder: (context, viewModel) {
         if (!viewModel.gameIsReady) {
@@ -293,15 +285,14 @@ class GameState extends State<Game> {
         if (viewModel.gameOver) {
           return _resolveEndgame(viewModel.completingGame);
         }
-        return new Stack(
+        return new Column(
           children: [
-            _mainBoardBody(),
-            new Positioned(
-              child: gameHistory(_store),
-              left: 0.0,
-              right: 0.0,
-              bottom: 0.0,
+            new Expanded(
+              child: new SingleChildScrollView(
+                child: _mainBoardBody(),
+              ),
             ),
+            gameHistory(_store),
           ],
         );
       });
@@ -327,9 +318,7 @@ class GameState extends State<Game> {
             ],
           ),
         ),
-        endDrawer: isDebugMode()
-            ? new Drawer(child: new ReduxDevTools<GameModel>(_store))
-            : null,
+        endDrawer: isDebugMode() ? new Drawer(child: new ReduxDevTools<GameModel>(_store)) : null,
         body: new TabBarView(
           children: [
             _mainBoard(),
@@ -347,8 +336,8 @@ class LoadingScreenViewModel {
   final bool isNewGame;
   final int playersSoFar;
 
-  LoadingScreenViewModel._(this.roomIsAvailable, this.waitingForPlayers,
-      this.isNewGame, this.playersSoFar);
+  LoadingScreenViewModel._(
+      this.roomIsAvailable, this.waitingForPlayers, this.isNewGame, this.playersSoFar);
 
   @override
   bool operator ==(Object other) =>
@@ -435,8 +424,7 @@ class GameActiveViewModel {
           completingGame == other.completingGame;
 
   @override
-  int get hashCode =>
-      gameIsReady.hashCode ^ gameOver.hashCode ^ completingGame.hashCode;
+  int get hashCode => gameIsReady.hashCode ^ gameOver.hashCode ^ completingGame.hashCode;
 
   @override
   String toString() {
@@ -460,8 +448,7 @@ class SecretBoardModel {
           rounds == other.rounds;
 
   @override
-  int get hashCode =>
-      player.hashCode ^ visibleToAccountant.hashCode ^ rounds.hashCode;
+  int get hashCode => player.hashCode ^ visibleToAccountant.hashCode ^ rounds.hashCode;
 
   @override
   String toString() {
@@ -472,8 +459,7 @@ class SecretBoardModel {
 void resetGameStore(Store<GameModel> store) {
   store.dispatch(new ClearAllPendingRequestsAction());
   store.dispatch(new CancelSubscriptionsAction());
-  store.dispatch(new UpdateStateAction<Room>(
-      new Room.initial(isDebugMode() ? 2 : minPlayers)));
+  store.dispatch(new UpdateStateAction<Room>(new Room.initial(isDebugMode() ? 2 : minPlayers)));
   store.dispatch(new UpdateStateAction<List<Player>>([]));
   store.dispatch(new UpdateStateAction<List<Heist>>([]));
   store.dispatch(new UpdateStateAction<Map<Heist, List<Round>>>({}));

@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:heist/db/database.dart';
 import 'package:heist/db/database_model.dart';
+import 'package:heist/keys.dart';
 import 'package:heist/main.dart';
+import 'package:heist/reducers/player_reducers.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -13,29 +16,78 @@ import 'package:redux/redux.dart';
 
 import 'middleware.dart';
 
+class ValidateRoomAction extends MiddlewareAction {
+  final BuildContext context;
+
+  ValidateRoomAction(this.context);
+
+  void _showRoomValidationDialog(String message) {
+    showDialog(
+        context: context,
+        builder: (context) => new AlertDialog(
+              title: const Text('Error'),
+              content: new Text(message),
+            ));
+  }
+
+  @override
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
+    withRequest(Request.ValidatingRoom, store, (store) async {
+      FirestoreDb db = store.state.db;
+      String code = getRoom(store.state).code;
+      Room room = await db.getRoomByCode(code);
+      if (room == null) {
+        return _showRoomValidationDialog('Room with code $code does not exist.');
+      }
+      store.dispatch(new SetPlayerInstallIdAction(await installId()));
+      String iid = getPlayerInstallId(store.state);
+      bool playerExists = await db.playerExists(room.id, iid);
+      if (!playerExists) {
+        String playerName = getPlayerName(store.state);
+        if (playerName == null || playerName.isEmpty) {
+          return _showRoomValidationDialog('Please enter a name.');
+        }
+        int numExistingPlayers = await db.getNumPlayers(room.id);
+        if (numExistingPlayers >= room.numPlayers) {
+          return _showRoomValidationDialog('Room is full.');
+        }
+        bool nameAlreadyTaken = await db.playerExistsWithName(room.id, playerName);
+        if (nameAlreadyTaken) {
+          return _showRoomValidationDialog('Name $playerName is already taken.');
+        }
+      }
+      Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Game(store)));
+    });
+  }
+}
+
 class CreateRoomAction extends MiddlewareAction {
-  Future<String> _createRoom(Store<GameModel> store, String code, String appVersion) {
-    return store.state.db.upsertRoom(new Room(
+  Future<void> _createRoom(Store<GameModel> store, String code, String appVersion) async {
+    Room room = new Room(
         code: code,
         createdAt: now(),
         appVersion: appVersion,
         owner: getPlayerInstallId(store.state),
         numPlayers: store.state.room.numPlayers,
         roles: store.state.room.roles,
-        visibleToAccountant: store.state.room.visibleToAccountant));
+        visibleToAccountant: store.state.room.visibleToAccountant);
+    String roomId = await store.state.db.upsertRoom(room);
+    store.dispatch(new UpdateStateAction<Room>(room.copyWith(id: roomId)));
   }
 
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
-    String appVersion = await _getAppVersion();
-    String code = await _newRoomCode(store);
-    String roomId = await _createRoom(store, code, appVersion);
-    store.dispatch(new UpdateStateAction<Room>(await store.state.db.getRoom(roomId)));
+    await withRequest(Request.ValidatingRoom, store, (store) async {
+      store.dispatch(new SetPlayerInstallIdAction(await installId()));
+      String appVersion = await _getAppVersion();
+      String code = await _newRoomCode(store);
+      await _createRoom(store, code, appVersion);
 
-    NavigatorState navigatorState = navigatorKey.currentState;
-    if (navigatorState != null) {
-      navigatorState.push(new MaterialPageRoute(builder: (context) => new Game(store)));
-    }
+      NavigatorState navigatorState = Keys.navigatorKey.currentState;
+      if (navigatorState != null) {
+        navigatorState.push(new MaterialPageRoute(builder: (context) => new Game(store)));
+      }
+    });
   }
 
   Future<String> _getAppVersion() async {
@@ -82,8 +134,6 @@ class AddVisibleToAccountantAction extends MiddlewareAction {
 
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
-    return store.state.db.addVisibleToAccountant(
-        getRoom(store.state).id, playerId);
+    return store.state.db.addVisibleToAccountant(getRoom(store.state).id, playerId);
   }
-
 }

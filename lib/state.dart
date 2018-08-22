@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:heist/db/database_model.dart';
 import 'package:heist/db/database.dart';
+import 'package:heist/db/database_model.dart';
 
 @immutable
 class GameModel {
@@ -119,6 +119,7 @@ class Subscriptions {
 }
 
 enum Request {
+  ValidatingRoom,
   CreatingNewRoom,
   JoiningGame,
   Bidding,

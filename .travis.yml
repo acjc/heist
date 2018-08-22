@@ -1,6 +1,25 @@
 os:
   - linux
 
+language: android
+licenses:
+  - 'android-sdk-preview-license-.+'
+  - 'android-sdk-license-.+'
+  - 'google-gdk-license-.+'
+android:
+  components:
+    - tools
+    - platform-tools
+    - build-tools-27.0.3
+    - build-tools-28.0.2
+    - android-27
+    - android-28
+    - sys-img-armeabi-v7a-google_apis-28
+    - extra-android-m2repository
+    - extra-google-m2repository
+    - extra-google-android-support
+jdk: oraclejdk8
+
 sudo: false
 
 addons:
@@ -12,13 +31,41 @@ addons:
       - libstdc++6
       - fonts-droid
 
+before_install:
+  - openssl aes-256-cbc -K $encrypted_c7a4618bb56c_key -iv $encrypted_c7a4618bb56c_iv -in secrets.tar.enc -out secrets.tar -d
+  - tar xvf secrets.tar
+
 before_script:
   - git clone https://github.com/flutter/flutter.git -b beta
-  - ./flutter/bin/flutter doctor
 
 script:
   - ./flutter/bin/flutter test
+  - ./flutter/bin/flutter build apk
+
+before_deploy:
+  - gem install dpl
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: bash deploy.sh
+    on:
+      branch: master
+      repo: acjc/heist
 
 cache:
   directories:
     - $HOME/.pub-cache
+
+env:
+  global:
+    # ANDROID_KEY_ALIAS
+    - secure: "TQllWJ6ITrg9ueW0jQUdKN55uChkkDBPdQq51oi+QizlLl6sc5gchF+oyNdhDU83WnFZyEp04o8m2V9AM/7iioNLINRXu6WjjQkK0aV9jPXgFZySAXHSwkR9PZ6lvKmq1ORRLkKD3g8bH4VkIuB2q3b87f23f6fadiGl0lGq92fSkvgSoh2wX2+hHCrvW/93QCCPTygSnJJ+JyQSorSrdi7eDWXCkzItytiF4aTGgqnIyvLnMFxLk+ZJnhKqUf5kfQ6zU3gACQrucS8UMQr3oliG6lkBdKcLf3S96BJlkqqOVWLhi+rIdgW93YO/LK1SF2VXNUVkCFcoODW5eB37ZgA0b509aYTwbeAQXTiXWEb3ehutNeVs5wledfpUD4FmNt57yYYMBCfe/vZYU0AYvcjkwXkOwwx3zzzB/FSX6aXhm9Cn6malYmJEl7WO/bfTdh25zBIkoUMWr1pw4nYGN54n+qxlgH0xe6J+cleuDlc56jaRyldExmV1MQ5ZjWNfGngIaLqD+kzDIc8jwcshTBioNmYMVXrFQAdJQrd5dU1OG3lPZFYkTG9yHvHfwbZXPEqEGKmM1fsKm0MyohVl6hQF9mWkoqcU9vIPTinw/YBZUCWARWut7FcrgWrg19F0yCrkQShNaId73tB1kDqBB0SAi46jfm4GvxgJuvNCR+Y="
+    # ANDROID_KEY_PASSWORD
+    - secure: "YkF/m8WZ6h1L2V5U+AvUeEo7FwvnM/8ScdHcYO9ipGuwWExp6W2JZe+kP9pDq+NMrF1eFDymnpUT6nPNI20IK/T79jopY78P2hFtk6LEIQxILN9apHYTGH7F7mTrQ2VHWCGPWWtfeVMqeouoSSWEqg/oCDESyZZ+SMvzDMNEs5PQ+fpIiB/KAyO5qKLVrmbpDhdXeMHKOX3ZzpP1+l3v+/wpn9lZH9Ze/B2MK9KoppmbztrqLSaG3vHMvKJ5UMctWomU82PL/T7ZbfvXbEH7p2x9hg3BDdoaoFZ0ptLJIn+Fdel5fgYpMbu4/RTOMndL3MYuky6Gwcj8uQhXBrTyILlMUpTvwPGfB2JlSAetTV7yY+xI8kfxYS6d7Rso+iqUBmNmeVTPgeZ6ttM1vMsG5yV8oMtto+K+FyDDSL61bmw3WjHl53LxEM46vHn9Z0ECoX9DpYk7ZTZQBYOFoaydeuXVOahs93YUSMMZSw1uSAce8WfoWHf7RCNzxra/Ju490Ebq3zt5h9CSVxEaV7FLpHcdnN914DyzuDgq5eF26t0yYg+DZChisZilotold93YhOpH+o9ZpXXQ+8pXwnXos5oAu/+eOe62bfdsJ55S0+MCvd50Yie5ZGBPtRP61qSVEQ/elxwC0ZbsT4n1J8TfDT1PGCa6l2PgzI1cDZQyClk="
+    # BUCKET
+    - secure: "A/77eHQDqOPPZ2TfEZuC+8ZlPOp0wJhHhQRgUBj/dG6XWHtqyw3ZrJKYwfvGSAyvKH5IllJELvgJqKsOTmLt6yAVW2mmz3AiRtsGQTMCzHVzSYbKtYhq6Ji1UU6/Pl0nr3t7MiEpg2nboRE3hzqm2+vQezDeVWPrfR58CSfk11iMy9Jr/m0LDzhP9s5ZdOUYjtxBUNK8cfX68JkBncLlXHQO6IZhdCtxxMDguD0zZnP8Ng+ibpB2jirXzGFk6y6o5XKfHtPi2RBq+baPM7erDk58u8wJ+fhXXCfC9Oxyo+kwl0aAmIIC4xGYHThdZrgUWq18dCrVy4Y3VOmt5vH4EZhil0u+LM1ihvkM/vg5DXd9whZk+7fm7eVTzpTSZJ7mDnh1i8kg8lpJeGX+ZFiMFmo2Sxl/3+y2dZ1Ydy7fiFGjM5MHVjxEuI05fkDGY4OaZWU/t4bkHV+V5zVQ/s84PtVC8XllP+4y38Z61cZNSIrtZhBTg0s21reF+RfyoFkJjVwkrAz2AIIfcVLesMpXVgcO43H5VgAUSOtEYSLH9wVjz7ocUAGNzQR2vPE/rfM2v+O+v/DN9armc610pZgC4gvTB0duw7jdABAdm4Rgk7oc8RvhwTqFPmQeksVbKclnxRgf3I6i2nVCFAgT4eSFPuwuk4vLT6kXdyGDNiKaDJY="
+    # GCS_KEY
+    - secure: "Ry0+zUFwlEjxA6A0mVb9pI9ZmzX5cP4dr4/SU1lmU7HL3gnwYKINL/FW5ibTM5u9AD0DEhSUtrvK/7vbbJuwBvIAm4VFesSPSA+8IRJsUJ+SgmrAVLDxwoprUcOG8MnN/8xjOIyjTyutsyIOKcrP2HFl5I2DFSCATPSSQ+vkrm2m62OyvtyR7+cA5Wv5YpJaeDIF8Wa6Vw/v4rnskwTklb2ElnzLSF+2IZZtynIhkVDL1mloVNffF027FNHu1d7+D0RPu7U8Ji7CnieEwgF42er8Mrj7t9Zj8pV27C6RnYKCbyRlfEulT7CqPD1Tiw1iaIdu4SHy1GqWAqkAp3QXK+PNOzMWwnDOGn6aKs0W+Qn/LzxbTcr0XqF4AibX1fMvcBGm+vyRc/oC+kJ/EFLUANBCneJywD2XMVP4gOs+E8fbENsJUx2ip71dCgohb6k3poEjCZJZAjlmSvACsxF1WcNg8LUOr5wqE4JZyD81JfiB1mmTW9c1sfeh3umej2xHbivnL9T0vYYzwaLtfD1BCIi5BwBu7VBa5+zu4wGlC7zR0RvegJXJwlz5ZJLtEyB2LcCZ1UWxt55NoEDbek9vjfsHxaQ/YlxKD0vAEMnq7ehxobY2ALnybKtAcYAE3wCB7KUvw9KMP10LKVsLWbMybSNkda54a5NwXc11JjsALpc="
+    # GCS_SECRET
+    - secure: "CTO6fuaokPCYrWUF5LmcefDF9Xgefmo3JKdJP8/RX0x6+MnBo2oOkTn2MF6IX9s8Xvd6iza0ZC3v8C04ZDncYARPE0NUNxpm2REeFcXZ3aJt8I/D9OJwwPGu7vOvjHiU+GbjwZIYcefut6E6AVS9sAK6TfQ6qRm9FeY6FvM9xRAllswMG/rQOd9Bawk0WFiZZBtZnI38OH03sdDQlqMZK1nWVUHHxooaUoEyRUSlAAEu5P9nZZC5LM0ZRMBaE1x4ycqW1phRDnnZI1TmmxIyddV3C2I0j1FUirMuxtynFZwsEYxOi7vOgLnK+J2s1p4rLUu1Xwucv62m+RcZhiX+ztK2XGetem6jV33j+RCTGX/Ap7iw/EbjgXhb0lCOCIXzmXnRWux3fl7v8LhMcEKMppnkkCD1iAkncR5ubX3k4XfH9RAkrKjPhCT5ocHYngb9T/V0MFafUDh+6j8SO+dnc2nTNXNyH43+90pAG23d+zhAV0vv1boidqC2ALohQ0A+ekYqoXiYhDo6TkC8nTigIvp+iZpNK0ecL0NQMp86YJ/26omZVm6QOrgg+cMhFXotOj7AU+TwGbLip4Y6SeHB73MJ7VM8DWwQRHihcdKKr3fyjbOJmn/iHXliKAUYVQB3JxfguESEOBRd0g44z6Gr5SpAc/hVFVCk/JMSmxGm9Dw="

@@ -45,11 +45,16 @@ int calculateBalance(
   heists.forEach((heist) {
     List<Round> rounds = allRounds[heist.id];
 
-    balance = resolveBalanceForGifts(player.id, rounds, balance);
+    if (rounds.isNotEmpty) {
+      balance = resolveBalanceForGifts(player.id, rounds, balance);
 
-    if (heist.allDecided) {
-      balance -= rounds.last.bids[player.id].amount;
-      balance = resolveBalanceForHeistOutcome(players, player, heist, rounds.last.pot, balance);
+      Map<String, Bid> mostRecentBids = rounds.last.bids;
+      if (heist.allDecided) {
+        balance -= mostRecentBids[player.id].amount;
+        balance = resolveBalanceForHeistOutcome(players, player, heist, rounds.last.pot, balance);
+      } else if (hasProposedBid(player.id, mostRecentBids, players.length)) {
+        balance -= mostRecentBids[player.id].amount;
+      }
     }
   });
   assert(balance >= 0);
@@ -67,16 +72,23 @@ int resolveBalanceForGifts(String playerId, List<Round> rounds, int balance) {
   return balance;
 }
 
+bool hasProposedBid(String playerId, Map<String, Bid> bids, int numPlayers) {
+  return bids.length != numPlayers && bids.containsKey(playerId);
+}
+
 int resolveBalanceForHeistOutcome(
     List<Player> players, Player player, Heist heist, int pot, int balance) {
   Random random = new Random(heist.id.hashCode);
+
   int kingpinPayout = randomlySplit(random, pot, 2)[0];
   int leadAgentPayout = pot - kingpinPayout;
   if (player.role == KINGPIN.roleId) {
     balance += kingpinPayout;
   }
+
   int steals = heist.decisions.values.where((d) => d == Steal).length;
   bool playerStole = heist.decisions[player.id] == Steal;
+
   if (shouldPayoutLeadAgent(player, playerStole, steals)) {
     balance += leadAgentPayout;
   } else if (steals > 0 && playerStole) {

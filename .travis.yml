@@ -52,6 +52,7 @@ deploy:
     on:
       branch: master
       repo: acjc/heist
+      tags: true
 
 cache:
   directories:

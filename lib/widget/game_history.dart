@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/db/database_model.dart';
@@ -11,7 +13,7 @@ import 'selection_board.dart';
 
 Widget heistDecisions(Heist heist) {
   List<String> decisions = new List.of(heist.decisions.values.toList());
-  decisions.shuffle();
+  decisions.shuffle(new Random(heist.id.hashCode));
   List<Widget> children = new List.generate(decisions.length, (i) {
     String decision = decisions[i];
     return new Container(

@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/heist_middleware.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -21,11 +24,12 @@ Widget heistContinueButton(Store<GameModel> store) {
 }
 
 Widget heistEnd(Store<GameModel> store) {
-  List<String> decisions = new List.of(currentHeist(store.state).decisions.values.toList());
+  Heist heist = currentHeist(store.state);
+  List<String> decisions = new List.of(heist.decisions.values.toList());
   if (decisions.isEmpty) {
     return null;
   }
-  decisions.shuffle();
+  decisions.shuffle(new Random(heist.id.hashCode));
   List<Widget> children = new List.generate(decisions.length, (i) {
     String decision = decisions[i];
     return new Container(

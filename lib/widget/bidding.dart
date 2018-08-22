@@ -11,7 +11,8 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget bidAmount(BuildContext context, Store<GameModel> store, int bidAmount, int balance) =>
+Widget bidAmount(
+        BuildContext context, Store<GameModel> store, int bidAmount, int balance, bool unlimited) =>
     new Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -24,7 +25,7 @@ Widget bidAmount(BuildContext context, Store<GameModel> store, int bidAmount, in
             context,
             Icons.arrow_forward,
             () => store.dispatch(new IncrementBidAmountAction(
-                balance, isAuction(store.state) ? 999 : currentHeist(store.state).maximumBid))),
+                balance, unlimited ? 999 : currentHeist(store.state).maximumBid))),
       ],
     );
 
@@ -43,11 +44,13 @@ Widget cancelButton(BuildContext context, Store<GameModel> store, bool loading, 
 Widget bidding(Store<GameModel> store) {
   return StoreConnector<GameModel, BiddingViewModel>(
       converter: (store) => new BiddingViewModel._(
-          currentBalance(store.state),
-          getBidAmount(store.state),
-          requestInProcess(store.state, Request.Bidding),
-          myCurrentBid(store.state),
-          numBids(store.state)),
+            currentBalance(store.state),
+            getBidAmount(store.state),
+            requestInProcess(store.state, Request.Bidding),
+            myCurrentBid(store.state),
+            bidderNames(store.state),
+            haveGuessedKingpin(store.state),
+          ),
       distinct: true,
       builder: (context, viewModel) {
         String currentBidAmount = viewModel.bid == null
@@ -72,13 +75,25 @@ Widget bidding(Store<GameModel> store) {
                 ),
               ];
 
-        String maximumBid = auction ? 'Unlimited' : heist.maximumBid.toString();
+        String maximumBid =
+            auction || viewModel.haveGuessedKingpin ? 'Unlimited' : heist.maximumBid.toString();
         children.addAll([
-          new Text('Bids so far: ${viewModel.numBids} / ${getRoom(store.state).numPlayers}',
+          new Text(
+              'Bidders so far (${viewModel.bidders.length} / ${getRoom(store.state).numPlayers}):',
               style: infoTextStyle),
-          new Text('Your bid: $currentBidAmount', style: infoTextStyle),
+          new Column(
+            children: new List.generate(
+              viewModel.bidders.length,
+              (i) => new Text(viewModel.bidders.elementAt(i), style: subtitleTextStyle),
+            ),
+          ),
+          new Padding(
+            padding: paddingSmall,
+            child: new Text('Your bid: $currentBidAmount', style: infoTextStyle),
+          ),
           new Text('Maximum bid: $maximumBid', style: infoTextStyle),
-          bidAmount(context, store, viewModel.bidAmount, viewModel.balance),
+          bidAmount(context, store, viewModel.bidAmount, viewModel.balance,
+              auction || viewModel.haveGuessedKingpin),
           new Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
             cancelButton(context, store, viewModel.loading, viewModel.bid),
             submitButton(store, viewModel.loading, viewModel.bidAmount),
@@ -101,9 +116,17 @@ class BiddingViewModel {
   final int bidAmount;
   final bool loading;
   final Bid bid;
-  final int numBids;
+  final Set<String> bidders;
+  final bool haveGuessedKingpin;
 
-  BiddingViewModel._(this.balance, this.bidAmount, this.loading, this.bid, this.numBids);
+  BiddingViewModel._(
+    this.balance,
+    this.bidAmount,
+    this.loading,
+    this.bid,
+    this.bidders,
+    this.haveGuessedKingpin,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -114,14 +137,20 @@ class BiddingViewModel {
           bidAmount == other.bidAmount &&
           loading == other.loading &&
           bid == other.bid &&
-          numBids == other.numBids;
+          bidders == other.bidders &&
+          haveGuessedKingpin == other.haveGuessedKingpin;
 
   @override
   int get hashCode =>
-      balance.hashCode ^ bidAmount.hashCode ^ loading.hashCode ^ bid.hashCode ^ numBids.hashCode;
+      balance.hashCode ^
+      bidAmount.hashCode ^
+      loading.hashCode ^
+      bid.hashCode ^
+      bidders.hashCode ^
+      haveGuessedKingpin.hashCode;
 
   @override
   String toString() {
-    return 'BiddingViewModel{balance: $balance, bidAmount: $bidAmount, loading: $loading, bid: $bid, numBids: $numBids}';
+    return 'BiddingViewModel{balance: $balance, bidAmount: $bidAmount, loading: $loading, bid: $bid, bidders: $bidders, haveGuessedKingpin: $haveGuessedKingpin}';
   }
 }

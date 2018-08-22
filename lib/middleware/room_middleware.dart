@@ -134,7 +134,8 @@ class AddVisibleToAccountantAction extends MiddlewareAction {
 
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
-    return store.state.db.addVisibleToAccountant(getRoom(store.state).id, playerId);
+    return withRequest(Request.SelectingVisibleToAccountant, store,
+            (store) => store.state.db.addVisibleToAccountant(getRoom(store.state).id, playerId));
   }
 }
 

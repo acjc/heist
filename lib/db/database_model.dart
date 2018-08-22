@@ -41,6 +41,7 @@ class Room extends Document {
   final DateTime completedAt;
   final int numPlayers;
   final Set<String> roles;
+  final Set<String> visibleToAccountant;
 
   Room(
       {id,
@@ -50,7 +51,8 @@ class Room extends Document {
       this.owner,
       this.completedAt,
       @required this.numPlayers,
-      @required this.roles})
+      @required this.roles,
+      this.visibleToAccountant})
       : super(id: id);
 
   factory Room.initial(int numPlayers) =>
@@ -65,6 +67,7 @@ class Room extends Document {
     DateTime completedAt,
     int numPlayers,
     Set<String> roles,
+    Set<String> visibleToAccountant,
   }) {
     return new Room(
       id: id ?? this.id,
@@ -75,6 +78,7 @@ class Room extends Document {
       completedAt: completedAt ?? this.completedAt,
       numPlayers: numPlayers ?? this.numPlayers,
       roles: roles ?? this.roles,
+      visibleToAccountant: visibleToAccountant ?? this.visibleToAccountant,
     );
   }
 
@@ -88,6 +92,7 @@ class Room extends Document {
         completedAt = json['completedAt'],
         numPlayers = json['numPlayers'],
         roles = _boolMapToSet(json['roles']?.cast<String, bool>()),
+        visibleToAccountant = _boolMapToSet(json['visibleToAccountant']?.cast<String, bool>()),
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -98,6 +103,7 @@ class Room extends Document {
         'completedAt': completedAt,
         'numPlayers': numPlayers,
         'roles': _toBoolMap(roles, getRoleIds(allRoles)),
+        'visibleToAccountant': _toBoolMap(visibleToAccountant, visibleToAccountant),
       };
 
   @override
@@ -108,15 +114,16 @@ class Room extends Document {
           code == other.code &&
           numPlayers == other.numPlayers &&
           roles == other.roles &&
-          completedAt == other.completedAt;
+          completedAt == other.completedAt &&
+          visibleToAccountant == other.visibleToAccountant;
 
   @override
   int get hashCode =>
-      id.hashCode ^ code.hashCode ^ numPlayers.hashCode ^ roles.hashCode ^ completedAt.hashCode;
+      id.hashCode ^ code.hashCode ^ numPlayers.hashCode ^ roles.hashCode ^ completedAt.hashCode ^ visibleToAccountant.hashCode;
 
   @override
   String toString() {
-    return 'Room{id: $id, code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles}';
+    return 'Room{id: $id, code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles, visibleToAccountant: $visibleToAccountant}';
   }
 }
 

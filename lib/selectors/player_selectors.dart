@@ -19,6 +19,9 @@ final getPlayerByRoleId =
 final getPlayerById =
     (GameModel gameModel, String id) => getPlayers(gameModel).singleWhere((p) => p.id == id);
 
+final getPlayerByName =
+    (GameModel gameModel, String name) => getPlayers(gameModel).singleWhere((p) => p.name == name);
+
 final Selector<GameModel, List<Player>> getOtherPlayers = createSelector2(getPlayers, getSelf,
     (List<Player> players, Player me) => players.where((Player p) => p.id != me.id).toList());
 

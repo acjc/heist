@@ -69,7 +69,8 @@ class CreateRoomAction extends MiddlewareAction {
         appVersion: appVersion,
         owner: getPlayerInstallId(store.state),
         numPlayers: store.state.room.numPlayers,
-        roles: store.state.room.roles);
+        roles: store.state.room.roles,
+        visibleToAccountant: store.state.room.visibleToAccountant);
     String roomId = await store.state.db.upsertRoom(room);
     store.dispatch(new UpdateStateAction<Room>(room.copyWith(id: roomId)));
   }
@@ -124,4 +125,15 @@ class CompleteGameAction extends MiddlewareAction {
       Request.CompletingGame,
       store,
       (store) => store.state.db.completeGame(getRoom(store.state).id));
+}
+
+class AddVisibleToAccountantAction extends MiddlewareAction {
+  final String playerId;
+
+  AddVisibleToAccountantAction(this.playerId);
+
+  @override
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
+    return store.state.db.addVisibleToAccountant(getRoom(store.state).id, playerId);
+  }
 }

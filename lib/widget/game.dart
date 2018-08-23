@@ -148,7 +148,7 @@ class GameState extends State<Game> {
           getSelf(store.state),
           getRoom(_store.state).visibleToAccountant,
           getRoom(_store.state).kingpinGuess,
-          getRounds(_store.state),
+          getRounds(_store.state), // so that the accountant sees updated balances
           requestInProcess(store.state, Request.GuessingKingpin),
           requestInProcess(store.state, Request.SelectingVisibleToAccountant)),
       distinct: true,

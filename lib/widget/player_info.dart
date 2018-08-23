@@ -28,10 +28,16 @@ Widget playerInfo(Store<GameModel> store) {
                   style: infoTextStyle,
                 ),
                 new VerticalDivider(),
-                new Text(
-                  viewModel.balance.toString(),
-                  style: infoTextStyle,
-                ),
+                new Column(children:[
+                  new Text(
+                    "Balance",
+                    style: infoTextStyle,
+                  ),
+                  new Text(
+                    viewModel.balance.toString(),
+                    style: infoTextStyle,
+                  ),
+                ])
               ],
             ),
           ),

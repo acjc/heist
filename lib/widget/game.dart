@@ -168,21 +168,30 @@ class GameState extends State<Game> {
   Card _getTeamAndRoleCard(Player me) {
     return new Card(
         elevation: 2.0,
-        child: new Column(
-            children: [
-                new ListTile(
-                  title: new Text(
-                    "You are in team ${getTeam(me.role).toString()}",
+        child: new Padding(padding: paddingMedium,
+          child: new Row(
+            children: [new Column(
+              children: [
+                  new Text(
+                      "You are in team:",
+                      style: infoTextStyle,
+                    ),
+                  new Text(
+                      "${getTeam(me.role).toString()}",
+                      style: titleTextStyle,
+                    ),
+                  new Text(
+                    "Your role is:",
                     style: infoTextStyle,
                   ),
-                ),
-                new ListTile(
-                  title: new Text(
-                    "Your role is ${getRoleDisplayName(me.role)}",
-                    style: infoTextStyle,
+                  new Text(
+                    "${getRoleDisplayName(me.role)}",
+                    style: titleTextStyle,
                   ),
-                ),
-              ]));
+                ])],
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+          )));
   }
 
   // show the identities the player knows, if any
@@ -190,21 +199,21 @@ class GameState extends State<Game> {
     if (getKnownIds(me.role) != null) {
       children.add(new Card(
           elevation: 2.0,
-          child: new Column(
-              children: [
-                new ListTile(
-                  title: new Text(
-                    "You also know these identities:",
-                    style: infoTextStyle,
+          child: new Padding(
+            padding: paddingMedium,
+            child: new Column(
+                children: [
+                  new ListTile(
+                    title: new Text(
+                      "You also know these identities:",
+                      style: infoTextStyle,
+                    ),
+                    subtitle: new Text(
+                      "${_getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
+                      style: infoTextStyle,
+                    ),
                   ),
-                ),
-                new ListTile(
-                  title: new Text(
-                    "${_getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
-                    style: infoTextStyle,
-                  ),
-                ),
-              ])));
+                ]))));
     }
   }
 
@@ -281,7 +290,9 @@ class GameState extends State<Game> {
 
       children.add(new Card(
           elevation: 2.0,
-          child: new Column(children: tiles)));
+          child: new Padding(
+              padding: paddingMedium,
+              child: new Column(children: tiles))));
     }
   }
 
@@ -337,7 +348,9 @@ class GameState extends State<Game> {
 
       children.add(new Card(
           elevation: 2.0,
-          child: new Column(children: tiles)));
+          child: new Padding(
+              padding: paddingMedium,
+              child: new Column(children: tiles))));
     }
   }
 

@@ -41,6 +41,8 @@ class Game extends StatefulWidget {
 
 class GameState extends State<Game> {
   final Store<GameModel> _store;
+  String _kingpinGuess;
+  String _accountantSelection;
 
   GameState(this._store);
 
@@ -82,7 +84,6 @@ class GameState extends State<Game> {
     return new Column(children: children);
   }
 
-  // TODO: for current heist, show which round it is
   Widget _gameLoop(MainBoardViewModel viewModel) {
     // team picking (not needed for auctions)
     if (!isAuction(_store.state) && viewModel.waitingForTeam) {
@@ -144,100 +145,75 @@ class GameState extends State<Game> {
 
   Widget _secretBoardBody() => new StoreConnector<GameModel, SecretBoardModel>(
       converter: (store) => new SecretBoardModel._(
-          getSelf(store.state), getRoom(_store.state).visibleToAccountant, getRounds(_store.state)),
+          getSelf(store.state),
+          getRoom(_store.state).visibleToAccountant,
+          getRoom(_store.state).kingpinGuess,
+          getRounds(_store.state), // so that the accountant sees updated balances
+          requestInProcess(store.state, Request.GuessingKingpin),
+          requestInProcess(store.state, Request.SelectingVisibleToAccountant)),
       distinct: true,
-      builder: (context, me) =>
-          new Card(elevation: 2.0, child: new Column(children: getSecretListTiles(me.player))));
+      builder: (context, me) {
+        List<Widget> children = [
+          _getTeamAndRoleCard(me.player),
+        ];
 
-  List<Widget> getSecretListTiles(Player me) {
-    List<Widget> basicTiles = [
-      new ListTile(
-        title: new Text(
-          "You are in team ${getTeam(me.role).toString()}",
-          style: infoTextStyle,
-        ),
-      ),
-      new ListTile(
-        title: new Text(
-          "Your role is ${getRoleDisplayName(me.role)}",
-          style: infoTextStyle,
-        ),
-      ),
-    ];
+        _addExtraIdsCardIfNeeded(me.player, children);
+        _addAccountantCardIfNeeded(me.player, children, me.selectingVisibleToAccountant);
+        _addLeadAgentCardIfNeeded(me.player, children, me.guessingKingpin);
 
-    // show the identities the player knows, if any
-    if (getKnownIds(me.role) != null) {
-      basicTiles.add(new ListTile(
-        title: new Text(
-          "You also know these identities:",
-          style: infoTextStyle,
-        ),
-      ));
-      basicTiles.add(new ListTile(
-        title: new Text(
-          "${_getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
-          style: infoTextStyle,
-        ),
-      ));
-    }
+        return new Column(children: children);
+      }
+  );
 
-    // show the balances the accountant knows, if needed
-    _addAccountantTiles(me, basicTiles);
-
-    return basicTiles;
+  Card _getTeamAndRoleCard(Player me) {
+    return new Card(
+        elevation: 2.0,
+        child: new Padding(padding: paddingMedium,
+          child: new Row(
+            children: [new Column(
+              children: [
+                  new Text(
+                      "You are in team:",
+                      style: infoTextStyle,
+                    ),
+                  new Text(
+                      "${getTeam(me.role).toString()}",
+                      style: titleTextStyle,
+                    ),
+                  new Text(
+                    "Your role is:",
+                    style: infoTextStyle,
+                  ),
+                  new Text(
+                    "${getRoleDisplayName(me.role)}",
+                    style: titleTextStyle,
+                  ),
+                ])],
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+          )));
   }
 
-  _addAccountantTiles(final Player me, final List<Widget> basicTiles) {
-    if (me.role == ACCOUNTANT.roleId) {
-      // the accountant can reveal a balance per completed heist up to a maximum
-      // of half the number of players rounded down
-      int completedHeists =
-          getHeists(_store.state).where((heist) => heist.completedAt != null).length;
-      int numPlayers = getRoom(_store.state).numPlayers;
-      int maxBalances = min(completedHeists, (numPlayers / 2).floor());
-      basicTiles.add(
-        new ListTile(
-          title: new Text(
-            'You can also see the balance of up to $maxBalances people:',
-            style: infoTextStyle,
-          ),
-        ),
-      );
-
-      Set<String> visibleToAccountant = getRoom(_store.state).visibleToAccountant;
-
-      visibleToAccountant?.forEach((String playerId) {
-        Player player = getPlayerById(_store.state, playerId);
-        basicTiles.add(
-          new ListTile(
-            title: new Text(
-              '${player.name}: ${calculateBalanceFromStore(_store, player)}',
-              style: infoTextStyle,
-            ),
-          ),
-        );
-      });
-
-      if (maxBalances > 0 && maxBalances > visibleToAccountant?.length) {
-        List<String> pickablePlayers = getPlayers(_store.state)
-            .where((p) => p.id != me.id && !visibleToAccountant.contains(p.id))
-            .map((p) => p.name)
-            .toList();
-        basicTiles.add(new DropdownButton<String>(
-            hint: new Text('PICK BALANCE TO SEE', style: infoTextStyle),
-            items: pickablePlayers.map((String value) {
-              return new DropdownMenuItem<String>(
-                value: value,
-                child: new Text(value),
-              );
-            }).toList(),
-            onChanged: (String newValue) {
-              setState(() {
-                _store.dispatch(
-                    new AddVisibleToAccountantAction(getPlayerByName(_store.state, newValue).id));
-              });
-            }));
-      }
+  // show the identities the player knows, if any
+  _addExtraIdsCardIfNeeded(final Player me, final List<Widget> children) {
+    if (getKnownIds(me.role) != null) {
+      children.add(new Card(
+          elevation: 2.0,
+          child: new Padding(
+            padding: paddingMedium,
+            child: new Column(
+                children: [
+                  new ListTile(
+                    title: new Text(
+                      "You also know these identities:",
+                      style: infoTextStyle,
+                    ),
+                    subtitle: new Text(
+                      "${_getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
+                      style: infoTextStyle,
+                    ),
+                  ),
+                ]))));
     }
   }
 
@@ -250,6 +226,132 @@ class GameState extends State<Game> {
           "\n";
     });
     return formattedKnownIds;
+  }
+
+  // show the balances the accountant knows, if needed
+  _addAccountantCardIfNeeded(final Player me, final List<Widget> children, final bool selectingVisibleToAccountant) {
+    if (me.role == ACCOUNTANT.roleId) {
+      final List<Widget> tiles = [];
+      // the accountant can reveal a balance per completed heist up to a maximum
+      // of half the number of players rounded down
+      int completedHeists =
+          getHeists(_store.state).where((heist) => heist.completedAt != null).length;
+      int numPlayers = getRoom(_store.state).numPlayers;
+      int maxBalances = min(completedHeists, (numPlayers / 2).floor());
+      tiles.add(
+        new ListTile(
+          title: new Text(
+            'You can also see the balance of up to $maxBalances people:',
+            style: infoTextStyle,
+          ),
+        ),
+      );
+
+      Set<String> visibleToAccountant = getRoom(_store.state).visibleToAccountant;
+
+      visibleToAccountant?.forEach((String playerId) {
+        Player player = getPlayerById(_store.state, playerId);
+        tiles.add(
+          new ListTile(
+            title: new Text(
+              '${player.name}: ${calculateBalanceFromStore(_store, player)}',
+              style: infoTextStyle,
+            ),
+          ),
+        );
+      });
+
+      if (maxBalances > 0 && maxBalances > visibleToAccountant?.length) {
+        List<String> pickablePlayers = getOtherPlayers(_store.state)
+            .where((p) => !visibleToAccountant.contains(p.id))
+            .map((p) => p.name)
+            .toList();
+        tiles.add(new DropdownButton<String>(
+            hint: new Text('PICK BALANCE TO SEE', style: infoTextStyle),
+            value: _accountantSelection,
+            items: pickablePlayers.map((String value) {
+              return new DropdownMenuItem<String>(
+                value: value,
+                child: new Text(value),
+              );
+            }).toList(),
+            onChanged: (String newValue) {
+              setState(() {
+                _accountantSelection = newValue;
+              });
+            }));
+        tiles.add(new RaisedButton(
+            child: const Text('CONFIRM SELECTION', style: buttonTextStyle),
+            onPressed: selectingVisibleToAccountant
+                ? null
+                : () => _store.dispatch(
+                    new AddVisibleToAccountantAction(getPlayerByName(_store.state, _accountantSelection).id))));
+      }
+
+      children.add(new Card(
+          elevation: 2.0,
+          child: new Padding(
+              padding: paddingMedium,
+              child: new Column(children: tiles))));
+    }
+  }
+
+  // show the UI to guess the kingpin, if needed
+  _addLeadAgentCardIfNeeded(final Player me, final List<Widget> children, final bool guessingKingpin) {
+    if (me.role == LEAD_AGENT.roleId) {
+      // the lead agent can try to guess who the kingpin is once during a game
+      List<Widget> tiles = [new ListTile(
+        title: new Text(
+          'You can try to guess who the kingpin is once during the game.'
+              ' If you get it right, your bids can be higher than the maximum'
+              ' bid from then on.',
+          style: infoTextStyle,
+        ),
+      )];
+
+      if (getRoom(_store.state).kingpinGuess == null) {
+        List<String> pickablePlayers = getOtherPlayers(_store.state)
+            .map((p) => p.name)
+            .toList();
+        tiles.add(new DropdownButton<String>(
+            hint: new Text('SELECT YOUR KINGPIN GUESS', style: infoTextStyle),
+            value: _kingpinGuess,
+            items: pickablePlayers.map((String value) {
+              return new DropdownMenuItem<String>(
+                value: value,
+                child: new Text(value),
+              );
+            }).toList(),
+            onChanged: (String newValue) {
+              setState(() {
+                _kingpinGuess = newValue;
+              });
+            }));
+        tiles.add(new RaisedButton(
+            child: const Text('CONFIRM GUESS', style: buttonTextStyle),
+            onPressed: guessingKingpin
+                ? null
+                : () => _store.dispatch(new GuessKingpinAction(getPlayerByName(_store.state, _kingpinGuess).id))));
+      } else {
+        final String kingpinGuessId = getRoom(_store.state).kingpinGuess;
+        final String kingpinGuessName = getPlayerById(_store.state, kingpinGuessId).name;
+        final String result = haveGuessedKingpin(_store.state) ? 'RIGHT!!!' : 'WRONG :(';
+        tiles.add(
+          new ListTile(
+            title: new Text(
+              'You checked if $kingpinGuessName is the kingpin. This is $result',
+              style: infoTextStyle,
+            ),
+          ),
+        );
+      }
+
+      children.add(new Card(
+          elevation: 2.0,
+          child: new Padding(
+              padding: paddingMedium,
+              child: new Column(children: tiles))));
+    }
   }
 
   Widget _loadingScreen() => new StoreConnector<GameModel, LoadingScreenViewModel>(
@@ -301,8 +403,9 @@ class GameState extends State<Game> {
       converter: (store) => gameIsReady(store.state),
       distinct: true,
       builder: (context, gameIsReady) => new Expanded(
-            child: gameIsReady ? _secretBoardBody() : _loadingScreen(),
-          ));
+          child: new SingleChildScrollView(
+              child: gameIsReady ? _secretBoardBody() : _loadingScreen(),
+          )));
 
   @override
   Widget build(BuildContext context) {
@@ -435,9 +538,18 @@ class GameActiveViewModel {
 class SecretBoardModel {
   final Player player;
   final Set<String> visibleToAccountant;
+  final String kingpinGuess;
   final Map<String, List<Round>> rounds;
+  final bool guessingKingpin;
+  final bool selectingVisibleToAccountant;
 
-  SecretBoardModel._(this.player, this.visibleToAccountant, this.rounds);
+  SecretBoardModel._(
+      this.player,
+      this.visibleToAccountant,
+      this.kingpinGuess,
+      this.rounds,
+      this.guessingKingpin,
+      this.selectingVisibleToAccountant);
 
   @override
   bool operator ==(Object other) =>
@@ -445,14 +557,27 @@ class SecretBoardModel {
       other is SecretBoardModel &&
           player == other.player &&
           visibleToAccountant == other.visibleToAccountant &&
-          rounds == other.rounds;
+          kingpinGuess == other.kingpinGuess &&
+          rounds == other.rounds &&
+          guessingKingpin == other.guessingKingpin &&
+          selectingVisibleToAccountant == other.selectingVisibleToAccountant;
 
   @override
-  int get hashCode => player.hashCode ^ visibleToAccountant.hashCode ^ rounds.hashCode;
+  int get hashCode => player.hashCode
+      ^ visibleToAccountant.hashCode
+      ^ kingpinGuess.hashCode
+      ^ rounds.hashCode
+      ^ guessingKingpin.hashCode
+      ^ selectingVisibleToAccountant.hashCode;
 
   @override
   String toString() {
-    return 'SecretBoardModel{player: $player, visibleToAccountant: $visibleToAccountant, rounds: $rounds}';
+    return 'SecretBoardModel{player: $player, '
+        'visibleToAccountant: $visibleToAccountant, '
+        'kingpinGuess: $kingpinGuess, '
+        'rounds: $rounds, '
+        'guessingKingpin: $guessingKingpin, '
+        'selectingVisibleToAccountant: $selectingVisibleToAccountant}';
   }
 }
 

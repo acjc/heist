@@ -23,21 +23,35 @@ Widget playerInfo(Store<GameModel> store) {
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                new Text(
-                  '${viewModel.me.name} (${viewModel.me.order})',
-                  style: infoTextStyle,
+                new Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    new Text(
+                      viewModel.me.name,
+                      style: boldTextStyle,
+                    ),
+                    new Text(
+                      'Player ${viewModel.me.order}',
+                      style: subtitleTextStyle,
+                    ),
+                  ],
                 ),
                 new VerticalDivider(),
-                new Column(children:[
-                  new Text(
-                    "Balance",
-                    style: infoTextStyle,
-                  ),
-                  new Text(
-                    viewModel.balance.toString(),
-                    style: infoTextStyle,
-                  ),
-                ])
+                new Row(
+                  children: [
+                    new Container(
+                      child: new Icon(
+                        Icons.attach_money,
+                        size: 36.0,
+                      ),
+                      margin: const EdgeInsets.only(right: 10.0),
+                    ),
+                    new Text(
+                      viewModel.balance.toString(),
+                      style: bigNumberTextStyle,
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

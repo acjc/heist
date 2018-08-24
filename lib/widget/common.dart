@@ -11,6 +11,8 @@ const EdgeInsets paddingTiny = const EdgeInsets.all(8.0);
 const EdgeInsets paddingTitle = const EdgeInsets.only(bottom: 12.0);
 
 const TextStyle infoTextStyle = const TextStyle(fontSize: 16.0);
+const TextStyle boldTextStyle = const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold);
+const TextStyle bigNumberTextStyle = const TextStyle(fontSize: 32.0, fontWeight: FontWeight.w300);
 const TextStyle titleTextStyle = const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
 const TextStyle subtitleTextStyle = const TextStyle(color: Colors.black54);
 const TextStyle buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
@@ -69,7 +71,7 @@ Widget roundTitle(Store<GameModel> store) {
     child: new ListTile(
       title: new Text(
         'Heist ${currentHeist(store.state).order}',
-        style: new TextStyle(fontWeight: FontWeight.bold),
+        style: boldTextStyle,
       ),
       subtitle: new Text(subtitle),
     ),

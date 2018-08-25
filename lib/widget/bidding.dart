@@ -11,21 +11,21 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget bidAmount(
-        BuildContext context, Store<GameModel> store, int bidAmount, int balance, bool unlimited) =>
+Widget bidSelector(BuildContext context, Store<GameModel> store, int bidAmount, int balance,
+        Heist heist, bool unlimited) =>
     new Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         iconWidget(context, Icons.arrow_back, () => store.dispatch(new DecrementBidAmountAction())),
-        new Text(bidAmount.toString(),
-            style: const TextStyle(
-              fontSize: 32.0,
-            )),
+        new Text(
+          bidAmount.toString(),
+          style: bigNumberTextStyle,
+        ),
         iconWidget(
             context,
             Icons.arrow_forward,
-            () => store.dispatch(new IncrementBidAmountAction(
-                balance, unlimited ? 999 : currentHeist(store.state).maximumBid))),
+            () => store.dispatch(
+                new IncrementBidAmountAction(balance, unlimited ? 999 : heist.maximumBid))),
       ],
     );
 
@@ -53,9 +53,7 @@ Widget bidding(Store<GameModel> store) {
           ),
       distinct: true,
       builder: (context, viewModel) {
-        String currentBidAmount = viewModel.bid == null
-            ? 'None'
-            : min(viewModel.bid.amount, viewModel.balance).toString();
+        String currentBid = viewModel.bid == null ? 'None' : viewModel.bid.amount.toString();
         Heist heist = currentHeist(store.state);
         bool auction = isAuction(store.state);
 
@@ -65,13 +63,18 @@ Widget bidding(Store<GameModel> store) {
                   padding: paddingTitle,
                   child: const Text('AUCTION!', style: titleTextStyle),
                 ),
-                new Text('${heist.numPlayers} spots available! Highest, then fastest, bids win!',
-                    style: infoTextStyle),
+                new Text(
+                  '${heist.numPlayers} spots available! Highest, then fastest, bids win!',
+                  style: infoTextStyle,
+                ),
               ]
             : [
                 new Container(
                   padding: paddingTitle,
-                  child: const Text('BIDDING', style: titleTextStyle),
+                  child: const Text(
+                    'BIDDING',
+                    style: titleTextStyle,
+                  ),
                 ),
               ];
 
@@ -89,15 +92,24 @@ Widget bidding(Store<GameModel> store) {
           ),
           new Padding(
             padding: paddingSmall,
-            child: new Text('Your bid: $currentBidAmount', style: infoTextStyle),
+            child: new Text('Your bid: $currentBid', style: infoTextStyle),
           ),
           new Text('Maximum bid: $maximumBid', style: infoTextStyle),
-          bidAmount(context, store, viewModel.bidAmount, viewModel.balance,
-              auction || viewModel.haveGuessedKingpin),
-          new Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-            cancelButton(context, store, viewModel.loading, viewModel.bid),
-            submitButton(store, viewModel.loading, viewModel.bidAmount),
-          ]),
+          bidSelector(
+            context,
+            store,
+            min(viewModel.bidAmount, viewModel.balance),
+            viewModel.balance,
+            heist,
+            auction || viewModel.haveGuessedKingpin,
+          ),
+          new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              cancelButton(context, store, viewModel.loading, viewModel.bid),
+              submitButton(store, viewModel.loading, viewModel.bidAmount),
+            ],
+          ),
         ]);
 
         return new Card(

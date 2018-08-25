@@ -11,16 +11,16 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget giftAmount(BuildContext context, Store<GameModel> store, int giftAmount, int balance) =>
+Widget giftSelector(BuildContext context, Store<GameModel> store, int giftAmount, int balance) =>
     new Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         iconWidget(
             context, Icons.arrow_back, () => store.dispatch(new DecrementGiftAmountAction())),
-        new Text(giftAmount.toString(),
-            style: const TextStyle(
-              fontSize: 32.0,
-            )),
+        new Text(
+          giftAmount.toString(),
+          style: bigNumberTextStyle,
+        ),
         iconWidget(context, Icons.arrow_forward,
             () => store.dispatch(new IncrementGiftAmountAction(balance))),
       ],
@@ -71,7 +71,7 @@ Widget gifting(Store<GameModel> store) => new StoreConnector<GameModel, GiftingV
                 style: infoTextStyle)));
       } else {
         children.addAll([
-          giftAmount(
+          giftSelector(
               context, store, min(viewModel.giftAmount, viewModel.balance), viewModel.balance),
           const Text('Choose a player to send a gift to:', style: infoTextStyle),
           recipientSelection(store, viewModel.giftAmount, viewModel.loading),

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
@@ -11,22 +9,21 @@ import 'package:heist/middleware/team_picker_middleware.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/reducers/request_reducers.dart';
 import 'package:heist/reducers/subscription_reducers.dart';
-import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
+import 'package:heist/widget/bidding.dart';
+import 'package:heist/widget/common.dart';
+import 'package:heist/widget/decision.dart';
+import 'package:heist/widget/endgame.dart';
+import 'package:heist/widget/game_history.dart';
+import 'package:heist/widget/gifting.dart';
+import 'package:heist/widget/heist_end.dart';
+import 'package:heist/widget/player_info.dart';
+import 'package:heist/widget/round_end.dart';
+import 'package:heist/widget/secret_board.dart';
+import 'package:heist/widget/selection_board.dart';
+import 'package:heist/widget/team_picker.dart';
 import 'package:redux/redux.dart';
-
-import 'bidding.dart';
-import 'common.dart';
-import 'decision.dart';
-import 'endgame.dart';
-import 'game_history.dart';
-import 'gifting.dart';
-import 'heist_end.dart';
-import 'player_info.dart';
-import 'round_end.dart';
-import 'selection_board.dart';
-import 'team_picker.dart';
 
 class Game extends StatefulWidget {
   final Store<GameModel> _store;
@@ -41,8 +38,6 @@ class Game extends StatefulWidget {
 
 class GameState extends State<Game> {
   final Store<GameModel> _store;
-  String _kingpinGuess;
-  String _accountantSelection;
 
   GameState(this._store);
 
@@ -143,221 +138,6 @@ class GameState extends State<Game> {
         );
       });
 
-  Widget _secretBoardBody() => new StoreConnector<GameModel, SecretBoardModel>(
-      converter: (store) => new SecretBoardModel._(
-          getSelf(store.state),
-          getRoom(_store.state).visibleToAccountant,
-          getRoom(_store.state).kingpinGuess,
-          getRounds(_store.state), // so that the accountant sees updated balances
-          requestInProcess(store.state, Request.GuessingKingpin),
-          requestInProcess(store.state, Request.SelectingVisibleToAccountant)),
-      distinct: true,
-      builder: (context, viewModel) {
-        List<Widget> children = [
-          _getTeamAndRoleCard(viewModel.me),
-        ];
-
-        _addExtraIdsCardIfNeeded(viewModel.me, children);
-        _addAccountantCardIfNeeded(viewModel.me, children, viewModel.selectingVisibleToAccountant);
-        _addLeadAgentCardIfNeeded(
-            viewModel.me, children, viewModel.kingpinGuess, viewModel.guessingKingpin);
-
-        return new Column(children: children);
-      });
-
-  Card _getTeamAndRoleCard(Player me) {
-    return new Card(
-        elevation: 2.0,
-        child: new Padding(
-            padding: paddingMedium,
-            child: new Row(
-              children: [
-                new Column(
-                  children: [
-                    new Text(
-                      "You are in team:",
-                      style: infoTextStyle,
-                    ),
-                    new Padding(
-                      padding: paddingTitle,
-                      child: new Text(
-                        "${getTeam(me.role).toString()}",
-                        style: titleTextStyle,
-                      ),
-                    ),
-                    new Text(
-                      "Your role is:",
-                      style: infoTextStyle,
-                    ),
-                    new Text(
-                      "${getRoleDisplayName(me.role)}",
-                      style: titleTextStyle,
-                    ),
-                  ],
-                ),
-              ],
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-            )));
-  }
-
-  // show the identities the player knows, if any
-  _addExtraIdsCardIfNeeded(final Player me, final List<Widget> children) {
-    if (getKnownIds(me.role) != null) {
-      children.add(new Card(
-          elevation: 2.0,
-          child: new Padding(
-              padding: paddingMedium,
-              child: new Column(children: [
-                new ListTile(
-                  title: new Text(
-                    "You also know these identities:",
-                    style: infoTextStyle,
-                  ),
-                  subtitle: new Text(
-                    "${_getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
-                    style: infoTextStyle,
-                  ),
-                ),
-              ]))));
-    }
-  }
-
-  String _getFormattedKnownIds(GameModel gameModel, Set<String> knownIds) {
-    String formattedKnownIds = "";
-    knownIds?.forEach((roleId) {
-      formattedKnownIds += getPlayerByRoleId(gameModel, roleId).name +
-          " is the " +
-          getRoleDisplayName(roleId) +
-          "\n";
-    });
-    return formattedKnownIds;
-  }
-
-  // show the balances the accountant knows, if needed
-  _addAccountantCardIfNeeded(
-      final Player me, final List<Widget> children, final bool selectingVisibleToAccountant) {
-    if (me.role == ACCOUNTANT.roleId) {
-      final List<Widget> tiles = [];
-      // the accountant can reveal a balance per completed heist up to a maximum
-      // of half the number of players rounded down
-      int completedHeists =
-          getHeists(_store.state).where((heist) => heist.completedAt != null).length;
-      int numPlayers = getRoom(_store.state).numPlayers;
-      int maxBalances = min(completedHeists, (numPlayers / 2).floor());
-      tiles.add(
-        new ListTile(
-          title: new Text(
-            'You can also see the balance of up to $maxBalances people:',
-            style: infoTextStyle,
-          ),
-        ),
-      );
-
-      Set<String> visibleToAccountant = getRoom(_store.state).visibleToAccountant;
-
-      visibleToAccountant?.forEach((String playerId) {
-        Player player = getPlayerById(_store.state, playerId);
-        tiles.add(
-          new ListTile(
-            title: new Text(
-              '${player.name}: ${calculateBalanceFromStore(_store, player)}',
-              style: infoTextStyle,
-            ),
-          ),
-        );
-      });
-
-      if (maxBalances > 0 && maxBalances > visibleToAccountant?.length) {
-        List<String> pickablePlayers = getOtherPlayers(_store.state)
-            .where((p) => !visibleToAccountant.contains(p.id))
-            .map((p) => p.name)
-            .toList();
-        tiles.add(new DropdownButton<String>(
-            hint: new Text('PICK BALANCE TO SEE', style: infoTextStyle),
-            value: _accountantSelection,
-            items: pickablePlayers.map((String value) {
-              return new DropdownMenuItem<String>(
-                value: value,
-                child: new Text(value),
-              );
-            }).toList(),
-            onChanged: (String newValue) {
-              setState(() {
-                _accountantSelection = newValue;
-              });
-            }));
-        tiles.add(new RaisedButton(
-            child: const Text('CONFIRM SELECTION', style: buttonTextStyle),
-            onPressed: selectingVisibleToAccountant
-                ? null
-                : () => _store.dispatch(new AddVisibleToAccountantAction(
-                    getPlayerByName(_store.state, _accountantSelection).id))));
-      }
-
-      children.add(new Card(
-          elevation: 2.0,
-          child: new Padding(padding: paddingMedium, child: new Column(children: tiles))));
-    }
-  }
-
-  // show the UI to guess the kingpin, if needed
-  _addLeadAgentCardIfNeeded(final Player me, final List<Widget> children, final String kingpinGuess,
-      final bool guessingKingpin) {
-    if (me.role == LEAD_AGENT.roleId) {
-      // the lead agent can try to guess who the kingpin is once during a game
-      List<Widget> tiles = [
-        new ListTile(
-          title: new Text(
-            'You can try to guess who the Kingpin is once during the game.'
-                ' If you get it right, your bids can be higher than the maximum'
-                ' bid from then on.',
-            style: infoTextStyle,
-          ),
-        )
-      ];
-
-      if (kingpinGuess == null) {
-        List<String> pickablePlayers = getOtherPlayers(_store.state).map((p) => p.name).toList();
-        tiles.add(new DropdownButton<String>(
-            hint: new Text('SELECT YOUR KINGPIN GUESS', style: infoTextStyle),
-            value: _kingpinGuess,
-            items: pickablePlayers.map((String value) {
-              return new DropdownMenuItem<String>(
-                value: value,
-                child: new Text(value),
-              );
-            }).toList(),
-            onChanged: (String newValue) {
-              setState(() {
-                _kingpinGuess = newValue;
-              });
-            }));
-        tiles.add(new RaisedButton(
-            child: const Text('CONFIRM GUESS', style: buttonTextStyle),
-            onPressed: guessingKingpin
-                ? null
-                : () => _store.dispatch(
-                    new GuessKingpinAction(getPlayerByName(_store.state, _kingpinGuess).id))));
-      } else {
-        final String kingpinGuessName = getPlayerById(_store.state, kingpinGuess).name;
-        final String result = haveGuessedKingpin(_store.state) ? 'CORRECT!' : 'INCORRECT! :(';
-        tiles.add(
-          new ListTile(
-            title: new Text(
-              'You checked if $kingpinGuessName is the Kingpin. This is $result',
-              style: infoTextStyle,
-            ),
-          ),
-        );
-      }
-
-      children.add(new Card(
-          elevation: 2.0,
-          child: new Padding(padding: paddingMedium, child: new Column(children: tiles))));
-    }
-  }
-
   Widget _loadingScreen() => new StoreConnector<GameModel, LoadingScreenViewModel>(
         converter: (store) => new LoadingScreenViewModel._(roomIsAvailable(store.state),
             waitingForPlayers(store.state), isNewGame(store.state), getPlayers(store.state).length),
@@ -404,12 +184,14 @@ class GameState extends State<Game> {
       });
 
   Widget _secretBoard() => new StoreConnector<GameModel, bool>(
-      converter: (store) => gameIsReady(store.state),
-      distinct: true,
-      builder: (context, gameIsReady) => new Expanded(
+        converter: (store) => gameIsReady(store.state),
+        distinct: true,
+        builder: (context, gameIsReady) => new Expanded(
               child: new SingleChildScrollView(
-            child: gameIsReady ? _secretBoardBody() : _loadingScreen(),
-          )));
+                child: gameIsReady ? new SecretBoard(_store) : _loadingScreen(),
+              ),
+            ),
+      );
 
   Widget _secretTab() => new StoreConnector<GameModel, bool>(
         converter: (store) =>
@@ -559,48 +341,6 @@ class GameActiveViewModel {
   @override
   String toString() {
     return 'GameActiveViewModel{gameIsReady: $gameIsReady, gameOver: $gameOver, completingGame: $completingGame}';
-  }
-}
-
-class SecretBoardModel {
-  final Player me;
-  final Set<String> visibleToAccountant;
-  final String kingpinGuess;
-  final Map<String, List<Round>> rounds;
-  final bool guessingKingpin;
-  final bool selectingVisibleToAccountant;
-
-  SecretBoardModel._(this.me, this.visibleToAccountant, this.kingpinGuess, this.rounds,
-      this.guessingKingpin, this.selectingVisibleToAccountant);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SecretBoardModel &&
-          me == other.me &&
-          visibleToAccountant == other.visibleToAccountant &&
-          kingpinGuess == other.kingpinGuess &&
-          rounds == other.rounds &&
-          guessingKingpin == other.guessingKingpin &&
-          selectingVisibleToAccountant == other.selectingVisibleToAccountant;
-
-  @override
-  int get hashCode =>
-      me.hashCode ^
-      visibleToAccountant.hashCode ^
-      kingpinGuess.hashCode ^
-      rounds.hashCode ^
-      guessingKingpin.hashCode ^
-      selectingVisibleToAccountant.hashCode;
-
-  @override
-  String toString() {
-    return 'SecretBoardModel{player: $me, '
-        'visibleToAccountant: $visibleToAccountant, '
-        'kingpinGuess: $kingpinGuess, '
-        'rounds: $rounds, '
-        'guessingKingpin: $guessingKingpin, '
-        'selectingVisibleToAccountant: $selectingVisibleToAccountant}';
   }
 }
 

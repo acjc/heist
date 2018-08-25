@@ -34,7 +34,7 @@ class CreateRoomPage extends StatelessWidget {
                 String roleId = roles.elementAt(i);
                 Color color = getTeam(roleId) == Team.THIEVES ? Colors.green : Colors.red;
                 return new Text(
-                  roleId,
+                  getRoleDisplayName(roleId),
                   style: new TextStyle(fontSize: 16.0, color: color, fontWeight: FontWeight.bold),
                 );
               }),

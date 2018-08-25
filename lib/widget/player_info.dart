@@ -23,19 +23,7 @@ Widget playerInfo(Store<GameModel> store) {
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                new Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    new Text(
-                      viewModel.me.name,
-                      style: boldTextStyle,
-                    ),
-                    new Text(
-                      'Player ${viewModel.me.order}',
-                      style: subtitleTextStyle,
-                    ),
-                  ],
-                ),
+                playerName(viewModel.me),
                 new VerticalDivider(),
                 new Row(
                   children: [
@@ -57,6 +45,29 @@ Widget playerInfo(Store<GameModel> store) {
           ),
         );
       });
+}
+
+Widget playerName(Player me) {
+  List<Widget> children = [
+    new Text(
+      me.name,
+      style: boldTextStyle,
+    ),
+  ];
+
+  if (me.order != null) {
+    children.add(
+      new Text(
+        'Player ${me.order}',
+        style: subtitleTextStyle,
+      ),
+    );
+  }
+
+  return new Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: children,
+  );
 }
 
 class PlayerInfoViewModel {

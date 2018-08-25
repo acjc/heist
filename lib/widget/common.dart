@@ -28,15 +28,11 @@ Widget iconWidget(BuildContext context, IconData icon, Function onPressed) {
 }
 
 Widget centeredMessage(String text) {
-  return new Center(
-      child: new Text(
-    text,
-    style: infoTextStyle,
-  ));
+  return new Center(child: new Text(text, style: infoTextStyle));
 }
 
 Widget loading() {
-  return centeredMessage('Loading...');
+  return new Center(child: new CircularProgressIndicator());
 }
 
 Color decisionColour(String decision) {

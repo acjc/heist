@@ -182,9 +182,9 @@ class GameState extends State<Game> {
         converter: (store) => gameIsReady(store.state),
         distinct: true,
         builder: (context, gameIsReady) => new Expanded(
-              child: new SingleChildScrollView(
-                child: gameIsReady ? new SecretBoard(_store) : _loadingScreen(),
-              ),
+              child: gameIsReady
+                  ? new SingleChildScrollView(child: new SecretBoard(_store))
+                  : _loadingScreen(),
             ),
       );
 

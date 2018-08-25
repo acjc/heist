@@ -6,10 +6,9 @@ import 'package:heist/db/database_model.dart';
 import 'package:heist/heist_definitions.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
+import 'package:heist/widget/common.dart';
+import 'package:heist/widget/team_picker.dart';
 import 'package:redux/redux.dart';
-
-import 'common.dart';
-import 'selection_board.dart';
 
 Widget heistDecisions(Heist heist) {
   List<String> decisions = new List.of(heist.decisions.values.toList());
@@ -92,12 +91,16 @@ Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int
   }
 
   if (heist != null && heist.complete) {
-    List<Player> players = getPlayers(store.state);
-    Set<String> teamNames =
-        players.where((p) => lastRound.team.contains(p.id)).map((p) => p.name).toSet();
+    Color color = Theme.of(context).accentColor;
+    Set<String> teamNames = teamNamesForRound(store.state, lastRound);
     children.addAll([
       new Divider(),
-      selectionGrid(context, players, teamNames),
+      new PlayerGridView(
+        new List.generate(
+          teamNames.length,
+          (i) => playerTile(teamNames.elementAt(i), true, color),
+        ),
+      ),
       heistDecisions(heist),
     ]);
   }

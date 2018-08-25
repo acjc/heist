@@ -34,21 +34,10 @@ Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, S
                     'TEAM (${teamNames.length} / ${currentHeist(store.state).numPlayers})',
                     style: titleTextStyle),
               ),
-              selectionGrid(context, players, teamNames),
+              new PlayerGridView(selectionBoardChildren(context, players, teamNames)),
             ])),
       );
     });
-
-Widget selectionGrid(BuildContext context, List<Player> players, Set<String> teamNames) =>
-    new GridView.count(
-        padding: paddingMedium,
-        shrinkWrap: true,
-        childAspectRatio: 6.0,
-        crossAxisCount: 2,
-        primary: false,
-        crossAxisSpacing: 10.0,
-        mainAxisSpacing: 10.0,
-        children: selectionBoardChildren(context, players, teamNames));
 
 List<Widget> selectionBoardChildren(
     BuildContext context, List<Player> players, Set<String> teamNames) {

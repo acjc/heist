@@ -9,10 +9,9 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget submitTeamButton(Store<GameModel> store, Set<String> teamIds, int playersRequired) {
+Widget submitTeamButton(Store<GameModel> store, bool enabled) {
   return new RaisedButton(
-    onPressed:
-        teamIds.length == playersRequired ? () => store.dispatch(new SubmitTeamAction()) : null,
+    onPressed: enabled ? () => store.dispatch(new SubmitTeamAction()) : null,
     child: const Text('SUBMIT TEAM', style: buttonTextStyle),
   );
 }
@@ -33,16 +32,11 @@ Widget teamPicker(Store<GameModel> store) {
                     child: new Column(children: [
                       new Text('Pick a team: ${teamIds.length} / $playersRequired',
                           style: infoTextStyle),
-                      new GridView.count(
-                          padding: paddingMedium,
-                          shrinkWrap: true,
-                          childAspectRatio: 4.0,
-                          crossAxisCount: 2,
-                          primary: false,
-                          crossAxisSpacing: 10.0,
-                          mainAxisSpacing: 10.0,
-                          children: teamPickerChildren(context, store, teamIds, playersRequired)),
-                      submitTeamButton(store, teamIds, playersRequired),
+                      new PlayerGridView(
+                        teamPickerChildren(context, store, teamIds, playersRequired),
+                        4.0,
+                      ),
+                      submitTeamButton(store, teamIds.length == playersRequired),
                     ])))
           ],
         );

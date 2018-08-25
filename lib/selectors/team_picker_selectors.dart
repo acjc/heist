@@ -28,3 +28,6 @@ final teamNames =
 
 // Reselect could not handle Set<String>
 final teamIds = (GameModel gameModel) => playersInTeam(gameModel).map((Player p) => p.id).toSet();
+
+final teamNamesForRound = (GameModel gameModel, Round round) =>
+    getPlayers(gameModel).where((p) => round.team.contains(p.id)).map((p) => p.name).toSet();

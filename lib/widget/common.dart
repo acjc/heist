@@ -73,3 +73,18 @@ Widget roundTitle(Store<GameModel> store) {
     ),
   );
 }
+
+/// Widget for showing a grid of player names
+class PlayerGridView extends GridView {
+  PlayerGridView(List<Widget> children, [double childAspectRatio])
+      : super.count(
+          padding: paddingMedium,
+          shrinkWrap: true,
+          childAspectRatio: childAspectRatio ?? 6.0,
+          crossAxisCount: 2,
+          primary: false,
+          crossAxisSpacing: 10.0,
+          mainAxisSpacing: 10.0,
+          children: children,
+        );
+}

@@ -28,23 +28,15 @@ Widget giftSelector(BuildContext context, Store<GameModel> store, int giftAmount
 
 Widget recipientSelection(Store<GameModel> store, int giftAmount, bool loading) {
   List<Player> otherPlayers = getOtherPlayers(store.state);
-  return new GridView.count(
-      padding: paddingMedium,
-      shrinkWrap: true,
-      childAspectRatio: 6.0,
-      crossAxisCount: 2,
-      primary: false,
-      crossAxisSpacing: 10.0,
-      mainAxisSpacing: 10.0,
-      children: new List.generate(otherPlayers.length, (i) {
-        Player player = otherPlayers[i];
-        return new RaisedButton(
-          child: new Text(player.name, style: buttonTextStyle),
-          onPressed: loading || giftAmount <= 0
-              ? null
-              : () => store.dispatch(new SendGiftAction(player.id, giftAmount)),
-        );
-      }));
+  return new PlayerGridView(new List.generate(otherPlayers.length, (i) {
+    Player player = otherPlayers[i];
+    return new RaisedButton(
+      child: new Text(player.name, style: buttonTextStyle),
+      onPressed: loading || giftAmount <= 0
+          ? null
+          : () => store.dispatch(new SendGiftAction(player.id, giftAmount)),
+    );
+  }));
 }
 
 Widget gifting(Store<GameModel> store) => new StoreConnector<GameModel, GiftingViewModel>(

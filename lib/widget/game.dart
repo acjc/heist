@@ -102,7 +102,7 @@ class GameState extends State<Game> {
 
     // active heist
     if (viewModel.heistIsActive) {
-      return goingOnHeist(_store.state) ? makeDecision(context, _store) : observeHeist(_store);
+      return activeHeist(context, _store);
     }
 
     // go to next heist

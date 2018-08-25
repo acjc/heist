@@ -112,6 +112,8 @@ class Room extends Document {
         'kingpinGuessed': kingpinGuess,
       };
 
+  bool get complete => completedAt != null;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

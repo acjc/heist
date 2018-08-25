@@ -54,7 +54,7 @@ class GameState extends State<Game> {
   }
 
   Widget _resolveEndgame(bool completingGame) {
-    if (!(getRoom(_store.state).completedAt == null) && !completingGame) {
+    if (!getRoom(_store.state).complete && !completingGame) {
       _store.dispatch(new CompleteGameAction());
     }
     return endgame(_store);
@@ -64,7 +64,7 @@ class GameState extends State<Game> {
     if (amOwner(_store.state) && !resolvingAuction) {
       _store.dispatch(new ResolveAuctionWinnersAction());
     }
-    return centeredMessage('Resolving auction...');
+    return null;
   }
 
   Widget _biddingAndGifting(Store<GameModel> store) {
@@ -114,29 +114,28 @@ class GameState extends State<Game> {
   }
 
   Widget _mainBoardBody() => new StoreConnector<GameModel, MainBoardViewModel>(
-      converter: (store) {
-        Heist heist = currentHeist(store.state);
-        Round round = currentRound(store.state);
-        return new MainBoardViewModel._(
-          waitingForTeam: !round.teamSubmitted,
-          biddingComplete: biddingComplete(store.state),
-          resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
-          roundComplete: round.complete,
-          heistIsActive: heistIsActive(store.state),
-          heistDecided: heist.allDecided,
-          heistComplete: heist.complete,
-        );
-      },
-      distinct: true,
-      builder: (context, viewModel) {
-        Widget child = _gameLoop(viewModel);
-        if (child == null) {
-          return loading();
-        }
-        return new SingleChildScrollView(
-          child: child,
-        );
-      });
+        converter: (store) {
+          Heist heist = currentHeist(store.state);
+          Round round = currentRound(store.state);
+          return new MainBoardViewModel._(
+            waitingForTeam: !round.teamSubmitted,
+            biddingComplete: biddingComplete(store.state),
+            resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
+            roundComplete: round.complete,
+            heistIsActive: heistIsActive(store.state),
+            heistDecided: heist.allDecided,
+            heistComplete: heist.complete,
+          );
+        },
+        distinct: true,
+        builder: (context, viewModel) {
+          Widget currentScreen = _gameLoop(viewModel);
+          if (currentScreen == null) {
+            return loading();
+          }
+          return new SingleChildScrollView(child: currentScreen);
+        },
+      );
 
   Widget _loadingScreen() => new StoreConnector<GameModel, LoadingScreenViewModel>(
         converter: (store) => new LoadingScreenViewModel._(roomIsAvailable(store.state),
@@ -173,11 +172,7 @@ class GameState extends State<Game> {
         }
         return new Column(
           children: [
-            new Expanded(
-              child: new SingleChildScrollView(
-                child: _mainBoardBody(),
-              ),
-            ),
+            new Expanded(child: _mainBoardBody()),
             gameHistory(_store),
           ],
         );

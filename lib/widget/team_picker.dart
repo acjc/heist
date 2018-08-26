@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/team_picker_middleware.dart';
 import 'package:heist/reducers/round_reducers.dart';
@@ -9,11 +10,11 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget submitTeamButton(Store<GameModel> store, Set<String> teamIds, int playersRequired) {
+Widget submitTeamButton(BuildContext context, Store<GameModel> store, Set<String> teamIds, int playersRequired) {
   return new RaisedButton(
     onPressed:
         teamIds.length == playersRequired ? () => store.dispatch(new SubmitTeamAction()) : null,
-    child: const Text('SUBMIT TEAM', style: buttonTextStyle),
+    child: Text(AppLocalizations.of(context).submitTeam, style: buttonTextStyle),
   );
 }
 
@@ -25,13 +26,13 @@ Widget teamPicker(Store<GameModel> store) {
         int playersRequired = currentHeist(store.state).numPlayers;
         return new Column(
           children: [
-            roundTitle(store),
+            roundTitle(context, store),
             new Card(
                 elevation: 2.0,
                 child: new Container(
                     padding: paddingMedium,
                     child: new Column(children: [
-                      new Text('Pick a team: ${teamIds.length} / $playersRequired',
+                      new Text(AppLocalizations.of(context).pickATeam(teamIds.length, playersRequired),
                           style: infoTextStyle),
                       new GridView.count(
                           padding: paddingMedium,
@@ -42,7 +43,7 @@ Widget teamPicker(Store<GameModel> store) {
                           crossAxisSpacing: 10.0,
                           mainAxisSpacing: 10.0,
                           children: teamPickerChildren(context, store, teamIds, playersRequired)),
-                      submitTeamButton(store, teamIds, playersRequired),
+                      submitTeamButton(context, store, teamIds, playersRequired),
                     ])))
           ],
         );

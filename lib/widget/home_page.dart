@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/keys.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/room_middleware.dart';
@@ -14,18 +15,18 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget enterNameForm(Store<GameModel> store, GlobalKey<FormState> key) => new Form(
+Widget enterNameForm(BuildContext context, Store<GameModel> store, GlobalKey<FormState> key) => new Form(
     key: key,
     child: new TextFormField(
         initialValue: isDebugMode() ? 'Mordred' : getPlayerName(store.state),
         decoration: new InputDecoration(
-          labelText: 'Enter your name',
+          labelText: AppLocalizations.of(context).enterYourName,
           isDense: true,
         ),
         style: new TextStyle(color: Colors.black87, fontSize: 24.0),
         autocorrect: false,
         textAlign: TextAlign.center,
-        validator: (value) => value == null || value.isEmpty ? 'Please enter a name' : null,
+        validator: (value) => value == null || value.isEmpty ? AppLocalizations.of(context).pleaseEnterAName : null,
         onSaved: (value) => store.dispatch(new SetPlayerNameAction(value))));
 
 class HomePage extends StatelessWidget {
@@ -34,7 +35,7 @@ class HomePage extends StatelessWidget {
       .withFunction((oldValue, newValue) => newValue.copyWith(text: newValue.text.toUpperCase()));
 
   Widget _enterRoomButton(BuildContext context, Store<GameModel> store) => new RaisedButton(
-        child: const Text('ENTER ROOM', style: buttonTextStyle),
+        child: Text(AppLocalizations.of(context).enterRoom, style: buttonTextStyle),
         onPressed: () {
           FormState enterCodeState = Keys.homePageCodeKey.currentState;
           FormState enterNameState = Keys.homePageNameKey.currentState;
@@ -46,12 +47,12 @@ class HomePage extends StatelessWidget {
         },
       );
 
-  Form _enterCodeForm(Store<GameModel> store) => new Form(
+  Form _enterCodeForm(BuildContext context, Store<GameModel> store) => new Form(
       key: Keys.homePageCodeKey,
       child: new TextFormField(
           initialValue: isDebugMode() ? 'ABCD' : null,
           decoration: new InputDecoration(
-            labelText: 'Enter an existing room code',
+            labelText: AppLocalizations.of(context).enterRoomCode,
             isDense: true,
           ),
           style: new TextStyle(color: Colors.black87, fontSize: 24.0),
@@ -62,7 +63,7 @@ class HomePage extends StatelessWidget {
             new WhitelistingTextInputFormatter(_onlyLetters),
             _capitalFormatter,
           ],
-          validator: (value) => value.length != 4 ? 'Invalid code' : null,
+          validator: (value) => value.length != 4 ? AppLocalizations.of(context).invalidCode : null,
           onSaved: (value) => store.dispatch(new SetRoomCodeAction(value))));
 
   Widget _body(Store<GameModel> store) => new StoreConnector<GameModel, bool>(
@@ -70,7 +71,7 @@ class HomePage extends StatelessWidget {
         distinct: true,
         builder: (context, validatingRoom) {
           if (validatingRoom) {
-            return loading();
+            return loading(context);
           }
           return new Padding(
             padding: paddingLarge,
@@ -78,11 +79,11 @@ class HomePage extends StatelessWidget {
               children: [
                 new Padding(
                   padding: EdgeInsets.only(bottom: 24.0),
-                  child: enterNameForm(store, Keys.homePageNameKey),
+                  child: enterNameForm(context, store, Keys.homePageNameKey),
                 ),
                 new Column(
                   children: [
-                    _enterCodeForm(store),
+                    _enterCodeForm(context, store),
                     _enterRoomButton(context, store),
                   ],
                 )
@@ -97,7 +98,7 @@ class HomePage extends StatelessWidget {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Heist: Homepage"),
+        title: new Text(AppLocalizations.of(context).homepageTitle),
       ),
       endDrawer: isDebugMode() ? new Drawer(child: new ReduxDevTools<GameModel>(store)) : null,
       floatingActionButton: new FloatingActionButton(

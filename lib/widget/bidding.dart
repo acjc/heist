@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/bidding_middleware.dart';
 import 'package:heist/reducers/bid_amount_reducers.dart';
@@ -29,8 +30,8 @@ Widget bidAmount(
       ],
     );
 
-Widget submitButton(Store<GameModel> store, bool loading, int bidAmount) => new RaisedButton(
-    child: const Text('SUBMIT BID', style: buttonTextStyle),
+Widget submitButton(BuildContext context, Store<GameModel> store, bool loading, int bidAmount) => new RaisedButton(
+    child: Text(AppLocalizations.of(context).submitBid, style: buttonTextStyle),
     onPressed: loading
         ? null
         : () => store.dispatch(new SubmitBidAction(getSelf(store.state).id, bidAmount)));
@@ -38,7 +39,7 @@ Widget submitButton(Store<GameModel> store, bool loading, int bidAmount) => new 
 Widget cancelButton(BuildContext context, Store<GameModel> store, bool loading, Bid bid) =>
     new RaisedButton(
         color: Theme.of(context).accentColor,
-        child: const Text('CANCEL BID', style: buttonTextStyle),
+        child: Text(AppLocalizations.of(context).cancelBid, style: buttonTextStyle),
         onPressed: loading || bid == null ? null : () => store.dispatch(new CancelBidAction()));
 
 Widget bidding(Store<GameModel> store) {
@@ -54,7 +55,7 @@ Widget bidding(Store<GameModel> store) {
       distinct: true,
       builder: (context, viewModel) {
         String currentBidAmount = viewModel.bid == null
-            ? 'None'
+            ? AppLocalizations.of(context).none
             : min(viewModel.bid.amount, viewModel.balance).toString();
         Heist heist = currentHeist(store.state);
         bool auction = isAuction(store.state);
@@ -63,23 +64,24 @@ Widget bidding(Store<GameModel> store) {
             ? [
                 new Container(
                   padding: paddingTitle,
-                  child: const Text('AUCTION!', style: titleTextStyle),
+                  child: Text(AppLocalizations.of(context).auctionTitle.toUpperCase(), style: titleTextStyle),
                 ),
-                new Text('${heist.numPlayers} spots available! Highest, then fastest, bids win!',
+                new Text(AppLocalizations.of(context).auctionDescription(heist.numPlayers),
                     style: infoTextStyle),
               ]
             : [
                 new Container(
                   padding: paddingTitle,
-                  child: const Text('BIDDING', style: titleTextStyle),
+                  child: Text(AppLocalizations.of(context).bidding, style: titleTextStyle),
                 ),
               ];
 
-        String maximumBid =
-            auction || viewModel.haveGuessedKingpin ? 'Unlimited' : heist.maximumBid.toString();
+        String maximumBid = auction || viewModel.haveGuessedKingpin
+            ? AppLocalizations.of(context).unlimited
+            : heist.maximumBid.toString();
         children.addAll([
           new Text(
-              'Bidders so far (${viewModel.bidders.length} / ${getRoom(store.state).numPlayers}):',
+              AppLocalizations.of(context).bidders(viewModel.bidders.length, getRoom(store.state).numPlayers),
               style: infoTextStyle),
           new Column(
             children: new List.generate(
@@ -89,14 +91,14 @@ Widget bidding(Store<GameModel> store) {
           ),
           new Padding(
             padding: paddingSmall,
-            child: new Text('Your bid: $currentBidAmount', style: infoTextStyle),
+            child: new Text(AppLocalizations.of(context).yourBid(currentBidAmount), style: infoTextStyle),
           ),
-          new Text('Maximum bid: $maximumBid', style: infoTextStyle),
+          new Text(AppLocalizations.of(context).maximumBid(maximumBid), style: infoTextStyle),
           bidAmount(context, store, viewModel.bidAmount, viewModel.balance,
               auction || viewModel.haveGuessedKingpin),
           new Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
             cancelButton(context, store, viewModel.loading, viewModel.bid),
-            submitButton(store, viewModel.loading, viewModel.bidAmount),
+            submitButton(context, store, viewModel.loading, viewModel.bidAmount),
           ]),
         ]);
 

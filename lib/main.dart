@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database.dart';
 import 'package:heist/keys.dart';
 import 'package:heist/middleware/middleware.dart';
@@ -76,13 +78,26 @@ class MyApp extends StatelessWidget {
       store: store,
       child: new MaterialApp(
         navigatorKey: Keys.navigatorKey,
-        title: 'Heist',
+        title: 'Heist', // can't localise this one because stuff hasn't been set up yet
         theme: new ThemeData(
           primaryColor: primaryColor,
           buttonColor: primaryColor,
           indicatorColor: Colors.white,
         ),
         home: new HomePage(),
+        localizationsDelegates: [
+          // app-specific localization delegate[s]
+          const AppLocalizationsDelegate(),
+          // provides localized strings and other values for the Material Components library
+          GlobalMaterialLocalizations.delegate,
+          // defines the default text direction, either left to right or right to left, for the widgets library
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: [
+          const Locale('en', ''), // English
+          const Locale('es', ''), // Spanish
+          // ... other locales the app supports
+        ],
       ),
     );
   }

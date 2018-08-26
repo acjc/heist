@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/game_middleware.dart';
@@ -62,19 +63,19 @@ class GameState extends State<Game> {
     if (!(getRoom(_store.state).completedAt == null) && !completingGame) {
       _store.dispatch(new CompleteGameAction());
     }
-    return endgame(_store);
+    return endgame(context, _store);
   }
 
   Widget _resolveAuctionWinners(bool resolvingAuction) {
     if (amOwner(_store.state) && !resolvingAuction) {
       _store.dispatch(new ResolveAuctionWinnersAction());
     }
-    return centeredMessage('Resolving auction...');
+    return centeredMessage(AppLocalizations.of(context).resolvingAuction);
   }
 
   Widget _biddingAndGifting(Store<GameModel> store) {
     List<Widget> children = [
-      roundTitle(store),
+      roundTitle(context, store),
       bidding(store),
     ];
     if (!isAuction(store.state)) {
@@ -87,7 +88,7 @@ class GameState extends State<Game> {
   Widget _gameLoop(MainBoardViewModel viewModel) {
     // team picking (not needed for auctions)
     if (!isAuction(_store.state) && viewModel.waitingForTeam) {
-      return isMyGo(_store.state) ? teamPicker(_store) : waitForTeam(_store);
+      return isMyGo(_store.state) ? teamPicker(_store) : waitForTeam(context, _store);
     }
 
     // bidding
@@ -97,7 +98,7 @@ class GameState extends State<Game> {
 
     // resolve round
     if (!viewModel.roundComplete) {
-      return roundEnd(_store);
+      return roundEnd(context, _store);
     }
 
     // resolve auction
@@ -136,7 +137,7 @@ class GameState extends State<Game> {
       builder: (context, viewModel) {
         Widget child = _gameLoop(viewModel);
         if (child == null) {
-          return loading();
+          return loading(context);
         }
         return new SingleChildScrollView(
           child: child,
@@ -175,22 +176,22 @@ class GameState extends State<Game> {
                 new Column(
                   children: [
                     new Text(
-                      "You are in team:",
+                      AppLocalizations.of(context).yourTeam,
                       style: infoTextStyle,
                     ),
                     new Padding(
                       padding: paddingTitle,
                       child: new Text(
-                        "${getTeam(me.role).toString()}",
+                        '${getTeam(me.role).toString()}',
                         style: titleTextStyle,
                       ),
                     ),
                     new Text(
-                      "Your role is:",
+                      AppLocalizations.of(context).yourRole,
                       style: infoTextStyle,
                     ),
                     new Text(
-                      "${getRoleDisplayName(me.role)}",
+                      '${getRoleDisplayName(me.role)}',
                       style: titleTextStyle,
                     ),
                   ],
@@ -211,11 +212,11 @@ class GameState extends State<Game> {
               child: new Column(children: [
                 new ListTile(
                   title: new Text(
-                    "You also know these identities:",
+                    AppLocalizations.of(context).otherIdentities,
                     style: infoTextStyle,
                   ),
                   subtitle: new Text(
-                    "${_getFormattedKnownIds(_store.state, getKnownIds(me.role))}",
+                    '${_getFormattedKnownIds(_store.state, getKnownIds(me.role))}',
                     style: infoTextStyle,
                   ),
                 ),
@@ -224,12 +225,10 @@ class GameState extends State<Game> {
   }
 
   String _getFormattedKnownIds(GameModel gameModel, Set<String> knownIds) {
-    String formattedKnownIds = "";
+    String formattedKnownIds = '';
     knownIds?.forEach((roleId) {
-      formattedKnownIds += getPlayerByRoleId(gameModel, roleId).name +
-          " is the " +
-          getRoleDisplayName(roleId) +
-          "\n";
+      formattedKnownIds += AppLocalizations.of(context).identity(
+          getPlayerByRoleId(gameModel, roleId).name, getRoleDisplayName(roleId));
     });
     return formattedKnownIds;
   }
@@ -248,7 +247,7 @@ class GameState extends State<Game> {
       tiles.add(
         new ListTile(
           title: new Text(
-            'You can also see the balance of up to $maxBalances people:',
+            AppLocalizations.of(context).accountantExplanation(maxBalances),
             style: infoTextStyle,
           ),
         ),
@@ -274,7 +273,7 @@ class GameState extends State<Game> {
             .map((p) => p.name)
             .toList();
         tiles.add(new DropdownButton<String>(
-            hint: new Text('PICK BALANCE TO SEE', style: infoTextStyle),
+            hint: new Text(AppLocalizations.of(context).accountantPickPlayer, style: infoTextStyle),
             value: _accountantSelection,
             items: pickablePlayers.map((String value) {
               return new DropdownMenuItem<String>(
@@ -288,7 +287,7 @@ class GameState extends State<Game> {
               });
             }));
         tiles.add(new RaisedButton(
-            child: const Text('CONFIRM SELECTION', style: buttonTextStyle),
+            child: Text(AppLocalizations.of(context).accountantConfirmPlayer, style: buttonTextStyle),
             onPressed: selectingVisibleToAccountant
                 ? null
                 : () => _store.dispatch(new AddVisibleToAccountantAction(
@@ -308,10 +307,7 @@ class GameState extends State<Game> {
       // the lead agent can try to guess who the kingpin is once during a game
       List<Widget> tiles = [
         new ListTile(
-          title: new Text(
-            'You can try to guess who the Kingpin is once during the game.'
-                ' If you get it right, your bids can be higher than the maximum'
-                ' bid from then on.',
+          title: new Text(AppLocalizations.of(context).leadAgentExplanation,
             style: infoTextStyle,
           ),
         )
@@ -320,7 +316,7 @@ class GameState extends State<Game> {
       if (kingpinGuess == null) {
         List<String> pickablePlayers = getOtherPlayers(_store.state).map((p) => p.name).toList();
         tiles.add(new DropdownButton<String>(
-            hint: new Text('SELECT YOUR KINGPIN GUESS', style: infoTextStyle),
+            hint: new Text(AppLocalizations.of(context).leadAgentPickPlayer, style: infoTextStyle),
             value: _kingpinGuess,
             items: pickablePlayers.map((String value) {
               return new DropdownMenuItem<String>(
@@ -334,18 +330,20 @@ class GameState extends State<Game> {
               });
             }));
         tiles.add(new RaisedButton(
-            child: const Text('CONFIRM GUESS', style: buttonTextStyle),
+            child: Text(AppLocalizations.of(context).leadAgentConfirmPlayer, style: buttonTextStyle),
             onPressed: guessingKingpin
                 ? null
                 : () => _store.dispatch(
                     new GuessKingpinAction(getPlayerByName(_store.state, _kingpinGuess).id))));
       } else {
         final String kingpinGuessName = getPlayerById(_store.state, kingpinGuess).name;
-        final String result = haveGuessedKingpin(_store.state) ? 'CORRECT!' : 'INCORRECT! :(';
+        final String result = haveGuessedKingpin(_store.state)
+            ? AppLocalizations.of(context).leadAgentResultRight
+            : AppLocalizations.of(context).leadAgentResultWrong;
         tiles.add(
           new ListTile(
             title: new Text(
-              'You checked if $kingpinGuessName is the Kingpin. This is $result',
+              AppLocalizations.of(context).leadAgentResult(kingpinGuessName, result),
               style: infoTextStyle,
             ),
           ),
@@ -364,19 +362,20 @@ class GameState extends State<Game> {
         distinct: true,
         builder: (context, viewModel) {
           if (!viewModel.roomIsAvailable) {
-            return loading();
+            return loading(context);
           }
 
           if (viewModel.waitingForPlayers) {
             return centeredMessage(
-                'Waiting for players: ${viewModel.playersSoFar} / ${getRoom(_store.state).numPlayers}');
+              AppLocalizations.of(context).waitingForPlayers(
+                  viewModel.playersSoFar, getRoom(_store.state).numPlayers));
           }
 
           if (viewModel.isNewGame) {
-            return centeredMessage('Assigning roles...');
+            return centeredMessage(AppLocalizations.of(context).assigningRoles);
           }
 
-          return loading();
+          return loading(context);
         },
       );
 
@@ -416,7 +415,7 @@ class GameState extends State<Game> {
             getHeists(store.state).isNotEmpty ? haveReceivedGiftThisRound(store.state) : false,
         distinct: true,
         builder: (context, haveReceivedGiftThisRound) {
-          Text title = new Text('SECRET');
+          Text title = new Text(AppLocalizations.of(context).secretTab);
           if (haveReceivedGiftThisRound) {
             return new Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -440,10 +439,10 @@ class GameState extends State<Game> {
       length: 2,
       child: new Scaffold(
         appBar: new AppBar(
-          title: new Text("Room: ${getRoom(_store.state).code}"),
+          title: new Text(AppLocalizations.of(context).roomTitle(getRoom(_store.state).code)),
           bottom: new TabBar(
             tabs: [
-              new Tab(text: 'GAME'),
+              new Tab(text: AppLocalizations.of(context).gameTab),
               _secretTab(),
             ],
           ),

@@ -15,9 +15,7 @@ Widget heistDecisions(Heist heist) {
   decisions.shuffle(new Random(heist.id.hashCode));
   List<Widget> children = new List.generate(decisions.length, (i) {
     String decision = decisions[i];
-    return new Container(
-      alignment: Alignment.center,
-      padding: paddingTiny,
+    return new Center(
       child: new Text(decision,
           style: new TextStyle(
             fontSize: 16.0,
@@ -26,9 +24,7 @@ Widget heistDecisions(Heist heist) {
           )),
     );
   });
-  return new Column(
-    children: children,
-  );
+  return new HeistGridView(children, 8.0);
 }
 
 Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int order) {
@@ -53,65 +49,69 @@ Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int
     ));
   }
 
-  List<Widget> children = [
-    new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: title,
-      ),
-      getHeistIcon(heist),
-    ]),
-    new Divider(),
-    new Container(
-      padding: paddingSmall,
-      child: new Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          new Text('Players: $numPlayers', style: subtitleTextStyle),
-          new Text('Price: $price', style: subtitleTextStyle),
-          new Text('Maximum bid: $maximumBid', style: subtitleTextStyle),
-        ],
-      ),
+  List<Widget> heistDetailsChildren = [
+    getHeistIcon(heist),
+    new Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: title,
     ),
+    new VerticalDivider(height: 40.0),
+    heistDetailsIcon(Icons.people, numPlayers.toString()),
+    heistDetailsIcon(Icons.monetization_on, price.toString()),
+    heistDetailsIcon(Icons.vertical_align_top, maximumBid.toString()),
   ];
 
   if (pot != null) {
-    children.add(
-      new Container(
-        padding: paddingSmall,
-        child: new Chip(
-          label: new Text(
-            'Pot: $pot',
-            style: chipTextStyle,
+    heistDetailsChildren.addAll([
+      new VerticalDivider(height: 40.0),
+      iconText(
+          new Icon(
+            Icons.attach_money,
+            size: 32.0,
           ),
-          backgroundColor: Colors.deepOrange,
-        ),
-      ),
-    );
+          new Text(
+            pot.toString(),
+            style: bigNumberTextStyle,
+          )),
+    ]);
   }
+
+  List<Widget> heistPopupChildren = [
+    new Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: heistDetailsChildren,
+    ),
+  ];
 
   if (heist != null && heist.complete) {
     Color color = Theme.of(context).accentColor;
     Set<String> teamNames = teamNamesForRound(store.state, lastRound);
-    children.addAll([
+    heistPopupChildren.addAll([
       new Divider(),
-      new PlayerGridView(
+      new HeistGridView(
         new List.generate(
           teamNames.length,
           (i) => playerTile(teamNames.elementAt(i), true, color),
         ),
       ),
+      new Divider(),
       heistDecisions(heist),
     ]);
   }
 
   return new Container(
-    padding: paddingLarge,
+    padding: paddingMedium,
     child: new Column(
-      mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
-      children: children,
+      children: heistPopupChildren,
     ),
+  );
+}
+
+Widget heistDetailsIcon(IconData icon, String text) {
+  return iconText(
+    new Icon(icon, color: Colors.grey),
+    new Text(text, style: subtitleTextStyle),
   );
 }
 

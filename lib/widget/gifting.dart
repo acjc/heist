@@ -28,7 +28,7 @@ Widget giftSelector(BuildContext context, Store<GameModel> store, int giftAmount
 
 Widget recipientSelection(Store<GameModel> store, int giftAmount, bool loading) {
   List<Player> otherPlayers = getOtherPlayers(store.state);
-  return new PlayerGridView(new List.generate(otherPlayers.length, (i) {
+  return new HeistGridView(new List.generate(otherPlayers.length, (i) {
     Player player = otherPlayers[i];
     return new RaisedButton(
       child: new Text(player.name, style: buttonTextStyle),

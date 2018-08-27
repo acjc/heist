@@ -32,7 +32,7 @@ Widget playerInfo(Store<GameModel> store) {
                         Icons.attach_money,
                         size: 36.0,
                       ),
-                      margin: const EdgeInsets.only(right: 10.0),
+                      margin: const EdgeInsets.only(right: 4.0),
                     ),
                     new Text(
                       viewModel.balance.toString(),

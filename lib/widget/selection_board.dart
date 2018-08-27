@@ -34,7 +34,7 @@ Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, S
                     'TEAM (${teamNames.length} / ${currentHeist(store.state).numPlayers})',
                     style: titleTextStyle),
               ),
-              new PlayerGridView(selectionBoardChildren(context, players, teamNames)),
+              new HeistGridView(selectionBoardChildren(context, players, teamNames)),
             ])),
       );
     });

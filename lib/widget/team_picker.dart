@@ -32,7 +32,7 @@ Widget teamPicker(Store<GameModel> store) {
                     child: new Column(children: [
                       new Text('Pick a team: ${teamIds.length} / $playersRequired',
                           style: infoTextStyle),
-                      new PlayerGridView(
+                      new HeistGridView(
                         teamPickerChildren(context, store, teamIds, playersRequired),
                         4.0,
                       ),

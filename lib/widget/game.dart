@@ -195,17 +195,7 @@ class GameState extends State<Game> {
         builder: (context, haveReceivedGiftThisRound) {
           Text title = new Text('SECRET');
           if (haveReceivedGiftThisRound) {
-            return new Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                new Container(
-                  child: new Icon(Icons.announcement),
-                  margin: const EdgeInsets.only(right: 10.0),
-                ),
-                title,
-              ],
-            );
+            return iconText(new Icon(Icons.announcement), title);
           }
           return title;
         },

@@ -34,7 +34,7 @@ Widget observeHeist(Store<GameModel> store) {
                 padding: paddingMedium,
                 child: new Column(children: [
                   const Text('Heist in progress...', style: infoTextStyle),
-                  new PlayerGridView(
+                  new HeistGridView(
                     observeHeistChildren(
                       context,
                       playersInTeam(store.state),

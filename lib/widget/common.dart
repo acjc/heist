@@ -48,13 +48,17 @@ Color decisionColour(String decision) {
 }
 
 class VerticalDivider extends StatelessWidget {
+  final double height;
+
+  VerticalDivider({this.height = 50.0});
+
   @override
   Widget build(BuildContext context) {
     return new Container(
-      height: 50.0,
-      width: 1.0,
+      height: height,
+      width: 0.2,
       color: Colors.grey,
-      margin: const EdgeInsets.only(left: 10.0, right: 10.0),
+      margin: const EdgeInsets.only(left: 6.0, right: 6.0),
     );
   }
 }
@@ -74,9 +78,9 @@ Widget roundTitle(Store<GameModel> store) {
   );
 }
 
-/// Widget for showing a grid of player names
-class PlayerGridView extends GridView {
-  PlayerGridView(List<Widget> children, [double childAspectRatio])
+/// Widget for showing a 2-column grid
+class HeistGridView extends GridView {
+  HeistGridView(List<Widget> children, [double childAspectRatio])
       : super.count(
           padding: paddingMedium,
           shrinkWrap: true,
@@ -88,3 +92,15 @@ class PlayerGridView extends GridView {
           children: children,
         );
 }
+
+Widget iconText(Icon icon, Text text) => new Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        new Container(
+          child: icon,
+          margin: const EdgeInsets.only(right: 4.0),
+        ),
+        text,
+      ],
+    );

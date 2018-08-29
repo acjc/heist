@@ -63,17 +63,43 @@ class VerticalDivider extends StatelessWidget {
   }
 }
 
+Widget roundTitleIcon(IconData icon, String text) {
+  return iconText(
+    new Icon(icon, color: Colors.teal, size: 32.0),
+    new Text(text, style: infoTextStyle),
+  );
+}
+
 Widget roundTitle(Store<GameModel> store) {
+  Heist heist = currentHeist(store.state);
   Round round = currentRound(store.state);
   String subtitle = round.isAuction ? 'Auction!' : 'Round ${round.order}';
+
+  List<Widget> children = [
+    new Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        new Text(
+          'Heist ${heist.order}',
+          style: boldTextStyle,
+        ),
+        new Text(subtitle, style: subtitleTextStyle),
+      ],
+    ),
+    new VerticalDivider(),
+    roundTitleIcon(Icons.people, heist.numPlayers.toString()),
+    roundTitleIcon(Icons.monetization_on, heist.price.toString()),
+    roundTitleIcon(Icons.vertical_align_top, heist.maximumBid.toString()),
+  ];
+
   return new Card(
     elevation: 2.0,
-    child: new ListTile(
-      title: new Text(
-        'Heist ${currentHeist(store.state).order}',
-        style: boldTextStyle,
+    child: new Padding(
+      padding: paddingSmall,
+      child: new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: children,
       ),
-      subtitle: new Text(subtitle),
     ),
   );
 }

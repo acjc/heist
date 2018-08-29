@@ -16,13 +16,18 @@ Widget giftSelector(BuildContext context, Store<GameModel> store, int giftAmount
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         iconWidget(
-            context, Icons.arrow_back, () => store.dispatch(new DecrementGiftAmountAction())),
-        new Text(
-          giftAmount.toString(),
-          style: bigNumberTextStyle,
+          context,
+          Icons.arrow_back,
+          () => store.dispatch(new DecrementGiftAmountAction()),
+          giftAmount > 0,
         ),
-        iconWidget(context, Icons.arrow_forward,
-            () => store.dispatch(new IncrementGiftAmountAction(balance))),
+        new Text(giftAmount.toString(), style: bigNumberTextStyle),
+        iconWidget(
+          context,
+          Icons.arrow_forward,
+          () => store.dispatch(new IncrementGiftAmountAction(balance)),
+          giftAmount < balance,
+        ),
       ],
     );
 

@@ -12,22 +12,30 @@ import 'package:redux/redux.dart';
 import 'common.dart';
 
 Widget bidSelector(BuildContext context, Store<GameModel> store, int bidAmount, int balance,
-        Heist heist, bool unlimited) =>
-    new Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        iconWidget(context, Icons.arrow_back, () => store.dispatch(new DecrementBidAmountAction())),
-        new Text(
-          bidAmount.toString(),
-          style: bigNumberTextStyle,
-        ),
-        iconWidget(
-            context,
-            Icons.arrow_forward,
-            () => store.dispatch(
-                new IncrementBidAmountAction(balance, unlimited ? 999 : heist.maximumBid))),
-      ],
-    );
+    Heist heist, bool unlimited) {
+  int maximumBid = unlimited ? 999 : heist.maximumBid;
+  return new Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: [
+      iconWidget(
+        context,
+        Icons.arrow_back,
+        () => store.dispatch(new DecrementBidAmountAction()),
+        bidAmount > 0,
+      ),
+      new Text(
+        bidAmount.toString(),
+        style: bigNumberTextStyle,
+      ),
+      iconWidget(
+        context,
+        Icons.arrow_forward,
+        () => store.dispatch(new IncrementBidAmountAction(balance, maximumBid)),
+        bidAmount < min(heist.maximumBid, balance),
+      ),
+    ],
+  );
+}
 
 Widget submitButton(Store<GameModel> store, bool loading, int bidAmount) => new RaisedButton(
     child: const Text('SUBMIT BID', style: buttonTextStyle),
@@ -53,7 +61,7 @@ Widget bidding(Store<GameModel> store) {
           ),
       distinct: true,
       builder: (context, viewModel) {
-        String currentBid = viewModel.bid == null ? 'None' : viewModel.bid.amount.toString();
+        String currentBid = viewModel.bid == null ? 'No bid' : viewModel.bid.amount.toString();
         Heist heist = currentHeist(store.state);
         bool auction = isAuction(store.state);
 
@@ -78,23 +86,32 @@ Widget bidding(Store<GameModel> store) {
                 ),
               ];
 
-        String maximumBid =
-            auction || viewModel.haveGuessedKingpin ? 'Unlimited' : heist.maximumBid.toString();
         children.addAll([
-          new Text(
-              'Bidders so far (${viewModel.bidders.length} / ${getRoom(store.state).numPlayers}):',
-              style: infoTextStyle),
-          new Column(
-            children: new List.generate(
-              viewModel.bidders.length,
-              (i) => new Text(viewModel.bidders.elementAt(i), style: subtitleTextStyle),
+          new Container(
+            padding: paddingSmall,
+            child: iconText(
+              new Icon(
+                Icons.attach_money,
+                size: 32.0,
+              ),
+              new Text(
+                currentBid,
+                style: bigNumberTextStyle,
+              ),
             ),
           ),
-          new Padding(
-            padding: paddingSmall,
-            child: new Text('Your bid: $currentBid', style: infoTextStyle),
-          ),
-          new Text('Maximum bid: $maximumBid', style: infoTextStyle),
+        ]);
+
+        if (auction || viewModel.haveGuessedKingpin) {
+          children.add(
+            new Text(
+              'You have no maximum bid limit for this round',
+              style: const TextStyle(fontStyle: FontStyle.italic),
+            ),
+          );
+        }
+
+        children.addAll([
           bidSelector(
             context,
             store,
@@ -103,12 +120,31 @@ Widget bidding(Store<GameModel> store) {
             heist,
             auction || viewModel.haveGuessedKingpin,
           ),
-          new Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              cancelButton(context, store, viewModel.loading, viewModel.bid),
-              submitButton(store, viewModel.loading, viewModel.bidAmount),
-            ],
+          new Padding(
+            padding: paddingSmall,
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                cancelButton(context, store, viewModel.loading, viewModel.bid),
+                submitButton(store, viewModel.loading, viewModel.bidAmount),
+              ],
+            ),
+          ),
+          new Padding(
+            padding: paddingSmall,
+            child: new Column(
+              children: [
+                new Text(
+                    'Bidders so far (${viewModel.bidders.length} / ${getRoom(store.state).numPlayers}):',
+                    style: infoTextStyle),
+                new Column(
+                  children: new List.generate(
+                    viewModel.bidders.length,
+                    (i) => new Text(viewModel.bidders.elementAt(i), style: subtitleTextStyle),
+                  ),
+                ),
+              ],
+            ),
           ),
         ]);
 

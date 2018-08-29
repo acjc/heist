@@ -18,12 +18,12 @@ const TextStyle subtitleTextStyle = const TextStyle(color: Colors.black54);
 const TextStyle buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
 const TextStyle chipTextStyle = const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
 
-Widget iconWidget(BuildContext context, IconData icon, Function onPressed) {
+Widget iconWidget(BuildContext context, IconData icon, Function onPressed, [bool enabled = true]) {
   Color color = Theme.of(context).primaryColor;
   return new IconButton(
     iconSize: 64.0,
-    onPressed: onPressed,
-    icon: new Icon(icon, color: color),
+    onPressed: enabled ? onPressed : null,
+    icon: new Icon(icon, color: enabled ? color : Colors.grey),
   );
 }
 

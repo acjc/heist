@@ -12,17 +12,31 @@ import 'package:heist/widget/home_page.dart';
 import 'package:redux/redux.dart';
 
 class CreateRoomPage extends StatelessWidget {
-  Widget _numPlayersText() => new StoreConnector<GameModel, int>(
-      distinct: true,
-      converter: (store) => store.state.room.numPlayers,
-      builder: (context, int numPlayers) {
-        return new Text(
-          numPlayers.toString(),
-          style: const TextStyle(
-            fontSize: 32.0,
-          ),
-        );
-      });
+  Widget _numPlayersSelector(Store<GameModel> store) {
+    return new StoreConnector<GameModel, int>(
+        distinct: true,
+        converter: (store) => store.state.room.numPlayers,
+        builder: (context, int numPlayers) {
+          return new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              iconWidget(
+                context,
+                Icons.arrow_back,
+                () => store.dispatch(new DecrementNumPlayersAction()),
+                numPlayers > minPlayers,
+              ),
+              new Text(numPlayers.toString(), style: bigNumberTextStyle),
+              iconWidget(
+                context,
+                Icons.arrow_forward,
+                () => store.dispatch(new IncrementNumPlayersAction()),
+                numPlayers < maxPlayers,
+              ),
+            ],
+          );
+        });
+  }
 
   Widget _rolesText() => new StoreConnector<GameModel, Set<String>>(
       distinct: true,
@@ -52,36 +66,29 @@ class CreateRoomPage extends StatelessWidget {
         },
       );
 
-  Widget _body(BuildContext context, Store<GameModel> store) => new Padding(
-        padding: paddingLarge,
-        child: new Column(
-          children: [
-            new Padding(
-              padding: EdgeInsets.only(bottom: 24.0),
-              child: enterNameForm(store, Keys.createRoomPageNameKey),
+  Widget _body(BuildContext context, Store<GameModel> store) {
+    return new Padding(
+      padding: paddingLarge,
+      child: new Column(
+        children: [
+          new Padding(
+            padding: EdgeInsets.only(bottom: 24.0),
+            child: enterNameForm(store, Keys.createRoomPageNameKey),
+          ),
+          new Padding(
+            padding: paddingMedium,
+            child: const Text(
+              'Choose number of players:',
+              style: infoTextStyle,
             ),
-            new Padding(
-              padding: paddingMedium,
-              child: const Text(
-                'Choose number of players:',
-                style: infoTextStyle,
-              ),
-            ),
-            new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                iconWidget(context, Icons.arrow_back,
-                    () => store.dispatch(new DecrementNumPlayersAction())),
-                _numPlayersText(),
-                iconWidget(context, Icons.arrow_forward,
-                    () => store.dispatch(new IncrementNumPlayersAction()))
-              ],
-            ),
-            _rolesText(),
-            _createRoomButton(store),
-          ],
-        ),
-      );
+          ),
+          _numPlayersSelector(store),
+          _rolesText(),
+          _createRoomButton(store),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -12,7 +12,7 @@ const EdgeInsets paddingTitle = const EdgeInsets.only(bottom: 12.0);
 
 const TextStyle infoTextStyle = const TextStyle(fontSize: 16.0);
 const TextStyle boldTextStyle = const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold);
-const TextStyle bigNumberTextStyle = const TextStyle(fontSize: 32.0, fontWeight: FontWeight.w300);
+const TextStyle bigNumberTextStyle = const TextStyle(fontSize: 30.0, fontWeight: FontWeight.w300);
 const TextStyle titleTextStyle = const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
 const TextStyle subtitleTextStyle = const TextStyle(color: Colors.black54);
 const TextStyle buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);

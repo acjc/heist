@@ -21,7 +21,7 @@ class CompleteRoundAction extends MiddlewareAction {
         assert(newOrder > 0 && newOrder <= 5);
 
         String newLeader = nextRoundLeader(
-            getPlayers(store.state), roundLeader(store.state).order, isAuction(store.state));
+            getPlayers(store.state), currentLeader(store.state).order, isAuction(store.state));
         await createNewRound(store, currentHeistId, newOrder, newLeader);
       }
       return store.state.db.completeRound(round.id);

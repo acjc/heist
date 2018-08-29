@@ -37,7 +37,7 @@ Widget observeHeist(Store<GameModel> store) {
                   new HeistGridView(
                     observeHeistChildren(
                       context,
-                      playersInTeam(store.state),
+                      currentTeam(store.state),
                       decisions,
                     ),
                   ),

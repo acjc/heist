@@ -27,6 +27,26 @@ Widget heistDecisions(Heist heist) {
   return new HeistGridView(children, 8.0);
 }
 
+Widget heistTeam(BuildContext context, Store<GameModel> store, Round round) {
+  Set<Player> team = teamForRound(store.state, round);
+  Player leader = leaderForRound(store.state, round);
+
+  List<Widget> gridChildren = new List.generate(
+    team.length,
+    (i) {
+      Player player = team.elementAt(i);
+      bool isLeader = player.id == leader.id;
+      return playerTile(context, player.name, true, isLeader);
+    },
+  );
+
+  if (!team.contains(leader)) {
+    gridChildren.add(playerTile(context, leader.name, false, true));
+  }
+
+  return new HeistGridView(gridChildren);
+}
+
 Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int order) {
   int totalPlayers = getRoom(store.state).numPlayers;
   int price = heist?.price ?? heistDefinitions[totalPlayers][order].price;
@@ -84,16 +104,9 @@ Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int
   ];
 
   if (heist != null && heist.complete) {
-    Color color = Theme.of(context).accentColor;
-    Set<String> teamNames = teamNamesForRound(store.state, lastRound);
     heistPopupChildren.addAll([
       new Divider(),
-      new HeistGridView(
-        new List.generate(
-          teamNames.length,
-          (i) => playerTile(teamNames.elementAt(i), true, color),
-        ),
-      ),
+      heistTeam(context, store, lastRound),
       new Divider(),
       heistDecisions(heist),
     ]);

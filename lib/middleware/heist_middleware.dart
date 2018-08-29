@@ -39,7 +39,7 @@ class CompleteHeistAction extends MiddlewareAction {
 
   Future<void> toNextHeist(Store<GameModel> store) async {
     String newLeader = nextRoundLeader(
-        getPlayers(store.state), roundLeader(store.state).order, isAuction(store.state));
+        getPlayers(store.state), currentLeader(store.state).order, isAuction(store.state));
 
     List<Heist> heists = getHeists(store.state);
     assert(heists.where((h) => h.completedAt == null).length == 1);

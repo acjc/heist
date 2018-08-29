@@ -14,15 +14,16 @@ Widget waitForTeam(Store<GameModel> store) => new Column(children: [
           elevation: 2.0,
           child: new Container(
               padding: paddingLarge,
-              child: centeredMessage('${roundLeader(store.state).name} is picking a team...'))),
+              child: centeredMessage('${currentLeader(store.state).name} is picking a team...'))),
       selectionBoard(store),
     ]);
 
-Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, Set<String>>(
-    converter: (store) => teamNames(store.state),
+Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, Set<Player>>(
+    converter: (store) => currentTeam(store.state),
     distinct: true,
-    builder: (context, teamNames) {
+    builder: (context, team) {
       List<Player> players = getPlayers(store.state);
+      Player leader = currentLeader(store.state);
       return new Card(
         elevation: 2.0,
         child: new Container(
@@ -30,21 +31,20 @@ Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, S
             child: new Column(children: [
               new Container(
                 padding: paddingTitle,
-                child: new Text(
-                    'TEAM (${teamNames.length} / ${currentHeist(store.state).numPlayers})',
+                child: new Text('TEAM (${team.length} / ${currentHeist(store.state).numPlayers})',
                     style: titleTextStyle),
               ),
-              new HeistGridView(selectionBoardChildren(context, players, teamNames)),
+              new HeistGridView(selectionBoardChildren(context, players, team, leader)),
             ])),
       );
     });
 
 List<Widget> selectionBoardChildren(
-    BuildContext context, List<Player> players, Set<String> teamNames) {
-  Color color = Theme.of(context).accentColor;
+    BuildContext context, List<Player> players, Set<Player> team, Player leader) {
   return new List.generate(players.length, (i) {
     Player player = players[i];
-    bool isInTeam = teamNames.contains(player.name);
-    return playerTile(player.name, isInTeam, color);
+    bool isInTeam = team.contains(player);
+    bool isLeader = player.id == leader.id;
+    return playerTile(context, player.name, isInTeam, isLeader);
   });
 }

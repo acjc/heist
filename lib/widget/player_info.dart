@@ -25,20 +25,15 @@ Widget playerInfo(Store<GameModel> store) {
               children: [
                 playerName(viewModel.me),
                 new VerticalDivider(),
-                new Row(
-                  children: [
-                    new Container(
-                      child: new Icon(
-                        Icons.attach_money,
-                        size: 36.0,
-                      ),
-                      margin: const EdgeInsets.only(right: 4.0),
-                    ),
-                    new Text(
-                      viewModel.balance.toString(),
-                      style: bigNumberTextStyle,
-                    ),
-                  ],
+                iconText(
+                  new Icon(
+                    Icons.attach_money,
+                    size: 32.0,
+                  ),
+                  new Text(
+                    viewModel.balance.toString(),
+                    style: bigNumberTextStyle,
+                  ),
                 ),
               ],
             ),

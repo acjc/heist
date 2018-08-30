@@ -11,9 +11,9 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget bidSelector(BuildContext context, Store<GameModel> store, int bidAmount, int balance,
-    Heist heist, bool unlimited) {
-  int maximumBid = unlimited ? 999 : heist.maximumBid;
+Widget bidSelector(
+    BuildContext context, Store<GameModel> store, int bidAmount, int balance, int maximumBid) {
+  int upperBound = min(maximumBid, balance);
   return new Row(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     children: [
@@ -30,8 +30,8 @@ Widget bidSelector(BuildContext context, Store<GameModel> store, int bidAmount, 
       iconWidget(
         context,
         Icons.arrow_forward,
-        () => store.dispatch(new IncrementBidAmountAction(balance, maximumBid)),
-        bidAmount < min(heist.maximumBid, balance),
+        () => store.dispatch(new IncrementBidAmountAction(upperBound)),
+        bidAmount < upperBound,
       ),
     ],
   );
@@ -61,7 +61,6 @@ Widget bidding(Store<GameModel> store) {
           ),
       distinct: true,
       builder: (context, viewModel) {
-        String currentBid = viewModel.bid == null ? 'No bid' : viewModel.bid.amount.toString();
         Heist heist = currentHeist(store.state);
         bool auction = isAuction(store.state);
 
@@ -86,6 +85,7 @@ Widget bidding(Store<GameModel> store) {
                 ),
               ];
 
+        String proposedBidText = viewModel.bid == null ? 'No bid' : viewModel.bid.amount.toString();
         children.addAll([
           new Container(
             padding: paddingSmall,
@@ -95,7 +95,7 @@ Widget bidding(Store<GameModel> store) {
                 size: 32.0,
               ),
               new Text(
-                currentBid,
+                proposedBidText,
                 style: bigNumberTextStyle,
               ),
             ),
@@ -111,14 +111,16 @@ Widget bidding(Store<GameModel> store) {
           );
         }
 
+        int proposedBid = viewModel.bid == null ? 0 : viewModel.bid.amount;
+        int potentialBalance = viewModel.balance + proposedBid;
+        int maximumBid = auction || viewModel.haveGuessedKingpin ? 999 : heist.maximumBid;
         children.addAll([
           bidSelector(
             context,
             store,
-            min(viewModel.bidAmount, viewModel.balance),
-            viewModel.balance,
-            heist,
-            auction || viewModel.haveGuessedKingpin,
+            min(viewModel.bidAmount, min(maximumBid, potentialBalance)),
+            potentialBalance,
+            maximumBid,
           ),
           new Padding(
             padding: paddingSmall,

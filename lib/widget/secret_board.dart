@@ -8,6 +8,7 @@ import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
+import 'package:heist/widget/player_info.dart';
 import 'package:redux/redux.dart';
 
 class SecretBoard extends StatefulWidget {
@@ -40,6 +41,8 @@ class SecretBoardState extends State<SecretBoard> {
       distinct: true,
       builder: (context, viewModel) {
         List<Widget> children = [
+          playerInfo(_store),
+          _playerList(),
           _getTeamAndRoleCard(viewModel.me),
         ];
 
@@ -50,6 +53,55 @@ class SecretBoardState extends State<SecretBoard> {
 
         return new Column(children: children);
       });
+
+  Widget _playerList() => new StoreConnector<GameModel, List<Player>>(
+        distinct: true,
+        converter: (store) => getPlayers(store.state),
+        builder: (context, players) {
+          if (!gameIsReady(_store.state)) {
+            return new Container();
+          }
+          Player me = getSelf(_store.state);
+          Player leader = currentLeader(_store.state);
+          List<Widget> children = [
+            new Padding(
+              padding: paddingTitle,
+              child: const Text('Players', style: titleTextStyle),
+            ),
+          ];
+          children.addAll(new List.generate(players.length, (i) {
+            Player player = players[i];
+            TextStyle textStyle = player.id == me.id ? boldTextStyle : infoTextStyle;
+            if (player.id == leader.id) {
+              return new Padding(
+                padding: paddingBelowText,
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    new Text('${player.order}. ', style: textStyle),
+                    iconText(
+                      new Icon(Icons.star_border, size: 20.0),
+                      new Text(player.name, style: textStyle),
+                      trailingIcon: true,
+                    ),
+                  ],
+                ),
+              );
+            }
+            return new Padding(
+              padding: paddingBelowText,
+              child: new Text('${player.order}. ${player.name}', style: textStyle),
+            );
+          }));
+          return new Card(
+            elevation: 2.0,
+            child: new Padding(
+              padding: paddingLarge,
+              child: new Column(children: children),
+            ),
+          );
+        },
+      );
 
   Card _getTeamAndRoleCard(Player me) {
     return new Card(

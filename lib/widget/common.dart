@@ -9,6 +9,7 @@ const EdgeInsets paddingMedium = const EdgeInsets.all(16.0);
 const EdgeInsets paddingSmall = const EdgeInsets.all(12.0);
 const EdgeInsets paddingTiny = const EdgeInsets.all(8.0);
 const EdgeInsets paddingTitle = const EdgeInsets.only(bottom: 12.0);
+const EdgeInsets paddingBelowText = const EdgeInsets.only(bottom: 2.0);
 
 const TextStyle infoTextStyle = const TextStyle(fontSize: 16.0);
 const TextStyle boldTextStyle = const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold);
@@ -119,14 +120,28 @@ class HeistGridView extends GridView {
         );
 }
 
-Widget iconText(Icon icon, Text text) => new Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        new Container(
-          child: icon,
-          margin: const EdgeInsets.only(right: 4.0),
-        ),
-        text,
-      ],
-    );
+Widget iconText(Icon icon, Text text, {bool trailingIcon = false}) {
+  List<Widget> children = [];
+  if (trailingIcon) {
+    children.addAll([
+      text,
+      new Container(
+        child: icon,
+        margin: const EdgeInsets.only(left: 4.0),
+      )
+    ]);
+  } else {
+    children.addAll([
+      new Container(
+        child: icon,
+        margin: const EdgeInsets.only(right: 4.0),
+      ),
+      text,
+    ]);
+  }
+  return new Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: children,
+  );
+}

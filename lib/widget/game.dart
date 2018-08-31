@@ -18,7 +18,6 @@ import 'package:heist/widget/endgame.dart';
 import 'package:heist/widget/game_history.dart';
 import 'package:heist/widget/gifting.dart';
 import 'package:heist/widget/heist_end.dart';
-import 'package:heist/widget/player_info.dart';
 import 'package:heist/widget/round_end.dart';
 import 'package:heist/widget/secret_board.dart';
 import 'package:heist/widget/selection_board.dart';
@@ -199,11 +198,9 @@ class GameState extends State<Game> {
   Widget _secretBoard() => new StoreConnector<GameModel, bool>(
         converter: (store) => gameIsReady(store.state),
         distinct: true,
-        builder: (context, gameIsReady) => new Expanded(
-              child: gameIsReady
-                  ? new SingleChildScrollView(child: new SecretBoard(_store))
-                  : _loadingScreen(),
-            ),
+        builder: (context, gameIsReady) => gameIsReady
+            ? new SingleChildScrollView(child: new SecretBoard(_store))
+            : _loadingScreen(),
       );
 
   Widget _secretTab() => new StoreConnector<GameModel, bool>(
@@ -237,7 +234,7 @@ class GameState extends State<Game> {
         body: new TabBarView(
           children: [
             _mainBoard(),
-            new Column(children: [playerInfo(_store), _secretBoard()]),
+            _secretBoard(),
           ],
         ),
       ),

@@ -139,9 +139,26 @@ class GameState extends State<Game> {
         },
       );
 
+  Widget _waitingForPlayers(List<Player> playersSoFar, int numPlayers) {
+    List<Widget> children = [
+      new Padding(
+        padding: paddingTitle,
+        child: new Text(
+          'Waiting for players (${playersSoFar.length} / $numPlayers)',
+          style: titleTextStyle,
+        ),
+      ),
+    ];
+    children.addAll(new List.generate(playersSoFar.length, (i) => new Text(playersSoFar[i].name)));
+    return new Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: children,
+    );
+  }
+
   Widget _loadingScreen() => new StoreConnector<GameModel, LoadingScreenViewModel>(
         converter: (store) => new LoadingScreenViewModel._(roomIsAvailable(store.state),
-            waitingForPlayers(store.state), isNewGame(store.state), getPlayers(store.state).length),
+            waitingForPlayers(store.state), isNewGame(store.state), getPlayers(store.state)),
         distinct: true,
         builder: (context, viewModel) {
           if (!viewModel.roomIsAvailable) {
@@ -149,12 +166,11 @@ class GameState extends State<Game> {
           }
 
           if (viewModel.waitingForPlayers) {
-            return centeredMessage(
-                'Waiting for players: ${viewModel.playersSoFar} / ${getRoom(_store.state).numPlayers}');
+            return _waitingForPlayers(viewModel.playersSoFar, getRoom(_store.state).numPlayers);
           }
 
           if (viewModel.isNewGame) {
-            return centeredMessage('Assigning roles...');
+            return centeredMessage('Initialising game...');
           }
 
           return loading();
@@ -233,7 +249,7 @@ class LoadingScreenViewModel {
   final bool roomIsAvailable;
   final bool waitingForPlayers;
   final bool isNewGame;
-  final int playersSoFar;
+  final List<Player> playersSoFar;
 
   LoadingScreenViewModel._(
       this.roomIsAvailable, this.waitingForPlayers, this.isNewGame, this.playersSoFar);

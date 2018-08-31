@@ -209,10 +209,7 @@ class GameState extends State<Game> {
         distinct: true,
         builder: (context, haveReceivedGiftThisRound) {
           Text title = new Text('SECRET');
-          if (haveReceivedGiftThisRound) {
-            return iconText(new Icon(Icons.announcement), title);
-          }
-          return title;
+          return haveReceivedGiftThisRound ? iconText(new Icon(Icons.cake), title) : title;
         },
       );
 

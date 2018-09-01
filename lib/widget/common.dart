@@ -9,7 +9,7 @@ const EdgeInsets paddingMedium = const EdgeInsets.all(16.0);
 const EdgeInsets paddingSmall = const EdgeInsets.all(12.0);
 const EdgeInsets paddingTiny = const EdgeInsets.all(8.0);
 const EdgeInsets paddingTitle = const EdgeInsets.only(bottom: 12.0);
-const EdgeInsets paddingBelowText = const EdgeInsets.only(bottom: 2.0);
+const EdgeInsets paddingBelowText = const EdgeInsets.only(bottom: 4.0);
 
 const TextStyle infoTextStyle = const TextStyle(fontSize: 16.0);
 const TextStyle boldTextStyle = const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold);

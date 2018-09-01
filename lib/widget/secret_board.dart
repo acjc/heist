@@ -96,7 +96,7 @@ class SecretBoardState extends State<SecretBoard> {
           return new Card(
             elevation: 2.0,
             child: new Padding(
-              padding: paddingLarge,
+              padding: paddingMedium,
               child: new Column(children: children),
             ),
           );

@@ -11,22 +11,22 @@ List<Widget> playerDecisions(Store<GameModel> store, Heist heist) {
   List<Widget> heistDecisions = [];
   heist.decisions.forEach((playerId, decision) {
     Player player = getPlayerById(store.state, playerId);
-    List<Widget> children = [
-      new Text(
-        '${player.name} (${getRoleDisplayName(player.role)}) ->',
-        style: infoTextStyle,
+    heistDecisions.add(
+      new Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          new Text('${player.name}:', style: infoTextStyle),
+          new Text(
+            ' $decision',
+            style: new TextStyle(
+              fontSize: 16.0,
+              color: decisionColour(decision),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
-    ];
-    children.add(new Text(' $decision',
-        style: new TextStyle(
-          fontSize: 16.0,
-          color: decisionColour(decision),
-          fontWeight: FontWeight.bold,
-        )));
-    heistDecisions.add(new Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: children,
-    ));
+    );
   });
   return heistDecisions;
 }
@@ -84,12 +84,61 @@ Widget winner(Score score) => new Card(
       ),
     );
 
+Widget fullPlayerListForTeam(List<Player> players, Team team, Color color) {
+  List<Player> playersInTeam = players.where((p) => getTeam(p.role) == team).toList();
+  return new Column(
+    children: new List.generate(playersInTeam.length + 1, (i) {
+      Player player = playersInTeam[0];
+      return new Padding(
+        padding: paddingBelowText,
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            new Text(
+              player.name,
+              style: infoTextStyle,
+            ),
+            new Text(
+              getRoleDisplayName(player.role),
+              style: new TextStyle(color: color),
+            ),
+          ],
+        ),
+      );
+    }),
+  );
+}
+
+Widget fullPlayerList(Store<GameModel> store) {
+  List<Player> players = getPlayers(store.state);
+  return new Card(
+    elevation: 2.0,
+    child: new Padding(
+      padding: paddingMedium,
+      child: new Column(children: [
+        new Padding(
+          padding: paddingTitle,
+          child: const Text('Players', style: titleTextStyle),
+        ),
+        new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            fullPlayerListForTeam(players, Team.THIEVES, Colors.pink),
+            fullPlayerListForTeam(players, Team.AGENTS, Colors.purple),
+          ],
+        )
+      ]),
+    ),
+  );
+}
+
 Widget endgame(Store<GameModel> store) {
   List<Heist> heists = getHeists(store.state);
   Score score = calculateScore(heists);
 
   List<Widget> children = [
     winner(score),
+    fullPlayerList(store),
   ];
 
   Map<String, List<Round>> rounds = getRounds(store.state);

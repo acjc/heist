@@ -5,7 +5,7 @@ import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
 import 'package:heist/keys.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/room_middleware.dart';
-import 'package:heist/reducers/player_reducers.dart';
+import 'package:heist/reducers/form_reducers.dart';
 import 'package:heist/reducers/room_reducers.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -26,7 +26,7 @@ Widget enterNameForm(Store<GameModel> store, GlobalKey<FormState> key) => new Fo
         autocorrect: false,
         textAlign: TextAlign.center,
         validator: (value) => value == null || value.isEmpty ? 'Please enter a name' : null,
-        onSaved: (value) => store.dispatch(new SetPlayerNameAction(value))));
+        onSaved: (value) => store.dispatch(new SavePlayerNameAction(value))));
 
 class HomePage extends StatelessWidget {
   static final _onlyLetters = new RegExp(r"[A-Za-z]");
@@ -49,7 +49,7 @@ class HomePage extends StatelessWidget {
   Form _enterCodeForm(Store<GameModel> store) => new Form(
       key: Keys.homePageCodeKey,
       child: new TextFormField(
-          initialValue: isDebugMode() ? 'ABCD' : null,
+          initialValue: isDebugMode() ? 'ABCD' : getRoomCode(store.state),
           decoration: new InputDecoration(
             labelText: 'Enter an existing room code',
             isDense: true,
@@ -63,7 +63,10 @@ class HomePage extends StatelessWidget {
             _capitalFormatter,
           ],
           validator: (value) => value.length != 4 ? 'Invalid code' : null,
-          onSaved: (value) => store.dispatch(new SetRoomCodeAction(value))));
+          onSaved: (value) {
+            store.dispatch(new SetRoomCodeAction(value));
+            store.dispatch(new SaveRoomCodeAction(value));
+          }));
 
   Widget _body(Store<GameModel> store) => new StoreConnector<GameModel, bool>(
         converter: (store) => requestInProcess(store.state, Request.ValidatingRoom),

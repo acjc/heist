@@ -11,6 +11,7 @@ class GameModel {
 
   final String playerInstallId;
   final String playerName;
+  final String roomCode;
   final int bidAmount;
   final int giftAmount;
 
@@ -27,6 +28,7 @@ class GameModel {
       this.subscriptions,
       this.playerInstallId,
       this.playerName,
+      this.roomCode,
       this.bidAmount,
       this.giftAmount,
       this.requests,
@@ -39,6 +41,7 @@ class GameModel {
       {Subscriptions subscriptions,
       String playerInstallId,
       String playerName,
+      String roomCode,
       int bidAmount,
       int giftAmount,
       Set<Request> requests,
@@ -51,6 +54,7 @@ class GameModel {
       subscriptions: subscriptions ?? this.subscriptions,
       playerInstallId: playerInstallId ?? this.playerInstallId,
       playerName: playerName ?? this.playerName,
+      roomCode: roomCode ?? this.roomCode,
       bidAmount: bidAmount ?? this.bidAmount,
       giftAmount: giftAmount ?? this.giftAmount,
       requests: requests ?? this.requests,
@@ -65,6 +69,7 @@ class GameModel {
       db: db,
       playerInstallId: null,
       playerName: null,
+      roomCode: null,
       bidAmount: 0,
       giftAmount: 0,
       requests: new Set(),
@@ -80,6 +85,7 @@ class GameModel {
           subscriptions == other.subscriptions &&
           playerInstallId == other.playerInstallId &&
           playerName == other.playerName &&
+          roomCode == other.roomCode &&
           bidAmount == other.bidAmount &&
           giftAmount == other.giftAmount &&
           requests == other.requests &&
@@ -93,6 +99,7 @@ class GameModel {
       subscriptions.hashCode ^
       playerInstallId.hashCode ^
       playerName.hashCode ^
+      roomCode.hashCode ^
       bidAmount.hashCode ^
       giftAmount.hashCode ^
       requests.hashCode ^
@@ -103,7 +110,7 @@ class GameModel {
 
   @override
   String toString() {
-    return 'GameModel{db: $db, subscriptions: $subscriptions, playerInstallId: $playerInstallId, playerName: $playerName, bidAmount: $bidAmount, giftAmount: $giftAmount, requests: $requests, room: $room, players: $players, heists: $heists, rounds: $rounds}';
+    return 'GameModel{db: $db, subscriptions: $subscriptions, playerInstallId: $playerInstallId, playerName: $playerName, roomCode: $roomCode, bidAmount: $bidAmount, giftAmount: $giftAmount, requests: $requests, room: $room, players: $players, heists: $heists, rounds: $rounds}';
   }
 }
 

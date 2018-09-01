@@ -6,7 +6,7 @@ import 'package:heist/db/database.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/heist_definitions.dart';
 import 'package:heist/main.dart';
-import 'package:heist/reducers/player_reducers.dart';
+import 'package:heist/reducers/form_reducers.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/reducers/request_reducers.dart';
 import 'package:heist/reducers/subscription_reducers.dart';

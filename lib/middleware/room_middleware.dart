@@ -6,7 +6,7 @@ import 'package:heist/db/database.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/keys.dart';
 import 'package:heist/main.dart';
-import 'package:heist/reducers/player_reducers.dart';
+import 'package:heist/reducers/form_reducers.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -135,7 +135,7 @@ class AddVisibleToAccountantAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
     return withRequest(Request.SelectingVisibleToAccountant, store,
-            (store) => store.state.db.addVisibleToAccountant(getRoom(store.state).id, playerId));
+        (store) => store.state.db.addVisibleToAccountant(getRoom(store.state).id, playerId));
   }
 }
 

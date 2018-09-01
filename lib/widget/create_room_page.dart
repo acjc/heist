@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/keys.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/room_middleware.dart';
@@ -41,8 +42,8 @@ class CreateRoomPage extends StatelessWidget {
             ),
           ));
 
-  Widget _createRoomButton(Store<GameModel> store) => new RaisedButton(
-        child: const Text('CREATE ROOM', style: buttonTextStyle),
+  Widget _createRoomButton(BuildContext context, Store<GameModel> store) => new RaisedButton(
+        child: Text(AppLocalizations.of(context).createRoom, style: buttonTextStyle),
         onPressed: () {
           FormState enterNameState = Keys.createRoomPageNameKey.currentState;
           if (enterNameState.validate()) {
@@ -58,12 +59,12 @@ class CreateRoomPage extends StatelessWidget {
           children: [
             new Padding(
               padding: EdgeInsets.only(bottom: 24.0),
-              child: enterNameForm(store, Keys.createRoomPageNameKey),
+              child: enterNameForm(context, store, Keys.createRoomPageNameKey),
             ),
             new Padding(
               padding: paddingMedium,
-              child: const Text(
-                'Choose number of players:',
+              child: Text(
+                AppLocalizations.of(context).chooseNumberOfPlayers,
                 style: infoTextStyle,
               ),
             ),
@@ -78,7 +79,7 @@ class CreateRoomPage extends StatelessWidget {
               ],
             ),
             _rolesText(),
-            _createRoomButton(store),
+            _createRoomButton(context, store),
           ],
         ),
       );
@@ -88,7 +89,7 @@ class CreateRoomPage extends StatelessWidget {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Heist: Create new room"),
+        title: new Text(AppLocalizations.of(context).createRoomTitle),
       ),
       endDrawer: isDebugMode() ? new Drawer(child: new ReduxDevTools<GameModel>(store)) : null,
       body: _body(context, store),

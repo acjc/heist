@@ -1,0 +1,438 @@
+{
+  "@@last_modified": "2018-09-01T14:28:06.191215",
+  "title": "Heist",
+  "@title": {
+    "description": "Title for the Heist application",
+    "type": "text",
+    "placeholders": {}
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Shown while loading",
+    "type": "text",
+    "placeholders": {}
+  },
+  "continueButton": "CONTINUE",
+  "@continueButton": {
+    "description": "Button for the game organiser to move to the next round or heist",
+    "type": "text",
+    "placeholders": {}
+  },
+  "auctionTitle": "Auction!",
+  "@auctionTitle": {
+    "description": "Auction title",
+    "type": "text",
+    "placeholders": {}
+  },
+  "roundTitle": "Round {order}",
+  "@roundTitle": {
+    "description": "Round title",
+    "type": "text",
+    "placeholders": {
+      "order": {}
+    }
+  },
+  "heistTitle": "Heist {order}",
+  "@heistTitle": {
+    "description": "Heist title",
+    "type": "text",
+    "placeholders": {
+      "order": {}
+    }
+  },
+  "roomTitle": "Room: {code}",
+  "@roomTitle": {
+    "description": "Room title",
+    "type": "text",
+    "placeholders": {
+      "code": {}
+    }
+  },
+  "playerOrder": "Player {order}",
+  "@playerOrder": {
+    "description": "Player order",
+    "type": "text",
+    "placeholders": {
+      "order": {}
+    }
+  },
+  "success": "Success",
+  "@success": {
+    "description": "Status of a successful heist",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fail": "Fail",
+  "@fail": {
+    "description": "Status of a failed heist",
+    "type": "text",
+    "placeholders": {}
+  },
+  "homepageTitle": "Heist: Homepage",
+  "@homepageTitle": {
+    "description": "Title for the homepage",
+    "type": "text",
+    "placeholders": {}
+  },
+  "enterYourName": "Enter your name",
+  "@enterYourName": {
+    "description": "Above the text field where the player writes their name",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterAName": "Please enter a name",
+  "@pleaseEnterAName": {
+    "description": "After the player has submitted an empty name",
+    "type": "text",
+    "placeholders": {}
+  },
+  "enterRoom": "ENTER ROOM",
+  "@enterRoom": {
+    "description": "Button to enter an existing room",
+    "type": "text",
+    "placeholders": {}
+  },
+  "enterRoomCode": "Enter an existing room code",
+  "@enterRoomCode": {
+    "description": "Above the text field where the player writes an existing room code",
+    "type": "text",
+    "placeholders": {}
+  },
+  "invalidCode": "Invalid code",
+  "@invalidCode": {
+    "description": "After the player has entered an invalid room code",
+    "type": "text",
+    "placeholders": {}
+  },
+  "createRoomTitle": "Heist: Create new room",
+  "@createRoomTitle": {
+    "description": "Title for the page to create a room",
+    "type": "text",
+    "placeholders": {}
+  },
+  "createRoom": "CREATE ROOM",
+  "@createRoom": {
+    "description": "Button to create a new room",
+    "type": "text",
+    "placeholders": {}
+  },
+  "chooseNumberOfPlayers": "Choose number of players",
+  "@chooseNumberOfPlayers": {
+    "description": "Above the selector of the number of players",
+    "type": "text",
+    "placeholders": {}
+  },
+  "bidding": "BIDDING",
+  "@bidding": {
+    "description": "Title of the bidding section",
+    "type": "text",
+    "placeholders": {}
+  },
+  "submitBid": "SUBMIT BID",
+  "@submitBid": {
+    "description": "Button to submit a bid",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cancelBid": "CANCEL BID",
+  "@cancelBid": {
+    "description": "Button to cancel a bid",
+    "type": "text",
+    "placeholders": {}
+  },
+  "none": "None",
+  "@none": {
+    "description": "What your bid is when you haven't bid yet",
+    "type": "text",
+    "placeholders": {}
+  },
+  "auctionDescription": "There are {numPlayers} spots available! Highest, then fastest, bids win!",
+  "@auctionDescription": {
+    "description": "Description of an auction",
+    "type": "text",
+    "placeholders": {
+      "numPlayers": {}
+    }
+  },
+  "bidders": "Bidders so far ({length} / {numPlayers}):",
+  "@bidders": {
+    "description": "Number of players that have bid over the total number of players",
+    "type": "text",
+    "placeholders": {
+      "length": {},
+      "numPlayers": {}
+    }
+  },
+  "yourBid": "Your bid: {bidAmount}",
+  "@yourBid": {
+    "description": "A player's current bid",
+    "type": "text",
+    "placeholders": {
+      "bidAmount": {}
+    }
+  },
+  "maximumBid": "Maximum bid: {maximumBid}",
+  "@maximumBid": {
+    "description": "The maximum allowed bid",
+    "type": "text",
+    "placeholders": {
+      "maximumBid": {}
+    }
+  },
+  "unlimited": "Unlimited",
+  "@unlimited": {
+    "description": "The lead agent's maximum bid when they have found the kingpin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "playerBid": "{name} bid {amount}",
+  "@playerBid": {
+    "description": "How much a player has bid",
+    "type": "text",
+    "placeholders": {
+      "name": {},
+      "amount": {}
+    }
+  },
+  "totalPot": "Total pot = {pot} / {price}",
+  "@totalPot": {
+    "description": "Round pot over round price",
+    "type": "text",
+    "placeholders": {
+      "pot": {},
+      "price": {}
+    }
+  },
+  "heistInProgress": "Heist in progress...",
+  "@heistInProgress": {
+    "description": "Shown while a heist is in progress",
+    "type": "text",
+    "placeholders": {}
+  },
+  "makeYourChoice": "Make your choice...",
+  "@makeYourChoice": {
+    "description": "Shown when you have to choose your result in a heist",
+    "type": "text",
+    "placeholders": {}
+  },
+  "youAreOnAHeist": "You are going on a heist with:",
+  "@youAreOnAHeist": {
+    "description": "Says who your partners in a heist are",
+    "type": "text",
+    "placeholders": {}
+  },
+  "assigningRoles": "Assigning roles...",
+  "@assigningRoles": {
+    "description": "Shown while roles are being assigned",
+    "type": "text",
+    "placeholders": {}
+  },
+  "resolvingAuction": "Resolving auction...",
+  "@resolvingAuction": {
+    "description": "Shown while the result of an auction is calculated",
+    "type": "text",
+    "placeholders": {}
+  },
+  "gameTab": "GAME",
+  "@gameTab": {
+    "description": "Title of the game tab",
+    "type": "text",
+    "placeholders": {}
+  },
+  "secretTab": "SECRET",
+  "@secretTab": {
+    "description": "Title of the secret tab",
+    "type": "text",
+    "placeholders": {}
+  },
+  "yourTeam": "You are in team:",
+  "@yourTeam": {
+    "description": "Next to your team in the secret board",
+    "type": "text",
+    "placeholders": {}
+  },
+  "yourRole": "Your role is:",
+  "@yourRole": {
+    "description": "Next to your role in the secret board",
+    "type": "text",
+    "placeholders": {}
+  },
+  "otherIdentities": "You also know these identities:",
+  "@otherIdentities": {
+    "description": "Next to other identities a player might know",
+    "type": "text",
+    "placeholders": {}
+  },
+  "identity": "{name} is the {role} \n",
+  "@identity": {
+    "description": "Identity a player might know",
+    "type": "text",
+    "placeholders": {
+      "name": {},
+      "role": {}
+    }
+  },
+  "accountantExplanation": "You can also see the balance of up to {maxBalances} people:",
+  "@accountantExplanation": {
+    "description": "Tells the accountant what they can do",
+    "type": "text",
+    "placeholders": {
+      "maxBalances": {}
+    }
+  },
+  "accountantPickPlayer": "PICK BALANCE TO SEE",
+  "@accountantPickPlayer": {
+    "description": "Dropdown button where the accountant selects a player",
+    "type": "text",
+    "placeholders": {}
+  },
+  "accountantConfirmPlayer": "CONFIRM SELECTION",
+  "@accountantConfirmPlayer": {
+    "description": "Button for the accountant to confirm the selected player",
+    "type": "text",
+    "placeholders": {}
+  },
+  "leadAgentExplanation": "You can try to guess who the Kingpin is once during the game. If you get it right, your bids can be higher than the maximum bid from then on.",
+  "@leadAgentExplanation": {
+    "description": "Tells the lead agent what they can do",
+    "type": "text",
+    "placeholders": {}
+  },
+  "leadAgentPickPlayer": "SELECT YOUR KINGPIN GUESS",
+  "@leadAgentPickPlayer": {
+    "description": "Dropdown button where the lead agent selects a player",
+    "type": "text",
+    "placeholders": {}
+  },
+  "leadAgentConfirmPlayer": "CONFIRM GUESS",
+  "@leadAgentConfirmPlayer": {
+    "description": "Button for the lead agent to confirm the selected player",
+    "type": "text",
+    "placeholders": {}
+  },
+  "leadAgentResult": "You checked if {name} is the Kingpin. This is {result}",
+  "@leadAgentResult": {
+    "description": "Tells the lead agent whether they found the kingpin after their guess",
+    "type": "text",
+    "placeholders": {
+      "name": {},
+      "result": {}
+    }
+  },
+  "leadAgentResultRight": "CORRECT!",
+  "@leadAgentResultRight": {
+    "description": "The lead agent guessed who the kingpin is",
+    "type": "text",
+    "placeholders": {}
+  },
+  "leadAgentResultWrong": "INCORRECT! :(",
+  "@leadAgentResultWrong": {
+    "description": "The lead agent didn't guess who the kingpin is",
+    "type": "text",
+    "placeholders": {}
+  },
+  "waitingForPlayers": "Waiting for players: {playersSoFar} / {totalPlayers}",
+  "@waitingForPlayers": {
+    "description": "Shown while players are joining the room",
+    "type": "text",
+    "placeholders": {
+      "playersSoFar": {},
+      "totalPlayers": {}
+    }
+  },
+  "giftingTitle": "GIFTING",
+  "@giftingTitle": {
+    "description": "Title of the gifting section",
+    "type": "text",
+    "placeholders": {}
+  },
+  "chooseGiftRecipient": "Choose a player to send a gift to:",
+  "@chooseGiftRecipient": {
+    "description": "Next to the list of players where you select who to send a gift to",
+    "type": "text",
+    "placeholders": {}
+  },
+  "giftAlreadySent": "You have already sent a gift this round of {amount} to {recipientName}",
+  "@giftAlreadySent": {
+    "description": "The player has already sent a gift this round",
+    "type": "text",
+    "placeholders": {
+      "amount": {},
+      "recipientName": {}
+    }
+  },
+  "pickingTeam": "{name} is picking a team...",
+  "@pickingTeam": {
+    "description": "A player is picking a team",
+    "type": "text",
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "pickATeam": "Pick a team: {playersPicked} / {teamSize}",
+  "@pickATeam": {
+    "description": "Current team size over number of players needed, as seen by the team picker",
+    "type": "text",
+    "placeholders": {
+      "playersPicked": {},
+      "teamSize": {}
+    }
+  },
+  "pickedTeamSize": "TEAM ({playersPicked} / {teamSize})",
+  "@pickedTeamSize": {
+    "description": "Current team size over number of players needed, as seen by the players who aren't picking a team",
+    "type": "text",
+    "placeholders": {
+      "playersPicked": {},
+      "teamSize": {}
+    }
+  },
+  "submitTeam": "SUBMIT TEAM",
+  "@submitTeam": {
+    "description": "Button for the team picker to confirm their team selection",
+    "type": "text",
+    "placeholders": {}
+  },
+  "playerRole": "{name} ({role}) ->",
+  "@playerRole": {
+    "description": "The name and role of a player",
+    "type": "text",
+    "placeholders": {
+      "name": {},
+      "role": {}
+    }
+  },
+  "heistPrice": "Price: {price}",
+  "@heistPrice": {
+    "description": "Price of a heist",
+    "type": "text",
+    "placeholders": {
+      "price": {}
+    }
+  },
+  "heistPot": "Pot: {pot}",
+  "@heistPot": {
+    "description": "Pot of a heist",
+    "type": "text",
+    "placeholders": {
+      "pot": {}
+    }
+  },
+  "winner": "{winner} win!",
+  "@winner": {
+    "description": "Winner team",
+    "type": "text",
+    "placeholders": {
+      "winner": {}
+    }
+  },
+  "teamScores": "{thiefScore} - {agentScore}",
+  "@teamScores": {
+    "description": "The scores of both teams - might need to reverse the order in RTL",
+    "type": "text",
+    "placeholders": {
+      "thiefScore": {},
+      "agentScore": {}
+    }
+  }
+}

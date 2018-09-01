@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/heist_definitions.dart';
 import 'package:heist/middleware/heist_middleware.dart';
@@ -20,7 +21,7 @@ Widget observeHeist(Store<GameModel> store) {
             child: new Container(
                 padding: paddingMedium,
                 child: new Column(children: [
-                  const Text('Heist in progress...', style: infoTextStyle),
+                  Text(AppLocalizations.of(context).heistInProgress, style: infoTextStyle),
                   new GridView.count(
                     padding: paddingMedium,
                     shrinkWrap: true,
@@ -62,12 +63,12 @@ Widget makeDecision(BuildContext context, Store<GameModel> store) =>
             return observeHeist(store);
           } else {
             List<Widget> children = [
-              roundTitle(store),
+              roundTitle(context, store),
               new Padding(
                 padding: paddingSmall,
-                child: const Text('Make your choice...', style: titleTextStyle),
+                child: Text(AppLocalizations.of(context).makeYourChoice, style: titleTextStyle),
               ),
-              new Text('You are going on a heist with:', style: infoTextStyle),
+              new Text(AppLocalizations.of(context).youAreOnAHeist, style: infoTextStyle),
               new Column(
                 children: [],
               ),

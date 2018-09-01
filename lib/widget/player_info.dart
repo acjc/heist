@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -31,7 +32,7 @@ Widget playerInfo(Store<GameModel> store) {
                       style: boldTextStyle,
                     ),
                     new Text(
-                      'Player ${viewModel.me.order}',
+                      AppLocalizations.of(context).playerOrder(viewModel.me.order),
                       style: subtitleTextStyle,
                     ),
                   ],

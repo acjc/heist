@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -8,13 +9,13 @@ import 'package:redux/redux.dart';
 import 'common.dart';
 import 'team_picker.dart';
 
-Widget waitForTeam(Store<GameModel> store) => new Column(children: [
-      roundTitle(store),
+Widget waitForTeam(BuildContext context, Store<GameModel> store) => new Column(children: [
+      roundTitle(context, store),
       new Card(
           elevation: 2.0,
           child: new Container(
               padding: paddingLarge,
-              child: centeredMessage('${roundLeader(store.state).name} is picking a team...'))),
+              child: centeredMessage(AppLocalizations.of(context).pickingTeam(roundLeader(store.state).name)))),
       selectionBoard(store),
     ]);
 
@@ -31,7 +32,7 @@ Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, S
               new Container(
                 padding: paddingTitle,
                 child: new Text(
-                    'TEAM (${teamNames.length} / ${currentHeist(store.state).numPlayers})',
+                    AppLocalizations.of(context).pickedTeamSize(teamNames.length, currentHeist(store.state).numPlayers),
                     style: titleTextStyle),
               ),
               selectionGrid(context, players, teamNames),

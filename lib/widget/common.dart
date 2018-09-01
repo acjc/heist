@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -35,8 +36,8 @@ Widget centeredMessage(String text) {
   ));
 }
 
-Widget loading() {
-  return centeredMessage('Loading...');
+Widget loading(BuildContext context) {
+  return centeredMessage(AppLocalizations.of(context).loading);
 }
 
 Color decisionColour(String decision) {
@@ -63,14 +64,16 @@ class VerticalDivider extends StatelessWidget {
   }
 }
 
-Widget roundTitle(Store<GameModel> store) {
+Widget roundTitle(BuildContext context, Store<GameModel> store) {
   Round round = currentRound(store.state);
-  String subtitle = round.isAuction ? 'Auction!' : 'Round ${round.order}';
+  String subtitle = round.isAuction
+      ? AppLocalizations.of(context).auctionTitle
+      : AppLocalizations.of(context).roundTitle(round.order);
   return new Card(
     elevation: 2.0,
     child: new ListTile(
       title: new Text(
-        'Heist ${currentHeist(store.state).order}',
+        AppLocalizations.of(context).heistTitle(currentHeist(store.state).order),
         style: boldTextStyle,
       ),
       subtitle: new Text(subtitle),

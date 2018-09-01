@@ -120,14 +120,7 @@ packages:
       name: front_end
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.0-alpha.12"
-  func:
-    dependency: transitive
-    description:
-      name: func
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0"
+    version: "0.1.4+1"
   glob:
     dependency: transitive
     description:
@@ -218,7 +211,7 @@ packages:
       name: memoize
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.4.0"
+    version: "2.0.0"
   meta:
     dependency: transitive
     description:
@@ -327,12 +320,10 @@ packages:
   reselect:
     dependency: "direct main"
     description:
-      path: "."
-      ref: dart-2
-      resolved-ref: "349bf201a2e3bf54fb2fc5579ce440516b4aea14"
-      url: "git://github.com/brianegan/reselect_dart.git"
-    source: git
-    version: "0.3.0"
+      name: reselect
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.0"
   shared_preferences:
     dependency: "direct main"
     description:

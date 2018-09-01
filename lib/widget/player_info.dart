@@ -52,7 +52,7 @@ Widget playerBalance(int balance, int amountReceivedThisRound) {
       new Container(
         child: new Text(
           '+$amountReceivedThisRound',
-          style: const TextStyle(color: Colors.green),
+          style: const TextStyle(fontSize: 16.0, color: Colors.green),
         ),
         margin: const EdgeInsets.only(left: 8.0),
       ),

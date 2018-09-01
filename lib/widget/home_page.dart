@@ -18,6 +18,7 @@ Widget enterNameForm(Store<GameModel> store, GlobalKey<FormState> key) => new Fo
     key: key,
     child: new TextFormField(
         initialValue: isDebugMode() ? 'Mordred' : getPlayerName(store.state),
+        maxLength: 12,
         decoration: new InputDecoration(
           labelText: 'Enter your name',
           isDense: true,

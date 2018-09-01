@@ -3,7 +3,7 @@ import 'package:heist/db/database_model.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/game_middleware.dart';
 import 'package:heist/middleware/room_middleware.dart';
-import 'package:heist/reducers/player_reducers.dart';
+import 'package:heist/reducers/form_reducers.dart';
 import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -17,7 +17,7 @@ void main() {
   test('test create and set up room', () async {
     FirestoreDb db = new MockFirestoreDb.empty();
     Store<GameModel> store = createStore(db, minPlayers);
-    store.dispatch(new SetPlayerNameAction('_name'));
+    store.dispatch(new SavePlayerNameAction('_name'));
 
     await handle(store, new CreateRoomAction());
     expect(store.state.room.code.length, 4);

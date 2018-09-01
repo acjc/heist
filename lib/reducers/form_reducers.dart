@@ -16,12 +16,12 @@ class SavePlayerNameAction extends Action<String> {
 }
 
 final playerInstallIdReducer =
-    combineReducers<String>([new TypedReducer<String, SetPlayerInstallIdAction>(reduce)]);
+    combineReducers<String>([new TypedReducer<String, SavePlayerInstallIdAction>(reduce)]);
 
-class SetPlayerInstallIdAction extends Action<String> {
+class SavePlayerInstallIdAction extends Action<String> {
   final String _installId;
 
-  SetPlayerInstallIdAction(this._installId);
+  SavePlayerInstallIdAction(this._installId);
 
   @override
   String reduce(String state, action) {

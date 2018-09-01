@@ -1,6 +1,5 @@
 import 'package:heist/db/database_model.dart';
 import 'package:heist/main.dart';
-import 'package:heist/reducers/player_reducers.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/reducers/room_reducers.dart';
 import 'package:test/test.dart';
@@ -26,15 +25,5 @@ void main() {
     Room room = new Room(numPlayers: 5, roles: new Set());
     Room updatedRoom = reduce(room, new SetRoomCodeAction('ABCD'));
     expect(updatedRoom.code, 'ABCD');
-  });
-
-  test('set player name', () {
-    String playerName = reduce(null, new SetPlayerNameAction('_name'));
-    expect(playerName, '_name');
-  });
-
-  test('set install ID', () {
-    String installId = reduce(null, new SetPlayerInstallIdAction('_id'));
-    expect(installId, '_id');
   });
 }

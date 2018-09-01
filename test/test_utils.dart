@@ -6,7 +6,7 @@ import 'package:heist/main.dart';
 import 'package:heist/middleware/game_middleware.dart';
 import 'package:heist/middleware/middleware.dart';
 import 'package:heist/middleware/room_middleware.dart';
-import 'package:heist/reducers/player_reducers.dart';
+import 'package:heist/reducers/form_reducers.dart';
 import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
 import 'package:uuid/uuid.dart';
@@ -31,7 +31,7 @@ Future<void> addOtherPlayers(Store<GameModel> store) async {
 Future<Store<GameModel>> initGame() async {
   FirestoreDb db = new MockFirestoreDb.empty();
   Store<GameModel> store = createStore(db, minPlayers);
-  store.dispatch(new SetPlayerNameAction('_name'));
+  store.dispatch(new SavePlayerNameAction('_name'));
   await handle(store, new CreateRoomAction());
   await new LoadGameAction().loadGame(store);
   await handle(store, new JoinGameAction());

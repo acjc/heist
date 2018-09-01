@@ -156,7 +156,7 @@ class LoadGameAction extends MiddlewareAction {
   }
 
   Future<void> loadGame(Store<GameModel> store) async {
-    store.dispatch(new SetPlayerInstallIdAction(await installId()));
+    store.dispatch(new SavePlayerInstallIdAction(await installId()));
 
     FirestoreDb db = store.state.db;
     Room room = getRoom(store.state);

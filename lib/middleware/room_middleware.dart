@@ -39,7 +39,7 @@ class ValidateRoomAction extends MiddlewareAction {
       if (room == null) {
         return _showRoomValidationDialog('Room with code $code does not exist.');
       }
-      store.dispatch(new SetPlayerInstallIdAction(await installId()));
+      store.dispatch(new SavePlayerInstallIdAction(await installId()));
       String iid = getPlayerInstallId(store.state);
       bool playerExists = await db.playerExists(room.id, iid);
       if (!playerExists) {
@@ -78,7 +78,7 @@ class CreateRoomAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
     await withRequest(Request.ValidatingRoom, store, (store) async {
-      store.dispatch(new SetPlayerInstallIdAction(await installId()));
+      store.dispatch(new SavePlayerInstallIdAction(await installId()));
       String appVersion = await _getAppVersion();
       String code = await _newRoomCode(store);
       await _createRoom(store, code, appVersion);

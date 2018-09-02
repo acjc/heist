@@ -103,20 +103,15 @@ int resolveBalanceForHeistOutcome(
     balance += kingpinPayout;
   }
 
-  int steals = heist.decisions.values.where((d) => d == Steal).length;
   bool playerStole = heist.decisions[player.id] == Steal;
-
-  if (shouldPayoutLeadAgent(player, playerStole, steals)) {
-    balance += leadAgentPayout;
-  } else if (steals > 0 && playerStole) {
-    List<Player> playersWhoStole = players.where((p) => heist.decisions[p.id] == Steal).toList();
-    balance += randomlySplit(random, leadAgentPayout, steals)[playersWhoStole.indexOf(player)];
+  if (player.role == LEAD_AGENT.roleId || playerStole) {
+    List<Player> playersToReceive = players
+        .where((p) => heist.decisions[p.id] == Steal || p.role == LEAD_AGENT.roleId)
+        .toList();
+    List<int> split = randomlySplit(random, leadAgentPayout, playersToReceive.length);
+    balance += split[playersToReceive.indexOf(player)];
   }
   return balance;
-}
-
-bool shouldPayoutLeadAgent(Player player, bool playerStole, int steals) {
-  return player.role == LEAD_AGENT.roleId && (steals == 0 || steals == 1 && playerStole);
 }
 
 /// Split a number into approximately equal integer portions, using the given RNG to assign remainders.

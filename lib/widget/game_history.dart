@@ -27,10 +27,7 @@ Widget heistDecisions(Heist heist) {
   return new HeistGridView(children, 8.0);
 }
 
-Widget heistTeam(BuildContext context, Store<GameModel> store, Round round) {
-  Set<Player> team = teamForRound(store.state, round);
-  Player leader = leaderForRound(store.state, round);
-
+Widget heistTeam(BuildContext context, Store<GameModel> store, Set<Player> team, Player leader) {
   List<Widget> gridChildren = new List.generate(
     team.length,
     (i) {
@@ -104,9 +101,11 @@ Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int
   ];
 
   if (heist != null && heist.complete) {
+    Set<Player> team = teamForRound(store.state, lastRound);
+    Player leader = leaderForRound(store.state, lastRound);
     heistPopupChildren.addAll([
       new Divider(),
-      heistTeam(context, store, lastRound),
+      heistTeam(context, store, team, leader),
       new Divider(),
       heistDecisions(heist),
     ]);

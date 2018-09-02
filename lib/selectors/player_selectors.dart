@@ -89,15 +89,23 @@ int resolveBalanceForGifts(String playerId, List<Round> rounds, int balance) {
   return balance;
 }
 
+Random newRandomForHeist(Heist heist) {
+  return new Random(heist.id.hashCode);
+}
+
+int calculateKingpinPayout(Random random, int pot) {
+  return randomlySplit(random, pot, 2)[0];
+}
+
 bool hasProposedBid(String playerId, Map<String, Bid> bids, int numPlayers) {
   return bids.length != numPlayers && bids.containsKey(playerId);
 }
 
 int resolveBalanceForHeistOutcome(
     List<Player> players, Player player, Heist heist, int pot, int balance) {
-  Random random = new Random(heist.id.hashCode);
+  Random random = newRandomForHeist(heist);
 
-  int kingpinPayout = randomlySplit(random, pot, 2)[0];
+  int kingpinPayout = calculateKingpinPayout(random, pot);
   int leadAgentPayout = pot - kingpinPayout;
   if (player.role == KINGPIN.roleId) {
     balance += kingpinPayout;

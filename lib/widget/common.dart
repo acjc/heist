@@ -36,6 +36,18 @@ Widget loading() {
   return new Center(child: new CircularProgressIndicator());
 }
 
+Text heistResultText(bool wasSuccess) {
+  return wasSuccess
+      ? const Text(
+          'SUCCESS',
+          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.green),
+        )
+      : const Text(
+          'FAIL',
+          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.red),
+        );
+}
+
 Color decisionColour(String decision) {
   switch (decision) {
     case 'SUCCEED':

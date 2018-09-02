@@ -38,15 +38,8 @@ Widget heistSummary(Store<GameModel> store, Heist heist, int pot) => new Card(
       child: new Column(
         children: [
           new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            new Text('Heist ${heist.order}',
-                style: new TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-            heist.wasSuccess
-                ? const Text('SUCCESS',
-                    style: const TextStyle(
-                        fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.green))
-                : const Text('FAIL',
-                    style: const TextStyle(
-                        fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.red)),
+            new Text('Heist ${heist.order}', style: boldTextStyle),
+            heistResultText(heist.wasSuccess),
           ]),
           new Divider(),
           new Container(

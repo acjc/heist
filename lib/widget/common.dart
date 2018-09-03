@@ -37,18 +37,6 @@ Widget loading() {
   return new Center(child: new CircularProgressIndicator());
 }
 
-Text heistResultText(BuildContext context, bool wasSuccess) {
-  return wasSuccess
-      ? new Text(
-          AppLocalizations.of(context).success.toUpperCase(),
-          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.green),
-        )
-      : new Text(
-          AppLocalizations.of(context).fail.toUpperCase(),
-          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.red),
-        );
-}
-
 Color decisionColour(String decision) {
   switch (decision) {
     case 'SUCCEED':

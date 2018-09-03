@@ -32,6 +32,18 @@ List<Widget> playerDecisions(BuildContext context, Store<GameModel> store, Heist
   return heistDecisions;
 }
 
+Text heistResultText(BuildContext context, bool wasSuccess) {
+  return wasSuccess
+      ? new Text(
+          AppLocalizations.of(context).success.toUpperCase(),
+          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.green),
+        )
+      : new Text(
+          AppLocalizations.of(context).fail.toUpperCase(),
+          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.red),
+        );
+}
+
 Widget heistSummary(BuildContext context, Store<GameModel> store, Heist heist, int pot) => new Card(
     elevation: 2.0,
     child: new Container(

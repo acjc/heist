@@ -64,6 +64,12 @@ class HeistEndState extends State<HeistEnd> {
             ));
   }
 
+  Widget _heistIcon(bool wasSuccess) {
+    return wasSuccess
+        ? const Icon(Icons.verified_user, color: Colors.green, size: 40.0)
+        : const Icon(Icons.cancel, color: Colors.red, size: 40.0);
+  }
+
   Widget _heistDetails(Heist heist, int pot) => new Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -74,7 +80,7 @@ class HeistEndState extends State<HeistEnd> {
             new Text(pot.toString(), style: bigNumberTextStyle),
           ),
           new VerticalDivider(),
-          heistResultText(context, heist.wasSuccess),
+          _heistIcon(heist.wasSuccess),
         ],
       );
 

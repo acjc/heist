@@ -69,7 +69,7 @@ class GameState extends State<Game> {
 
   Widget _biddingAndGifting(Store<GameModel> store) {
     List<Widget> children = [
-      roundTitle(context, store),
+      roundTitleCard(context, store),
     ];
     if (!isAuction(store.state)) {
       children.add(selectionBoard(_store));
@@ -78,7 +78,7 @@ class GameState extends State<Game> {
       bidding(store),
     );
     children.add(gifting(store));
-    return new Column(children: children);
+    return new SingleChildScrollView(child: new Column(children: children));
   }
 
   Widget _gameLoop(MainBoardViewModel viewModel) {
@@ -135,7 +135,7 @@ class GameState extends State<Game> {
           if (currentScreen == null) {
             return loading();
           }
-          return new SingleChildScrollView(child: currentScreen);
+          return currentScreen;
         },
       );
 

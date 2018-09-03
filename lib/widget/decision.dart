@@ -13,7 +13,7 @@ import 'common.dart';
 
 Widget activeHeist(BuildContext context, Store<GameModel> store) {
   List<Widget> children = [
-    roundTitle(context, store),
+    roundTitleCard(context, store),
     observeHeist(store),
   ];
   if (goingOnHeist(store.state)) {

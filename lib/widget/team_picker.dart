@@ -25,7 +25,7 @@ Widget teamPicker(Store<GameModel> store) {
         int playersRequired = currentHeist(store.state).numPlayers;
         return new Column(
           children: [
-            roundTitle(context, store),
+            roundTitleCard(context, store),
             new Card(
                 elevation: 2.0,
                 child: new Container(

@@ -161,6 +161,6 @@ class HeistEndState extends State<HeistEnd> {
     if (!gameIsReady(_store.state)) {
       return new Container();
     }
-    return _heistResult(context);
+    return new SingleChildScrollView(child: _heistResult(context));
   }
 }

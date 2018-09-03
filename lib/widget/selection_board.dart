@@ -9,16 +9,76 @@ import 'package:redux/redux.dart';
 import 'common.dart';
 import 'team_picker.dart';
 
-Widget waitForTeam(BuildContext context, Store<GameModel> store) => new Column(children: [
-      roundTitle(context, store),
-      new Card(
-          elevation: 2.0,
-          child: new Container(
-              padding: paddingLarge,
-              child: centeredMessage(
-                  AppLocalizations.of(context).pickingTeam(currentLeader(store.state).name)))),
-      selectionBoard(store),
-    ]);
+Widget waitForTeamMessage(bool goingOnHeist, String leaderName) {
+  const TextStyle defaultTextStyle = const TextStyle(color: Colors.black87, fontSize: 16.0);
+  if (goingOnHeist) {
+    return new RichText(
+      textAlign: TextAlign.center,
+      text: new TextSpan(
+        style: defaultTextStyle,
+        children: [
+          new TextSpan(text: leaderName, style: boldTextStyle),
+          new TextSpan(text: ' picked you in the team!'),
+        ],
+      ),
+    );
+  }
+
+  return new Column(
+    children: [
+      new Padding(
+        padding: paddingSmall,
+        child: new Text("You haven't been picked!", style: infoTextStyle),
+      ),
+      new RichText(
+        textAlign: TextAlign.center,
+        text: new TextSpan(
+          style: defaultTextStyle,
+          children: [
+            new TextSpan(text: "Convince "),
+            new TextSpan(text: leaderName, style: boldTextStyle),
+            new TextSpan(text: ' to put you in the team!'),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget waitForTeam(BuildContext context, Store<GameModel> store) {
+  return new StoreConnector<GameModel, bool>(
+    distinct: true,
+    converter: (store) => goingOnHeist(store.state),
+    builder: (context, goingOnHeist) {
+      Player leader = currentLeader(store.state);
+      return new Container(
+        color: goingOnHeist ? Colors.teal : Colors.redAccent,
+        padding: paddingLarge,
+        child: new Card(
+          elevation: 6.0,
+          child: new Padding(
+            padding: paddingSmall,
+            child: new Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                goingOnHeist
+                    ? const Icon(Icons.check_circle, color: Colors.green, size: 250.0)
+                    : const Icon(Icons.do_not_disturb_alt, color: Colors.red, size: 250.0),
+                waitForTeamMessage(goingOnHeist, leader.name),
+                new Column(
+                  children: [
+                    new Divider(),
+                    roundTitleContents(context, store),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
 
 Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, Set<Player>>(
     converter: (store) => currentTeam(store.state),
@@ -35,9 +95,9 @@ Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, S
                 padding: paddingTitle,
                 child: new Text(
                     AppLocalizations.of(context).pickedTeamSize(
-                          team.length,
-                          currentHeist(store.state).numPlayers,
-                        ),
+                      team.length,
+                      currentHeist(store.state).numPlayers,
+                    ),
                     style: titleTextStyle),
               ),
               new HeistGridView(selectionBoardChildren(context, players, team, leader)),

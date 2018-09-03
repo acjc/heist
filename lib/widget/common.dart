@@ -72,7 +72,7 @@ Widget roundTitleIcon(IconData icon, String text) {
   );
 }
 
-Widget roundTitle(BuildContext context, Store<GameModel> store) {
+Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
   Heist heist = currentHeist(store.state);
   Round round = currentRound(store.state);
   String subtitle = round.isAuction
@@ -96,17 +96,19 @@ Widget roundTitle(BuildContext context, Store<GameModel> store) {
     roundTitleIcon(Icons.vertical_align_top, heist.maximumBid.toString()),
   ];
 
-  return new Card(
-    elevation: 2.0,
-    child: new Padding(
-      padding: paddingSmall,
-      child: new Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: children,
-      ),
-    ),
+  return new Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: children,
   );
 }
+
+Widget roundTitleCard(BuildContext context, Store<GameModel> store) => new Card(
+      elevation: 2.0,
+      child: new Padding(
+        padding: paddingSmall,
+        child: roundTitleContents(context, store),
+      ),
+    );
 
 /// Widget for showing a 2-column grid
 class HeistGridView extends GridView {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/game_middleware.dart';
@@ -56,7 +57,7 @@ class GameState extends State<Game> {
     if (!getRoom(_store.state).complete && !completingGame) {
       _store.dispatch(new CompleteGameAction());
     }
-    return endgame(_store);
+    return endgame(context, _store);
   }
 
   Widget _resolveAuctionWinners(bool resolvingAuction) {
@@ -68,7 +69,7 @@ class GameState extends State<Game> {
 
   Widget _biddingAndGifting(Store<GameModel> store) {
     List<Widget> children = [
-      roundTitle(store),
+      roundTitle(context, store),
     ];
     if (!isAuction(store.state)) {
       children.add(selectionBoard(_store));
@@ -83,7 +84,7 @@ class GameState extends State<Game> {
   Widget _gameLoop(MainBoardViewModel viewModel) {
     // team picking (not needed for auctions)
     if (!isAuction(_store.state) && viewModel.waitingForTeam) {
-      return isMyGo(_store.state) ? teamPicker(_store) : waitForTeam(_store);
+      return isMyGo(_store.state) ? teamPicker(_store) : waitForTeam(context, _store);
     }
 
     // bidding
@@ -93,7 +94,7 @@ class GameState extends State<Game> {
 
     // resolve round
     if (!viewModel.roundComplete) {
-      return roundEnd(_store);
+      return roundEnd(context, _store);
     }
 
     // resolve auction
@@ -143,7 +144,7 @@ class GameState extends State<Game> {
       new Padding(
         padding: paddingTitle,
         child: new Text(
-          'Waiting for players (${playersSoFar.length} / $numPlayers)',
+          AppLocalizations.of(context).waitingForPlayers(playersSoFar.length, numPlayers),
           style: titleTextStyle,
         ),
       ),
@@ -169,7 +170,7 @@ class GameState extends State<Game> {
           }
 
           if (viewModel.isNewGame) {
-            return centeredMessage('Initialising game...');
+            return centeredMessage(AppLocalizations.of(context).initialisingGame);
           }
 
           return loading();
@@ -208,7 +209,7 @@ class GameState extends State<Game> {
             getHeists(store.state).isNotEmpty ? haveReceivedGiftThisRound(store.state) : false,
         distinct: true,
         builder: (context, haveReceivedGiftThisRound) {
-          Text title = new Text('SECRET');
+          Text title = new Text(AppLocalizations.of(context).secretTab);
           return haveReceivedGiftThisRound ? iconText(new Icon(Icons.cake), title) : title;
         },
       );
@@ -219,10 +220,10 @@ class GameState extends State<Game> {
       length: 2,
       child: new Scaffold(
         appBar: new AppBar(
-          title: new Text("Room: ${getRoom(_store.state).code}"),
+          title: new Text(AppLocalizations.of(context).roomTitle(getRoom(_store.state).code)),
           bottom: new TabBar(
             tabs: [
-              new Tab(text: 'GAME'),
+              new Tab(text: AppLocalizations.of(context).gameTab),
               _secretTab(),
             ],
           ),

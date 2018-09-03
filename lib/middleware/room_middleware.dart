@@ -37,7 +37,8 @@ class ValidateRoomAction extends MiddlewareAction {
       String code = getRoom(store.state).code;
       Room room = await db.getRoomByCode(code);
       if (room == null) {
-        return _showRoomValidationDialog('Room with code $code does not exist.');
+        _showRoomValidationDialog('Room with code $code does not exist.');
+        return;
       }
       store.dispatch(new SavePlayerInstallIdAction(await installId()));
       String iid = getPlayerInstallId(store.state);
@@ -45,15 +46,18 @@ class ValidateRoomAction extends MiddlewareAction {
       if (!playerExists) {
         String playerName = getPlayerName(store.state);
         if (playerName == null || playerName.isEmpty) {
-          return _showRoomValidationDialog('Please enter a name.');
+          _showRoomValidationDialog('Please enter a name.');
+          return;
         }
         int numExistingPlayers = await db.getNumPlayers(room.id);
         if (numExistingPlayers >= room.numPlayers) {
-          return _showRoomValidationDialog('Room is full.');
+          _showRoomValidationDialog('Room is full.');
+          return;
         }
         bool nameAlreadyTaken = await db.playerExistsWithName(room.id, playerName);
         if (nameAlreadyTaken) {
-          return _showRoomValidationDialog('Name $playerName is already taken.');
+          _showRoomValidationDialog('Name $playerName is already taken.');
+          return;
         }
       }
       Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Game(store)));

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -26,7 +27,7 @@ Widget playerInfo(Store<GameModel> store) {
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                playerName(viewModel.me),
+                playerName(context, viewModel.me),
                 new VerticalDivider(),
                 playerBalance(viewModel.balance, viewModel.amountReceivedThisRound),
               ],
@@ -69,7 +70,7 @@ Widget playerBalance(int balance, int amountReceivedThisRound) {
   );
 }
 
-Widget playerName(Player me) {
+Widget playerName(BuildContext context, Player me) {
   List<Widget> children = [
     new Text(
       me.name,
@@ -80,7 +81,7 @@ Widget playerName(Player me) {
   if (me.order != null) {
     children.add(
       new Text(
-        'Player ${me.order}',
+        AppLocalizations.of(context).playerOrder(me.order),
         style: subtitleTextStyle,
       ),
     );

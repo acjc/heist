@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/gifting_middleware.dart';
 import 'package:heist/reducers/gift_amount_reducers.dart';
@@ -55,7 +56,7 @@ Widget gifting(Store<GameModel> store) => new StoreConnector<GameModel, GiftingV
       List<Widget> children = [
         new Container(
           padding: paddingTitle,
-          child: const Text('GIFTING', style: titleTextStyle),
+          child: new Text(AppLocalizations.of(context).giftingTitle, style: titleTextStyle),
         ),
       ];
 
@@ -64,13 +65,13 @@ Widget gifting(Store<GameModel> store) => new StoreConnector<GameModel, GiftingV
         children.add(new Container(
             padding: paddingMedium,
             child: new Text(
-                'You have already sent a gift this round of ${viewModel.gift.amount} to $recipientName',
+                AppLocalizations.of(context).giftAlreadySent(viewModel.gift.amount, recipientName),
                 style: infoTextStyle)));
       } else {
         children.addAll([
           giftSelector(
               context, store, min(viewModel.giftAmount, viewModel.balance), viewModel.balance),
-          const Text('Choose a player to send a gift to:', style: infoTextStyle),
+          new Text(AppLocalizations.of(context).chooseGiftRecipient, style: infoTextStyle),
           recipientSelection(store, viewModel.giftAmount, viewModel.loading),
         ]);
       }

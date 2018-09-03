@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
@@ -7,7 +8,7 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-List<Widget> playerDecisions(Store<GameModel> store, Heist heist) {
+List<Widget> playerDecisions(BuildContext context, Store<GameModel> store, Heist heist) {
   List<Widget> heistDecisions = [];
   heist.decisions.forEach((playerId, decision) {
     Player player = getPlayerById(store.state, playerId);
@@ -31,32 +32,32 @@ List<Widget> playerDecisions(Store<GameModel> store, Heist heist) {
   return heistDecisions;
 }
 
-Widget heistSummary(Store<GameModel> store, Heist heist, int pot) => new Card(
+Widget heistSummary(BuildContext context, Store<GameModel> store, Heist heist, int pot) => new Card(
     elevation: 2.0,
     child: new Container(
       padding: paddingMedium,
       child: new Column(
         children: [
           new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            new Text('Heist ${heist.order}', style: boldTextStyle),
-            heistResultText(heist.wasSuccess),
+            new Text(AppLocalizations.of(context).heistTitle(heist.order), style: boldTextStyle),
+            heistResultText(context, heist.wasSuccess),
           ]),
           new Divider(),
           new Container(
             padding: paddingSmall,
             child: new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              new Text('Price: ${heist.price}', style: infoTextStyle),
-              new Text('Pot: $pot', style: infoTextStyle),
+              new Text(AppLocalizations.of(context).heistPrice(heist.price), style: infoTextStyle),
+              new Text(AppLocalizations.of(context).heistPot(pot), style: infoTextStyle),
             ]),
           ),
           new Column(
-            children: playerDecisions(store, heist),
+            children: playerDecisions(context, store, heist),
           ),
         ],
       ),
     ));
 
-Widget winner(Score score) => new Card(
+Widget winner(BuildContext context, Score score) => new Card(
       elevation: 2.0,
       child: new Container(
         alignment: Alignment.center,
@@ -65,10 +66,11 @@ Widget winner(Score score) => new Card(
           children: [
             new Container(
                 padding: paddingTitle,
-                child: new Text('${score.winner} win!', style: titleTextStyle)),
+                child: new Text(AppLocalizations.of(context).winner(score.winner.toString()),
+                    style: titleTextStyle)),
             new Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
               new Text(Team.THIEVES.toString(), style: infoTextStyle),
-              new Text('${score.thiefScore} - ${score.agentScore}',
+              new Text(AppLocalizations.of(context).teamScores(score.thiefScore, score.agentScore),
                   style: new TextStyle(fontSize: 32.0)),
               new Text(Team.AGENTS.toString(), style: infoTextStyle),
             ])
@@ -102,7 +104,7 @@ Widget fullPlayerListForTeam(List<Player> players, Team team, Color color) {
   );
 }
 
-Widget fullPlayerList(Store<GameModel> store) {
+Widget fullPlayerList(BuildContext context, Store<GameModel> store) {
   List<Player> players = getPlayers(store.state);
   return new Card(
     elevation: 2.0,
@@ -111,7 +113,7 @@ Widget fullPlayerList(Store<GameModel> store) {
       child: new Column(children: [
         new Padding(
           padding: paddingTitle,
-          child: const Text('Players', style: titleTextStyle),
+          child: new Text(AppLocalizations.of(context).players, style: titleTextStyle),
         ),
         new Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -125,19 +127,19 @@ Widget fullPlayerList(Store<GameModel> store) {
   );
 }
 
-Widget endgame(Store<GameModel> store) {
+Widget endgame(BuildContext context, Store<GameModel> store) {
   List<Heist> heists = getHeists(store.state);
   Score score = calculateScore(heists);
 
   List<Widget> children = [
-    winner(score),
-    fullPlayerList(store),
+    winner(context, score),
+    fullPlayerList(context, store),
   ];
 
   Map<String, List<Round>> rounds = getRounds(store.state);
   for (Heist heist in heists) {
     Round lastRound = rounds[heist.id].last;
-    children.add(heistSummary(store, heist, lastRound.pot));
+    children.add(heistSummary(context, store, heist, lastRound.pot));
   }
 
   return new ListView(

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/heist_definitions.dart';
 import 'package:heist/middleware/heist_middleware.dart';
@@ -53,7 +54,10 @@ class HeistEndState extends State<HeistEnd> {
         builder: (context, completingHeist) => new Padding(
               padding: paddingSmall,
               child: new RaisedButton(
-                child: const Text('CONTINUE', style: buttonTextStyle),
+                child: new Text(
+                  AppLocalizations.of(context).continueButton,
+                  style: buttonTextStyle,
+                ),
                 onPressed:
                     completingHeist ? null : () => _store.dispatch(new CompleteHeistAction()),
               ),
@@ -63,14 +67,14 @@ class HeistEndState extends State<HeistEnd> {
   Widget _heistDetails(Heist heist, int pot) => new Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          new Text('Heist ${heist.order}', style: boldTextStyle),
+          new Text(AppLocalizations.of(context).heistTitle(heist.order), style: boldTextStyle),
           new VerticalDivider(),
           iconText(
             new Icon(Icons.monetization_on, color: Colors.teal),
             new Text(pot.toString(), style: bigNumberTextStyle),
           ),
           new VerticalDivider(),
-          heistResultText(heist.wasSuccess),
+          heistResultText(context, heist.wasSuccess),
         ],
       );
 
@@ -110,7 +114,7 @@ class HeistEndState extends State<HeistEnd> {
               style: potResolutionTextStyle,
             ),
             new Text(
-              '...received by ${KINGPIN.displayName}',
+              AppLocalizations.of(context).kingpinReceived(KINGPIN.displayName),
               style: infoTextStyle,
             ),
           ],
@@ -125,7 +129,7 @@ class HeistEndState extends State<HeistEnd> {
               style: potResolutionTextStyle,
             ),
             new Text(
-              '...shared between the ${LEAD_AGENT.displayName} and any players who chose $Steal on the heist: ',
+              AppLocalizations.of(context).sharedBetween(LEAD_AGENT.displayName, Steal),
               style: infoTextStyle,
             ),
           ],

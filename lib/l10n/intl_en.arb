@@ -1,14 +1,8 @@
 {
-  "@@last_modified": "2018-09-01T14:28:06.191215",
+  "@@last_modified": "2018-09-03T13:53:37.722526",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
-    "type": "text",
-    "placeholders": {}
-  },
-  "loading": "Loading...",
-  "@loading": {
-    "description": "Shown while loading",
     "type": "text",
     "placeholders": {}
   },
@@ -140,9 +134,9 @@
     "type": "text",
     "placeholders": {}
   },
-  "none": "None",
-  "@none": {
-    "description": "What your bid is when you haven't bid yet",
+  "noBid": "No Bid",
+  "@noBid": {
+    "description": "Player hasn't made a bid yet",
     "type": "text",
     "placeholders": {}
   },
@@ -163,25 +157,9 @@
       "numPlayers": {}
     }
   },
-  "yourBid": "Your bid: {bidAmount}",
-  "@yourBid": {
-    "description": "A player's current bid",
-    "type": "text",
-    "placeholders": {
-      "bidAmount": {}
-    }
-  },
-  "maximumBid": "Maximum bid: {maximumBid}",
-  "@maximumBid": {
-    "description": "The maximum allowed bid",
-    "type": "text",
-    "placeholders": {
-      "maximumBid": {}
-    }
-  },
-  "unlimited": "Unlimited",
+  "unlimited": "You have no maximum bid limit for this round",
   "@unlimited": {
-    "description": "The lead agent's maximum bid when they have found the kingpin",
+    "description": "The Lead Agent's maximum bid when they have found the Kingpin (or it is an auction)",
     "type": "text",
     "placeholders": {}
   },
@@ -215,21 +193,15 @@
     "type": "text",
     "placeholders": {}
   },
-  "youAreOnAHeist": "You are going on a heist with:",
-  "@youAreOnAHeist": {
-    "description": "Says who your partners in a heist are",
+  "youHaveMadeYourChoice": "You have made your choice!",
+  "@youHaveMadeYourChoice": {
+    "description": "Shown when a player on a heist has made a decision",
     "type": "text",
     "placeholders": {}
   },
-  "assigningRoles": "Assigning roles...",
-  "@assigningRoles": {
-    "description": "Shown while roles are being assigned",
-    "type": "text",
-    "placeholders": {}
-  },
-  "resolvingAuction": "Resolving auction...",
-  "@resolvingAuction": {
-    "description": "Shown while the result of an auction is calculated",
+  "initialisingGame": "Initialising game...",
+  "@initialisingGame": {
+    "description": "Shown while roles and player order are being assigned",
     "type": "text",
     "placeholders": {}
   },
@@ -292,7 +264,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "leadAgentExplanation": "You can try to guess who the Kingpin is once during the game. If you get it right, your bids can be higher than the maximum bid from then on.",
+  "leadAgentExplanation": "You can try to guess who the Kingpin is ONCE during the game. If you get it right, you will no longer be restricted by maximum bid limits.",
   "@leadAgentExplanation": {
     "description": "Tells the lead agent what they can do",
     "type": "text",

@@ -9,6 +9,7 @@ ios/.generated/
 packages
 .flutter-plugins
 *.iml
+.dart_tool/
 
 google-services.json
 key.properties

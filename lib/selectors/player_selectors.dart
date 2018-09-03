@@ -53,11 +53,16 @@ int calculateBalanceFromStore(Store<GameModel> store, Player player) => calculat
 
 int calculateBalance(
     List<Player> players, Player player, List<Heist> heists, Map<String, List<Round>> allRounds) {
+  if (players.isEmpty || player == null) {
+    return 0;
+  }
   int balance = player.initialBalance;
+  if (allRounds.isEmpty) {
+    return balance;
+  }
   heists.forEach((heist) {
     List<Round> rounds = allRounds[heist.id];
-
-    if (rounds.isNotEmpty) {
+    if (rounds != null && rounds.isNotEmpty) {
       balance = resolveBalanceForGifts(player.id, rounds, balance);
 
       Map<String, Bid> mostRecentBids = rounds.last.bids;

@@ -11,6 +11,19 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
+Widget activeHeist(BuildContext context, Store<GameModel> store) {
+  List<Widget> children = [
+    roundTitle(context, store),
+    observeHeist(store),
+  ];
+  if (goingOnHeist(store.state)) {
+    children.add(
+      makeDecision(context, store),
+    );
+  }
+  return new Column(children: children);
+}
+
 Widget observeHeist(Store<GameModel> store) {
   return new StoreConnector<GameModel, Map<String, String>>(
       converter: (store) => currentHeist(store.state).decisions,
@@ -21,17 +34,14 @@ Widget observeHeist(Store<GameModel> store) {
             child: new Container(
                 padding: paddingMedium,
                 child: new Column(children: [
-                  Text(AppLocalizations.of(context).heistInProgress, style: infoTextStyle),
-                  new GridView.count(
-                    padding: paddingMedium,
-                    shrinkWrap: true,
-                    childAspectRatio: 6.0,
-                    crossAxisCount: 2,
-                    primary: false,
-                    crossAxisSpacing: 10.0,
-                    mainAxisSpacing: 10.0,
-                    children: observeHeistChildren(context, playersInTeam(store.state), decisions),
-                  )
+                  new Text(AppLocalizations.of(context).heistInProgress, style: infoTextStyle),
+                  new HeistGridView(
+                    observeHeistChildren(
+                      context,
+                      currentTeam(store.state),
+                      decisions,
+                    ),
+                  ),
                 ])));
       });
 }
@@ -59,31 +69,32 @@ Widget makeDecision(BuildContext context, Store<GameModel> store) =>
         distinct: true,
         builder: (context, decisions) {
           Player me = getSelf(store.state);
+          List<Widget> children = [];
           if (decisions.containsKey(me.id)) {
-            return observeHeist(store);
+            children.add(
+              new Text(AppLocalizations.of(context).youHaveMadeYourChoice, style: infoTextStyle),
+            );
           } else {
-            List<Widget> children = [
-              roundTitle(context, store),
+            children.addAll([
               new Padding(
                 padding: paddingSmall,
-                child: Text(AppLocalizations.of(context).makeYourChoice, style: titleTextStyle),
+                child: new Text(AppLocalizations.of(context).makeYourChoice, style: titleTextStyle),
               ),
-              new Text(AppLocalizations.of(context).youAreOnAHeist, style: infoTextStyle),
               new Column(
                 children: [],
               ),
               decisionButton(context, store, Succeed, true),
               decisionButton(context, store, Steal, me.role != KINGPIN.roleId),
               decisionButton(context, store, Fail, getTeam(me.role) == Team.AGENTS),
-            ];
-            return new Card(
-                elevation: 2.0,
-                child: new Container(
-                    padding: paddingMedium,
-                    alignment: Alignment.center,
-                    child: new Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: children)));
+            ]);
           }
+          return new Card(
+              elevation: 2.0,
+              child: new Container(
+                  padding: paddingMedium,
+                  alignment: Alignment.center,
+                  child: new Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: children)));
         });
 
 Widget decisionButton(

@@ -12,22 +12,22 @@ List<Widget> playerDecisions(BuildContext context, Store<GameModel> store, Heist
   List<Widget> heistDecisions = [];
   heist.decisions.forEach((playerId, decision) {
     Player player = getPlayerById(store.state, playerId);
-    List<Widget> children = [
-      new Text(
-        AppLocalizations.of(context).playerRole(player.name, getRoleDisplayName(player.role)),
-        style: infoTextStyle,
+    heistDecisions.add(
+      new Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          new Text('${player.name}:', style: infoTextStyle),
+          new Text(
+            ' $decision',
+            style: new TextStyle(
+              fontSize: 16.0,
+              color: decisionColour(decision),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
-    ];
-    children.add(new Text(' $decision',
-        style: new TextStyle(
-          fontSize: 16.0,
-          color: decisionColour(decision),
-          fontWeight: FontWeight.bold,
-        )));
-    heistDecisions.add(new Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: children,
-    ));
+    );
   });
   return heistDecisions;
 }
@@ -42,10 +42,10 @@ Widget heistSummary(BuildContext context, Store<GameModel> store, Heist heist, i
             new Text(AppLocalizations.of(context).heistTitle(heist.order),
                 style: new TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
             heist.wasSuccess
-                ? Text(AppLocalizations.of(context).success.toUpperCase(),
+                ? new Text(AppLocalizations.of(context).success.toUpperCase(),
                     style: const TextStyle(
                         fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.green))
-                : Text(AppLocalizations.of(context).fail.toUpperCase(),
+                : new Text(AppLocalizations.of(context).fail.toUpperCase(),
                     style: const TextStyle(
                         fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.red)),
           ]),
@@ -73,8 +73,7 @@ Widget winner(BuildContext context, Score score) => new Card(
           children: [
             new Container(
                 padding: paddingTitle,
-                child: new Text(
-                    AppLocalizations.of(context).winner(score.winner.toString()),
+                child: new Text(AppLocalizations.of(context).winner(score.winner.toString()),
                     style: titleTextStyle)),
             new Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
               new Text(Team.THIEVES.toString(), style: infoTextStyle),
@@ -87,12 +86,61 @@ Widget winner(BuildContext context, Score score) => new Card(
       ),
     );
 
+Widget fullPlayerListForTeam(List<Player> players, Team team, Color color) {
+  List<Player> playersInTeam = players.where((p) => getTeam(p.role) == team).toList();
+  return new Column(
+    children: new List.generate(playersInTeam.length + 1, (i) {
+      Player player = playersInTeam[0];
+      return new Padding(
+        padding: paddingBelowText,
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            new Text(
+              player.name,
+              style: infoTextStyle,
+            ),
+            new Text(
+              getRoleDisplayName(player.role),
+              style: new TextStyle(color: color),
+            ),
+          ],
+        ),
+      );
+    }),
+  );
+}
+
+Widget fullPlayerList(Store<GameModel> store) {
+  List<Player> players = getPlayers(store.state);
+  return new Card(
+    elevation: 2.0,
+    child: new Padding(
+      padding: paddingMedium,
+      child: new Column(children: [
+        new Padding(
+          padding: paddingTitle,
+          child: const Text('Players', style: titleTextStyle),
+        ),
+        new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            fullPlayerListForTeam(players, Team.THIEVES, Colors.pink),
+            fullPlayerListForTeam(players, Team.AGENTS, Colors.purple),
+          ],
+        )
+      ]),
+    ),
+  );
+}
+
 Widget endgame(BuildContext context, Store<GameModel> store) {
   List<Heist> heists = getHeists(store.state);
   Score score = calculateScore(heists);
 
   List<Widget> children = [
     winner(context, score),
+    fullPlayerList(store),
   ];
 
   Map<String, List<Round>> rounds = getRounds(store.state);

@@ -18,7 +18,7 @@ Widget heistContinueButton(Store<GameModel> store) {
       builder: (context, completingHeist) => new Padding(
             padding: paddingSmall,
             child: new RaisedButton(
-              child: Text(AppLocalizations.of(context).continueButton, style: buttonTextStyle),
+              child: new Text(AppLocalizations.of(context).continueButton, style: buttonTextStyle),
               onPressed: completingHeist ? null : () => store.dispatch(new CompleteHeistAction()),
             ),
           ));

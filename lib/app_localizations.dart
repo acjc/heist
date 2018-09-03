@@ -45,14 +45,6 @@ class AppLocalizations {
 
   // Common
 
-  String get loading {
-    return Intl.message(
-      'Loading...',
-      name: 'loading',
-      desc: 'Shown while loading',
-    );
-  }
-
   String get continueButton {
     return Intl.message(
       'CONTINUE',
@@ -223,11 +215,11 @@ class AppLocalizations {
     );
   }
 
-  String get none {
+  String get noBid {
     return Intl.message(
-      'None',
-      name: 'none',
-      desc: 'What your bid is when you haven\'t bid yet',
+      'No Bid',
+      name: 'noBid',
+      desc: "Player hasn't made a bid yet",
     );
   }
 
@@ -249,29 +241,11 @@ class AppLocalizations {
     );
   }
 
-  String yourBid(String bidAmount) {
-    return Intl.message(
-      'Your bid: $bidAmount',
-      name: 'yourBid',
-      args: [bidAmount],
-      desc: 'A player\'s current bid',
-    );
-  }
-
-  String maximumBid(String maximumBid) {
-    return Intl.message(
-      'Maximum bid: $maximumBid',
-      name: 'maximumBid',
-      args: [maximumBid],
-      desc: 'The maximum allowed bid',
-    );
-  }
-
   String get unlimited {
     return Intl.message(
-      'Unlimited',
+      'You have no maximum bid limit for this round',
       name: 'unlimited',
-      desc: 'The lead agent\'s maximum bid when they have found the kingpin',
+      desc: 'The Lead Agent\'s maximum bid when they have found the Kingpin (or it is an auction)',
     );
   }
 
@@ -311,29 +285,21 @@ class AppLocalizations {
     );
   }
 
-  String get youAreOnAHeist {
+  String get youHaveMadeYourChoice {
     return Intl.message(
-      'You are going on a heist with:',
-      name: 'youAreOnAHeist',
-      desc: 'Says who your partners in a heist are',
+      'You have made your choice!',
+      name: 'youHaveMadeYourChoice',
+      desc: 'Shown when a player on a heist has made a decision',
     );
   }
 
   // Game
 
-  String get assigningRoles {
+  String get initialisingGame {
     return Intl.message(
-      'Assigning roles...',
-      name: 'assigningRoles',
-      desc: 'Shown while roles are being assigned',
-    );
-  }
-
-  String get resolvingAuction {
-    return Intl.message(
-      'Resolving auction...',
-      name: 'resolvingAuction',
-      desc: 'Shown while the result of an auction is calculated',
+      'Initialising game...',
+      name: 'initialisingGame',
+      desc: 'Shown while roles and player order are being assigned',
     );
   }
 
@@ -413,9 +379,8 @@ class AppLocalizations {
 
   String get leadAgentExplanation {
     return Intl.message(
-      'You can try to guess who the Kingpin is once during the game.'
-      ' If you get it right, your bids can be higher than the maximum'
-      ' bid from then on.',
+      'You can try to guess who the Kingpin is ONCE during the game.'
+          ' If you get it right, you will no longer be restricted by maximum bid limits.',
       name: 'leadAgentExplanation',
       desc: 'Tells the lead agent what they can do',
     );
@@ -523,7 +488,8 @@ class AppLocalizations {
       'TEAM ($playersPicked / $teamSize)',
       name: 'pickedTeamSize',
       args: [playersPicked, teamSize],
-      desc: 'Current team size over number of players needed, as seen by the players who aren\'t picking a team',
+      desc:
+          'Current team size over number of players needed, as seen by the players who aren\'t picking a team',
     );
   }
 
@@ -581,7 +547,6 @@ class AppLocalizations {
       desc: 'The scores of both teams - might need to reverse the order in RTL',
     );
   }
-
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

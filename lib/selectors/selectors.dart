@@ -15,6 +15,7 @@ final getHeists = (GameModel gameModel) => gameModel.heists;
 final getRounds = (GameModel gameModel) => gameModel.rounds;
 final getPlayerInstallId = (GameModel gameModel) => gameModel.playerInstallId;
 final getPlayerName = (GameModel gameModel) => gameModel.playerName;
+final getRoomCode = (GameModel gameModel) => gameModel.roomCode;
 final getBidAmount = (GameModel gameModel) => gameModel.bidAmount;
 final getGiftAmount = (GameModel gameModel) => gameModel.giftAmount;
 final getSubscriptions = (GameModel gameModel) => gameModel.subscriptions;

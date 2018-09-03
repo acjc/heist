@@ -10,19 +10,18 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget submitTeamButton(BuildContext context, Store<GameModel> store, Set<String> teamIds, int playersRequired) {
+Widget submitTeamButton(BuildContext context, Store<GameModel> store, bool enabled) {
   return new RaisedButton(
-    onPressed:
-        teamIds.length == playersRequired ? () => store.dispatch(new SubmitTeamAction()) : null,
-    child: Text(AppLocalizations.of(context).submitTeam, style: buttonTextStyle),
+    onPressed: enabled ? () => store.dispatch(new SubmitTeamAction()) : null,
+    child: new Text(AppLocalizations.of(context).submitTeam, style: buttonTextStyle),
   );
 }
 
 Widget teamPicker(Store<GameModel> store) {
-  return new StoreConnector<GameModel, Set<String>>(
-      converter: (store) => teamIds(store.state),
+  return new StoreConnector<GameModel, Set<Player>>(
+      converter: (store) => currentTeam(store.state),
       distinct: true,
-      builder: (context, teamIds) {
+      builder: (context, team) {
         int playersRequired = currentHeist(store.state).numPlayers;
         return new Column(
           children: [
@@ -32,51 +31,59 @@ Widget teamPicker(Store<GameModel> store) {
                 child: new Container(
                     padding: paddingMedium,
                     child: new Column(children: [
-                      new Text(AppLocalizations.of(context).pickATeam(teamIds.length, playersRequired),
+                      new Text('Pick a team: ${team.length} / $playersRequired',
                           style: infoTextStyle),
-                      new GridView.count(
-                          padding: paddingMedium,
-                          shrinkWrap: true,
-                          childAspectRatio: 4.0,
-                          crossAxisCount: 2,
-                          primary: false,
-                          crossAxisSpacing: 10.0,
-                          mainAxisSpacing: 10.0,
-                          children: teamPickerChildren(context, store, teamIds, playersRequired)),
-                      submitTeamButton(context, store, teamIds, playersRequired),
+                      new HeistGridView(
+                        teamPickerChildren(context, store, team, playersRequired),
+                        4.0,
+                      ),
+                      submitTeamButton(context, store, team.length == playersRequired),
                     ])))
           ],
         );
       });
 }
 
-Widget playerTile(String playerName, bool isInTeam, Color color) => new Container(
-    alignment: Alignment.center,
-    decoration: new BoxDecoration(
-      border: new Border.all(color: color),
-      borderRadius: BorderRadius.circular(5.0),
-      color: isInTeam ? color : null,
+Widget playerTileText(String playerName, bool isInTeam, bool isLeader) {
+  Color textColor = isInTeam ? Colors.white : Colors.black87;
+  Text text = new Text(
+    playerName,
+    style: new TextStyle(
+      color: textColor,
+      fontSize: 16.0,
     ),
-    child: new Text(
-      playerName,
-      style: new TextStyle(
-        color: isInTeam ? Colors.white : Colors.black87,
-        fontSize: 16.0,
+  );
+  if (isLeader) {
+    return iconText(new Icon(Icons.star, color: textColor), text);
+  }
+  return text;
+}
+
+Widget playerTile(BuildContext context, String playerName, bool isInTeam, bool isLeader) {
+  Color backgroundColor = Theme.of(context).accentColor;
+  return new Container(
+      alignment: Alignment.center,
+      decoration: new BoxDecoration(
+        border: new Border.all(color: backgroundColor),
+        borderRadius: BorderRadius.circular(5.0),
+        color: isInTeam ? backgroundColor : null,
       ),
-    ));
+      child: playerTileText(playerName, isInTeam, isLeader));
+}
 
 List<Widget> teamPickerChildren(
-    BuildContext context, Store<GameModel> store, Set<String> teamIds, int playersRequired) {
-  Color color = Theme.of(context).accentColor;
+    BuildContext context, Store<GameModel> store, Set<Player> team, int playersRequired) {
   String roundId = currentRound(store.state).id;
   List<Player> players = getPlayers(store.state);
+  Player leader = currentLeader(store.state);
   return new List.generate(players.length, (i) {
     Player player = players[i];
-    bool isInTeam = teamIds.contains(player.id);
-    bool pickedEnough = !isInTeam && teamIds.length == playersRequired;
+    bool isInTeam = team.contains(player);
+    bool isLeader = player.id == leader.id;
+    bool pickedEnough = !isInTeam && team.length == playersRequired;
     return new InkWell(
         onTap: pickedEnough ? null : () => onTap(store, roundId, player.id, isInTeam),
-        child: playerTile(player.name, isInTeam, color));
+        child: playerTile(context, player.name, isInTeam, isLeader));
   });
 }
 

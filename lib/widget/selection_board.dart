@@ -15,15 +15,17 @@ Widget waitForTeam(BuildContext context, Store<GameModel> store) => new Column(c
           elevation: 2.0,
           child: new Container(
               padding: paddingLarge,
-              child: centeredMessage(AppLocalizations.of(context).pickingTeam(roundLeader(store.state).name)))),
+              child: centeredMessage(
+                  AppLocalizations.of(context).pickingTeam(currentLeader(store.state).name)))),
       selectionBoard(store),
     ]);
 
-Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, Set<String>>(
-    converter: (store) => teamNames(store.state),
+Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, Set<Player>>(
+    converter: (store) => currentTeam(store.state),
     distinct: true,
-    builder: (context, teamNames) {
+    builder: (context, team) {
       List<Player> players = getPlayers(store.state);
+      Player leader = currentLeader(store.state);
       return new Card(
         elevation: 2.0,
         child: new Container(
@@ -32,31 +34,23 @@ Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, S
               new Container(
                 padding: paddingTitle,
                 child: new Text(
-                    AppLocalizations.of(context).pickedTeamSize(teamNames.length, currentHeist(store.state).numPlayers),
+                    AppLocalizations.of(context).pickedTeamSize(
+                          team.length,
+                          currentHeist(store.state).numPlayers,
+                        ),
                     style: titleTextStyle),
               ),
-              selectionGrid(context, players, teamNames),
+              new HeistGridView(selectionBoardChildren(context, players, team, leader)),
             ])),
       );
     });
 
-Widget selectionGrid(BuildContext context, List<Player> players, Set<String> teamNames) =>
-    new GridView.count(
-        padding: paddingMedium,
-        shrinkWrap: true,
-        childAspectRatio: 6.0,
-        crossAxisCount: 2,
-        primary: false,
-        crossAxisSpacing: 10.0,
-        mainAxisSpacing: 10.0,
-        children: selectionBoardChildren(context, players, teamNames));
-
 List<Widget> selectionBoardChildren(
-    BuildContext context, List<Player> players, Set<String> teamNames) {
-  Color color = Theme.of(context).accentColor;
+    BuildContext context, List<Player> players, Set<Player> team, Player leader) {
   return new List.generate(players.length, (i) {
     Player player = players[i];
-    bool isInTeam = teamNames.contains(player.name);
-    return playerTile(player.name, isInTeam, color);
+    bool isInTeam = team.contains(player);
+    bool isLeader = player.id == leader.id;
+    return playerTile(context, player.name, isInTeam, isLeader);
   });
 }

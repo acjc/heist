@@ -1,3 +1,4 @@
+import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/bidding_middleware.dart';
 import 'package:heist/middleware/team_picker_middleware.dart';
 import 'package:heist/selectors/selectors.dart';
@@ -13,26 +14,25 @@ void main() {
     String myId = getSelf(store.state).id;
 
     await handle(store, new PickPlayerMiddlewareAction(myId));
-    expect(teamIds(store.state).single, myId);
-    expect(teamNames(store.state).single, '_name');
+    Player onlyTeamMember = currentTeam(store.state).single;
+    expect(onlyTeamMember.id, myId);
+    expect(onlyTeamMember.name, '_name');
 
     await handle(store, new RemovePlayerMiddlewareAction(myId));
-    expect(teamIds(store.state), isEmpty);
-    expect(teamNames(store.state), isEmpty);
+    expect(currentTeam(store.state), isEmpty);
   });
 
   test('test resolve auction winners', () async {
     Store<GameModel> store = await initGame();
-    String myId = getSelf(store.state).id;
+    Player me = getSelf(store.state);
 
-    List<String> otherPlayers =
-        getPlayers(store.state).where((p) => p.id != myId).map((p) => p.id).toList();
-    for (String playerId in otherPlayers) {
-      await handle(store, new SubmitBidAction(playerId, 9));
+    List<Player> otherPlayers = getOtherPlayers(store.state);
+    for (Player player in otherPlayers) {
+      await handle(store, new SubmitBidAction(player.id, 9));
     }
-    await handle(store, new SubmitBidAction(myId, 10));
+    await handle(store, new SubmitBidAction(me.id, 10));
 
     await handle(store, new ResolveAuctionWinnersAction());
-    expect(teamIds(store.state), containsAll([myId, otherPlayers[0]]));
+    expect(currentTeam(store.state), containsAll([me, otherPlayers[0]]));
   });
 }

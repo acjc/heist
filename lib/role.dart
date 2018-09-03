@@ -143,5 +143,5 @@ class Agent extends Role {
 
 @immutable
 class Thief extends Role {
-  Thief({roleId}) : super(roleId: roleId, displayName: 'THIEF', team: Team.THIEVES);
+  Thief({roleId}) : super(roleId: roleId, displayName: 'Thief', team: Team.THIEVES);
 }

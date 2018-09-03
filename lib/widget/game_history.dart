@@ -7,19 +7,16 @@ import 'package:heist/db/database_model.dart';
 import 'package:heist/heist_definitions.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
+import 'package:heist/widget/common.dart';
+import 'package:heist/widget/team_picker.dart';
 import 'package:redux/redux.dart';
-
-import 'common.dart';
-import 'selection_board.dart';
 
 Widget heistDecisions(Heist heist) {
   List<String> decisions = new List.of(heist.decisions.values.toList());
   decisions.shuffle(new Random(heist.id.hashCode));
   List<Widget> children = new List.generate(decisions.length, (i) {
     String decision = decisions[i];
-    return new Container(
-      alignment: Alignment.center,
-      padding: paddingTiny,
+    return new Center(
       child: new Text(decision,
           style: new TextStyle(
             fontSize: 16.0,
@@ -28,9 +25,27 @@ Widget heistDecisions(Heist heist) {
           )),
     );
   });
-  return new Column(
-    children: children,
+  return new HeistGridView(children, 8.0);
+}
+
+Widget heistTeam(BuildContext context, Store<GameModel> store, Round round) {
+  Set<Player> team = teamForRound(store.state, round);
+  Player leader = leaderForRound(store.state, round);
+
+  List<Widget> gridChildren = new List.generate(
+    team.length,
+    (i) {
+      Player player = team.elementAt(i);
+      bool isLeader = player.id == leader.id;
+      return playerTile(context, player.name, true, isLeader);
+    },
   );
+
+  if (!team.contains(leader)) {
+    gridChildren.add(playerTile(context, leader.name, false, true));
+  }
+
+  return new HeistGridView(gridChildren);
 }
 
 Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int order) {
@@ -55,61 +70,62 @@ Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int
     ));
   }
 
-  List<Widget> children = [
-    new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: title,
-      ),
-      getHeistIcon(heist),
-    ]),
-    new Divider(),
-    new Container(
-      padding: paddingSmall,
-      child: new Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          new Text('Players: $numPlayers', style: subtitleTextStyle),
-          new Text('Price: $price', style: subtitleTextStyle),
-          new Text('Maximum bid: $maximumBid', style: subtitleTextStyle),
-        ],
-      ),
+  List<Widget> heistDetailsChildren = [
+    getHeistIcon(heist),
+    new Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: title,
     ),
+    new VerticalDivider(height: 40.0),
+    heistDetailsIcon(Icons.people, numPlayers.toString()),
+    heistDetailsIcon(Icons.monetization_on, price.toString()),
+    heistDetailsIcon(Icons.vertical_align_top, maximumBid.toString()),
   ];
 
   if (pot != null) {
-    children.add(
-      new Container(
-        padding: paddingSmall,
-        child: new Chip(
-          label: new Text(
-            'Pot: $pot',
-            style: chipTextStyle,
+    heistDetailsChildren.addAll([
+      new VerticalDivider(height: 40.0),
+      iconText(
+          new Icon(
+            Icons.attach_money,
+            size: 32.0,
           ),
-          backgroundColor: Colors.deepOrange,
-        ),
-      ),
-    );
+          new Text(
+            pot.toString(),
+            style: bigNumberTextStyle,
+          )),
+    ]);
   }
 
+  List<Widget> heistPopupChildren = [
+    new Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: heistDetailsChildren,
+    ),
+  ];
+
   if (heist != null && heist.complete) {
-    List<Player> players = getPlayers(store.state);
-    Set<String> teamNames =
-        players.where((p) => lastRound.team.contains(p.id)).map((p) => p.name).toSet();
-    children.addAll([
+    heistPopupChildren.addAll([
       new Divider(),
-      selectionGrid(context, players, teamNames),
+      heistTeam(context, store, lastRound),
+      new Divider(),
       heistDecisions(heist),
     ]);
   }
 
   return new Container(
-    padding: paddingLarge,
+    padding: paddingMedium,
     child: new Column(
-      mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
-      children: children,
+      children: heistPopupChildren,
     ),
+  );
+}
+
+Widget heistDetailsIcon(IconData icon, String text) {
+  return iconText(
+    new Icon(icon, color: Colors.grey),
+    new Text(text, style: subtitleTextStyle),
   );
 }
 
@@ -157,9 +173,10 @@ Widget gameHistory(Store<GameModel> store) {
                 Heist heist = i < heists.length ? heists[i] : null;
                 return new InkWell(
                   onTap: () {
-                    return showModalBottomSheet(
+                    showModalBottomSheet(
                         context: context,
                         builder: (context) => heistPopup(context, store, heist, i + 1));
+                    return;
                   },
                   child: new Container(
                     padding: paddingMedium,

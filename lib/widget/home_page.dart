@@ -6,7 +6,7 @@ import 'package:heist/app_localizations.dart';
 import 'package:heist/keys.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/room_middleware.dart';
-import 'package:heist/reducers/player_reducers.dart';
+import 'package:heist/reducers/form_reducers.dart';
 import 'package:heist/reducers/room_reducers.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -15,24 +15,28 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget enterNameForm(BuildContext context, Store<GameModel> store, GlobalKey<FormState> key) => new Form(
-    key: key,
-    child: new TextFormField(
-        initialValue: isDebugMode() ? 'Mordred' : getPlayerName(store.state),
-        decoration: new InputDecoration(
-          labelText: AppLocalizations.of(context).enterYourName,
-          isDense: true,
-        ),
-        style: new TextStyle(color: Colors.black87, fontSize: 24.0),
-        autocorrect: false,
-        textAlign: TextAlign.center,
-        validator: (value) => value == null || value.isEmpty ? AppLocalizations.of(context).pleaseEnterAName : null,
-        onSaved: (value) => store.dispatch(new SetPlayerNameAction(value))));
+Widget enterNameForm(BuildContext context, Store<GameModel> store, GlobalKey<FormState> key) =>
+    new Form(
+        key: key,
+        child: new TextFormField(
+            initialValue: isDebugMode() ? 'Mordred' : getPlayerName(store.state),
+            maxLength: 12,
+            decoration: new InputDecoration(
+              labelText: AppLocalizations.of(context).enterYourName,
+              isDense: true,
+            ),
+            style: new TextStyle(color: Colors.black87, fontSize: 24.0),
+            autocorrect: false,
+            textAlign: TextAlign.center,
+            validator: (value) => value == null || value.isEmpty
+                ? AppLocalizations.of(context).pleaseEnterAName
+                : null,
+            onSaved: (value) => store.dispatch(new SavePlayerNameAction(value))));
 
 class HomePage extends StatelessWidget {
   static final _onlyLetters = new RegExp(r"[A-Za-z]");
-  static final TextInputFormatter _capitalFormatter = TextInputFormatter
-      .withFunction((oldValue, newValue) => newValue.copyWith(text: newValue.text.toUpperCase()));
+  static final TextInputFormatter _capitalFormatter = TextInputFormatter.withFunction(
+      (oldValue, newValue) => newValue.copyWith(text: newValue.text.toUpperCase()));
 
   Widget _enterRoomButton(BuildContext context, Store<GameModel> store) => new RaisedButton(
         child: Text(AppLocalizations.of(context).enterRoom, style: buttonTextStyle),
@@ -50,7 +54,7 @@ class HomePage extends StatelessWidget {
   Form _enterCodeForm(BuildContext context, Store<GameModel> store) => new Form(
       key: Keys.homePageCodeKey,
       child: new TextFormField(
-          initialValue: isDebugMode() ? 'ABCD' : null,
+          initialValue: isDebugMode() ? 'ABCD' : getRoomCode(store.state),
           decoration: new InputDecoration(
             labelText: AppLocalizations.of(context).enterRoomCode,
             isDense: true,
@@ -64,14 +68,17 @@ class HomePage extends StatelessWidget {
             _capitalFormatter,
           ],
           validator: (value) => value.length != 4 ? AppLocalizations.of(context).invalidCode : null,
-          onSaved: (value) => store.dispatch(new SetRoomCodeAction(value))));
+          onSaved: (value) {
+            store.dispatch(new SetRoomCodeAction(value));
+            store.dispatch(new SaveRoomCodeAction(value));
+          }));
 
   Widget _body(Store<GameModel> store) => new StoreConnector<GameModel, bool>(
         converter: (store) => requestInProcess(store.state, Request.ValidatingRoom),
         distinct: true,
         builder: (context, validatingRoom) {
           if (validatingRoom) {
-            return loading(context);
+            return loading();
           }
           return new Padding(
             padding: paddingLarge,

@@ -1,6 +1,7 @@
 import 'package:heist/state.dart';
 
 import 'bid_amount_reducers.dart';
+import 'form_reducers.dart';
 import 'gift_amount_reducers.dart';
 import 'heist_reducers.dart';
 import 'player_reducers.dart';
@@ -15,6 +16,7 @@ GameModel gameModelReducer(GameModel gameModel, dynamic action) {
     subscriptions: subscriptionReducer(gameModel.subscriptions, action),
     playerInstallId: playerInstallIdReducer(gameModel.playerInstallId, action),
     playerName: playerNameReducer(gameModel.playerName, action),
+    roomCode: roomCodeReducer(gameModel.roomCode, action),
     bidAmount: bidAmountReducer(gameModel.bidAmount, action),
     giftAmount: giftAmountReducer(gameModel.giftAmount, action),
     requests: requestReducer(gameModel.requests, action),

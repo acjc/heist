@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:redux/redux.dart';
 
 import 'reducers.dart';
@@ -10,14 +8,13 @@ final bidAmountReducer = combineReducers<int>([
 ]);
 
 class IncrementBidAmountAction extends Action<int> {
-  final int balance;
   final int maximumBid;
 
-  IncrementBidAmountAction(this.balance, this.maximumBid);
+  IncrementBidAmountAction(this.maximumBid);
 
   @override
   int reduce(int bidAmount, action) {
-    return bidAmount < min(balance, maximumBid) ? bidAmount + 1 : bidAmount;
+    return bidAmount < maximumBid ? bidAmount + 1 : bidAmount;
   }
 }
 

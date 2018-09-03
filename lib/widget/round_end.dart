@@ -16,7 +16,7 @@ Widget roundContinueButton(Store<GameModel> store) => new StoreConnector<GameMod
       return new Container(
         padding: paddingSmall,
         child: new RaisedButton(
-          child: Text(AppLocalizations.of(context).continueButton, style: buttonTextStyle),
+          child: new Text(AppLocalizations.of(context).continueButton, style: buttonTextStyle),
           onPressed: completingGame ? null : () => store.dispatch(new CompleteRoundAction()),
         ),
       );
@@ -39,7 +39,8 @@ Widget roundEnd(BuildContext context, Store<GameModel> store) {
     ..add(
       new Container(
           padding: paddingSmall,
-          child: new Text(AppLocalizations.of(context).totalPot(round.pot, currentHeist(store.state).price),
+          child: new Text(
+              AppLocalizations.of(context).totalPot(round.pot, currentHeist(store.state).price),
               style: titleTextStyle)),
     );
 

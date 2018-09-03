@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/heist_middleware.dart';
 import 'package:heist/selectors/selectors.dart';
@@ -17,7 +18,7 @@ Widget heistContinueButton(Store<GameModel> store) {
       builder: (context, completingHeist) => new Padding(
             padding: paddingSmall,
             child: new RaisedButton(
-              child: const Text('CONTINUE', style: buttonTextStyle),
+              child: new Text(AppLocalizations.of(context).continueButton, style: buttonTextStyle),
               onPressed: completingHeist ? null : () => store.dispatch(new CompleteHeistAction()),
             ),
           ));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -71,17 +72,19 @@ Widget roundTitleIcon(IconData icon, String text) {
   );
 }
 
-Widget roundTitle(Store<GameModel> store) {
+Widget roundTitle(BuildContext context, Store<GameModel> store) {
   Heist heist = currentHeist(store.state);
   Round round = currentRound(store.state);
-  String subtitle = round.isAuction ? 'Auction!' : 'Round ${round.order}';
+  String subtitle = round.isAuction
+      ? AppLocalizations.of(context).auctionTitle
+      : AppLocalizations.of(context).roundTitle(round.order);
 
   List<Widget> children = [
     new Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         new Text(
-          'Heist ${heist.order}',
+          AppLocalizations.of(context).heistTitle(heist.order),
           style: boldTextStyle,
         ),
         new Text(subtitle, style: subtitleTextStyle),

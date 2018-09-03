@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/bidding_middleware.dart';
 import 'package:heist/reducers/bid_amount_reducers.dart';
@@ -37,16 +38,17 @@ Widget bidSelector(
   );
 }
 
-Widget submitButton(Store<GameModel> store, bool loading, int bidAmount) => new RaisedButton(
-    child: const Text('SUBMIT BID', style: buttonTextStyle),
-    onPressed: loading
-        ? null
-        : () => store.dispatch(new SubmitBidAction(getSelf(store.state).id, bidAmount)));
+Widget submitButton(BuildContext context, Store<GameModel> store, bool loading, int bidAmount) =>
+    new RaisedButton(
+        child: Text(AppLocalizations.of(context).submitBid, style: buttonTextStyle),
+        onPressed: loading
+            ? null
+            : () => store.dispatch(new SubmitBidAction(getSelf(store.state).id, bidAmount)));
 
 Widget cancelButton(BuildContext context, Store<GameModel> store, bool loading, Bid bid) =>
     new RaisedButton(
         color: Theme.of(context).accentColor,
-        child: const Text('CANCEL BID', style: buttonTextStyle),
+        child: new Text(AppLocalizations.of(context).cancelBid, style: buttonTextStyle),
         onPressed: loading || bid == null ? null : () => store.dispatch(new CancelBidAction()));
 
 Widget bidding(Store<GameModel> store) {
@@ -68,24 +70,27 @@ Widget bidding(Store<GameModel> store) {
             ? [
                 new Container(
                   padding: paddingTitle,
-                  child: const Text('AUCTION!', style: titleTextStyle),
+                  child: new Text(AppLocalizations.of(context).auctionTitle.toUpperCase(),
+                      style: titleTextStyle),
                 ),
                 new Text(
-                  '${heist.numPlayers} spots available! Highest, then fastest, bids win!',
+                  AppLocalizations.of(context).auctionDescription(heist.numPlayers),
                   style: infoTextStyle,
                 ),
               ]
             : [
                 new Container(
                   padding: paddingTitle,
-                  child: const Text(
-                    'BIDDING',
+                  child: new Text(
+                    AppLocalizations.of(context).bidding,
                     style: titleTextStyle,
                   ),
                 ),
               ];
 
-        String proposedBidText = viewModel.bid == null ? 'No bid' : viewModel.bid.amount.toString();
+        String proposedBidText = viewModel.bid == null
+            ? AppLocalizations.of(context).noBid
+            : viewModel.bid.amount.toString();
         children.addAll([
           new Container(
             padding: paddingSmall,
@@ -105,7 +110,7 @@ Widget bidding(Store<GameModel> store) {
         if (auction || viewModel.haveGuessedKingpin) {
           children.add(
             new Text(
-              'You have no maximum bid limit for this round',
+              AppLocalizations.of(context).unlimited,
               style: const TextStyle(fontStyle: FontStyle.italic),
             ),
           );
@@ -128,7 +133,7 @@ Widget bidding(Store<GameModel> store) {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 cancelButton(context, store, viewModel.loading, viewModel.bid),
-                submitButton(store, viewModel.loading, viewModel.bidAmount),
+                submitButton(context, store, viewModel.loading, viewModel.bidAmount),
               ],
             ),
           ),
@@ -137,7 +142,8 @@ Widget bidding(Store<GameModel> store) {
             child: new Column(
               children: [
                 new Text(
-                    'Bidders so far (${viewModel.bidders.length} / ${getRoom(store.state).numPlayers}):',
+                    AppLocalizations.of(context)
+                        .bidders(viewModel.bidders.length, getRoom(store.state).numPlayers),
                     style: infoTextStyle),
                 new Column(
                   children: new List.generate(

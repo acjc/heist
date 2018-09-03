@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/team_picker_middleware.dart';
 import 'package:heist/reducers/round_reducers.dart';
@@ -9,10 +10,10 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget submitTeamButton(Store<GameModel> store, bool enabled) {
+Widget submitTeamButton(BuildContext context, Store<GameModel> store, bool enabled) {
   return new RaisedButton(
     onPressed: enabled ? () => store.dispatch(new SubmitTeamAction()) : null,
-    child: const Text('SUBMIT TEAM', style: buttonTextStyle),
+    child: new Text(AppLocalizations.of(context).submitTeam, style: buttonTextStyle),
   );
 }
 
@@ -24,7 +25,7 @@ Widget teamPicker(Store<GameModel> store) {
         int playersRequired = currentHeist(store.state).numPlayers;
         return new Column(
           children: [
-            roundTitle(store),
+            roundTitle(context, store),
             new Card(
                 elevation: 2.0,
                 child: new Container(
@@ -36,7 +37,7 @@ Widget teamPicker(Store<GameModel> store) {
                         teamPickerChildren(context, store, team, playersRequired),
                         4.0,
                       ),
-                      submitTeamButton(store, team.length == playersRequired),
+                      submitTeamButton(context, store, team.length == playersRequired),
                     ])))
           ],
         );

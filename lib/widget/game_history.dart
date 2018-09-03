@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/heist_definitions.dart';
 import 'package:heist/selectors/selectors.dart';
@@ -64,7 +65,7 @@ Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int
 
   if (heist != null) {
     title.add(new Text(
-      getHeistStatus(heist, lastRound),
+      getHeistStatus(context, heist, lastRound),
       style: subtitleTextStyle,
     ));
   }
@@ -128,17 +129,19 @@ Widget heistDetailsIcon(IconData icon, String text) {
   );
 }
 
-String getHeistStatus(Heist heist, Round lastRound) {
+String getHeistStatus(BuildContext context, Heist heist, Round lastRound) {
   if (heist.complete) {
-    return heist.wasSuccess ? 'Success' : 'Fail';
+    return heist.wasSuccess
+        ? AppLocalizations.of(context).success
+        : AppLocalizations.of(context).fail;
   }
   if (lastRound == null) {
-    return 'Round 1';
+    return AppLocalizations.of(context).roundTitle(1);
   }
   if (lastRound.isAuction) {
-    return 'Auction!';
+    return AppLocalizations.of(context).auctionTitle;
   }
-  return 'Round ${lastRound.order}';
+  return AppLocalizations.of(context).roundTitle(lastRound.order);
 }
 
 Icon getHeistIcon(Heist heist) {
@@ -170,9 +173,10 @@ Widget gameHistory(Store<GameModel> store) {
                 Heist heist = i < heists.length ? heists[i] : null;
                 return new InkWell(
                   onTap: () {
-                    return showModalBottomSheet(
+                    showModalBottomSheet(
                         context: context,
                         builder: (context) => heistPopup(context, store, heist, i + 1));
+                    return;
                   },
                   child: new Container(
                     padding: paddingMedium,

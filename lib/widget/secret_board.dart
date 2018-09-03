@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/room_middleware.dart';
 import 'package:heist/role.dart';
@@ -113,7 +114,7 @@ class SecretBoardState extends State<SecretBoard> {
                 new Column(
                   children: [
                     new Text(
-                      "You are in team:",
+                      AppLocalizations.of(context).yourTeam,
                       style: infoTextStyle,
                     ),
                     new Padding(
@@ -124,7 +125,7 @@ class SecretBoardState extends State<SecretBoard> {
                       ),
                     ),
                     new Text(
-                      "Your role is:",
+                      AppLocalizations.of(context).yourRole,
                       style: infoTextStyle,
                     ),
                     new Text(
@@ -139,7 +140,7 @@ class SecretBoardState extends State<SecretBoard> {
             )));
   }
 
-// show the identities the player knows, if any
+  // show the identities the player knows, if any
   _addExtraIdsCardIfNeeded(final Player me, final List<Widget> children) {
     if (getKnownIds(me.role) != null) {
       children.add(new Card(
@@ -149,7 +150,7 @@ class SecretBoardState extends State<SecretBoard> {
               child: new Column(children: [
                 new ListTile(
                   title: new Text(
-                    "You also know these identities:",
+                    AppLocalizations.of(context).otherIdentities,
                     style: infoTextStyle,
                   ),
                   subtitle: new Text(
@@ -164,15 +165,13 @@ class SecretBoardState extends State<SecretBoard> {
   String _getFormattedKnownIds(Set<String> knownIds) {
     String formattedKnownIds = "";
     knownIds?.forEach((roleId) {
-      formattedKnownIds += getPlayerByRoleId(_store.state, roleId).name +
-          " is the " +
-          getRoleDisplayName(roleId) +
-          "\n";
+      formattedKnownIds += AppLocalizations.of(context)
+          .identity(getPlayerByRoleId(_store.state, roleId).name, getRoleDisplayName(roleId));
     });
     return formattedKnownIds;
   }
 
-// show the balances the accountant knows, if needed
+  // show the balances the accountant knows, if needed
   _addAccountantCardIfNeeded(
       final Player me, final List<Widget> children, final bool selectingVisibleToAccountant) {
     if (me.role == ACCOUNTANT.roleId) {
@@ -186,7 +185,7 @@ class SecretBoardState extends State<SecretBoard> {
       tiles.add(
         new ListTile(
           title: new Text(
-            'You can also see the balance of up to $maxBalances people:',
+            AppLocalizations.of(context).accountantExplanation(maxBalances),
             style: infoTextStyle,
           ),
         ),
@@ -212,7 +211,7 @@ class SecretBoardState extends State<SecretBoard> {
             .map((p) => p.name)
             .toList();
         tiles.add(new DropdownButton<String>(
-            hint: new Text('PICK BALANCE TO SEE', style: infoTextStyle),
+            hint: new Text(AppLocalizations.of(context).accountantPickPlayer, style: infoTextStyle),
             value: _accountantSelection,
             items: pickablePlayers.map((String value) {
               return new DropdownMenuItem<String>(
@@ -226,7 +225,10 @@ class SecretBoardState extends State<SecretBoard> {
               });
             }));
         tiles.add(new RaisedButton(
-            child: const Text('CONFIRM SELECTION', style: buttonTextStyle),
+            child: new Text(
+              AppLocalizations.of(context).accountantConfirmPlayer,
+              style: buttonTextStyle,
+            ),
             onPressed: selectingVisibleToAccountant
                 ? null
                 : () => _store.dispatch(new AddVisibleToAccountantAction(
@@ -239,7 +241,7 @@ class SecretBoardState extends State<SecretBoard> {
     }
   }
 
-// show the UI to guess the kingpin, if needed
+  // show the UI to guess the kingpin, if needed
   _addLeadAgentCardIfNeeded(final Player me, final List<Widget> children, final String kingpinGuess,
       final bool guessingKingpin) {
     if (me.role == LEAD_AGENT.roleId) {
@@ -247,9 +249,7 @@ class SecretBoardState extends State<SecretBoard> {
       List<Widget> tiles = [
         new ListTile(
           title: new Text(
-            'You can try to guess who the Kingpin is once during the game.'
-                ' If you get it right, your bids can be higher than the maximum'
-                ' bid from then on.',
+            AppLocalizations.of(context).leadAgentExplanation,
             style: infoTextStyle,
           ),
         )
@@ -258,7 +258,7 @@ class SecretBoardState extends State<SecretBoard> {
       if (kingpinGuess == null) {
         List<String> pickablePlayers = getOtherPlayers(_store.state).map((p) => p.name).toList();
         tiles.add(new DropdownButton<String>(
-            hint: new Text('SELECT YOUR KINGPIN GUESS', style: infoTextStyle),
+            hint: new Text(AppLocalizations.of(context).leadAgentPickPlayer, style: infoTextStyle),
             value: _kingpinGuess,
             items: pickablePlayers.map((String value) {
               return new DropdownMenuItem<String>(
@@ -272,18 +272,23 @@ class SecretBoardState extends State<SecretBoard> {
               });
             }));
         tiles.add(new RaisedButton(
-            child: const Text('CONFIRM GUESS', style: buttonTextStyle),
+            child: new Text(
+              AppLocalizations.of(context).leadAgentConfirmPlayer,
+              style: buttonTextStyle,
+            ),
             onPressed: guessingKingpin
                 ? null
                 : () => _store.dispatch(
                     new GuessKingpinAction(getPlayerByName(_store.state, _kingpinGuess).id))));
       } else {
         final String kingpinGuessName = getPlayerById(_store.state, kingpinGuess).name;
-        final String result = haveGuessedKingpin(_store.state) ? 'CORRECT!' : 'INCORRECT! :(';
+        final String result = haveGuessedKingpin(_store.state)
+            ? AppLocalizations.of(context).leadAgentResultRight
+            : AppLocalizations.of(context).leadAgentResultWrong;
         tiles.add(
           new ListTile(
             title: new Text(
-              'You checked if $kingpinGuessName is the Kingpin. This is $result',
+              AppLocalizations.of(context).leadAgentResult(kingpinGuessName, result),
               style: infoTextStyle,
             ),
           ),

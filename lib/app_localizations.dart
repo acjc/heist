@@ -88,6 +88,14 @@ class AppLocalizations {
     );
   }
 
+  String get players {
+    return Intl.message(
+      'Players',
+      name: 'players',
+      desc: 'Title of a list of players in the game',
+    );
+  }
+
   String playerOrder(int order) {
     return Intl.message(
       'Player $order',
@@ -290,6 +298,24 @@ class AppLocalizations {
       'You have made your choice!',
       name: 'youHaveMadeYourChoice',
       desc: 'Shown when a player on a heist has made a decision',
+    );
+  }
+
+  String kingpinReceived(String kingpinDisplayName) {
+    return Intl.message(
+      '...received by $kingpinDisplayName',
+      name: 'kingpinReceived',
+      args: [kingpinDisplayName],
+      desc: 'Describe how much money the Kingpin receives after a heist',
+    );
+  }
+
+  String sharedBetween(String leadAgentDisplayName, String stealOption) {
+    return Intl.message(
+      '...shared between the $leadAgentDisplayName} and any players who chose $stealOption on the heist:',
+      name: 'sharedBetween',
+      args: [leadAgentDisplayName, stealOption],
+      desc: 'Describe how much money gets split between the Lead Agent and those who stole',
     );
   }
 

@@ -18,13 +18,17 @@ void main() {
   test('calculate balance', () async {
     String myId = uuid();
     String kingpinId = uuid();
-    String otherPlayer2 = uuid();
-    String otherPlayer3 = uuid();
+    String leadAgentId = uuid();
+    String thiefId = uuid();
     String heistId1 = '#heist1';
     String heistId2 = '#heist2';
 
     Player kingpin =
         new Player(id: kingpinId, installId: uuid(), name: '_other1', role: KINGPIN.roleId);
+    Player leadAgent =
+        new Player(id: leadAgentId, installId: uuid(), name: '_other2', role: LEAD_AGENT.roleId);
+    Player thief =
+        new Player(id: thiefId, installId: uuid(), name: '_other3', role: THIEF_1.roleId);
 
     FirestoreDb db = new MockFirestoreDb(
         room: new Room(
@@ -35,8 +39,8 @@ void main() {
         players: [
           new Player(id: myId, installId: DebugInstallId, name: '_name', role: AGENT_1.roleId),
           kingpin,
-          new Player(id: otherPlayer2, installId: uuid(), name: '_other2', role: LEAD_AGENT.roleId),
-          new Player(id: otherPlayer3, installId: uuid(), name: '_other3', role: THIEF_1.roleId),
+          leadAgent,
+          thief,
         ],
         heists: [
           new Heist(
@@ -48,8 +52,8 @@ void main() {
               decisions: {
                 myId: Steal,
                 kingpinId: Succeed,
-                otherPlayer2: Steal,
-                otherPlayer3: Steal
+                leadAgentId: Fail,
+                thiefId: Steal,
               },
               startedAt: now()),
           new Heist(
@@ -63,14 +67,19 @@ void main() {
                 heist: heistId1,
                 team: new Set(),
                 bids: {},
-                gifts: {kingpinId: new Gift(amount: 10, recipient: myId)},
+                gifts: {kingpinId: new Gift(amount: 7, recipient: myId)},
                 startedAt: now()),
             new Round(
                 id: uuid(),
                 order: 2,
                 heist: heistId1,
                 team: new Set(),
-                bids: {myId: new Bid(12), kingpinId: new Bid(1)},
+                bids: {
+                  myId: new Bid(10),
+                  kingpinId: new Bid(1),
+                  leadAgentId: new Bid(1),
+                  thiefId: new Bid(1)
+                },
                 gifts: {},
                 startedAt: now())
           ],
@@ -89,8 +98,17 @@ void main() {
 
     await handle(store, new LoadGameAction());
 
-    expect(currentBalance(store.state), 3);
-    expect(calculateBalanceFromStore(store, kingpin), 7);
+    // 8 + 7 (gift) - 10 (bid) + 2 (half of 13 split 3 ways) - 3 (gift) - 2 (proposed bid)
+    expect(currentBalance(store.state), 2);
+
+    // 8 - 7 (gift) - bid (1) + 7 (half of 13) + 3 (gift)
+    expect(calculateBalanceFromStore(store, kingpin), 10);
+
+    // 8 - 1 (bid) + 2 (half of 13 split 3 ways)
+    expect(calculateBalanceFromStore(store, leadAgent), 9);
+
+    // 8 - 1 (bid) + 2 (half of 13 split 3 ways)
+    expect(calculateBalanceFromStore(store, thief), 9);
   });
 
   test('randomly split', () {

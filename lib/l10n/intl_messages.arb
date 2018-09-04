@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-03T13:53:37.722526",
+  "@@last_modified": "2018-09-03T17:41:20.287693",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -41,6 +41,12 @@
     "placeholders": {
       "code": {}
     }
+  },
+  "players": "Players",
+  "@players": {
+    "description": "Title of a list of players in the game",
+    "type": "text",
+    "placeholders": {}
   },
   "playerOrder": "Player {order}",
   "@playerOrder": {
@@ -198,6 +204,23 @@
     "description": "Shown when a player on a heist has made a decision",
     "type": "text",
     "placeholders": {}
+  },
+  "kingpinReceived": "...received by {kingpinDisplayName}",
+  "@kingpinReceived": {
+    "description": "Describe how much money the Kingpin receives after a heist",
+    "type": "text",
+    "placeholders": {
+      "kingpinDisplayName": {}
+    }
+  },
+  "sharedBetween": "...shared between the {leadAgentDisplayName}} and any players who chose {stealOption} on the heist:",
+  "@sharedBetween": {
+    "description": "Describe how much money gets split between the Lead Agent and those who stole",
+    "type": "text",
+    "placeholders": {
+      "leadAgentDisplayName": {},
+      "stealOption": {}
+    }
   },
   "initialisingGame": "Initialising game...",
   "@initialisingGame": {

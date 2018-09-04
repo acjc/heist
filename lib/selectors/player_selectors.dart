@@ -89,34 +89,37 @@ int resolveBalanceForGifts(String playerId, List<Round> rounds, int balance) {
   return balance;
 }
 
+Random newRandomForHeist(Heist heist) {
+  return new Random(heist.id.hashCode);
+}
+
+int calculateKingpinPayout(Random random, int pot) {
+  return randomlySplit(random, pot, 2)[0];
+}
+
 bool hasProposedBid(String playerId, Map<String, Bid> bids, int numPlayers) {
   return bids.length != numPlayers && bids.containsKey(playerId);
 }
 
 int resolveBalanceForHeistOutcome(
     List<Player> players, Player player, Heist heist, int pot, int balance) {
-  Random random = new Random(heist.id.hashCode);
+  Random random = newRandomForHeist(heist);
 
-  int kingpinPayout = randomlySplit(random, pot, 2)[0];
+  int kingpinPayout = calculateKingpinPayout(random, pot);
   int leadAgentPayout = pot - kingpinPayout;
   if (player.role == KINGPIN.roleId) {
     balance += kingpinPayout;
   }
 
-  int steals = heist.decisions.values.where((d) => d == Steal).length;
   bool playerStole = heist.decisions[player.id] == Steal;
-
-  if (shouldPayoutLeadAgent(player, playerStole, steals)) {
-    balance += leadAgentPayout;
-  } else if (steals > 0 && playerStole) {
-    List<Player> playersWhoStole = players.where((p) => heist.decisions[p.id] == Steal).toList();
-    balance += randomlySplit(random, leadAgentPayout, steals)[playersWhoStole.indexOf(player)];
+  if (player.role == LEAD_AGENT.roleId || playerStole) {
+    List<Player> playersToReceive = players
+        .where((p) => heist.decisions[p.id] == Steal || p.role == LEAD_AGENT.roleId)
+        .toList();
+    List<int> split = randomlySplit(random, leadAgentPayout, playersToReceive.length);
+    balance += split[playersToReceive.indexOf(player)];
   }
   return balance;
-}
-
-bool shouldPayoutLeadAgent(Player player, bool playerStole, int steals) {
-  return player.role == LEAD_AGENT.roleId && (steals == 0 || steals == 1 && playerStole);
 }
 
 /// Split a number into approximately equal integer portions, using the given RNG to assign remainders.

@@ -32,6 +32,18 @@ List<Widget> playerDecisions(BuildContext context, Store<GameModel> store, Heist
   return heistDecisions;
 }
 
+Text heistResultText(BuildContext context, bool wasSuccess) {
+  return wasSuccess
+      ? new Text(
+          AppLocalizations.of(context).success.toUpperCase(),
+          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.green),
+        )
+      : new Text(
+          AppLocalizations.of(context).fail.toUpperCase(),
+          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.red),
+        );
+}
+
 Widget heistSummary(BuildContext context, Store<GameModel> store, Heist heist, int pot) => new Card(
     elevation: 2.0,
     child: new Container(
@@ -39,15 +51,8 @@ Widget heistSummary(BuildContext context, Store<GameModel> store, Heist heist, i
       child: new Column(
         children: [
           new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            new Text(AppLocalizations.of(context).heistTitle(heist.order),
-                style: new TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-            heist.wasSuccess
-                ? new Text(AppLocalizations.of(context).success.toUpperCase(),
-                    style: const TextStyle(
-                        fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.green))
-                : new Text(AppLocalizations.of(context).fail.toUpperCase(),
-                    style: const TextStyle(
-                        fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.red)),
+            new Text(AppLocalizations.of(context).heistTitle(heist.order), style: boldTextStyle),
+            heistResultText(context, heist.wasSuccess),
           ]),
           new Divider(),
           new Container(
@@ -111,7 +116,7 @@ Widget fullPlayerListForTeam(List<Player> players, Team team, Color color) {
   );
 }
 
-Widget fullPlayerList(Store<GameModel> store) {
+Widget fullPlayerList(BuildContext context, Store<GameModel> store) {
   List<Player> players = getPlayers(store.state);
   return new Card(
     elevation: 2.0,
@@ -120,7 +125,7 @@ Widget fullPlayerList(Store<GameModel> store) {
       child: new Column(children: [
         new Padding(
           padding: paddingTitle,
-          child: const Text('Players', style: titleTextStyle),
+          child: new Text(AppLocalizations.of(context).players, style: titleTextStyle),
         ),
         new Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -140,7 +145,7 @@ Widget endgame(BuildContext context, Store<GameModel> store) {
 
   List<Widget> children = [
     winner(context, score),
-    fullPlayerList(store),
+    fullPlayerList(context, store),
   ];
 
   Map<String, List<Round>> rounds = getRounds(store.state);

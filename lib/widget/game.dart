@@ -109,7 +109,7 @@ class GameState extends State<Game> {
 
     // go to next heist
     if (viewModel.heistDecided && !viewModel.heistComplete) {
-      return heistEnd(_store);
+      return new HeistEnd(_store);
     }
 
     return null;

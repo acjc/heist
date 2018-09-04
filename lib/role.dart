@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:heist/app_localizations.dart';
 
 class Team {
   final _value;
@@ -11,19 +12,23 @@ class Team {
 }
 
 // agent roles
-final Role LEAD_AGENT =
-    new Role(roleId: 'LEAD_AGENT', displayName: 'Lead Agent', team: Team.AGENTS);
+final Role LEAD_AGENT = new Role(
+    roleId: 'LEAD_AGENT',
+    displayNameFunc: (BuildContext context) => AppLocalizations.of(context).leadAgent,
+    team: Team.AGENTS);
 final Role AGENT_1 = new Agent(roleId: 'AGENT_1');
 final Role AGENT_2 = new Agent(roleId: 'AGENT_2');
 final Role AGENT_3 = new Agent(roleId: 'AGENT_3');
 // thief roles
 final Role KINGPIN = new Role(
     roleId: 'KINGPIN',
-    displayName: 'Kingpin',
+    displayNameFunc: (BuildContext context) => AppLocalizations.of(context).kingpin,
     team: Team.THIEVES,
     knownIds: new Set.of(['LEAD_AGENT']));
-final Role ACCOUNTANT =
-    new Role(roleId: 'ACCOUNTANT', displayName: 'Accountant', team: Team.THIEVES);
+final Role ACCOUNTANT = new Role(
+    roleId: 'ACCOUNTANT',
+    displayNameFunc: (BuildContext context) => AppLocalizations.of(context).accountant,
+    team: Team.THIEVES);
 final Role THIEF_1 = new Thief(roleId: 'THIEF_1');
 final Role THIEF_2 = new Thief(roleId: 'THIEF_2');
 final Role THIEF_3 = new Thief(roleId: 'THIEF_3');
@@ -117,17 +122,17 @@ final getTeam = (String roleId) => allRoles.singleWhere((r) => r.roleId == roleI
 
 final getKnownIds = (String roleId) => allRoles.singleWhere((r) => r.roleId == roleId).knownIds;
 
-final getRoleDisplayName =
-    (String roleId) => allRoles.singleWhere((r) => r.roleId == roleId).displayName;
+final getRoleDisplayName = (BuildContext context, String roleId)
+    => allRoles.singleWhere((r) => r.roleId == roleId).displayNameFunc(context);
 
 @immutable
 class Role {
   final String roleId;
-  final String displayName;
+  final String Function(BuildContext) displayNameFunc;
   final Team team;
   final Set<String> knownIds;
 
-  Role({@required this.roleId, @required this.displayName, @required this.team, this.knownIds});
+  Role({@required this.roleId, @required this.displayNameFunc, @required this.team, this.knownIds});
 }
 
 @immutable
@@ -135,7 +140,7 @@ class Agent extends Role {
   Agent({roleId})
       : super(
           roleId: roleId,
-          displayName: 'Agent',
+          displayNameFunc: (BuildContext context) => AppLocalizations.of(context).agent,
           team: Team.AGENTS,
           knownIds: new Set.of(['LEAD_AGENT']),
         );
@@ -143,5 +148,8 @@ class Agent extends Role {
 
 @immutable
 class Thief extends Role {
-  Thief({roleId}) : super(roleId: roleId, displayName: 'Thief', team: Team.THIEVES);
+  Thief({roleId}) : super(
+      roleId: roleId,
+      displayNameFunc: (BuildContext context) => AppLocalizations.of(context).thief,
+      team: Team.THIEVES);
 }

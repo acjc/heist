@@ -63,9 +63,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
+    "accountant" : MessageLookupByLibrary.simpleMessage("Accountant"),
     "accountantConfirmPlayer" : MessageLookupByLibrary.simpleMessage("CONFIRM SELECTION"),
     "accountantExplanation" : m0,
     "accountantPickPlayer" : MessageLookupByLibrary.simpleMessage("PICK BALANCE TO SEE"),
+    "agent" : MessageLookupByLibrary.simpleMessage("Agent"),
     "auctionDescription" : m1,
     "auctionTitle" : MessageLookupByLibrary.simpleMessage("Auction!"),
     "bidders" : m2,
@@ -91,7 +93,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "identity" : m7,
     "initialisingGame" : MessageLookupByLibrary.simpleMessage("Initialising game..."),
     "invalidCode" : MessageLookupByLibrary.simpleMessage("Invalid code"),
+    "kingpin" : MessageLookupByLibrary.simpleMessage("Kingpin"),
     "kingpinReceived" : m8,
+    "leadAgent" : MessageLookupByLibrary.simpleMessage("Lead agent"),
     "leadAgentConfirmPlayer" : MessageLookupByLibrary.simpleMessage("CONFIRM GUESS"),
     "leadAgentExplanation" : MessageLookupByLibrary.simpleMessage("You can try to guess who the Kingpin is ONCE during the game. If you get it right, you will no longer be restricted by maximum bid limits."),
     "leadAgentPickPlayer" : MessageLookupByLibrary.simpleMessage("SELECT YOUR KINGPIN GUESS"),
@@ -116,6 +120,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "submitTeam" : MessageLookupByLibrary.simpleMessage("SUBMIT TEAM"),
     "success" : MessageLookupByLibrary.simpleMessage("Success"),
     "teamScores" : m18,
+    "thief" : MessageLookupByLibrary.simpleMessage("Thief"),
     "title" : MessageLookupByLibrary.simpleMessage("Heist"),
     "totalPot" : m19,
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),

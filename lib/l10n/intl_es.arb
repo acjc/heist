@@ -6,6 +6,36 @@
     "type": "text",
     "placeholders": {}
   },
+  "leadAgent": "Lead agent",
+  "@leadAgent": {
+    "description": "Lead agent role",
+    "type": "text",
+    "placeholders": {}
+  },
+  "agent": "Agent",
+  "@agent": {
+    "description": "Agent role",
+    "type": "text",
+    "placeholders": {}
+  },
+  "kingpin": "Kingpin",
+  "@kingpin": {
+    "description": "Kingpin role",
+    "type": "text",
+    "placeholders": {}
+  },
+  "accountant": "Accountant",
+  "@accountant": {
+    "description": "Accountant role",
+    "type": "text",
+    "placeholders": {}
+  },
+  "thief": "Thief",
+  "@thief": {
+    "description": "Thief role",
+    "type": "text",
+    "placeholders": {}
+  },
   "continueButton": "CONTINUE",
   "@continueButton": {
     "description": "Button for the game organiser to move to the next round or heist",

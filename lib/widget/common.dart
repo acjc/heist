@@ -9,6 +9,7 @@ const EdgeInsets paddingLarge = const EdgeInsets.all(24.0);
 const EdgeInsets paddingMedium = const EdgeInsets.all(16.0);
 const EdgeInsets paddingSmall = const EdgeInsets.all(12.0);
 const EdgeInsets paddingTiny = const EdgeInsets.all(8.0);
+const EdgeInsets paddingNano = const EdgeInsets.all(4.0);
 const EdgeInsets paddingTitle = const EdgeInsets.only(bottom: 12.0);
 const EdgeInsets paddingBelowText = const EdgeInsets.only(bottom: 4.0);
 

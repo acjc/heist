@@ -79,15 +79,6 @@ class AppLocalizations {
     );
   }
 
-  String roomTitle(String code) {
-    return Intl.message(
-      'Room: $code',
-      name: 'roomTitle',
-      args: [code],
-      desc: 'Room title',
-    );
-  }
-
   String get players {
     return Intl.message(
       'Players',

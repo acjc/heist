@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-03T17:41:20.287693",
+  "@@last_modified": "2018-09-04T21:53:58.472480",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -32,14 +32,6 @@
     "type": "text",
     "placeholders": {
       "order": {}
-    }
-  },
-  "roomTitle": "Room: {code}",
-  "@roomTitle": {
-    "description": "Room title",
-    "type": "text",
-    "placeholders": {
-      "code": {}
     }
   },
   "players": "Players",

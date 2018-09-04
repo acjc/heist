@@ -34,14 +34,6 @@
       "order": {}
     }
   },
-  "roomTitle": "Sala: {code}",
-  "@roomTitle": {
-    "description": "Room title",
-    "type": "text",
-    "placeholders": {
-      "code": {}
-    }
-  },
   "players": "Players",
   "@players": {
     "description": "Title of a list of players in the game",

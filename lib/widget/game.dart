@@ -221,8 +221,14 @@ class GameState extends State<Game> {
       length: 2,
       child: new Scaffold(
         appBar: new AppBar(
-          title: new Text(AppLocalizations.of(context).roomTitle(getRoom(_store.state).code)),
-          bottom: new TabBar(
+          leading: new Container(
+            alignment: Alignment.center,
+            padding: paddingNano,
+            child: new Text(
+              getRoom(_store.state).code,
+              style: boldTextStyle,
+            )),
+          title: new TabBar(
             tabs: [
               new Tab(text: AppLocalizations.of(context).gameTab),
               _secretTab(),

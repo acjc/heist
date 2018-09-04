@@ -116,6 +116,7 @@ class GameState extends State<Game> {
   }
 
   Widget _mainBoardBody() => new StoreConnector<GameModel, MainBoardViewModel>(
+        ignoreChange: (gameModel) => currentHeist(gameModel) != null,
         converter: (store) {
           Heist heist = currentHeist(store.state);
           Round round = currentRound(store.state);

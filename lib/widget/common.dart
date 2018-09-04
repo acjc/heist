@@ -65,6 +65,12 @@ class VerticalDivider extends StatelessWidget {
   }
 }
 
+Widget teamSelectionIcon(bool goingOnHeist, {double size = 250.0}) {
+  return goingOnHeist
+      ? new Icon(Icons.check_circle, color: Colors.green, size: size)
+      : new Icon(Icons.do_not_disturb_alt, color: Colors.red, size: size);
+}
+
 Widget roundTitleIcon(IconData icon, String text) {
   return iconText(
     new Icon(icon, color: Colors.teal, size: 32.0),
@@ -112,11 +118,11 @@ Widget roundTitleCard(BuildContext context, Store<GameModel> store) => new Card(
 
 /// Widget for showing a 2-column grid
 class HeistGridView extends GridView {
-  HeistGridView(List<Widget> children, [double childAspectRatio])
+  HeistGridView(List<Widget> children, {double childAspectRatio = 6.0})
       : super.count(
           padding: paddingMedium,
           shrinkWrap: true,
-          childAspectRatio: childAspectRatio ?? 6.0,
+          childAspectRatio: childAspectRatio,
           crossAxisCount: 2,
           primary: false,
           crossAxisSpacing: 10.0,

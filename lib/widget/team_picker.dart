@@ -22,24 +22,44 @@ Widget teamPicker(Store<GameModel> store) {
       converter: (store) => currentTeam(store.state),
       distinct: true,
       builder: (context, team) {
+        Player me = getSelf(store.state);
         int playersRequired = currentHeist(store.state).numPlayers;
-        return new Column(
-          children: [
-            roundTitleCard(context, store),
-            new Card(
-                elevation: 2.0,
-                child: new Container(
-                    padding: paddingMedium,
-                    child: new Column(children: [
-                      new Text('Pick a team: ${team.length} / $playersRequired',
-                          style: infoTextStyle),
+        bool goingOnHeist = team.contains(me);
+        return new Container(
+          color: goingOnHeist ? Colors.teal : Colors.redAccent,
+          padding: paddingLarge,
+          child: new Card(
+            elevation: 6.0,
+            child: new Padding(
+              padding: paddingSmall,
+              child: new Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  teamSelectionIcon(goingOnHeist, size: 75.0),
+                  new Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      new Text(
+                        AppLocalizations.of(context).pickATeam(team.length, playersRequired),
+                        style: infoTextStyle,
+                      ),
                       new HeistGridView(
                         teamPickerChildren(context, store, team, playersRequired),
-                        4.0,
+                        childAspectRatio: 5.0,
                       ),
+                    ],
+                  ),
+                  new Column(
+                    children: [
                       submitTeamButton(context, store, team.length == playersRequired),
-                    ])))
-          ],
+                      new Divider(),
+                      roundTitleContents(context, store),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
         );
       });
 }

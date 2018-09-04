@@ -25,7 +25,7 @@ Widget heistDecisions(Heist heist) {
           )),
     );
   });
-  return new HeistGridView(children, 8.0);
+  return new HeistGridView(children, childAspectRatio: 8.0);
 }
 
 Widget heistTeam(BuildContext context, Store<GameModel> store, Set<Player> team, Player leader) {

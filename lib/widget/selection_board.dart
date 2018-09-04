@@ -61,9 +61,7 @@ Widget waitForTeam(BuildContext context, Store<GameModel> store) {
             child: new Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                goingOnHeist
-                    ? const Icon(Icons.check_circle, color: Colors.green, size: 250.0)
-                    : const Icon(Icons.do_not_disturb_alt, color: Colors.red, size: 250.0),
+                teamSelectionIcon(goingOnHeist),
                 waitForTeamMessage(goingOnHeist, leader.name),
                 new Column(
                   children: [

@@ -84,7 +84,7 @@ class GameState extends State<Game> {
   Widget _gameLoop(MainBoardViewModel viewModel) {
     // team picking (not needed for auctions)
     if (!isAuction(_store.state) && viewModel.waitingForTeam) {
-      return isMyGo(_store.state) ? teamPicker(_store) : waitForTeam(context, _store);
+      return isMyGo(_store.state) ? new TeamPicker(_store) : new WaitForTeam(_store);
     }
 
     // bidding

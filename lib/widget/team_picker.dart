@@ -30,100 +30,94 @@ class TeamPickerState extends State<TeamPicker> with TickerProviderStateMixin {
 
   TeamPickerState(this._store);
 
-  void _setUpAnimation(bool goingOnHeist) {
+  Animation<Color> getTween(bool goingOnHeist, bool fullTeam) {
+    if (fullTeam) {
+      Color beginColor = goingOnHeist ? Colors.teal : Colors.red;
+      Color endColor = goingOnHeist ? Colors.green : Colors.pinkAccent;
+      return new ColorTween(begin: beginColor, end: endColor).animate(_controller)
+        ..addStatusListener((status) {
+          if (status == AnimationStatus.completed) {
+            _controller.reverse();
+          } else if (status == AnimationStatus.dismissed) {
+            _controller.forward();
+          }
+        });
+    }
+    return new ConstantTween<Color>(goingOnHeist ? Colors.teal : Colors.redAccent)
+        .animate(_controller);
+  }
+
+  void _setUpAnimation(bool goingOnHeist, bool fullTeam) {
     _controller?.dispose();
+    _controller = null;
     _controller = new AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    Color beginColor = goingOnHeist ? Colors.teal : Colors.red;
-    Color endColor = goingOnHeist ? Colors.green : Colors.pinkAccent;
-    _animation = new ColorTween(begin: beginColor, end: endColor).animate(_controller)
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _controller.reverse();
-        } else if (status == AnimationStatus.dismissed) {
-          _controller.forward();
-        }
-      });
+    _animation = getTween(goingOnHeist, fullTeam);
     _controller.forward();
   }
 
-  void _resetAnimation(bool goingOnHeist) {
-    if (_controller != null) {
-      if (!_controller.isAnimating) {
-        _controller.forward();
-      }
-    } else {
-      _setUpAnimation(goingOnHeist);
-    }
-  }
-
-  Widget _submitTeamButton(BuildContext context, bool enabled) {
-    return new RaisedButton(
-      onPressed: enabled ? () => _store.dispatch(new SubmitTeamAction()) : null,
-      child: new Text(AppLocalizations.of(context).submitTeam, style: buttonTextStyle),
-    );
-  }
+  Widget _submitTeamButton(BuildContext context, bool enabled) => new RaisedButton(
+        onPressed: enabled ? () => _store.dispatch(new SubmitTeamAction()) : null,
+        child: new Text(AppLocalizations.of(context).submitTeam, style: buttonTextStyle),
+      );
 
   @override
-  Widget build(BuildContext context) {
-    return new StoreConnector<GameModel, Set<Player>>(
-        distinct: true,
-        converter: (store) => currentTeam(store.state),
-        onInit: (store) => _setUpAnimation(goingOnHeist(store.state)),
-        onWillChange: (team) => _setUpAnimation(goingOnHeist(_store.state)),
-        onDispose: (gameModel) => _controller?.dispose(),
-        builder: (context, team) {
-          Player me = getSelf(_store.state);
-          int playersRequired = currentHeist(_store.state).numPlayers;
-          bool goingOnHeist = team.contains(me);
-          _resetAnimation(goingOnHeist);
-          return new AnimationListenable<Color>(
-            animation: _animation,
-            builder: (context, value, child) => new Container(
-                  color: value,
-                  padding: paddingLarge,
-                  child: child,
-                ),
-            staticChild: new Card(
-              elevation: 6.0,
-              child: new Padding(
-                padding: paddingSmall,
-                child: new Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    new AnimationListenable<Color>(
-                      animation: _animation,
-                      builder: (context, value, _) => teamSelectionIcon(goingOnHeist, value, 100.0),
-                    ),
-                    new Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        new Text(
-                          AppLocalizations.of(context).pickATeam(team.length, playersRequired),
-                          style: infoTextStyle,
-                        ),
-                        new HeistGridView(
-                          _teamPickerChildren(context, team, playersRequired),
-                          childAspectRatio: 5.0,
-                        ),
-                      ],
-                    ),
-                    new Column(
-                      children: [
-                        _submitTeamButton(context, team.length == playersRequired),
-                        new Divider(),
-                        roundTitleContents(context, _store),
-                      ],
-                    ),
-                  ],
-                ),
+  Widget build(BuildContext context) => new StoreConnector<GameModel, Set<Player>>(
+      distinct: true,
+      converter: (store) => currentTeam(store.state),
+      onInit: (store) => _setUpAnimation(goingOnHeist(store.state), currentTeamIsFull(store.state)),
+      onWillChange: (team) =>
+          _setUpAnimation(goingOnHeist(_store.state), currentTeamIsFull(_store.state)),
+      onDispose: (gameModel) => _controller?.dispose(),
+      builder: (context, team) {
+        int playersRequired = currentHeist(_store.state).numPlayers;
+        bool amGoingOnHeist = goingOnHeist(_store.state);
+        return new AnimationListenable<Color>(
+          animation: _animation,
+          builder: (context, value, child) => new Container(
+                color: value,
+                padding: paddingLarge,
+                child: child,
+              ),
+          staticChild: new Card(
+            elevation: 6.0,
+            child: new Padding(
+              padding: paddingSmall,
+              child: new Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  new AnimationListenable<Color>(
+                    animation: _animation,
+                    builder: (context, value, _) => teamSelectionIcon(amGoingOnHeist, value, 100.0),
+                  ),
+                  new Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      new Text(
+                        AppLocalizations.of(context).pickATeam(team.length, playersRequired),
+                        style: infoTextStyle,
+                      ),
+                      new HeistGridView(
+                        _teamPickerChildren(context, team, playersRequired),
+                        childAspectRatio: 5.0,
+                      ),
+                    ],
+                  ),
+                  new Column(
+                    children: [
+                      _submitTeamButton(context, team.length == playersRequired),
+                      new Divider(),
+                      roundTitleContents(context, _store),
+                    ],
+                  ),
+                ],
               ),
             ),
-          );
-        });
-  }
+          ),
+        );
+      });
 
   List<Widget> _teamPickerChildren(BuildContext context, Set<Player> team, int playersRequired) {
     String roundId = currentRound(_store.state).id;

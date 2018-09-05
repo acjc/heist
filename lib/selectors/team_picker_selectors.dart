@@ -25,5 +25,8 @@ final Selector<GameModel, Set<Player>> currentTeam = createSelector2(
           return playerInTeam;
         }).toSet());
 
+final Selector<GameModel, bool> currentTeamIsFull = createSelector2(currentHeist, currentTeam,
+    (Heist currentHeist, Set<Player> currentTeam) => currentHeist.numPlayers == currentTeam.length);
+
 final teamForRound = (GameModel gameModel, Round round) =>
     getPlayers(gameModel).where((p) => round.team.contains(p.id)).toSet();

@@ -49,25 +49,25 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m15(name, role) => "${name} (${role}) ->";
 
-  static m16(code) => "Room: ${code}";
+  static m16(order) => "Round ${order}";
 
-  static m17(order) => "Round ${order}";
+  static m17(leadAgentDisplayName, stealOption) => "...shared between the ${leadAgentDisplayName}} and any players who chose ${stealOption} on the heist:";
 
-  static m18(leadAgentDisplayName, stealOption) => "...shared between the ${leadAgentDisplayName}} and any players who chose ${stealOption} on the heist:";
+  static m18(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
 
-  static m19(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
+  static m19(pot, price) => "Total pot = ${pot} / ${price}";
 
-  static m20(pot, price) => "Total pot = ${pot} / ${price}";
+  static m20(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
 
-  static m21(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
-
-  static m22(winner) => "${winner} win!";
+  static m21(winner) => "${winner} win!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
+    "accountant" : MessageLookupByLibrary.simpleMessage("Accountant"),
     "accountantConfirmPlayer" : MessageLookupByLibrary.simpleMessage("CONFIRM SELECTION"),
     "accountantExplanation" : m0,
     "accountantPickPlayer" : MessageLookupByLibrary.simpleMessage("PICK BALANCE TO SEE"),
+    "agent" : MessageLookupByLibrary.simpleMessage("Agent"),
     "auctionDescription" : m1,
     "auctionTitle" : MessageLookupByLibrary.simpleMessage("Auction!"),
     "bidders" : m2,
@@ -93,7 +93,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "identity" : m7,
     "initialisingGame" : MessageLookupByLibrary.simpleMessage("Initialising game..."),
     "invalidCode" : MessageLookupByLibrary.simpleMessage("Invalid code"),
+    "kingpin" : MessageLookupByLibrary.simpleMessage("Kingpin"),
     "kingpinReceived" : m8,
+    "leadAgent" : MessageLookupByLibrary.simpleMessage("Lead agent"),
     "leadAgentConfirmPlayer" : MessageLookupByLibrary.simpleMessage("CONFIRM GUESS"),
     "leadAgentExplanation" : MessageLookupByLibrary.simpleMessage("You can try to guess who the Kingpin is ONCE during the game. If you get it right, you will no longer be restricted by maximum bid limits."),
     "leadAgentPickPlayer" : MessageLookupByLibrary.simpleMessage("SELECT YOUR KINGPIN GUESS"),
@@ -111,19 +113,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "playerRole" : m15,
     "players" : MessageLookupByLibrary.simpleMessage("Players"),
     "pleaseEnterAName" : MessageLookupByLibrary.simpleMessage("Please enter a name"),
-    "roomTitle" : m16,
-    "roundTitle" : m17,
+    "roundTitle" : m16,
     "secretTab" : MessageLookupByLibrary.simpleMessage("SECRET"),
-    "sharedBetween" : m18,
+    "sharedBetween" : m17,
     "submitBid" : MessageLookupByLibrary.simpleMessage("SUBMIT BID"),
     "submitTeam" : MessageLookupByLibrary.simpleMessage("SUBMIT TEAM"),
     "success" : MessageLookupByLibrary.simpleMessage("Success"),
-    "teamScores" : m19,
+    "teamScores" : m18,
+    "thief" : MessageLookupByLibrary.simpleMessage("Thief"),
     "title" : MessageLookupByLibrary.simpleMessage("Heist"),
-    "totalPot" : m20,
+    "totalPot" : m19,
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),
-    "waitingForPlayers" : m21,
-    "winner" : m22,
+    "waitingForPlayers" : m20,
+    "winner" : m21,
     "youHaveMadeYourChoice" : MessageLookupByLibrary.simpleMessage("You have made your choice!"),
     "yourRole" : MessageLookupByLibrary.simpleMessage("Your role is:"),
     "yourTeam" : MessageLookupByLibrary.simpleMessage("You are in team:")

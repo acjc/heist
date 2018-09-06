@@ -41,7 +41,45 @@ class AppLocalizations {
 
   // Roles
 
-  // TODO because I don't know how to get the context there
+  String get leadAgent {
+    return Intl.message(
+      'Lead agent',
+      name: 'leadAgent',
+      desc: 'Lead agent role',
+    );
+  }
+
+  String get agent {
+    return Intl.message(
+      'Agent',
+      name: 'agent',
+      desc: 'Agent role',
+    );
+  }
+
+  String get kingpin {
+    return Intl.message(
+      'Kingpin',
+      name: 'kingpin',
+      desc: 'Kingpin role',
+    );
+  }
+
+  String get accountant {
+    return Intl.message(
+      'Accountant',
+      name: 'accountant',
+      desc: 'Accountant role',
+    );
+  }
+
+  String get thief {
+    return Intl.message(
+      'Thief',
+      name: 'thief',
+      desc: 'Thief role',
+    );
+  }
 
   // Common
 
@@ -76,15 +114,6 @@ class AppLocalizations {
       name: 'heistTitle',
       args: [order],
       desc: 'Heist title',
-    );
-  }
-
-  String roomTitle(String code) {
-    return Intl.message(
-      'Room: $code',
-      name: 'roomTitle',
-      args: [code],
-      desc: 'Room title',
     );
   }
 

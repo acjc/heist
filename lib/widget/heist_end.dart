@@ -120,7 +120,8 @@ class HeistEndState extends State<HeistEnd> {
               style: potResolutionTextStyle,
             ),
             new Text(
-              AppLocalizations.of(context).kingpinReceived(KINGPIN.displayName),
+              AppLocalizations.of(context).kingpinReceived(
+                  getRoleDisplayName(context, KINGPIN.roleId)),
               style: infoTextStyle,
             ),
           ],
@@ -135,7 +136,8 @@ class HeistEndState extends State<HeistEnd> {
               style: potResolutionTextStyle,
             ),
             new Text(
-              AppLocalizations.of(context).sharedBetween(LEAD_AGENT.displayName, Steal),
+              AppLocalizations.of(context).sharedBetween(
+                  getRoleDisplayName(context, LEAD_AGENT.roleId), Steal),
               style: infoTextStyle,
             ),
           ],

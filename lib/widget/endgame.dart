@@ -91,7 +91,7 @@ Widget winner(BuildContext context, Score score) => new Card(
       ),
     );
 
-Widget fullPlayerListForTeam(List<Player> players, Team team, Color color) {
+Widget fullPlayerListForTeam(BuildContext context, List<Player> players, Team team, Color color) {
   List<Player> playersInTeam = players.where((p) => getTeam(p.role) == team).toList();
   return new Column(
     children: new List.generate(playersInTeam.length + 1, (i) {
@@ -106,7 +106,7 @@ Widget fullPlayerListForTeam(List<Player> players, Team team, Color color) {
               style: infoTextStyle,
             ),
             new Text(
-              getRoleDisplayName(player.role),
+              getRoleDisplayName(context, player.role),
               style: new TextStyle(color: color),
             ),
           ],
@@ -130,8 +130,8 @@ Widget fullPlayerList(BuildContext context, Store<GameModel> store) {
         new Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            fullPlayerListForTeam(players, Team.THIEVES, Colors.pink),
-            fullPlayerListForTeam(players, Team.AGENTS, Colors.purple),
+            fullPlayerListForTeam(context, players, Team.THIEVES, Colors.pink),
+            fullPlayerListForTeam(context, players, Team.AGENTS, Colors.purple),
           ],
         )
       ]),

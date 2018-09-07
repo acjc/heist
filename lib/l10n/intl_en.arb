@@ -1,8 +1,38 @@
 {
-  "@@last_modified": "2018-09-03T17:41:20.287693",
+  "@@last_modified": "2018-09-04T21:55:49.285905",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
+    "type": "text",
+    "placeholders": {}
+  },
+  "leadAgent": "Lead agent",
+  "@leadAgent": {
+    "description": "Lead agent role",
+    "type": "text",
+    "placeholders": {}
+  },
+  "agent": "Agent",
+  "@agent": {
+    "description": "Agent role",
+    "type": "text",
+    "placeholders": {}
+  },
+  "kingpin": "Kingpin",
+  "@kingpin": {
+    "description": "Kingpin role",
+    "type": "text",
+    "placeholders": {}
+  },
+  "accountant": "Accountant",
+  "@accountant": {
+    "description": "Accountant role",
+    "type": "text",
+    "placeholders": {}
+  },
+  "thief": "Thief",
+  "@thief": {
+    "description": "Thief role",
     "type": "text",
     "placeholders": {}
   },
@@ -32,14 +62,6 @@
     "type": "text",
     "placeholders": {
       "order": {}
-    }
-  },
-  "roomTitle": "Room: {code}",
-  "@roomTitle": {
-    "description": "Room title",
-    "type": "text",
-    "placeholders": {
-      "code": {}
     }
   },
   "players": "Players",

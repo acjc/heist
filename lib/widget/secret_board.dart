@@ -137,7 +137,7 @@ class SecretBoardState extends State<SecretBoard> {
                       style: infoTextStyle,
                     ),
                     new Text(
-                      "${getRoleDisplayName(me.role)}",
+                      "${getRoleDisplayName(context, me.role)}",
                       style: titleTextStyle,
                     ),
                   ],
@@ -174,7 +174,7 @@ class SecretBoardState extends State<SecretBoard> {
     String formattedKnownIds = "";
     knownIds?.forEach((roleId) {
       formattedKnownIds += AppLocalizations.of(context)
-          .identity(getPlayerByRoleId(_store.state, roleId).name, getRoleDisplayName(roleId));
+          .identity(getPlayerByRoleId(_store.state, roleId).name, getRoleDisplayName(context, roleId));
     });
     return formattedKnownIds;
   }

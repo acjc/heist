@@ -1,142 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:heist/animations/animation_listenable.dart';
 import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
+import 'package:heist/widget/common.dart';
 import 'package:redux/redux.dart';
-
-import 'common.dart';
-import 'team_picker.dart';
-
-class WaitForTeam extends StatefulWidget {
-  final Store<GameModel> _store;
-
-  WaitForTeam(this._store);
-
-  @override
-  State<StatefulWidget> createState() {
-    return new WaitForTeamState(_store);
-  }
-}
-
-class WaitForTeamState extends State<WaitForTeam> with TickerProviderStateMixin {
-  final Store<GameModel> _store;
-
-  Animation<Color> _animation;
-  AnimationController _controller;
-
-  WaitForTeamState(this._store);
-
-  Widget _waitForTeamMessage(bool goingOnHeist, String leaderName) {
-    const TextStyle defaultTextStyle = const TextStyle(color: Colors.black87, fontSize: 16.0);
-    if (goingOnHeist) {
-      return new RichText(
-        textAlign: TextAlign.center,
-        text: new TextSpan(
-          style: defaultTextStyle,
-          children: [
-            new TextSpan(text: leaderName, style: boldTextStyle),
-            new TextSpan(text: ' picked you in the team!'),
-          ],
-        ),
-      );
-    }
-
-    return new Column(
-      children: [
-        new Padding(
-          padding: paddingSmall,
-          child: new Text("You haven't been picked!", style: infoTextStyle),
-        ),
-        new RichText(
-          textAlign: TextAlign.center,
-          text: new TextSpan(
-            style: defaultTextStyle,
-            children: [
-              new TextSpan(text: "Convince "),
-              new TextSpan(text: leaderName, style: boldTextStyle),
-              new TextSpan(text: ' to put you in the team!'),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Animation<Color> getTween(bool goingOnHeist, bool fullTeam) {
-    if (fullTeam) {
-      Color beginColor = goingOnHeist ? Colors.teal : Colors.red;
-      Color endColor = goingOnHeist ? Colors.green : Colors.pinkAccent;
-      return new ColorTween(begin: beginColor, end: endColor).animate(_controller)
-        ..addStatusListener((status) {
-          if (status == AnimationStatus.completed) {
-            _controller.reverse();
-          } else if (status == AnimationStatus.dismissed) {
-            _controller.forward();
-          }
-        });
-    }
-    return new ConstantTween<Color>(goingOnHeist ? Colors.teal : Colors.redAccent)
-        .animate(_controller);
-  }
-
-  void _setUpAnimation(bool goingOnHeist, bool fullTeam) {
-    _controller?.dispose();
-    _controller = null;
-    _controller = new AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-    _animation = getTween(goingOnHeist, fullTeam);
-    _controller.forward();
-  }
-
-  @override
-  Widget build(BuildContext context) => new StoreConnector<GameModel, bool>(
-        distinct: true,
-        converter: (store) => goingOnHeist(store.state),
-        onInit: (store) =>
-            _setUpAnimation(goingOnHeist(store.state), currentTeamIsFull(store.state)),
-        onWillChange: (goingOnHeist) =>
-            _setUpAnimation(goingOnHeist, currentTeamIsFull(_store.state)),
-        onDispose: (gameModel) => _controller?.dispose(),
-        builder: (context, goingOnHeist) {
-          Player leader = currentLeader(_store.state);
-          return new AnimationListenable<Color>(
-            animation: _animation,
-            builder: (context, value, child) => new Container(
-                  color: value,
-                  padding: paddingLarge,
-                  child: child,
-                ),
-            staticChild: new Card(
-              elevation: 6.0,
-              child: new Padding(
-                padding: paddingSmall,
-                child: new Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    new AnimationListenable<Color>(
-                      animation: _animation,
-                      builder: (context, value, _) => teamSelectionIcon(goingOnHeist, value, 250.0),
-                    ),
-                    _waitForTeamMessage(goingOnHeist, leader.name),
-                    new Column(
-                      children: [
-                        new Divider(),
-                        roundTitleContents(context, _store),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      );
-}
 
 Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, Set<Player>>(
     converter: (store) => currentTeam(store.state),
@@ -171,3 +40,30 @@ List<Widget> selectionBoardChildren(
       bool isLeader = player.id == leader.id;
       return playerTile(context, player.name, isInTeam, isLeader);
     });
+
+Widget playerTileText(String playerName, bool isInTeam, bool isLeader) {
+  Color textColor = isInTeam ? Colors.white : Colors.black87;
+  Text text = new Text(
+    playerName,
+    style: new TextStyle(
+      color: textColor,
+      fontSize: 16.0,
+    ),
+  );
+  if (isLeader) {
+    return iconText(new Icon(Icons.star, color: textColor), text);
+  }
+  return text;
+}
+
+Widget playerTile(BuildContext context, String playerName, bool isInTeam, bool isLeader) {
+  Color backgroundColor = Theme.of(context).accentColor;
+  return new Container(
+      alignment: Alignment.center,
+      decoration: new BoxDecoration(
+        border: new Border.all(color: backgroundColor),
+        borderRadius: BorderRadius.circular(5.0),
+        color: isInTeam ? backgroundColor : null,
+      ),
+      child: playerTileText(playerName, isInTeam, isLeader));
+}

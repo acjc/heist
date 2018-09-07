@@ -22,7 +22,7 @@ import 'package:heist/widget/heist_end.dart';
 import 'package:heist/widget/round_end.dart';
 import 'package:heist/widget/secret_board.dart';
 import 'package:heist/widget/selection_board.dart';
-import 'package:heist/widget/team_picker.dart';
+import 'package:heist/widget/team_selection.dart';
 import 'package:redux/redux.dart';
 
 class Game extends StatefulWidget {
@@ -78,23 +78,23 @@ class GameState extends State<Game> {
       bidding(store),
     );
     children.add(gifting(store));
-    return new SingleChildScrollView(child: new Column(children: children));
+    return new ListView(children: children);
   }
 
   Widget _gameLoop(MainBoardViewModel viewModel) {
     // team picking (not needed for auctions)
     if (!isAuction(_store.state) && viewModel.waitingForTeam) {
-      return isMyGo(_store.state) ? new TeamPicker(_store) : new WaitForTeam(_store);
+      return new TeamSelection(_store, isMyGo(_store.state));
     }
 
     // bidding
     if (!viewModel.biddingComplete) {
-      return _biddingAndGifting(_store);
+      return appendGameHistory(_biddingAndGifting(_store));
     }
 
     // resolve round
     if (!viewModel.roundComplete) {
-      return roundEnd(context, _store);
+      return appendGameHistory(roundEnd(context, _store));
     }
 
     // resolve auction
@@ -104,16 +104,23 @@ class GameState extends State<Game> {
 
     // active heist
     if (viewModel.heistIsActive) {
-      return activeHeist(context, _store);
+      return appendGameHistory(activeHeist(context, _store));
     }
 
     // go to next heist
     if (viewModel.heistDecided && !viewModel.heistComplete) {
-      return new HeistEnd(_store);
+      return appendGameHistory(new HeistEnd(_store));
     }
 
     return null;
   }
+
+  Widget appendGameHistory(Widget child) => new Column(
+        children: [
+          new Expanded(child: child),
+          gameHistory(_store),
+        ],
+      );
 
   Widget _mainBoardBody() => new StoreConnector<GameModel, MainBoardViewModel>(
         converter: (store) {
@@ -188,20 +195,13 @@ class GameState extends State<Game> {
         if (viewModel.gameOver) {
           return _resolveEndgame(viewModel.completingGame);
         }
-        return new Column(
-          children: [
-            new Expanded(child: _mainBoardBody()),
-            gameHistory(_store),
-          ],
-        );
+        return _mainBoardBody();
       });
 
   Widget _secretBoard() => new StoreConnector<GameModel, bool>(
         converter: (store) => gameIsReady(store.state),
         distinct: true,
-        builder: (context, gameIsReady) => gameIsReady
-            ? new SingleChildScrollView(child: new SecretBoard(_store))
-            : _loadingScreen(),
+        builder: (context, gameIsReady) => gameIsReady ? new SecretBoard(_store) : _loadingScreen(),
       );
 
   Widget _secretTab() => new StoreConnector<GameModel, bool>(

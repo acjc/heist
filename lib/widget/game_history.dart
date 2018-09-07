@@ -8,7 +8,7 @@ import 'package:heist/heist_definitions.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
-import 'package:heist/widget/team_picker.dart';
+import 'package:heist/widget/selection_board.dart';
 import 'package:redux/redux.dart';
 
 Widget heistDecisions(Heist heist) {

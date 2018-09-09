@@ -41,25 +41,23 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m11(playersPicked, teamSize) => "TEAM (${playersPicked} / ${teamSize})";
 
-  static m12(name) => "${name} is picking a team...";
+  static m12(name, amount) => "${name} bid ${amount}";
 
-  static m13(name, amount) => "${name} bid ${amount}";
+  static m13(order) => "Jugador ${order}";
 
-  static m14(order) => "Jugador ${order}";
+  static m14(name, role) => "${name} (${role}) ->";
 
-  static m15(name, role) => "${name} (${role}) ->";
+  static m15(order) => "Ronda ${order}";
 
-  static m16(order) => "Ronda ${order}";
+  static m16(leadAgentDisplayName, stealOption) => "...shared between the ${leadAgentDisplayName}} and any players who chose ${stealOption} on the heist:";
 
-  static m17(leadAgentDisplayName, stealOption) => "...shared between the ${leadAgentDisplayName}} and any players who chose ${stealOption} on the heist:";
+  static m17(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
 
-  static m18(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
+  static m18(pot, price) => "Total pot = ${pot} / ${price}";
 
-  static m19(pot, price) => "Total pot = ${pot} / ${price}";
+  static m19(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
 
-  static m20(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
-
-  static m21(winner) => "${winner} win!";
+  static m20(winner) => "${winner} win!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -107,25 +105,24 @@ class MessageLookup extends MessageLookupByLibrary {
     "otherIdentities" : MessageLookupByLibrary.simpleMessage("You also know these identities:"),
     "pickATeam" : m10,
     "pickedTeamSize" : m11,
-    "pickingTeam" : m12,
-    "playerBid" : m13,
-    "playerOrder" : m14,
-    "playerRole" : m15,
+    "playerBid" : m12,
+    "playerOrder" : m13,
+    "playerRole" : m14,
     "players" : MessageLookupByLibrary.simpleMessage("Players"),
     "pleaseEnterAName" : MessageLookupByLibrary.simpleMessage("Please enter a name"),
-    "roundTitle" : m16,
+    "roundTitle" : m15,
     "secretTab" : MessageLookupByLibrary.simpleMessage("SECRET"),
-    "sharedBetween" : m17,
+    "sharedBetween" : m16,
     "submitBid" : MessageLookupByLibrary.simpleMessage("SUBMIT BID"),
     "submitTeam" : MessageLookupByLibrary.simpleMessage("SUBMIT TEAM"),
     "success" : MessageLookupByLibrary.simpleMessage("Success"),
-    "teamScores" : m18,
+    "teamScores" : m17,
     "thief" : MessageLookupByLibrary.simpleMessage("Thief"),
     "title" : MessageLookupByLibrary.simpleMessage("Heist"),
-    "totalPot" : m19,
+    "totalPot" : m18,
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),
-    "waitingForPlayers" : m20,
-    "winner" : m21,
+    "waitingForPlayers" : m19,
+    "winner" : m20,
     "youHaveMadeYourChoice" : MessageLookupByLibrary.simpleMessage("You have made your choice!"),
     "yourRole" : MessageLookupByLibrary.simpleMessage("Your role is:"),
     "yourTeam" : MessageLookupByLibrary.simpleMessage("You are in team:")

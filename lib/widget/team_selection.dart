@@ -174,7 +174,7 @@ class WaitForTeamState extends TeamSelectionState {
           style: defaultTextStyle,
           children: [
             new TextSpan(text: leaderName, style: boldTextStyle),
-            new TextSpan(text: ' picked you in the team!'),
+            new TextSpan(text: AppLocalizations.of(context).pickedYou),
           ],
         ),
       );
@@ -184,16 +184,16 @@ class WaitForTeamState extends TeamSelectionState {
       children: [
         new Padding(
           padding: paddingSmall,
-          child: new Text("You haven't been picked!", style: infoTextStyle),
+          child: new Text(AppLocalizations.of(context).notPicked, style: infoTextStyle),
         ),
         new RichText(
           textAlign: TextAlign.center,
           text: new TextSpan(
             style: defaultTextStyle,
             children: [
-              new TextSpan(text: 'Convince '),
+              new TextSpan(text: AppLocalizations.of(context).convince),
               new TextSpan(text: leaderName, style: boldTextStyle),
-              new TextSpan(text: ' to put you in the team!'),
+              new TextSpan(text: AppLocalizations.of(context).putYouInTeam),
             ],
           ),
         ),

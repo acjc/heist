@@ -520,12 +520,35 @@ class AppLocalizations {
 
   // Picking a team
 
-  String pickingTeam(String name) {
+  String get pickedYou {
     return Intl.message(
-      '$name is picking a team...',
-      name: 'pickingTeam',
-      args: [name],
-      desc: 'A player is picking a team',
+      ' picked you in the team!',
+      name: 'pickedYou',
+      desc: 'Leader picked you in the team',
+    );
+  }
+
+  String get notPicked {
+    return Intl.message(
+      "You haven't been picked!",
+      name: 'notPicked',
+      desc: 'Leader has not picked you in the team',
+    );
+  }
+
+  String get convince {
+    return Intl.message(
+      'Convince ',
+      name: 'convince',
+      desc: 'Convince leader to pick you in the team (1 / 2)',
+    );
+  }
+
+  String get putYouInTeam {
+    return Intl.message(
+      ' to put you in the team!',
+      name: 'putYouInTeam',
+      desc: 'Convince leader to pick you in the team (2 / 2)',
     );
   }
 
@@ -534,7 +557,7 @@ class AppLocalizations {
       'Pick a team: $playersPicked / $teamSize',
       name: 'pickATeam',
       args: [playersPicked, teamSize],
-      desc: 'Current team size over number of players needed, as seen by the team picker',
+      desc: 'Team picker title',
     );
   }
 
@@ -543,8 +566,7 @@ class AppLocalizations {
       'TEAM ($playersPicked / $teamSize)',
       name: 'pickedTeamSize',
       args: [playersPicked, teamSize],
-      desc:
-          'Current team size over number of players needed, as seen by the players who aren\'t picking a team',
+      desc: 'Selection board title',
     );
   }
 

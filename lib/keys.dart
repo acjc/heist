@@ -7,4 +7,6 @@ class Keys {
   static final GlobalKey<FormState> homePageNameKey = new GlobalKey<FormState>();
   static final GlobalKey<FormState> homePageCodeKey = new GlobalKey<FormState>();
   static final GlobalKey<FormState> createRoomPageNameKey = new GlobalKey<FormState>();
+
+  static final GlobalKey noConnectionDialogKey = new GlobalKey();
 }

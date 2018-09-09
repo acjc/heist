@@ -49,7 +49,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m15(order) => "Round ${order}";
 
-  static m16(bertieDisplayName, stealOption) => "...shared between the ${bertieDisplayName}} and any players who chose ${stealOption} on the haunt:";
+  static m16(bertieDisplayName, stealOption) => "...shared between ${bertieDisplayName}} and any players who chose ${stealOption} on the haunt:";
 
   static m17(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
 
@@ -103,7 +103,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "invalidCode" : MessageLookupByLibrary.simpleMessage("Invalid code"),
     "makeYourChoice" : MessageLookupByLibrary.simpleMessage("Make your choice..."),
     "noBid" : MessageLookupByLibrary.simpleMessage("No Bid"),
+    "noConnectionDialogText" : MessageLookupByLibrary.simpleMessage("You need to be connected to the internet to be able to play."),
+    "noConnectionDialogTitle" : MessageLookupByLibrary.simpleMessage("No internet"),
     "notPicked" : MessageLookupByLibrary.simpleMessage("You haven\'t been picked!"),
+    "okButton" : MessageLookupByLibrary.simpleMessage("OK"),
     "otherIdentities" : MessageLookupByLibrary.simpleMessage("You also know these identities:"),
     "pickATeam" : m10,
     "pickedTeamSize" : m11,

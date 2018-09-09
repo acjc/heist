@@ -83,6 +83,14 @@ class AppLocalizations {
 
   // Common
 
+  String get okButton {
+    return Intl.message(
+      'OK',
+      name: 'okButton',
+      desc: 'OK button in a dialog',
+    );
+  }
+
   String get continueButton {
     return Intl.message(
       'CONTINUE',
@@ -622,6 +630,24 @@ class AppLocalizations {
       name: 'teamScores',
       args: [thiefScore, agentScore],
       desc: 'The scores of both teams - might need to reverse the order in RTL',
+    );
+  }
+
+  // No connection
+
+  String get noConnectionDialogTitle {
+    return Intl.message(
+      'No internet',
+      name: 'noConnectionDialogTitle',
+      desc: 'Title of the dialog telling the user they have lost their internet connection',
+    );
+  }
+
+  String get noConnectionDialogText {
+    return Intl.message(
+      'You need to be connected to the internet to be able to play.',
+      name: 'noConnectionDialogText',
+      desc: 'Body of the dialog telling the user they have lost their internet connection',
     );
   }
 }

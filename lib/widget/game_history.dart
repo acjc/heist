@@ -3,15 +3,16 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/app_localizations.dart';
+import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
-import 'package:heist/heist_definitions.dart';
+import 'package:heist/haunt_definitions.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
 import 'package:heist/widget/selection_board.dart';
 import 'package:redux/redux.dart';
 
-Widget heistDecisions(Heist heist) {
+Widget heistDecisions(Haunt heist) {
   List<String> decisions = new List.of(heist.decisions.values.toList());
   decisions.shuffle(new Random(heist.id.hashCode));
   List<Widget> children = new List.generate(decisions.length, (i) {
@@ -25,7 +26,7 @@ Widget heistDecisions(Heist heist) {
           )),
     );
   });
-  return new HeistGridView(children, childAspectRatio: 8.0);
+  return new TeamGridView(children, childAspectRatio: 8.0);
 }
 
 Widget heistTeam(BuildContext context, Store<GameModel> store, Set<Player> team, Player leader) {
@@ -42,21 +43,21 @@ Widget heistTeam(BuildContext context, Store<GameModel> store, Set<Player> team,
     gridChildren.add(playerTile(context, leader.name, false, true));
   }
 
-  return new HeistGridView(gridChildren);
+  return new TeamGridView(gridChildren);
 }
 
-Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int order) {
+Widget heistPopup(BuildContext context, Store<GameModel> store, Haunt heist, int order) {
   int totalPlayers = getRoom(store.state).numPlayers;
-  int price = heist?.price ?? heistDefinitions[totalPlayers][order].price;
-  int numPlayers = heist?.numPlayers ?? heistDefinitions[totalPlayers][order].numPlayers;
-  int maximumBid = heist?.maximumBid ?? heistDefinitions[totalPlayers][order].maximumBid;
+  int price = heist?.price ?? hauntDefinitions[totalPlayers][order].price;
+  int numPlayers = heist?.numPlayers ?? hauntDefinitions[totalPlayers][order].numPlayers;
+  int maximumBid = heist?.maximumBid ?? hauntDefinitions[totalPlayers][order].maximumBid;
   Round lastRound = heist != null ? getRounds(store.state)[heist.id].last : null;
   int pot = lastRound != null && lastRound.bids.length == numPlayers ? lastRound.pot : null;
 
   List<Widget> title = [
     new Text(
-      'Heist $order',
-      style: new TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+      AppLocalizations.of(context).hauntTitle(order),
+      style: boldTextStyle,
     ),
   ];
 
@@ -75,22 +76,15 @@ Widget heistPopup(BuildContext context, Store<GameModel> store, Heist heist, int
     ),
     new VerticalDivider(height: 40.0),
     heistDetailsIcon(Icons.people, numPlayers.toString()),
-    heistDetailsIcon(Icons.monetization_on, price.toString()),
+    heistDetailsIcon(Icons.bubble_chart, price.toString()),
     heistDetailsIcon(Icons.vertical_align_top, maximumBid.toString()),
   ];
 
   if (pot != null) {
     heistDetailsChildren.addAll([
       new VerticalDivider(height: 40.0),
-      iconText(
-          new Icon(
-            Icons.attach_money,
-            size: 32.0,
-          ),
-          new Text(
-            pot.toString(),
-            style: bigNumberTextStyle,
-          )),
+      iconText(new Icon(Icons.bubble_chart, size: 32.0),
+          new Text(pot.toString(), style: bigNumberTextStyle)),
     ]);
   }
 
@@ -128,7 +122,7 @@ Widget heistDetailsIcon(IconData icon, String text) {
   );
 }
 
-String getHeistStatus(BuildContext context, Heist heist, Round lastRound) {
+String getHeistStatus(BuildContext context, Haunt heist, Round lastRound) {
   if (heist.complete) {
     return heist.wasSuccess
         ? AppLocalizations.of(context).success
@@ -143,23 +137,23 @@ String getHeistStatus(BuildContext context, Heist heist, Round lastRound) {
   return AppLocalizations.of(context).roundTitle(lastRound.order);
 }
 
-Icon getHeistIcon(Heist heist) {
+Icon getHeistIcon(Haunt heist) {
   if (heist == null) {
-    return const Icon(Icons.remove, size: 32.0);
+    return const Icon(Icons.remove, size: 32.0, color: Colors.grey);
   }
   if (!heist.complete) {
-    return const Icon(Icons.adjust, color: Colors.blue);
+    return const Icon(Icons.adjust, color: HeistColors.blue);
   }
   if (heist.wasSuccess) {
-    return const Icon(Icons.verified_user, color: Colors.green, size: 32.0);
+    return const Icon(Icons.verified_user, color: HeistColors.green, size: 32.0);
   }
   return const Icon(Icons.cancel, color: Colors.red, size: 32.0);
 }
 
 Widget gameHistory(Store<GameModel> store) {
-  return new StoreConnector<GameModel, List<Heist>>(
+  return new StoreConnector<GameModel, List<Haunt>>(
       distinct: true,
-      converter: (store) => store.state.heists,
+      converter: (store) => store.state.haunts,
       builder: (context, heists) {
         if (heists.isEmpty) {
           return new Container();
@@ -169,7 +163,7 @@ Widget gameHistory(Store<GameModel> store) {
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: new List.generate(5, (i) {
-                Heist heist = i < heists.length ? heists[i] : null;
+                Haunt heist = i < heists.length ? heists[i] : null;
                 return new InkWell(
                   onTap: () {
                     showModalBottomSheet(

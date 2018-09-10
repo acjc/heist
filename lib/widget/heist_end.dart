@@ -3,9 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/app_localizations.dart';
+import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
-import 'package:heist/heist_definitions.dart';
-import 'package:heist/middleware/heist_middleware.dart';
+import 'package:heist/haunt_definitions.dart';
+import 'package:heist/middleware/haunt_middleware.dart';
 import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -47,7 +48,7 @@ class HeistEndState extends State<HeistEnd> {
         },
       );
 
-  Widget _heistContinueButton() {
+  Widget _hauntContinueButton() {
     return new StoreConnector<GameModel, bool>(
         converter: (store) => requestInProcess(store.state, Request.CompletingHeist),
         distinct: true,
@@ -59,21 +60,21 @@ class HeistEndState extends State<HeistEnd> {
                   style: buttonTextStyle,
                 ),
                 onPressed:
-                    completingHeist ? null : () => _store.dispatch(new CompleteHeistAction()),
+                    completingHeist ? null : () => _store.dispatch(new CompleteHauntAction()),
               ),
             ));
   }
 
   Widget _heistIcon(bool wasSuccess) {
     return wasSuccess
-        ? const Icon(Icons.verified_user, color: Colors.green, size: 40.0)
+        ? const Icon(Icons.verified_user, color: HeistColors.green, size: 40.0)
         : const Icon(Icons.cancel, color: Colors.red, size: 40.0);
   }
 
-  Widget _heistDetails(Heist heist, int pot) => new Row(
+  Widget _heistDetails(Haunt heist, int pot) => new Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          new Text(AppLocalizations.of(context).heistTitle(heist.order), style: boldTextStyle),
+          new Text(AppLocalizations.of(context).hauntTitle(heist.order), style: boldTextStyle),
           new VerticalDivider(),
           iconText(
             new Icon(Icons.monetization_on, color: Colors.teal),
@@ -84,8 +85,8 @@ class HeistEndState extends State<HeistEnd> {
         ],
       );
 
-  Widget _heistResult(BuildContext context) {
-    Heist heist = currentHeist(_store.state);
+  Widget _hauntResult(BuildContext context) {
+    Haunt heist = currentHaunt(_store.state);
     List<String> decisions = new List.of(heist.decisions.values.toList());
     if (decisions.isEmpty) {
       return null;
@@ -102,7 +103,7 @@ class HeistEndState extends State<HeistEnd> {
 
     children.addAll(_heistDecisions(decisions));
 
-    int kingpinPayout = calculateKingpinPayout(newRandomForHeist(heist), pot);
+    int kingpinPayout = calculateBrendaPayout(newRandomForHaunt(heist), pot);
     int leadAgentPayout = pot - kingpinPayout;
     TextStyle potResolutionTextStyle = const TextStyle(
       fontSize: 30.0,
@@ -120,8 +121,8 @@ class HeistEndState extends State<HeistEnd> {
               style: potResolutionTextStyle,
             ),
             new Text(
-              AppLocalizations.of(context).kingpinReceived(
-                  getRoleDisplayName(context, KINGPIN.roleId)),
+              AppLocalizations.of(context)
+                  .brendaReceived(Roles.getRoleDisplayName(context, Roles.brenda.roleId)),
               style: infoTextStyle,
             ),
           ],
@@ -136,8 +137,8 @@ class HeistEndState extends State<HeistEnd> {
               style: potResolutionTextStyle,
             ),
             new Text(
-              AppLocalizations.of(context).sharedBetween(
-                  getRoleDisplayName(context, LEAD_AGENT.roleId), Steal),
+              AppLocalizations.of(context)
+                  .sharedBetween(Roles.getRoleDisplayName(context, Roles.bertie.roleId), Steal),
               style: infoTextStyle,
             ),
           ],
@@ -146,7 +147,7 @@ class HeistEndState extends State<HeistEnd> {
     ]);
 
     if (amOwner(_store.state)) {
-      children.add(_heistContinueButton());
+      children.add(_hauntContinueButton());
     }
 
     return new Card(
@@ -163,6 +164,6 @@ class HeistEndState extends State<HeistEnd> {
     if (!gameIsReady(_store.state)) {
       return new Container();
     }
-    return new SingleChildScrollView(child: _heistResult(context));
+    return new SingleChildScrollView(child: _hauntResult(context));
   }
 }

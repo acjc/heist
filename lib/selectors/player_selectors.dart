@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:heist/db/database_model.dart';
-import 'package:heist/heist_definitions.dart';
+import 'package:heist/haunt_definitions.dart';
 import 'package:heist/role.dart';
 import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
@@ -28,31 +28,31 @@ final Selector<GameModel, List<Player>> getOtherPlayers = createSelector2(getPla
 final Selector<GameModel, bool> amOwner = createSelector2(
     getRoom, getPlayerInstallId, (Room room, String installId) => room.owner == installId);
 
-final getKingpin = (GameModel gameModel) =>
-    getPlayers(gameModel).singleWhere((p) => p.role == KINGPIN.roleId, orElse: null);
+final getBrenda = (GameModel gameModel) =>
+    getPlayers(gameModel).singleWhere((p) => p.role == Roles.brenda.roleId, orElse: null);
 
-final Selector<GameModel, bool> haveGuessedKingpin = createSelector3(
+final Selector<GameModel, bool> haveGuessedBrenda = createSelector3(
     getSelf,
-    getKingpin,
+    getBrenda,
     getRoom,
-    (Player me, Player kingpin, Room room) =>
-        room.kingpinGuess != null &&
-        room.kingpinGuess == kingpin.id &&
-        me.role == LEAD_AGENT.roleId);
+    (Player me, Player brenda, Room room) =>
+        room.brendaGuess != null &&
+        room.brendaGuess == brenda.id &&
+        me.role == Roles.bertie.roleId);
 
 final Selector<GameModel, int> currentBalance = createSelector4(
     getPlayers,
     getSelf,
-    getHeists,
+    getHaunts,
     getRounds,
-    (List<Player> players, Player me, List<Heist> heists, Map<String, List<Round>> rounds) =>
-        calculateBalance(players, me, heists, rounds));
+    (List<Player> players, Player me, List<Haunt> haunts, Map<String, List<Round>> rounds) =>
+        calculateBalance(players, me, haunts, rounds));
 
 int calculateBalanceFromStore(Store<GameModel> store, Player player) => calculateBalance(
-    getPlayers(store.state), player, getHeists(store.state), getRounds(store.state));
+    getPlayers(store.state), player, getHaunts(store.state), getRounds(store.state));
 
 int calculateBalance(
-    List<Player> players, Player player, List<Heist> heists, Map<String, List<Round>> allRounds) {
+    List<Player> players, Player player, List<Haunt> haunts, Map<String, List<Round>> allRounds) {
   if (players.isEmpty || player == null) {
     return 0;
   }
@@ -60,15 +60,15 @@ int calculateBalance(
   if (allRounds.isEmpty) {
     return balance;
   }
-  heists.forEach((heist) {
-    List<Round> rounds = allRounds[heist.id];
+  haunts.forEach((haunt) {
+    List<Round> rounds = allRounds[haunt.id];
     if (rounds != null && rounds.isNotEmpty) {
       balance = resolveBalanceForGifts(player.id, rounds, balance);
 
       Map<String, Bid> mostRecentBids = rounds.last.bids;
-      if (heist.allDecided) {
+      if (haunt.allDecided) {
         balance -= mostRecentBids[player.id].amount;
-        balance = resolveBalanceForHeistOutcome(players, player, heist, rounds.last.pot, balance);
+        balance = resolveBalanceForHauntOutcome(players, player, haunt, rounds.last.pot, balance);
       } else if (hasProposedBid(player.id, mostRecentBids, players.length)) {
         balance -= mostRecentBids[player.id].amount;
       }
@@ -89,11 +89,11 @@ int resolveBalanceForGifts(String playerId, List<Round> rounds, int balance) {
   return balance;
 }
 
-Random newRandomForHeist(Heist heist) {
-  return new Random(heist.id.hashCode);
+Random newRandomForHaunt(Haunt haunt) {
+  return new Random(haunt.id.hashCode);
 }
 
-int calculateKingpinPayout(Random random, int pot) {
+int calculateBrendaPayout(Random random, int pot) {
   return randomlySplit(random, pot, 2)[0];
 }
 
@@ -101,22 +101,22 @@ bool hasProposedBid(String playerId, Map<String, Bid> bids, int numPlayers) {
   return bids.length != numPlayers && bids.containsKey(playerId);
 }
 
-int resolveBalanceForHeistOutcome(
-    List<Player> players, Player player, Heist heist, int pot, int balance) {
-  Random random = newRandomForHeist(heist);
+int resolveBalanceForHauntOutcome(
+    List<Player> players, Player player, Haunt haunt, int pot, int balance) {
+  Random random = newRandomForHaunt(haunt);
 
-  int kingpinPayout = calculateKingpinPayout(random, pot);
-  int leadAgentPayout = pot - kingpinPayout;
-  if (player.role == KINGPIN.roleId) {
-    balance += kingpinPayout;
+  int brendaPayout = calculateBrendaPayout(random, pot);
+  int bertiePayout = pot - brendaPayout;
+  if (player.role == Roles.brenda.roleId) {
+    balance += brendaPayout;
   }
 
-  bool playerStole = heist.decisions[player.id] == Steal;
-  if (player.role == LEAD_AGENT.roleId || playerStole) {
+  bool playerStole = haunt.decisions[player.id] == Steal;
+  if (player.role == Roles.bertie.roleId || playerStole) {
     List<Player> playersToReceive = players
-        .where((p) => heist.decisions[p.id] == Steal || p.role == LEAD_AGENT.roleId)
+        .where((p) => haunt.decisions[p.id] == Steal || p.role == Roles.bertie.roleId)
         .toList();
-    List<int> split = randomlySplit(random, leadAgentPayout, playersToReceive.length);
+    List<int> split = randomlySplit(random, bertiePayout, playersToReceive.length);
     balance += split[playersToReceive.indexOf(player)];
   }
   return balance;

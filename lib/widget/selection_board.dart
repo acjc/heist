@@ -23,11 +23,11 @@ Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, S
                 child: new Text(
                     AppLocalizations.of(context).pickedTeamSize(
                       team.length,
-                      currentHeist(store.state).numPlayers,
+                      currentHaunt(store.state).numPlayers,
                     ),
                     style: titleTextStyle),
               ),
-              new HeistGridView(selectionBoardChildren(context, players, team, leader)),
+              new TeamGridView(selectionBoardChildren(context, players, team, leader)),
             ])),
       );
     });

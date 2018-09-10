@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/app_localizations.dart';
+import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -39,26 +40,20 @@ Widget playerInfo(Store<GameModel> store) {
 
 Widget playerBalance(int balance, int amountReceivedThisRound) {
   List<Widget> children = [
-    new Icon(
-      Icons.attach_money,
-      size: 32.0,
-    ),
-    new Text(
-      balance.toString(),
-      style: bigNumberTextStyle,
-    ),
+    new Icon(Icons.bubble_chart, size: 32.0),
+    new Text(balance.toString(), style: bigNumberTextStyle),
   ];
   if (amountReceivedThisRound > 0) {
     children.addAll([
       new Container(
         child: new Text(
           '+$amountReceivedThisRound',
-          style: const TextStyle(fontSize: 16.0, color: Colors.green),
+          style: const TextStyle(fontSize: 16.0, color: HeistColors.green),
         ),
         margin: const EdgeInsets.only(left: 8.0),
       ),
       new Container(
-        child: new Icon(Icons.cake, size: 14.0, color: Colors.green),
+        child: new Icon(Icons.cake, size: 14.0, color: HeistColors.green),
         margin: const EdgeInsets.only(left: 2.0),
       ),
     ]);

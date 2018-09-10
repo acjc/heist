@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/animations/animation_listenable.dart';
 import 'package:heist/app_localizations.dart';
+import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/team_picker_middleware.dart';
 import 'package:heist/reducers/round_reducers.dart';
@@ -38,8 +39,8 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
 
   Animation<Color> _getPulseTween(bool goingOnHeist, bool fullTeam) {
     if (fullTeam) {
-      Color beginColor = goingOnHeist ? Colors.teal : Colors.red;
-      Color endColor = goingOnHeist ? Colors.green : Colors.pinkAccent;
+      Color beginColor = goingOnHeist ? Colors.green : Colors.redAccent;
+      Color endColor = goingOnHeist ? HeistColors.green : HeistColors.peach;
       return new ColorTween(begin: beginColor, end: endColor).animate(_pulseController)
         ..addStatusListener((status) {
           if (status == AnimationStatus.completed) {
@@ -49,7 +50,7 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
           }
         });
     }
-    return new ConstantTween<Color>(goingOnHeist ? Colors.teal : Colors.redAccent)
+    return new ConstantTween<Color>(goingOnHeist ? HeistColors.green : HeistColors.peach)
         .animate(_pulseController);
   }
 
@@ -145,12 +146,12 @@ class WaitForTeamState extends TeamSelectionState {
   @override
   Widget build(BuildContext context) => new StoreConnector<GameModel, bool>(
         distinct: true,
-        converter: (store) => goingOnHeist(store.state),
-        onInit: (store) => _setUpPulse(goingOnHeist(store.state), currentTeamIsFull(store.state)),
+        converter: (store) => goingOnHaunt(store.state),
+        onInit: (store) => _setUpPulse(goingOnHaunt(store.state), currentTeamIsFull(store.state)),
         onWillChange: (goingOnHeist) => _setUpPulse(goingOnHeist, currentTeamIsFull(_store.state)),
         onDispose: (gameModel) => _pulseController?.dispose(),
         builder: (context, goingOnHeist) {
-          int playersRequired = currentHeist(_store.state).numPlayers;
+          int playersRequired = currentHaunt(_store.state).numPlayers;
           Player leader = currentLeader(_store.state);
           return new AnimationListenable<Color>(
             animation: _pulseAnimation,
@@ -242,13 +243,13 @@ class TeamPickerState extends TeamSelectionState {
   Widget build(BuildContext context) => new StoreConnector<GameModel, Set<Player>>(
       distinct: true,
       converter: (store) => currentTeam(store.state),
-      onInit: (store) => _setUpPulse(goingOnHeist(store.state), currentTeamIsFull(store.state)),
+      onInit: (store) => _setUpPulse(goingOnHaunt(store.state), currentTeamIsFull(store.state)),
       onWillChange: (team) =>
-          _setUpPulse(goingOnHeist(_store.state), currentTeamIsFull(_store.state)),
+          _setUpPulse(goingOnHaunt(_store.state), currentTeamIsFull(_store.state)),
       onDispose: (gameModel) => _pulseController?.dispose(),
       builder: (context, team) {
-        int playersRequired = currentHeist(_store.state).numPlayers;
-        bool amGoingOnHeist = goingOnHeist(_store.state);
+        int playersRequired = currentHaunt(_store.state).numPlayers;
+        bool amGoingOnHeist = goingOnHaunt(_store.state);
         return new AnimationListenable<Color>(
           animation: _pulseAnimation,
           builder: (context, value, child) => new Container(color: value, child: child),
@@ -282,7 +283,7 @@ class TeamPickerState extends TeamSelectionState {
                         AppLocalizations.of(context).pickATeam(team.length, playersRequired),
                         style: infoTextStyle,
                       ),
-                      new HeistGridView(
+                      new TeamGridView(
                         _teamPickerChildren(context, team, playersRequired),
                         childAspectRatio: 5.0,
                       ),

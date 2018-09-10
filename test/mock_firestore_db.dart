@@ -8,19 +8,19 @@ import 'package:uuid/uuid.dart';
 class MockFirestoreDb implements FirestoreDb {
   Room room;
   List<Player> players;
-  List<Heist> heists;
+  List<Haunt> haunts;
   Map<String, List<Round>> rounds;
 
   StreamController<Room> _roomStream;
   StreamController<List<Player>> _playerStream;
-  StreamController<List<Heist>> _heistStream;
+  StreamController<List<Haunt>> _hauntStream;
   StreamController<List<Round>> _roundStream;
 
-  MockFirestoreDb({this.room, this.players, this.heists, this.rounds});
+  MockFirestoreDb({this.room, this.players, this.haunts, this.rounds});
 
   MockFirestoreDb.empty()
       : this.players = [],
-        this.heists = [],
+        this.haunts = [],
         this.rounds = {};
 
   @override
@@ -34,8 +34,8 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<List<Heist>> getHeists(String roomRef) {
-    return new Future<List<Heist>>.value(heists);
+  Future<List<Haunt>> getHaunts(String roomRef) {
+    return new Future<List<Haunt>>.value(haunts);
   }
 
   @override
@@ -44,8 +44,8 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<Heist> getHeist(String roomId, int order) {
-    return new Future<Heist>.value(heists.singleWhere((h) => h.order == order, orElse: () => null));
+  Future<Haunt> getHaunt(String roomId, int order) {
+    return new Future<Haunt>.value(haunts.singleWhere((h) => h.order == order, orElse: () => null));
   }
 
   @override
@@ -80,9 +80,9 @@ class MockFirestoreDb implements FirestoreDb {
     }
   }
 
-  void _postHeists() {
-    if (_heistStream != null && !_heistStream.isClosed && heists != null) {
-      _heistStream.add(heists);
+  void _postHaunts() {
+    if (_hauntStream != null && !_hauntStream.isClosed && haunts != null) {
+      _hauntStream.add(haunts);
     }
   }
 
@@ -110,10 +110,10 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  StreamSubscription<List<Heist>> listenOnHeists(String roomRef, void onData(List<Heist> heists)) {
-    _heistStream = new StreamController(onCancel: () => _heistStream.close(), sync: true);
-    StreamSubscription<List<Heist>> subscription = _heistStream.stream.listen(onData);
-    _postHeists();
+  StreamSubscription<List<Haunt>> listenOnHaunts(String roomRef, void onData(List<Haunt> heists)) {
+    _hauntStream = new StreamController(onCancel: () => _hauntStream.close(), sync: true);
+    StreamSubscription<List<Haunt>> subscription = _hauntStream.stream.listen(onData);
+    _postHaunts();
     return subscription;
   }
 
@@ -151,16 +151,16 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<String> upsertHeist(Heist heist, String roomId) {
+  Future<String> upsertHaunt(Haunt haunt, String roomId) {
     return new Future<String>(() {
-      if (heist.id == null) {
-        heist = heist.copyWith(id: new Uuid().v4());
+      if (haunt.id == null) {
+        haunt = haunt.copyWith(id: new Uuid().v4());
       }
-      heists
-        ..removeWhere((h) => h.id == heist.id)
-        ..add(heist);
-      _postHeists();
-      return heist.id;
+      haunts
+        ..removeWhere((h) => h.id == haunt.id)
+        ..add(haunt);
+      _postHaunts();
+      return haunt.id;
     });
   }
 
@@ -170,12 +170,12 @@ class MockFirestoreDb implements FirestoreDb {
       if (round.id == null) {
         round = round.copyWith(id: new Uuid().v4());
       }
-      if (rounds.containsKey(round.heist)) {
-        rounds[round.heist]
+      if (rounds.containsKey(round.haunt)) {
+        rounds[round.haunt]
           ..removeWhere((r) => r.id == round.id)
           ..add(round);
       } else {
-        rounds[round.heist] = [round];
+        rounds[round.haunt] = [round];
       }
       _postRounds();
     });
@@ -224,16 +224,16 @@ class MockFirestoreDb implements FirestoreDb {
     return upsertRound(round.copyWith(teamSubmitted: true), null);
   }
 
-  Heist _getHeist(String id) {
-    return heists.singleWhere((h) => h.id == id);
+  Haunt _getHaunt(String id) {
+    return haunts.singleWhere((h) => h.id == id);
   }
 
   @override
-  Future<void> makeDecision(String heistId, String playerId, String decision) {
-    Heist heist = _getHeist(heistId);
-    Map<String, String> decisions = new Map.from(heist.decisions);
+  Future<void> makeDecision(String hauntId, String playerId, String decision) {
+    Haunt haunt = _getHaunt(hauntId);
+    Map<String, String> decisions = new Map.from(haunt.decisions);
     decisions[playerId] = decision;
-    return upsertHeist(heist.copyWith(decisions: decisions), null);
+    return upsertHaunt(haunt.copyWith(decisions: decisions), null);
   }
 
   @override
@@ -243,9 +243,9 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<void> completeHeist(String id) {
-    Heist heist = _getHeist(id);
-    return upsertHeist(heist.copyWith(completedAt: now()), null);
+  Future<void> completeHaunt(String id) {
+    Haunt haunt = _getHaunt(id);
+    return upsertHaunt(haunt.copyWith(completedAt: now()), null);
   }
 
   @override
@@ -262,7 +262,7 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<void> guessKingpin(String id, String playerId) {
-    return upsertRoom(room.copyWith(kingpinGuess: playerId));
+  Future<void> guessBrenda(String id, String playerId) {
+    return upsertRoom(room.copyWith(brendaGuess: playerId));
   }
 }

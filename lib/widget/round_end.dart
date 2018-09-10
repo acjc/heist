@@ -40,7 +40,7 @@ Widget roundEnd(BuildContext context, Store<GameModel> store) {
       new Container(
           padding: paddingSmall,
           child: new Text(
-              AppLocalizations.of(context).totalPot(round.pot, currentHeist(store.state).price),
+              AppLocalizations.of(context).totalPot(round.pot, currentHaunt(store.state).price),
               style: titleTextStyle)),
     );
 

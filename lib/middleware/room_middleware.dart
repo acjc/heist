@@ -143,14 +143,14 @@ class AddVisibleToAccountantAction extends MiddlewareAction {
   }
 }
 
-class GuessKingpinAction extends MiddlewareAction {
+class GuessBrendaAction extends MiddlewareAction {
   final String playerId;
 
-  GuessKingpinAction(this.playerId);
+  GuessBrendaAction(this.playerId);
 
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
-    return withRequest(Request.GuessingKingpin, store,
-        (store) => store.state.db.guessKingpin(getRoom(store.state).id, playerId));
+    return withRequest(Request.GuessingBrenda, store,
+        (store) => store.state.db.guessBrenda(getRoom(store.state).id, playerId));
   }
 }

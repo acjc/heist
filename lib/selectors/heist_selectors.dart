@@ -7,41 +7,41 @@ import 'selectors.dart';
 
 final Selector<GameModel, bool> heistIsActive = createSelector4(
     currentRound,
-    currentHeist,
+    currentHaunt,
     biddingComplete,
     isAuction,
-    (Round currentRound, Heist currentHeist, bool biddingComplete, bool isAuction) =>
-        ((isAuction && biddingComplete) || currentRound.pot >= currentHeist.price) &&
-        !currentHeist.allDecided);
+    (Round currentRound, Haunt currentHaunt, bool biddingComplete, bool isAuction) =>
+        ((isAuction && biddingComplete) || currentRound.pot >= currentHaunt.price) &&
+        !currentHaunt.allDecided);
 
-final Selector<GameModel, bool> goingOnHeist =
+final Selector<GameModel, bool> goingOnHaunt =
     createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.team.contains(me.id));
 
 class Score {
-  int thiefScore;
-  int agentScore;
+  int scaryScore;
+  int friendlyScore;
 
-  Score(this.thiefScore, this.agentScore);
+  Score(this.scaryScore, this.friendlyScore);
 
-  Team get winner => thiefScore >= 3 ? Team.THIEVES : Team.AGENTS;
+  Team get winner => scaryScore >= 3 ? Team.SCARY : Team.FRIENDLY;
 }
 
-final Selector<GameModel, bool> gameOver = createSelector1(getHeists, (List<Heist> heists) {
+final Selector<GameModel, bool> gameOver = createSelector1(getHaunts, (List<Haunt> heists) {
   Score score = calculateScore(heists);
-  return score.thiefScore >= 3 || score.agentScore >= 3;
+  return score.scaryScore >= 3 || score.friendlyScore >= 3;
 });
 
-Score calculateScore(List<Heist> heists) {
-  int thiefScore = 0;
-  int agentScore = 0;
-  for (Heist heist in heists) {
+Score calculateScore(List<Haunt> heists) {
+  int scaryScore = 0;
+  int friendlyScore = 0;
+  for (Haunt heist in heists) {
     if (heist.allDecided) {
       if (heist.wasSuccess) {
-        thiefScore++;
+        scaryScore++;
       } else {
-        agentScore++;
+        friendlyScore++;
       }
     }
   }
-  return new Score(thiefScore, agentScore);
+  return new Score(scaryScore, friendlyScore);
 }

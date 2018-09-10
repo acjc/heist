@@ -26,11 +26,11 @@ void main() {
     expect(
         store.state.room.roles,
         new Set.of([
-          ACCOUNTANT.roleId,
-          KINGPIN.roleId,
-          THIEF_1.roleId,
-          LEAD_AGENT.roleId,
-          AGENT_1.roleId
+          Roles.accountant.roleId,
+          Roles.brenda.roleId,
+          Roles.scaryGhost1.roleId,
+          Roles.bertie.roleId,
+          Roles.friendlyGhost1.roleId
         ]));
 
     // Call loadGame() manually to avoid some async calls that we call manually later in the test
@@ -48,7 +48,7 @@ void main() {
     for (Player player in store.state.players) {
       expect(player.role, isNotNull);
     }
-    expect(store.state.heists.length, 1);
+    expect(store.state.haunts.length, 1);
   });
 
   test('add visible to accountant player', () async {

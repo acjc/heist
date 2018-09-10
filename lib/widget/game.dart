@@ -123,9 +123,9 @@ class GameState extends State<Game> {
       );
 
   Widget _mainBoardBody() => new StoreConnector<GameModel, MainBoardViewModel>(
-        ignoreChange: (gameModel) => currentHeist(gameModel) != null,
+        ignoreChange: (gameModel) => currentHaunt(gameModel) != null,
         converter: (store) {
-          Heist heist = currentHeist(store.state);
+          Haunt heist = currentHaunt(store.state);
           Round round = currentRound(store.state);
           return new MainBoardViewModel._(
             waitingForTeam: !round.teamSubmitted,
@@ -139,6 +139,7 @@ class GameState extends State<Game> {
         },
         distinct: true,
         builder: (context, viewModel) {
+          return new TeamSelection(_store, true);
           Widget currentScreen = _gameLoop(viewModel);
           if (currentScreen == null) {
             return loading();
@@ -207,7 +208,7 @@ class GameState extends State<Game> {
 
   Widget _secretTab() => new StoreConnector<GameModel, bool>(
         converter: (store) =>
-            getHeists(store.state).isNotEmpty ? haveReceivedGiftThisRound(store.state) : false,
+            getHaunts(store.state).isNotEmpty ? haveReceivedGiftThisRound(store.state) : false,
         distinct: true,
         builder: (context, haveReceivedGiftThisRound) {
           Text title = new Text(AppLocalizations.of(context).secretTab);
@@ -222,12 +223,12 @@ class GameState extends State<Game> {
       child: new Scaffold(
         appBar: new AppBar(
           leading: new Container(
-            alignment: Alignment.center,
-            padding: paddingNano,
-            child: new Text(
-              getRoom(_store.state).code,
-              style: boldTextStyle,
-            )),
+              alignment: Alignment.center,
+              padding: paddingNano,
+              child: new Text(
+                getRoom(_store.state).code,
+                style: boldTextStyle,
+              )),
           title: new TabBar(
             tabs: [
               new Tab(text: AppLocalizations.of(context).gameTab),
@@ -354,6 +355,6 @@ void resetGameStore(Store<GameModel> store) {
   store.dispatch(new CancelSubscriptionsAction());
   store.dispatch(new UpdateStateAction<Room>(new Room.initial(isDebugMode() ? 2 : minPlayers)));
   store.dispatch(new UpdateStateAction<List<Player>>([]));
-  store.dispatch(new UpdateStateAction<List<Heist>>([]));
-  store.dispatch(new UpdateStateAction<Map<Heist, List<Round>>>({}));
+  store.dispatch(new UpdateStateAction<List<Haunt>>([]));
+  store.dispatch(new UpdateStateAction<Map<Haunt, List<Round>>>({}));
 }

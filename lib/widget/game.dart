@@ -139,7 +139,6 @@ class GameState extends State<Game> {
         },
         distinct: true,
         builder: (context, viewModel) {
-          return new TeamSelection(_store, true);
           Widget currentScreen = _gameLoop(viewModel);
           if (currentScreen == null) {
             return loading();

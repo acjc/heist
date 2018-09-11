@@ -15,7 +15,7 @@ class CompleteRoundAction extends MiddlewareAction {
     return withRequest(Request.CompletingRound, store, (store) async {
       Round round = currentRound(store.state);
 
-      if (!heistIsActive(store.state)) {
+      if (!hauntIsActive(store.state)) {
         String currentHauntId = currentHaunt(store.state).id;
         int newOrder = round.order + 1;
         assert(newOrder > 0 && newOrder <= 5);

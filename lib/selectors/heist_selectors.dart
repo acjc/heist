@@ -5,7 +5,7 @@ import 'package:reselect/reselect.dart';
 
 import 'selectors.dart';
 
-final Selector<GameModel, bool> heistIsActive = createSelector4(
+final Selector<GameModel, bool> hauntIsActive = createSelector4(
     currentRound,
     currentHaunt,
     biddingComplete,

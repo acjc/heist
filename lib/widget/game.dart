@@ -132,7 +132,7 @@ class GameState extends State<Game> {
             biddingComplete: biddingComplete(store.state),
             resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
             roundComplete: round.complete,
-            heistIsActive: heistIsActive(store.state),
+            heistIsActive: hauntIsActive(store.state),
             heistDecided: heist.allDecided,
             heistComplete: heist.complete,
           );

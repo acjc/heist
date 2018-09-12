@@ -20,8 +20,8 @@ void main() {
     String brendaId = uuid();
     String bertieId = uuid();
     String scaryId = uuid();
-    String heistId1 = '#heist1';
-    String heistId2 = '#heist2';
+    String hauntId1 = '#haunt1';
+    String hauntId2 = '#haunt2';
 
     Player kingpin =
         new Player(id: brendaId, installId: uuid(), name: '_other1', role: Roles.brenda.roleId);
@@ -53,27 +53,27 @@ void main() {
         ],
         haunts: [
           new Haunt(
-              id: heistId1,
+              id: hauntId1,
               price: 12,
               numPlayers: 4,
               maximumBid: 20,
               order: 1,
               decisions: {
                 myId: Steal,
-                brendaId: Succeed,
-                bertieId: Fail,
+                brendaId: Scare,
+                bertieId: Tickle,
                 scaryId: Steal,
               },
               startedAt: now()),
           new Haunt(
-              id: heistId2, price: 12, numPlayers: 4, maximumBid: 20, order: 2, startedAt: now())
+              id: hauntId2, price: 12, numPlayers: 4, maximumBid: 20, order: 2, startedAt: now())
         ],
         rounds: {
-          heistId1: [
+          hauntId1: [
             new Round(
                 id: uuid(),
                 order: 1,
-                haunt: heistId1,
+                haunt: hauntId1,
                 team: new Set(),
                 bids: {},
                 gifts: {brendaId: new Gift(amount: 7, recipient: myId)},
@@ -81,7 +81,7 @@ void main() {
             new Round(
                 id: uuid(),
                 order: 2,
-                haunt: heistId1,
+                haunt: hauntId1,
                 team: new Set(),
                 bids: {
                   myId: new Bid(10),
@@ -92,11 +92,11 @@ void main() {
                 gifts: {},
                 startedAt: now())
           ],
-          heistId2: [
+          hauntId2: [
             new Round(
                 id: uuid(),
                 order: 1,
-                haunt: heistId2,
+                haunt: hauntId2,
                 team: new Set(),
                 gifts: {myId: new Gift(amount: 3, recipient: brendaId)},
                 bids: {myId: new Bid(2)},
@@ -110,14 +110,14 @@ void main() {
     // 8 + 7 (gift) - 10 (bid) + 2 (half of 13 split 3 ways) - 3 (gift) - 2 (proposed bid)
     expect(currentBalance(store.state), 2);
 
-    // 8 - 7 (gift) - bid (1) + 7 (half of 13) + 3 (gift)
-    expect(calculateBalanceFromStore(store, kingpin), 10);
+    // 8 - 7 (gift) - bid (1) + 6 (half of 13) + 3 (gift)
+    expect(calculateBalanceFromStore(store, kingpin), 9);
 
     // 8 - 1 (bid) + 2 (half of 13 split 3 ways)
     expect(calculateBalanceFromStore(store, leadAgent), 9);
 
-    // 8 - 1 (bid) + 2 (half of 13 split 3 ways)
-    expect(calculateBalanceFromStore(store, thief), 9);
+    // 8 - 1 (bid) + 3 (half of 13 split 3 ways)
+    expect(calculateBalanceFromStore(store, thief), 10);
   });
 
   test('randomly split', () {

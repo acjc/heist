@@ -15,23 +15,23 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-class HeistEnd extends StatefulWidget {
+class HauntEnd extends StatefulWidget {
   final Store<GameModel> _store;
 
-  HeistEnd(this._store);
+  HauntEnd(this._store);
 
   @override
   State<StatefulWidget> createState() {
-    return new HeistEndState(_store);
+    return new _HauntEndState(_store);
   }
 }
 
-class HeistEndState extends State<HeistEnd> {
+class _HauntEndState extends State<HauntEnd> {
   final Store<GameModel> _store;
 
-  HeistEndState(this._store);
+  _HauntEndState(this._store);
 
-  List<Widget> _heistDecisions(List<String> decisions) => new List.generate(
+  List<Widget> _hauntDecisions(List<String> decisions) => new List.generate(
         decisions.length,
         (i) {
           String decision = decisions[i];
@@ -50,7 +50,7 @@ class HeistEndState extends State<HeistEnd> {
 
   Widget _hauntContinueButton() {
     return new StoreConnector<GameModel, bool>(
-        converter: (store) => requestInProcess(store.state, Request.CompletingHeist),
+        converter: (store) => requestInProcess(store.state, Request.CompletingHaunt),
         distinct: true,
         builder: (context, completingHeist) => new Padding(
               padding: paddingSmall,
@@ -65,46 +65,46 @@ class HeistEndState extends State<HeistEnd> {
             ));
   }
 
-  Widget _heistIcon(bool wasSuccess) {
+  Widget _hauntIcon(bool wasSuccess) {
     return wasSuccess
         ? const Icon(Icons.verified_user, color: HeistColors.green, size: 40.0)
         : const Icon(Icons.cancel, color: Colors.red, size: 40.0);
   }
 
-  Widget _heistDetails(Haunt heist, int pot) => new Row(
+  Widget _hauntDetails(Haunt haunt, int pot) => new Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          new Text(AppLocalizations.of(context).hauntTitle(heist.order), style: boldTextStyle),
+          new Text(AppLocalizations.of(context).hauntTitle(haunt.order), style: boldTextStyle),
           new VerticalDivider(),
           iconText(
             new Icon(Icons.monetization_on, color: Colors.teal),
             new Text(pot.toString(), style: bigNumberTextStyle),
           ),
           new VerticalDivider(),
-          _heistIcon(heist.wasSuccess),
+          _hauntIcon(haunt.wasSuccess),
         ],
       );
 
   Widget _hauntResult(BuildContext context) {
-    Haunt heist = currentHaunt(_store.state);
-    List<String> decisions = new List.of(heist.decisions.values.toList());
+    Haunt haunt = currentHaunt(_store.state);
+    List<String> decisions = new List.of(haunt.decisions.values.toList());
     if (decisions.isEmpty) {
       return null;
     }
     int pot = currentRound(_store.state).pot;
-    decisions.shuffle(new Random(heist.id.hashCode));
+    decisions.shuffle(new Random(haunt.id.hashCode));
 
     List<Widget> children = [
-      _heistDetails(heist, pot),
+      _hauntDetails(haunt, pot),
       new Divider(),
-      heistTeam(context, _store, currentTeam(_store.state), currentLeader(_store.state)),
+      hauntTeam(context, _store, currentTeam(_store.state), currentLeader(_store.state)),
       new Divider(),
     ];
 
-    children.addAll(_heistDecisions(decisions));
+    children.addAll(_hauntDecisions(decisions));
 
-    int kingpinPayout = calculateBrendaPayout(newRandomForHaunt(heist), pot);
-    int leadAgentPayout = pot - kingpinPayout;
+    int brendaPayout = calculateBrendaPayout(newRandomForHaunt(haunt), pot);
+    int bertiePayout = pot - brendaPayout;
     TextStyle potResolutionTextStyle = const TextStyle(
       fontSize: 30.0,
       fontWeight: FontWeight.w300,
@@ -117,7 +117,7 @@ class HeistEndState extends State<HeistEnd> {
         child: new Column(
           children: [
             new Text(
-              '+$kingpinPayout',
+              '+$brendaPayout',
               style: potResolutionTextStyle,
             ),
             new Text(
@@ -133,7 +133,7 @@ class HeistEndState extends State<HeistEnd> {
         child: new Column(
           children: [
             new Text(
-              '+$leadAgentPayout',
+              '+$bertiePayout',
               style: potResolutionTextStyle,
             ),
             new Text(

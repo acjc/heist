@@ -299,7 +299,7 @@ class Haunt extends Document {
     List<String> decisions = this.decisions.values.toList();
     assert(decisions.length == numPlayers);
     int steals = decisions.where((d) => d == Steal).length;
-    return !decisions.contains(Fail) && steals < 2;
+    return !decisions.contains(Tickle) && steals < 2;
   }
 
   @override

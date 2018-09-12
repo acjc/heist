@@ -101,7 +101,7 @@ class SetUpNewGameAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
     _assignRoles(store);
-    // TODO: create all heists now to minimise how often we have to create new documents in the database
+    // TODO: create all haunts now to minimise how often we have to create new documents in the database
     String hauntId = await _createFirstHaunt(store);
     return _createFirstRound(store, hauntId);
   }

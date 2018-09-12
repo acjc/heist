@@ -13,7 +13,7 @@ void main() {
 
     await handle(store, new CompleteRoundAction());
     Round newRound = currentRound(store.state);
-    expect(getRounds(store.state)[newRound.heist].singleWhere((r) => r.order == 1).complete, true);
+    expect(getRounds(store.state)[newRound.haunt].singleWhere((r) => r.order == 1).complete, true);
     expect(newRound.complete, false);
     expect(newRound.order, 2);
   });
@@ -34,11 +34,11 @@ void main() {
     Store<GameModel> store = await initGame();
     String myId = getSelf(store.state).id;
 
-    await createNewRound(store, currentHeist(store.state).id, 2, myId);
+    await createNewRound(store, currentHaunt(store.state).id, 2, myId);
 
     Round round = currentRound(store.state);
     expect(round.order, 2);
     expect(round.leader, myId);
-    expect(getRounds(store.state)[round.heist].length, 2);
+    expect(getRounds(store.state)[round.haunt].length, 2);
   });
 }

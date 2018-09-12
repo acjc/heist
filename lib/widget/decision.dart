@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
-import 'package:heist/heist_definitions.dart';
-import 'package:heist/middleware/heist_middleware.dart';
+import 'package:heist/haunt_definitions.dart';
+import 'package:heist/middleware/haunt_middleware.dart';
 import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -16,7 +16,7 @@ Widget activeHeist(BuildContext context, Store<GameModel> store) {
     roundTitleCard(context, store),
     observeHeist(store),
   ];
-  if (goingOnHeist(store.state)) {
+  if (goingOnHaunt(store.state)) {
     children.add(
       makeDecision(context, store),
     );
@@ -26,7 +26,7 @@ Widget activeHeist(BuildContext context, Store<GameModel> store) {
 
 Widget observeHeist(Store<GameModel> store) {
   return new StoreConnector<GameModel, Map<String, String>>(
-      converter: (store) => currentHeist(store.state).decisions,
+      converter: (store) => currentHaunt(store.state).decisions,
       distinct: true,
       builder: (context, decisions) {
         return new Card(
@@ -34,8 +34,8 @@ Widget observeHeist(Store<GameModel> store) {
             child: new Container(
                 padding: paddingMedium,
                 child: new Column(children: [
-                  new Text(AppLocalizations.of(context).heistInProgress, style: infoTextStyle),
-                  new HeistGridView(
+                  new Text(AppLocalizations.of(context).hauntInProgress, style: infoTextStyle),
+                  new TeamGridView(
                     observeHeistChildren(
                       context,
                       currentTeam(store.state),
@@ -65,7 +65,7 @@ List<Widget> observeHeistChildren(
 
 Widget makeDecision(BuildContext context, Store<GameModel> store) =>
     new StoreConnector<GameModel, Map<String, String>>(
-        converter: (store) => currentHeist(store.state).decisions,
+        converter: (store) => currentHaunt(store.state).decisions,
         distinct: true,
         builder: (context, decisions) {
           Player me = getSelf(store.state);
@@ -83,9 +83,9 @@ Widget makeDecision(BuildContext context, Store<GameModel> store) =>
               new Column(
                 children: [],
               ),
-              decisionButton(context, store, Succeed, true),
-              decisionButton(context, store, Steal, me.role != KINGPIN.roleId),
-              decisionButton(context, store, Fail, getTeam(me.role) == Team.AGENTS),
+              decisionButton(context, store, Scare, true),
+              decisionButton(context, store, Steal, me.role != Roles.brenda.roleId),
+              decisionButton(context, store, Tickle, Roles.getTeam(me.role) == Team.FRIENDLY),
             ]);
           }
           return new Card(

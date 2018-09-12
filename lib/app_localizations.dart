@@ -41,43 +41,43 @@ class AppLocalizations {
 
   // Roles
 
-  String get leadAgent {
+  String get bertie {
     return Intl.message(
-      'Lead agent',
-      name: 'leadAgent',
-      desc: 'Lead agent role',
+      'Bertie',
+      name: 'bertie',
+      desc: 'Bertie role',
     );
   }
 
-  String get agent {
+  String get friendlyGhost {
     return Intl.message(
-      'Agent',
-      name: 'agent',
-      desc: 'Agent role',
+      'Friendly Ghost',
+      name: 'friendlyGhost',
+      desc: 'Friendly Ghost role',
     );
   }
 
-  String get kingpin {
+  String get brenda {
     return Intl.message(
-      'Kingpin',
-      name: 'kingpin',
-      desc: 'Kingpin role',
+      'Brenda',
+      name: 'brenda',
+      desc: 'Brenda',
     );
   }
 
-  String get accountant {
+  String get formerAccountantGhost {
     return Intl.message(
-      'Accountant',
-      name: 'accountant',
-      desc: 'Accountant role',
+      'Former Accountant Ghost',
+      name: 'formerAccountantGhost',
+      desc: 'Former Accountant Ghost role',
     );
   }
 
-  String get thief {
+  String get scaryGhost {
     return Intl.message(
-      'Thief',
-      name: 'thief',
-      desc: 'Thief role',
+      'Scary Ghost',
+      name: 'scaryGhost',
+      desc: 'Scary Ghost role',
     );
   }
 
@@ -87,7 +87,7 @@ class AppLocalizations {
     return Intl.message(
       'CONTINUE',
       name: 'continueButton',
-      desc: 'Button for the game organiser to move to the next round or heist',
+      desc: 'Button for the game organiser to move to the next round or haunt',
     );
   }
 
@@ -108,12 +108,12 @@ class AppLocalizations {
     );
   }
 
-  String heistTitle(int order) {
+  String hauntTitle(int order) {
     return Intl.message(
-      'Heist $order',
-      name: 'heistTitle',
+      'Haunt $order',
+      name: 'hauntTitle',
       args: [order],
-      desc: 'Heist title',
+      desc: 'Haunt title',
     );
   }
 
@@ -138,7 +138,7 @@ class AppLocalizations {
     return Intl.message(
       'Success',
       name: 'success',
-      desc: 'Status of a successful heist',
+      desc: 'Status of a successful haunt',
     );
   }
 
@@ -146,7 +146,7 @@ class AppLocalizations {
     return Intl.message(
       'Fail',
       name: 'fail',
-      desc: 'Status of a failed heist',
+      desc: 'Status of a failed haunt',
     );
   }
 
@@ -306,11 +306,11 @@ class AppLocalizations {
 
   // Decision
 
-  String get heistInProgress {
+  String get hauntInProgress {
     return Intl.message(
-      'Heist in progress...',
-      name: 'heistInProgress',
-      desc: 'Shown while a heist is in progress',
+      'Haunt in progress...',
+      name: 'hauntInProgress',
+      desc: 'Shown while a haunt is in progress',
     );
   }
 
@@ -318,7 +318,7 @@ class AppLocalizations {
     return Intl.message(
       'Make your choice...',
       name: 'makeYourChoice',
-      desc: 'Shown when you have to choose your result in a heist',
+      desc: 'Shown when you have to choose your result in a haunt',
     );
   }
 
@@ -326,25 +326,25 @@ class AppLocalizations {
     return Intl.message(
       'You have made your choice!',
       name: 'youHaveMadeYourChoice',
-      desc: 'Shown when a player on a heist has made a decision',
+      desc: 'Shown when a player on a haunt has made a decision',
     );
   }
 
-  String kingpinReceived(String kingpinDisplayName) {
+  String brendaReceived(String brendaDisplayName) {
     return Intl.message(
-      '...received by $kingpinDisplayName',
-      name: 'kingpinReceived',
-      args: [kingpinDisplayName],
-      desc: 'Describe how much money the Kingpin receives after a heist',
+      '...received by $brendaDisplayName',
+      name: 'brendaReceived',
+      args: [brendaDisplayName],
+      desc: 'Describe how much money Brenda receives after a haunt',
     );
   }
 
-  String sharedBetween(String leadAgentDisplayName, String stealOption) {
+  String sharedBetween(String bertieDisplayName, String stealOption) {
     return Intl.message(
-      '...shared between the $leadAgentDisplayName} and any players who chose $stealOption on the heist:',
+      '...shared between $bertieDisplayName} and any players who chose $stealOption on the haunt:',
       name: 'sharedBetween',
-      args: [leadAgentDisplayName, stealOption],
-      desc: 'Describe how much money gets split between the Lead Agent and those who stole',
+      args: [bertieDisplayName, stealOption],
+      desc: 'Describe how much money gets split between Bertie and those who stole',
     );
   }
 
@@ -432,53 +432,53 @@ class AppLocalizations {
     );
   }
 
-  String get leadAgentExplanation {
+  String get bertieExplanation {
     return Intl.message(
-      'You can try to guess who the Kingpin is ONCE during the game.'
+      'You can try to guess who Brenda is ONCE during the game.'
           ' If you get it right, you will no longer be restricted by maximum bid limits.',
-      name: 'leadAgentExplanation',
-      desc: 'Tells the lead agent what they can do',
+      name: 'bertieExplanation',
+      desc: 'Tells Bertie what they can do',
     );
   }
 
-  String get leadAgentPickPlayer {
+  String get bertiePickPlayer {
     return Intl.message(
       'SELECT YOUR KINGPIN GUESS',
-      name: 'leadAgentPickPlayer',
-      desc: 'Dropdown button where the lead agent selects a player',
+      name: 'bertiePickPlayer',
+      desc: 'Dropdown button where Bertie selects a player',
     );
   }
 
-  String get leadAgentConfirmPlayer {
+  String get bertieConfirmPlayer {
     return Intl.message(
       'CONFIRM GUESS',
-      name: 'leadAgentConfirmPlayer',
-      desc: 'Button for the lead agent to confirm the selected player',
+      name: 'bertieConfirmPlayer',
+      desc: 'Button for Bertie to confirm the selected player',
     );
   }
 
-  String leadAgentResult(String name, String result) {
+  String bertieResult(String name, String result) {
     return Intl.message(
-      'You checked if $name is the Kingpin. This is $result',
-      name: 'leadAgentResult',
+      'You checked if $name is Brenda. This is $result',
+      name: 'bertieResult',
       args: [name, result],
-      desc: 'Tells the lead agent whether they found the kingpin after their guess',
+      desc: 'Tells Bertie whether they found Brenda after their guess',
     );
   }
 
-  String get leadAgentResultRight {
+  String get bertieResultRight {
     return Intl.message(
       'CORRECT!',
-      name: 'leadAgentResultRight',
-      desc: 'The lead agent guessed who the kingpin is',
+      name: 'bertieResultRight',
+      desc: 'Bertie correctly guessed who Brenda is',
     );
   }
 
-  String get leadAgentResultWrong {
+  String get bertieResultWrong {
     return Intl.message(
       'INCORRECT! :(',
-      name: 'leadAgentResultWrong',
-      desc: 'The lead agent didn\'t guess who the kingpin is',
+      name: 'bertieResultWrong',
+      desc: 'Bertie failed to guess who Brenda is',
     );
   }
 
@@ -589,21 +589,21 @@ class AppLocalizations {
     );
   }
 
-  String heistPrice(int price) {
+  String hauntPrice(int price) {
     return Intl.message(
       'Price: $price',
-      name: 'heistPrice',
+      name: 'hauntPrice',
       args: [price],
-      desc: 'Price of a heist',
+      desc: 'Price of a haunt',
     );
   }
 
-  String heistPot(int pot) {
+  String hauntPot(int pot) {
     return Intl.message(
       'Pot: $pot',
-      name: 'heistPot',
+      name: 'hauntPot',
       args: [pot],
-      desc: 'Pot of a heist',
+      desc: 'Pot of a haunt',
     );
   }
 

@@ -1,44 +1,44 @@
 {
-  "@@last_modified": "2018-09-03T13:53:37.722526",
+  "@@last_modified": "2018-09-09T17:11:19.947559",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
     "type": "text",
     "placeholders": {}
   },
-  "leadAgent": "Lead agent",
-  "@leadAgent": {
-    "description": "Lead agent role",
+  "bertie": "Bertie",
+  "@bertie": {
+    "description": "Bertie role",
     "type": "text",
     "placeholders": {}
   },
-  "agent": "Agent",
-  "@agent": {
-    "description": "Agent role",
+  "friendlyGhost": "Friendly Ghost",
+  "@friendlyGhost": {
+    "description": "Friendly Ghost role",
     "type": "text",
     "placeholders": {}
   },
-  "kingpin": "Kingpin",
-  "@kingpin": {
-    "description": "Kingpin role",
+  "brenda": "Brenda",
+  "@brenda": {
+    "description": "Brenda",
     "type": "text",
     "placeholders": {}
   },
-  "accountant": "Accountant",
-  "@accountant": {
-    "description": "Accountant role",
+  "formerAccountantGhost": "Former Accountant Ghost",
+  "@formerAccountantGhost": {
+    "description": "Former Accountant Ghost role",
     "type": "text",
     "placeholders": {}
   },
-  "thief": "Thief",
-  "@thief": {
-    "description": "Thief role",
+  "scaryGhost": "Scary Ghost",
+  "@scaryGhost": {
+    "description": "Scary Ghost role",
     "type": "text",
     "placeholders": {}
   },
   "continueButton": "CONTINUE",
   "@continueButton": {
-    "description": "Button for the game organiser to move to the next round or heist",
+    "description": "Button for the game organiser to move to the next round or haunt",
     "type": "text",
     "placeholders": {}
   },
@@ -48,7 +48,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "roundTitle": "Ronda {order}",
+  "roundTitle": "Round {order}",
   "@roundTitle": {
     "description": "Round title",
     "type": "text",
@@ -56,9 +56,9 @@
       "order": {}
     }
   },
-  "heistTitle": "Atraco {order}",
-  "@heistTitle": {
-    "description": "Heist title",
+  "hauntTitle": "Haunt {order}",
+  "@hauntTitle": {
+    "description": "Haunt title",
     "type": "text",
     "placeholders": {
       "order": {}
@@ -70,7 +70,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "playerOrder": "Jugador {order}",
+  "playerOrder": "Player {order}",
   "@playerOrder": {
     "description": "Player order",
     "type": "text",
@@ -80,13 +80,13 @@
   },
   "success": "Success",
   "@success": {
-    "description": "Status of a successful heist",
+    "description": "Status of a successful haunt",
     "type": "text",
     "placeholders": {}
   },
   "fail": "Fail",
   "@fail": {
-    "description": "Status of a failed heist",
+    "description": "Status of a failed haunt",
     "type": "text",
     "placeholders": {}
   },
@@ -96,7 +96,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "enterYourName": "Escribe tu nombre",
+  "enterYourName": "Enter your name",
   "@enterYourName": {
     "description": "Above the text field where the player writes their name",
     "type": "text",
@@ -209,38 +209,38 @@
       "price": {}
     }
   },
-  "heistInProgress": "Heist in progress...",
-  "@heistInProgress": {
-    "description": "Shown while a heist is in progress",
+  "hauntInProgress": "Haunt in progress...",
+  "@hauntInProgress": {
+    "description": "Shown while a haunt is in progress",
     "type": "text",
     "placeholders": {}
   },
   "makeYourChoice": "Make your choice...",
   "@makeYourChoice": {
-    "description": "Shown when you have to choose your result in a heist",
+    "description": "Shown when you have to choose your result in a haunt",
     "type": "text",
     "placeholders": {}
   },
   "youHaveMadeYourChoice": "You have made your choice!",
   "@youHaveMadeYourChoice": {
-    "description": "Shown when a player on a heist has made a decision",
+    "description": "Shown when a player on a haunt has made a decision",
     "type": "text",
     "placeholders": {}
   },
-  "kingpinReceived": "...received by {kingpinDisplayName}",
-  "@kingpinReceived": {
-    "description": "Describe how much money the Kingpin receives after a heist",
+  "brendaReceived": "...received by {brendaDisplayName}",
+  "@brendaReceived": {
+    "description": "Describe how much money the Brenda receives after a haunt",
     "type": "text",
     "placeholders": {
-      "kingpinDisplayName": {}
+      "brendaDisplayName": {}
     }
   },
-  "sharedBetween": "...shared between the {leadAgentDisplayName}} and any players who chose {stealOption} on the heist:",
+  "sharedBetween": "...shared between the {bertieDisplayName}} and any players who chose {stealOption} on the haunt:",
   "@sharedBetween": {
-    "description": "Describe how much money gets split between the Lead Agent and those who stole",
+    "description": "Describe how much money gets split between the Bertie and those who stole",
     "type": "text",
     "placeholders": {
-      "leadAgentDisplayName": {},
+      "bertieDisplayName": {},
       "stealOption": {}
     }
   },
@@ -309,42 +309,42 @@
     "type": "text",
     "placeholders": {}
   },
-  "leadAgentExplanation": "You can try to guess who the Kingpin is ONCE during the game. If you get it right, you will no longer be restricted by maximum bid limits.",
-  "@leadAgentExplanation": {
-    "description": "Tells the lead agent what they can do",
+  "bertieExplanation": "You can try to guess who Brenda is ONCE during the game. If you get it right, you will no longer be restricted by maximum bid limits.",
+  "@bertieExplanation": {
+    "description": "Tells Bertie what they can do",
     "type": "text",
     "placeholders": {}
   },
-  "leadAgentPickPlayer": "SELECT YOUR KINGPIN GUESS",
-  "@leadAgentPickPlayer": {
-    "description": "Dropdown button where the lead agent selects a player",
+  "bertiePickPlayer": "SELECT YOUR KINGPIN GUESS",
+  "@bertiePickPlayer": {
+    "description": "Dropdown button where Bertie selects a player",
     "type": "text",
     "placeholders": {}
   },
-  "leadAgentConfirmPlayer": "CONFIRM GUESS",
-  "@leadAgentConfirmPlayer": {
-    "description": "Button for the lead agent to confirm the selected player",
+  "bertieConfirmPlayer": "CONFIRM GUESS",
+  "@bertieConfirmPlayer": {
+    "description": "Button for Bertie to confirm the selected player",
     "type": "text",
     "placeholders": {}
   },
-  "leadAgentResult": "You checked if {name} is the Kingpin. This is {result}",
-  "@leadAgentResult": {
-    "description": "Tells the lead agent whether they found the kingpin after their guess",
+  "bertieResult": "You checked if {name} is Brenda. This is {result}",
+  "@bertieResult": {
+    "description": "Tells Bertie whether they found Brenda after their guess",
     "type": "text",
     "placeholders": {
       "name": {},
       "result": {}
     }
   },
-  "leadAgentResultRight": "CORRECT!",
-  "@leadAgentResultRight": {
-    "description": "The lead agent guessed who the kingpin is",
+  "bertieResultRight": "CORRECT!",
+  "@bertieResultRight": {
+    "description": "Bertie correctly guessed who Brenda is",
     "type": "text",
     "placeholders": {}
   },
-  "leadAgentResultWrong": "INCORRECT! :(",
-  "@leadAgentResultWrong": {
-    "description": "The lead agent didn't guess who the kingpin is",
+  "bertieResultWrong": "INCORRECT! :(",
+  "@bertieResultWrong": {
+    "description": "Bertie failed to guess who Brenda is",
     "type": "text",
     "placeholders": {}
   },
@@ -378,17 +378,33 @@
       "recipientName": {}
     }
   },
-  "pickingTeam": "{name} is picking a team...",
-  "@pickingTeam": {
-    "description": "A player is picking a team",
+  "pickedYou": " picked you in the team!",
+  "@pickedYou": {
+    "description": "Leader picked you in the team",
     "type": "text",
-    "placeholders": {
-      "name": {}
-    }
+    "placeholders": {}
+  },
+  "notPicked": "You haven't been picked!",
+  "@notPicked": {
+    "description": "Leader has not picked you in the team",
+    "type": "text",
+    "placeholders": {}
+  },
+  "convince": "Convince ",
+  "@convince": {
+    "description": "Convince leader to pick you in the team (1 / 2)",
+    "type": "text",
+    "placeholders": {}
+  },
+  "putYouInTeam": " to put you in the team!",
+  "@putYouInTeam": {
+    "description": "Convince leader to pick you in the team (2 / 2)",
+    "type": "text",
+    "placeholders": {}
   },
   "pickATeam": "Pick a team: {playersPicked} / {teamSize}",
   "@pickATeam": {
-    "description": "Current team size over number of players needed, as seen by the team picker",
+    "description": "Team picker title",
     "type": "text",
     "placeholders": {
       "playersPicked": {},
@@ -397,7 +413,7 @@
   },
   "pickedTeamSize": "TEAM ({playersPicked} / {teamSize})",
   "@pickedTeamSize": {
-    "description": "Current team size over number of players needed, as seen by the players who aren't picking a team",
+    "description": "Selection board title",
     "type": "text",
     "placeholders": {
       "playersPicked": {},
@@ -419,17 +435,17 @@
       "role": {}
     }
   },
-  "heistPrice": "Price: {price}",
-  "@heistPrice": {
-    "description": "Price of a heist",
+  "hauntPrice": "Price: {price}",
+  "@hauntPrice": {
+    "description": "Price of a haunt",
     "type": "text",
     "placeholders": {
       "price": {}
     }
   },
-  "heistPot": "Pot: {pot}",
-  "@heistPot": {
-    "description": "Pot of a heist",
+  "hauntPot": "Pot: {pot}",
+  "@hauntPot": {
+    "description": "Pot of a haunt",
     "type": "text",
     "placeholders": {
       "pot": {}

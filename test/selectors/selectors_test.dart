@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:heist/db/database.dart';
 import 'package:heist/db/database_model.dart';
-import 'package:heist/heist_definitions.dart';
+import 'package:heist/haunt_definitions.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/game_middleware.dart';
 import 'package:heist/role.dart';
@@ -17,79 +17,88 @@ import '../test_utils.dart';
 void main() {
   test('calculate balance', () async {
     String myId = uuid();
-    String kingpinId = uuid();
-    String leadAgentId = uuid();
-    String thiefId = uuid();
-    String heistId1 = '#heist1';
-    String heistId2 = '#heist2';
+    String brendaId = uuid();
+    String bertieId = uuid();
+    String scaryId = uuid();
+    String hauntId1 = '#haunt1';
+    String hauntId2 = '#haunt2';
 
     Player kingpin =
-        new Player(id: kingpinId, installId: uuid(), name: '_other1', role: KINGPIN.roleId);
+        new Player(id: brendaId, installId: uuid(), name: '_other1', role: Roles.brenda.roleId);
     Player leadAgent =
-        new Player(id: leadAgentId, installId: uuid(), name: '_other2', role: LEAD_AGENT.roleId);
+        new Player(id: bertieId, installId: uuid(), name: '_other2', role: Roles.bertie.roleId);
     Player thief =
-        new Player(id: thiefId, installId: uuid(), name: '_other3', role: THIEF_1.roleId);
+        new Player(id: scaryId, installId: uuid(), name: '_other3', role: Roles.scaryGhost1.roleId);
 
     FirestoreDb db = new MockFirestoreDb(
         room: new Room(
             id: uuid(),
             code: 'ABCD',
             numPlayers: 2,
-            roles: new Set.of([KINGPIN.roleId, LEAD_AGENT.roleId, AGENT_1.roleId, THIEF_1.roleId])),
+            roles: new Set.of([
+              Roles.brenda.roleId,
+              Roles.bertie.roleId,
+              Roles.friendlyGhost1.roleId,
+              Roles.scaryGhost1.roleId
+            ])),
         players: [
-          new Player(id: myId, installId: DebugInstallId, name: '_name', role: AGENT_1.roleId),
+          new Player(
+              id: myId,
+              installId: DebugInstallId,
+              name: '_name',
+              role: Roles.friendlyGhost1.roleId),
           kingpin,
           leadAgent,
           thief,
         ],
-        heists: [
-          new Heist(
-              id: heistId1,
+        haunts: [
+          new Haunt(
+              id: hauntId1,
               price: 12,
               numPlayers: 4,
               maximumBid: 20,
               order: 1,
               decisions: {
                 myId: Steal,
-                kingpinId: Succeed,
-                leadAgentId: Fail,
-                thiefId: Steal,
+                brendaId: Scare,
+                bertieId: Tickle,
+                scaryId: Steal,
               },
               startedAt: now()),
-          new Heist(
-              id: heistId2, price: 12, numPlayers: 4, maximumBid: 20, order: 2, startedAt: now())
+          new Haunt(
+              id: hauntId2, price: 12, numPlayers: 4, maximumBid: 20, order: 2, startedAt: now())
         ],
         rounds: {
-          heistId1: [
+          hauntId1: [
             new Round(
                 id: uuid(),
                 order: 1,
-                heist: heistId1,
+                haunt: hauntId1,
                 team: new Set(),
                 bids: {},
-                gifts: {kingpinId: new Gift(amount: 7, recipient: myId)},
+                gifts: {brendaId: new Gift(amount: 7, recipient: myId)},
                 startedAt: now()),
             new Round(
                 id: uuid(),
                 order: 2,
-                heist: heistId1,
+                haunt: hauntId1,
                 team: new Set(),
                 bids: {
                   myId: new Bid(10),
-                  kingpinId: new Bid(1),
-                  leadAgentId: new Bid(1),
-                  thiefId: new Bid(1)
+                  brendaId: new Bid(1),
+                  bertieId: new Bid(1),
+                  scaryId: new Bid(1)
                 },
                 gifts: {},
                 startedAt: now())
           ],
-          heistId2: [
+          hauntId2: [
             new Round(
                 id: uuid(),
                 order: 1,
-                heist: heistId2,
+                haunt: hauntId2,
                 team: new Set(),
-                gifts: {myId: new Gift(amount: 3, recipient: kingpinId)},
+                gifts: {myId: new Gift(amount: 3, recipient: brendaId)},
                 bids: {myId: new Bid(2)},
                 startedAt: now())
           ]
@@ -101,14 +110,14 @@ void main() {
     // 8 + 7 (gift) - 10 (bid) + 2 (half of 13 split 3 ways) - 3 (gift) - 2 (proposed bid)
     expect(currentBalance(store.state), 2);
 
-    // 8 - 7 (gift) - bid (1) + 7 (half of 13) + 3 (gift)
-    expect(calculateBalanceFromStore(store, kingpin), 10);
+    // 8 - 7 (gift) - bid (1) + 6 (half of 13) + 3 (gift)
+    expect(calculateBalanceFromStore(store, kingpin), 9);
 
     // 8 - 1 (bid) + 2 (half of 13 split 3 ways)
     expect(calculateBalanceFromStore(store, leadAgent), 9);
 
-    // 8 - 1 (bid) + 2 (half of 13 split 3 ways)
-    expect(calculateBalanceFromStore(store, thief), 9);
+    // 8 - 1 (bid) + 3 (half of 13 split 3 ways)
+    expect(calculateBalanceFromStore(store, thief), 10);
   });
 
   test('randomly split', () {

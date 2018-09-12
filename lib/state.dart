@@ -20,7 +20,7 @@ class GameModel {
 
   final Room room;
   final List<Player> players;
-  final List<Heist> heists;
+  final List<Haunt> haunts;
   final Map<String, List<Round>> rounds;
 
   GameModel(
@@ -34,7 +34,7 @@ class GameModel {
       this.requests,
       this.room,
       this.players,
-      this.heists,
+      this.haunts,
       this.rounds});
 
   GameModel copyWith(
@@ -47,7 +47,7 @@ class GameModel {
       Set<Request> requests,
       Room room,
       List<Player> players,
-      List<Heist> heists,
+      List<Haunt> heists,
       Map<String, List<Round>> rounds}) {
     return new GameModel(
       db: this.db,
@@ -60,7 +60,7 @@ class GameModel {
       requests: requests ?? this.requests,
       room: room ?? this.room,
       players: players ?? this.players,
-      heists: heists ?? this.heists,
+      haunts: heists ?? this.haunts,
       rounds: rounds ?? this.rounds,
     );
   }
@@ -75,7 +75,7 @@ class GameModel {
       requests: new Set(),
       room: new Room.initial(numPlayers),
       players: [],
-      heists: [],
+      haunts: [],
       rounds: {});
 
   @override
@@ -91,7 +91,7 @@ class GameModel {
           requests == other.requests &&
           room == other.room &&
           players == other.players &&
-          heists == other.heists &&
+          haunts == other.haunts &&
           rounds == other.rounds;
 
   @override
@@ -105,12 +105,12 @@ class GameModel {
       requests.hashCode ^
       room.hashCode ^
       players.hashCode ^
-      heists.hashCode ^
+      haunts.hashCode ^
       rounds.hashCode;
 
   @override
   String toString() {
-    return 'GameModel{db: $db, subscriptions: $subscriptions, playerInstallId: $playerInstallId, playerName: $playerName, roomCode: $roomCode, bidAmount: $bidAmount, giftAmount: $giftAmount, requests: $requests, room: $room, players: $players, heists: $heists, rounds: $rounds}';
+    return 'GameModel{db: $db, subscriptions: $subscriptions, playerInstallId: $playerInstallId, playerName: $playerName, roomCode: $roomCode, bidAmount: $bidAmount, giftAmount: $giftAmount, requests: $requests, room: $room, players: $players, heists: $haunts, rounds: $rounds}';
   }
 }
 
@@ -132,9 +132,9 @@ enum Request {
   Bidding,
   Gifting,
   ResolvingAuction,
-  CompletingHeist,
+  CompletingHaunt,
   CompletingRound,
   CompletingGame,
-  GuessingKingpin,
+  GuessingBrenda,
   SelectingVisibleToAccountant,
 }

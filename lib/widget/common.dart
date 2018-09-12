@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heist/app_localizations.dart';
+import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -40,12 +41,12 @@ Widget loading() {
 
 Color decisionColour(String decision) {
   switch (decision) {
-    case 'SUCCEED':
-      return Colors.green;
-    case 'FAIL':
+    case 'SCARE':
+      return HeistColors.green;
+    case 'TICKLE':
       return Colors.red;
     case 'STEAL':
-      return Colors.blue;
+      return HeistColors.blue;
   }
   throw new ArgumentError.value(decision, 'decision', 'Unknown decision');
 }
@@ -66,21 +67,21 @@ class VerticalDivider extends StatelessWidget {
   }
 }
 
-Widget teamSelectionIcon(bool goingOnHeist, Color color, double size) {
-  return goingOnHeist
+Widget teamSelectionIcon(bool goingOnHaunt, Color color, double size) {
+  return goingOnHaunt
       ? new Icon(Icons.check_circle, color: color, size: size)
       : new Icon(Icons.do_not_disturb_alt, color: color, size: size);
 }
 
 Widget roundTitleIcon(IconData icon, String text) {
   return iconText(
-    new Icon(icon, color: Colors.teal, size: 32.0),
+    new Icon(icon, size: 32.0),
     new Text(text, style: infoTextStyle),
   );
 }
 
 Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
-  Heist heist = currentHeist(store.state);
+  Haunt haunt = currentHaunt(store.state);
   Round round = currentRound(store.state);
   String subtitle = round.isAuction
       ? AppLocalizations.of(context).auctionTitle
@@ -91,16 +92,16 @@ Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         new Text(
-          AppLocalizations.of(context).heistTitle(heist.order),
+          AppLocalizations.of(context).hauntTitle(haunt.order),
           style: boldTextStyle,
         ),
         new Text(subtitle, style: subtitleTextStyle),
       ],
     ),
     new VerticalDivider(),
-    roundTitleIcon(Icons.people, heist.numPlayers.toString()),
-    roundTitleIcon(Icons.monetization_on, heist.price.toString()),
-    roundTitleIcon(Icons.vertical_align_top, heist.maximumBid.toString()),
+    roundTitleIcon(Icons.people, haunt.numPlayers.toString()),
+    roundTitleIcon(Icons.bubble_chart, haunt.price.toString()),
+    roundTitleIcon(Icons.vertical_align_top, haunt.maximumBid.toString()),
   ];
 
   return new Row(
@@ -118,8 +119,8 @@ Widget roundTitleCard(BuildContext context, Store<GameModel> store) => new Card(
     );
 
 /// Widget for showing a 2-column grid
-class HeistGridView extends GridView {
-  HeistGridView(List<Widget> children, {double childAspectRatio = 6.0})
+class TeamGridView extends GridView {
+  TeamGridView(List<Widget> children, {double childAspectRatio = 6.0})
       : super.count(
           padding: paddingMedium,
           shrinkWrap: true,

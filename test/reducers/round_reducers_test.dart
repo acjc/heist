@@ -9,12 +9,12 @@ import '../test_utils.dart';
 void main() {
   test('test pick and remove player', () {
     String roundId = uuid();
-    String heistId = uuid();
+    String hauntId = uuid();
     String playerId = uuid();
     Round round =
-        new Round(id: roundId, order: 1, heist: heistId, team: new Set(), startedAt: now());
+        new Round(id: roundId, order: 1, haunt: hauntId, team: new Set(), startedAt: now());
     Map<String, List<Round>> rounds = {
-      heistId: [round]
+      hauntId: [round]
     };
     rounds = reduce(rounds, new PickPlayerAction(roundId, playerId));
     expect(round.team, contains(playerId));

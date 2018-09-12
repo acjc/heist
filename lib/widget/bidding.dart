@@ -59,11 +59,11 @@ Widget bidding(Store<GameModel> store) {
             requestInProcess(store.state, Request.Bidding),
             myCurrentBid(store.state),
             bidderNames(store.state),
-            haveGuessedKingpin(store.state),
+            haveGuessedBrenda(store.state),
           ),
       distinct: true,
       builder: (context, viewModel) {
-        Heist heist = currentHeist(store.state);
+        Haunt heist = currentHaunt(store.state);
         bool auction = isAuction(store.state);
 
         List<Widget> children = auction

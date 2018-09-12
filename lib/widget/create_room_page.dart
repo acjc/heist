@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
 import 'package:heist/app_localizations.dart';
+import 'package:heist/colors.dart';
 import 'package:heist/keys.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/room_middleware.dart';
@@ -47,9 +48,10 @@ class CreateRoomPage extends StatelessWidget {
             child: new Column(
               children: new List.generate(roles.length, (i) {
                 String roleId = roles.elementAt(i);
-                Color color = getTeam(roleId) == Team.THIEVES ? Colors.green : Colors.red;
+                Color color =
+                    Roles.getTeam(roleId) == Team.SCARY ? HeistColors.purple : HeistColors.peach;
                 return new Text(
-                  getRoleDisplayName(context, roleId),
+                  Roles.getRoleDisplayName(context, roleId),
                   style: new TextStyle(fontSize: 16.0, color: color, fontWeight: FontWeight.bold),
                 );
               }),

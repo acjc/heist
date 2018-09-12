@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:heist/db/database.dart';
 import 'package:heist/db/database_model.dart';
-import 'package:heist/heist_definitions.dart';
+import 'package:heist/haunt_definitions.dart';
 import 'package:heist/main.dart';
 import 'package:heist/reducers/form_reducers.dart';
 import 'package:heist/reducers/reducers.dart';
@@ -66,34 +66,34 @@ class SetUpNewGameAction extends MiddlewareAction {
     }
   }
 
-  Future<String> _createFirstHeist(Store<GameModel> store) async {
+  Future<String> _createFirstHaunt(Store<GameModel> store) async {
     FirestoreDb db = store.state.db;
     Room room = getRoom(store.state);
-    List<Heist> heists = getHeists(store.state);
-    if (heists.isEmpty) {
-      Heist heist = await db.getHeist(room.id, 1);
-      if (heist != null) {
-        return heist.id;
+    List<Haunt> haunts = getHaunts(store.state);
+    if (haunts.isEmpty) {
+      Haunt haunt = await db.getHaunt(room.id, 1);
+      if (haunt != null) {
+        return haunt.id;
       }
-      HeistDefinition heistDefinition = heistDefinitions[room.numPlayers][1];
-      Heist newHeist = new Heist(
-          price: heistDefinition.price,
-          numPlayers: heistDefinition.numPlayers,
-          maximumBid: heistDefinition.maximumBid,
+      HauntDefinition hauntDefinition = hauntDefinitions[room.numPlayers][1];
+      Haunt newHaunt = new Haunt(
+          price: hauntDefinition.price,
+          numPlayers: hauntDefinition.numPlayers,
+          maximumBid: hauntDefinition.maximumBid,
           order: 1,
           startedAt: now());
-      return db.upsertHeist(newHeist, room.id);
+      return db.upsertHaunt(newHaunt, room.id);
     }
-    return heists[0].id;
+    return haunts[0].id;
   }
 
-  Future<void> _createFirstRound(Store<GameModel> store, String heistId) async {
+  Future<void> _createFirstRound(Store<GameModel> store, String hauntId) async {
     FirestoreDb db = store.state.db;
     String roomId = getRoom(store.state).id;
-    if (!hasRounds(store.state) && !(await db.roundExists(roomId, heistId, 1))) {
+    if (!hasRounds(store.state) && !(await db.roundExists(roomId, hauntId, 1))) {
       String newLeader = getPlayers(store.state).singleWhere((p) => p.order == 1).id;
       Round round =
-          new Round(order: 1, heist: heistId, leader: newLeader, team: new Set(), startedAt: now());
+          new Round(order: 1, haunt: hauntId, leader: newLeader, team: new Set(), startedAt: now());
       return db.upsertRound(round, roomId);
     }
   }
@@ -101,9 +101,9 @@ class SetUpNewGameAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
     _assignRoles(store);
-    // TODO: create all heists now to minimise how often we have to create new documents in the database
-    String heistId = await _createFirstHeist(store);
-    return _createFirstRound(store, heistId);
+    // TODO: create all haunts now to minimise how often we have to create new documents in the database
+    String hauntId = await _createFirstHaunt(store);
+    return _createFirstRound(store, hauntId);
   }
 }
 
@@ -161,9 +161,9 @@ class LoadGameAction extends MiddlewareAction {
     FirestoreDb db = store.state.db;
     Room room = getRoom(store.state);
     String roomId = room.id ?? (await db.getRoomByCode(room.code)).id;
-    List<Heist> heists = await db.getHeists(roomId);
+    List<Haunt> haunts = await db.getHaunts(roomId);
 
-    _subscribe(store, roomId, heists);
+    _subscribe(store, roomId, haunts);
   }
 
   StreamSubscription<Room> _roomSubscription(Store<GameModel> store, String id) {
@@ -177,26 +177,26 @@ class LoadGameAction extends MiddlewareAction {
         roomId, (players) => store.dispatch(new UpdateStateAction<List<Player>>(players)));
   }
 
-  StreamSubscription<List<Heist>> _heistSubscription(Store<GameModel> store, String roomId) {
-    return store.state.db.listenOnHeists(
-        roomId, (heists) => store.dispatch(new UpdateStateAction<List<Heist>>(heists)));
+  StreamSubscription<List<Haunt>> _hauntSubscription(Store<GameModel> store, String roomId) {
+    return store.state.db.listenOnHaunts(
+        roomId, (haunts) => store.dispatch(new UpdateStateAction<List<Haunt>>(haunts)));
   }
 
   StreamSubscription<List<Round>> _roundSubscriptions(Store<GameModel> store, String roomId) {
     return store.state.db.listenOnRounds(roomId, (rounds) {
-      Map<String, List<Round>> roundMap = groupBy(rounds, (r) => r.heist);
+      Map<String, List<Round>> roundMap = groupBy(rounds, (r) => r.haunt);
       roundMap.values.forEach((rs) => rs.sort((r1, r2) => r1.order.compareTo(r2.order)));
       store.dispatch(new UpdateStateAction<Map<String, List<Round>>>(roundMap));
     });
   }
 
-  void _subscribe(Store<GameModel> store, String roomId, List<Heist> heists) {
+  void _subscribe(Store<GameModel> store, String roomId, List<Haunt> haunts) {
     assert(roomId != null);
 
     List<StreamSubscription> subs = [
       _roomSubscription(store, roomId),
       _playerSubscription(store, roomId),
-      _heistSubscription(store, roomId),
+      _hauntSubscription(store, roomId),
       _roundSubscriptions(store, roomId)
     ];
 

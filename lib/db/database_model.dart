@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:heist/heist_definitions.dart';
+import 'package:heist/haunt_definitions.dart';
 import 'package:heist/main.dart';
 import 'package:heist/role.dart';
 
@@ -42,7 +42,7 @@ class Room extends Document {
   final int numPlayers;
   final Set<String> roles;
   final Set<String> visibleToAccountant;
-  final String kingpinGuess; // player ID
+  final String brendaGuess; // player ID
 
   Room({
     id,
@@ -54,11 +54,11 @@ class Room extends Document {
     @required this.numPlayers,
     @required this.roles,
     this.visibleToAccountant,
-    this.kingpinGuess,
+    this.brendaGuess,
   }) : super(id: id);
 
   factory Room.initial(int numPlayers) =>
-      Room(numPlayers: numPlayers, roles: getRoleIds(numPlayersToRolesMap[numPlayers]));
+      Room(numPlayers: numPlayers, roles: Roles.getRoleIds(Roles.numPlayersToRolesMap[numPlayers]));
 
   Room copyWith({
     String id,
@@ -70,7 +70,7 @@ class Room extends Document {
     int numPlayers,
     Set<String> roles,
     Set<String> visibleToAccountant,
-    String kingpinGuess,
+    String brendaGuess,
   }) {
     return new Room(
       id: id ?? this.id,
@@ -82,7 +82,7 @@ class Room extends Document {
       numPlayers: numPlayers ?? this.numPlayers,
       roles: roles ?? this.roles,
       visibleToAccountant: visibleToAccountant ?? this.visibleToAccountant,
-      kingpinGuess: kingpinGuess ?? this.kingpinGuess,
+      brendaGuess: brendaGuess ?? this.brendaGuess,
     );
   }
 
@@ -97,7 +97,7 @@ class Room extends Document {
         numPlayers = json['numPlayers'],
         roles = _boolMapToSet(json['roles']?.cast<String, bool>()),
         visibleToAccountant = _boolMapToSet(json['visibleToAccountant']?.cast<String, bool>()),
-        kingpinGuess = json['kingpinGuess'],
+        brendaGuess = json['kingpinGuess'],
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -107,9 +107,9 @@ class Room extends Document {
         'owner': owner,
         'completedAt': completedAt,
         'numPlayers': numPlayers,
-        'roles': _toBoolMap(roles, getRoleIds(allRoles)),
+        'roles': _toBoolMap(roles, Roles.getRoleIds(Roles.allRoles)),
         'visibleToAccountant': _toBoolMap(visibleToAccountant, visibleToAccountant),
-        'kingpinGuessed': kingpinGuess,
+        'kingpinGuessed': brendaGuess,
       };
 
   bool get complete => completedAt != null;
@@ -124,7 +124,7 @@ class Room extends Document {
           roles == other.roles &&
           completedAt == other.completedAt &&
           visibleToAccountant == other.visibleToAccountant &&
-          kingpinGuess == other.kingpinGuess;
+          brendaGuess == other.brendaGuess;
 
   @override
   int get hashCode =>
@@ -134,11 +134,11 @@ class Room extends Document {
       roles.hashCode ^
       completedAt.hashCode ^
       visibleToAccountant.hashCode ^
-      kingpinGuess.hashCode;
+      brendaGuess.hashCode;
 
   @override
   String toString() {
-    return 'Room{code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles, visibleToAccountant: $visibleToAccountant, kingpinGuess: $kingpinGuess}';
+    return 'Room{code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles, visibleToAccountant: $visibleToAccountant, brendaGuess: $brendaGuess}';
   }
 }
 
@@ -221,7 +221,7 @@ class Player extends Document {
 }
 
 @immutable
-class Heist extends Document {
+class Haunt extends Document {
   final DocumentReference room;
   final int price;
   final int numPlayers;
@@ -231,7 +231,7 @@ class Heist extends Document {
   final Map<String, String> decisions;
   final DateTime completedAt;
 
-  Heist(
+  Haunt(
       {id,
       this.room,
       @required this.price,
@@ -243,7 +243,7 @@ class Heist extends Document {
       this.completedAt})
       : super(id: id);
 
-  Heist copyWith({
+  Haunt copyWith({
     String id,
     DocumentReference room,
     int price,
@@ -254,7 +254,7 @@ class Heist extends Document {
     Map<String, String> decisions, // player ID -> { SUCCEED, FAIL, STEAL }
     DateTime completedAt,
   }) {
-    return new Heist(
+    return new Haunt(
       id: id ?? this.id,
       room: room ?? this.room,
       price: price ?? this.price,
@@ -267,9 +267,9 @@ class Heist extends Document {
     );
   }
 
-  Heist.fromSnapshot(DocumentSnapshot snapshot) : this.fromJson(snapshot.documentID, snapshot.data);
+  Haunt.fromSnapshot(DocumentSnapshot snapshot) : this.fromJson(snapshot.documentID, snapshot.data);
 
-  Heist.fromJson(String id, Map<String, dynamic> json)
+  Haunt.fromJson(String id, Map<String, dynamic> json)
       : room = json['room'],
         price = json['price'],
         numPlayers = json['numPlayers'],
@@ -299,13 +299,13 @@ class Heist extends Document {
     List<String> decisions = this.decisions.values.toList();
     assert(decisions.length == numPlayers);
     int steals = decisions.where((d) => d == Steal).length;
-    return !decisions.contains(Fail) && steals < 2;
+    return !decisions.contains(Tickle) && steals < 2;
   }
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Heist &&
+      other is Haunt &&
           id == other.id &&
           decisions == other.decisions &&
           complete == other.complete;
@@ -315,7 +315,7 @@ class Heist extends Document {
 
   @override
   String toString() {
-    return 'Heist{room: $room, price: $price, numPlayers: $numPlayers, maximumBid: $maximumBid, order: $order, startedAt: $startedAt, decisions: $decisions, completedAt: $completedAt}';
+    return 'Haunt{room: $room, price: $price, numPlayers: $numPlayers, maximumBid: $maximumBid, order: $order, startedAt: $startedAt, decisions: $decisions, completedAt: $completedAt}';
   }
 }
 
@@ -380,7 +380,7 @@ class Round extends Document {
   final String leader;
   final int order;
   final DocumentReference room;
-  final String heist;
+  final String haunt;
   final DateTime startedAt;
   final Set<String> team; // player IDs
   final bool teamSubmitted;
@@ -393,7 +393,7 @@ class Round extends Document {
       this.leader,
       @required this.order,
       this.room,
-      @required this.heist,
+      @required this.haunt,
       @required this.startedAt,
       @required this.team,
       this.teamSubmitted = false,
@@ -407,7 +407,7 @@ class Round extends Document {
     String leader,
     int order,
     DocumentReference room,
-    String heist,
+    String haunt,
     DateTime startedAt,
     Set<String> team,
     bool teamSubmitted,
@@ -420,7 +420,7 @@ class Round extends Document {
       leader: leader ?? this.leader,
       order: order ?? this.order,
       room: room ?? this.room,
-      heist: heist ?? this.heist,
+      haunt: haunt ?? this.haunt,
       startedAt: startedAt ?? this.startedAt,
       team: team ?? this.team,
       teamSubmitted: teamSubmitted ?? this.teamSubmitted,
@@ -436,7 +436,7 @@ class Round extends Document {
       : leader = json['leader'],
         order = json['order'],
         room = json['room'],
-        heist = json['heist'],
+        haunt = json['heist'],
         startedAt = json['startedAt'],
         team = _boolMapToSet(json['team'].cast<String, bool>()),
         teamSubmitted = json['teamSubmitted'],
@@ -451,7 +451,7 @@ class Round extends Document {
         'leader': leader,
         'order': order,
         'room': room,
-        'heist': heist,
+        'heist': haunt,
         'startedAt': startedAt,
         'team': _toBoolMap(team, team),
         'teamSubmitted': teamSubmitted,
@@ -490,6 +490,6 @@ class Round extends Document {
 
   @override
   String toString() {
-    return 'Round{leader: $leader, order: $order, room: $room, heist: $heist, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts, completedAt: $completedAt}';
+    return 'Round{leader: $leader, order: $order, room: $room, haunt: $haunt, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts, completedAt: $completedAt}';
   }
 }

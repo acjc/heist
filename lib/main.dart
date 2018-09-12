@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/app_localizations.dart';
+import 'package:heist/colors.dart';
 import 'package:heist/db/database.dart';
 import 'package:heist/keys.dart';
 import 'package:heist/middleware/middleware.dart';
@@ -73,7 +74,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color primaryColor = Colors.deepOrange;
+    Color primaryColor = HeistColors.blue;
     return new StoreProvider(
       store: store,
       child: new MaterialApp(
@@ -81,6 +82,8 @@ class MyApp extends StatelessWidget {
         title: 'Heist', // can't localise this one because stuff hasn't been set up yet
         theme: new ThemeData(
           primaryColor: primaryColor,
+          accentColor: HeistColors.peach,
+          iconTheme: const IconThemeData(color: HeistColors.peach),
           buttonColor: primaryColor,
           indicatorColor: Colors.white,
         ),

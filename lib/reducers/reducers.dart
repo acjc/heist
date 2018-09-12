@@ -3,7 +3,7 @@ import 'package:heist/state.dart';
 import 'bid_amount_reducers.dart';
 import 'form_reducers.dart';
 import 'gift_amount_reducers.dart';
-import 'heist_reducers.dart';
+import 'haunt_reducers.dart';
 import 'player_reducers.dart';
 import 'request_reducers.dart';
 import 'room_reducers.dart';
@@ -22,7 +22,7 @@ GameModel gameModelReducer(GameModel gameModel, dynamic action) {
     requests: requestReducer(gameModel.requests, action),
     room: roomReducer(gameModel.room, action),
     players: playerReducer(gameModel.players, action),
-    heists: heistReducer(gameModel.heists, action),
+    haunts: hauntReducer(gameModel.haunts, action),
     rounds: roundReducer(gameModel.rounds, action),
   );
 }

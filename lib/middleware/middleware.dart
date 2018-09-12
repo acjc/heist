@@ -8,7 +8,7 @@ import 'package:redux_logging/redux_logging.dart';
 import 'bidding_middleware.dart';
 import 'game_middleware.dart';
 import 'gifting_middleware.dart';
-import 'heist_middleware.dart';
+import 'haunt_middleware.dart';
 import 'room_middleware.dart';
 import 'round_end_middleware.dart';
 import 'team_picker_middleware.dart';
@@ -29,10 +29,10 @@ List<Middleware<GameModel>> createMiddleware() {
     new TypedMiddleware<GameModel, MakeDecisionAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, ResolveAuctionWinnersAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, CompleteRoundAction>(_dispatchMiddleware),
-    new TypedMiddleware<GameModel, CompleteHeistAction>(_dispatchMiddleware),
+    new TypedMiddleware<GameModel, CompleteHauntAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, CompleteGameAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, AddVisibleToAccountantAction>(_dispatchMiddleware),
-    new TypedMiddleware<GameModel, GuessKingpinAction>(_dispatchMiddleware),
+    new TypedMiddleware<GameModel, GuessBrendaAction>(_dispatchMiddleware),
   ];
 
   // asserts only work in debug mode

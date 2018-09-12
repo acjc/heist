@@ -26,7 +26,7 @@ class SecretBoard extends StatefulWidget {
 
 class SecretBoardState extends State<SecretBoard> {
   final Store<GameModel> _store;
-  String _kingpinGuess;
+  String _brendaGuess;
   String _accountantSelection;
 
   SecretBoardState(this._store);
@@ -36,9 +36,9 @@ class SecretBoardState extends State<SecretBoard> {
       converter: (store) => new SecretBoardModel._(
           getSelf(store.state),
           getRoom(store.state).visibleToAccountant,
-          getRoom(store.state).kingpinGuess,
+          getRoom(store.state).brendaGuess,
           getRounds(store.state), // so that the accountant sees updated balances
-          requestInProcess(store.state, Request.GuessingKingpin),
+          requestInProcess(store.state, Request.GuessingBrenda),
           requestInProcess(store.state, Request.SelectingVisibleToAccountant)),
       distinct: true,
       builder: (context, viewModel) {
@@ -51,7 +51,7 @@ class SecretBoardState extends State<SecretBoard> {
         _addExtraIdsCardIfNeeded(viewModel.me, children);
         _addAccountantCardIfNeeded(viewModel.me, children, viewModel.selectingVisibleToAccountant);
         _addLeadAgentCardIfNeeded(
-            viewModel.me, children, viewModel.kingpinGuess, viewModel.guessingKingpin);
+            viewModel.me, children, viewModel.brendaGuess, viewModel.guessingBrenda);
 
         return new Column(children: [
           new Expanded(
@@ -128,7 +128,7 @@ class SecretBoardState extends State<SecretBoard> {
                     new Padding(
                       padding: paddingTitle,
                       child: new Text(
-                        "${getTeam(me.role).toString()}",
+                        "${Roles.getTeam(me.role).toString()}",
                         style: titleTextStyle,
                       ),
                     ),
@@ -137,7 +137,7 @@ class SecretBoardState extends State<SecretBoard> {
                       style: infoTextStyle,
                     ),
                     new Text(
-                      "${getRoleDisplayName(context, me.role)}",
+                      "${Roles.getRoleDisplayName(context, me.role)}",
                       style: titleTextStyle,
                     ),
                   ],
@@ -150,7 +150,7 @@ class SecretBoardState extends State<SecretBoard> {
 
   // show the identities the player knows, if any
   _addExtraIdsCardIfNeeded(final Player me, final List<Widget> children) {
-    if (getKnownIds(me.role) != null) {
+    if (Roles.getKnownIds(me.role) != null) {
       children.add(new Card(
           elevation: 2.0,
           child: new Padding(
@@ -162,7 +162,7 @@ class SecretBoardState extends State<SecretBoard> {
                     style: infoTextStyle,
                   ),
                   subtitle: new Text(
-                    "${_getFormattedKnownIds(getKnownIds(me.role))}",
+                    "${_getFormattedKnownIds(Roles.getKnownIds(me.role))}",
                     style: infoTextStyle,
                   ),
                 ),
@@ -173,8 +173,8 @@ class SecretBoardState extends State<SecretBoard> {
   String _getFormattedKnownIds(Set<String> knownIds) {
     String formattedKnownIds = "";
     knownIds?.forEach((roleId) {
-      formattedKnownIds += AppLocalizations.of(context)
-          .identity(getPlayerByRoleId(_store.state, roleId).name, getRoleDisplayName(context, roleId));
+      formattedKnownIds += AppLocalizations.of(context).identity(
+          getPlayerByRoleId(_store.state, roleId).name, Roles.getRoleDisplayName(context, roleId));
     });
     return formattedKnownIds;
   }
@@ -182,14 +182,14 @@ class SecretBoardState extends State<SecretBoard> {
   // show the balances the accountant knows, if needed
   _addAccountantCardIfNeeded(
       final Player me, final List<Widget> children, final bool selectingVisibleToAccountant) {
-    if (me.role == ACCOUNTANT.roleId) {
+    if (me.role == Roles.accountant.roleId) {
       final List<Widget> tiles = [];
-      // the accountant can reveal a balance per completed heist up to a maximum
+      // the accountant can reveal a balance per completed haunt up to a maximum
       // of half the number of players rounded down
-      int completedHeists =
-          getHeists(_store.state).where((heist) => heist.completedAt != null).length;
+      int completedHaunts =
+          getHaunts(_store.state).where((haunt) => haunt.completedAt != null).length;
       int numPlayers = getRoom(_store.state).numPlayers;
-      int maxBalances = min(completedHeists, (numPlayers / 2).floor());
+      int maxBalances = min(completedHaunts, (numPlayers / 2).floor());
       tiles.add(
         new ListTile(
           title: new Text(
@@ -249,25 +249,25 @@ class SecretBoardState extends State<SecretBoard> {
     }
   }
 
-  // show the UI to guess the kingpin, if needed
-  _addLeadAgentCardIfNeeded(final Player me, final List<Widget> children, final String kingpinGuess,
+  // show the UI to guess Brenda, if needed
+  _addLeadAgentCardIfNeeded(final Player me, final List<Widget> children, final String brendaGuess,
       final bool guessingKingpin) {
-    if (me.role == LEAD_AGENT.roleId) {
-      // the lead agent can try to guess who the kingpin is once during a game
+    if (me.role == Roles.bertie.roleId) {
+      // the lead agent can try to guess who Brenda is once during a game
       List<Widget> tiles = [
         new ListTile(
           title: new Text(
-            AppLocalizations.of(context).leadAgentExplanation,
+            AppLocalizations.of(context).bertieExplanation,
             style: infoTextStyle,
           ),
         )
       ];
 
-      if (kingpinGuess == null) {
+      if (brendaGuess == null) {
         List<String> pickablePlayers = getOtherPlayers(_store.state).map((p) => p.name).toList();
         tiles.add(new DropdownButton<String>(
-            hint: new Text(AppLocalizations.of(context).leadAgentPickPlayer, style: infoTextStyle),
-            value: _kingpinGuess,
+            hint: new Text(AppLocalizations.of(context).bertiePickPlayer, style: infoTextStyle),
+            value: _brendaGuess,
             items: pickablePlayers.map((String value) {
               return new DropdownMenuItem<String>(
                 value: value,
@@ -276,27 +276,27 @@ class SecretBoardState extends State<SecretBoard> {
             }).toList(),
             onChanged: (String newValue) {
               setState(() {
-                _kingpinGuess = newValue;
+                _brendaGuess = newValue;
               });
             }));
         tiles.add(new RaisedButton(
             child: new Text(
-              AppLocalizations.of(context).leadAgentConfirmPlayer,
+              AppLocalizations.of(context).bertieConfirmPlayer,
               style: buttonTextStyle,
             ),
             onPressed: guessingKingpin
                 ? null
                 : () => _store.dispatch(
-                    new GuessKingpinAction(getPlayerByName(_store.state, _kingpinGuess).id))));
+                    new GuessBrendaAction(getPlayerByName(_store.state, _brendaGuess).id))));
       } else {
-        final String kingpinGuessName = getPlayerById(_store.state, kingpinGuess).name;
-        final String result = haveGuessedKingpin(_store.state)
-            ? AppLocalizations.of(context).leadAgentResultRight
-            : AppLocalizations.of(context).leadAgentResultWrong;
+        final String brendaGuessName = getPlayerById(_store.state, brendaGuess).name;
+        final String result = haveGuessedBrenda(_store.state)
+            ? AppLocalizations.of(context).bertieResultRight
+            : AppLocalizations.of(context).bertieResultWrong;
         tiles.add(
           new ListTile(
             title: new Text(
-              AppLocalizations.of(context).leadAgentResult(kingpinGuessName, result),
+              AppLocalizations.of(context).bertieResult(brendaGuessName, result),
               style: infoTextStyle,
             ),
           ),
@@ -313,13 +313,13 @@ class SecretBoardState extends State<SecretBoard> {
 class SecretBoardModel {
   final Player me;
   final Set<String> visibleToAccountant;
-  final String kingpinGuess;
+  final String brendaGuess;
   final Map<String, List<Round>> rounds;
-  final bool guessingKingpin;
+  final bool guessingBrenda;
   final bool selectingVisibleToAccountant;
 
-  SecretBoardModel._(this.me, this.visibleToAccountant, this.kingpinGuess, this.rounds,
-      this.guessingKingpin, this.selectingVisibleToAccountant);
+  SecretBoardModel._(this.me, this.visibleToAccountant, this.brendaGuess, this.rounds,
+      this.guessingBrenda, this.selectingVisibleToAccountant);
 
   @override
   bool operator ==(Object other) =>
@@ -327,27 +327,27 @@ class SecretBoardModel {
       other is SecretBoardModel &&
           me == other.me &&
           visibleToAccountant == other.visibleToAccountant &&
-          kingpinGuess == other.kingpinGuess &&
+          brendaGuess == other.brendaGuess &&
           rounds == other.rounds &&
-          guessingKingpin == other.guessingKingpin &&
+          guessingBrenda == other.guessingBrenda &&
           selectingVisibleToAccountant == other.selectingVisibleToAccountant;
 
   @override
   int get hashCode =>
       me.hashCode ^
       visibleToAccountant.hashCode ^
-      kingpinGuess.hashCode ^
+      brendaGuess.hashCode ^
       rounds.hashCode ^
-      guessingKingpin.hashCode ^
+      guessingBrenda.hashCode ^
       selectingVisibleToAccountant.hashCode;
 
   @override
   String toString() {
     return 'SecretBoardModel{player: $me, '
         'visibleToAccountant: $visibleToAccountant, '
-        'kingpinGuess: $kingpinGuess, '
+        'brendaGuess: $brendaGuess, '
         'rounds: $rounds, '
-        'guessingKingpin: $guessingKingpin, '
+        'guessingBrenda: $guessingBrenda, '
         'selectingVisibleToAccountant: $selectingVisibleToAccountant}';
   }
 }

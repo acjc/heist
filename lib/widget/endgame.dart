@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heist/app_localizations.dart';
+import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
@@ -8,9 +9,9 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-List<Widget> playerDecisions(BuildContext context, Store<GameModel> store, Heist heist) {
+List<Widget> playerDecisions(BuildContext context, Store<GameModel> store, Haunt haunt) {
   List<Widget> heistDecisions = [];
-  heist.decisions.forEach((playerId, decision) {
+  haunt.decisions.forEach((playerId, decision) {
     Player player = getPlayerById(store.state, playerId);
     heistDecisions.add(
       new Row(
@@ -36,7 +37,8 @@ Text heistResultText(BuildContext context, bool wasSuccess) {
   return wasSuccess
       ? new Text(
           AppLocalizations.of(context).success.toUpperCase(),
-          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.green),
+          style: const TextStyle(
+              fontSize: 16.0, fontWeight: FontWeight.bold, color: HeistColors.green),
         )
       : new Text(
           AppLocalizations.of(context).fail.toUpperCase(),
@@ -44,26 +46,26 @@ Text heistResultText(BuildContext context, bool wasSuccess) {
         );
 }
 
-Widget heistSummary(BuildContext context, Store<GameModel> store, Heist heist, int pot) => new Card(
+Widget heistSummary(BuildContext context, Store<GameModel> store, Haunt haunt, int pot) => new Card(
     elevation: 2.0,
     child: new Container(
       padding: paddingMedium,
       child: new Column(
         children: [
           new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            new Text(AppLocalizations.of(context).heistTitle(heist.order), style: boldTextStyle),
-            heistResultText(context, heist.wasSuccess),
+            new Text(AppLocalizations.of(context).hauntTitle(haunt.order), style: boldTextStyle),
+            heistResultText(context, haunt.wasSuccess),
           ]),
           new Divider(),
           new Container(
             padding: paddingSmall,
             child: new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              new Text(AppLocalizations.of(context).heistPrice(heist.price), style: infoTextStyle),
-              new Text(AppLocalizations.of(context).heistPot(pot), style: infoTextStyle),
+              new Text(AppLocalizations.of(context).hauntPrice(haunt.price), style: infoTextStyle),
+              new Text(AppLocalizations.of(context).hauntPot(pot), style: infoTextStyle),
             ]),
           ),
           new Column(
-            children: playerDecisions(context, store, heist),
+            children: playerDecisions(context, store, haunt),
           ),
         ],
       ),
@@ -81,10 +83,11 @@ Widget winner(BuildContext context, Score score) => new Card(
                 child: new Text(AppLocalizations.of(context).winner(score.winner.toString()),
                     style: titleTextStyle)),
             new Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-              new Text(Team.THIEVES.toString(), style: infoTextStyle),
-              new Text(AppLocalizations.of(context).teamScores(score.thiefScore, score.agentScore),
+              new Text(Team.SCARY.toString(), style: infoTextStyle),
+              new Text(
+                  AppLocalizations.of(context).teamScores(score.scaryScore, score.friendlyScore),
                   style: new TextStyle(fontSize: 32.0)),
-              new Text(Team.AGENTS.toString(), style: infoTextStyle),
+              new Text(Team.FRIENDLY.toString(), style: infoTextStyle),
             ])
           ],
         ),
@@ -92,7 +95,7 @@ Widget winner(BuildContext context, Score score) => new Card(
     );
 
 Widget fullPlayerListForTeam(BuildContext context, List<Player> players, Team team, Color color) {
-  List<Player> playersInTeam = players.where((p) => getTeam(p.role) == team).toList();
+  List<Player> playersInTeam = players.where((p) => Roles.getTeam(p.role) == team).toList();
   return new Column(
     children: new List.generate(playersInTeam.length + 1, (i) {
       Player player = playersInTeam[0];
@@ -106,7 +109,7 @@ Widget fullPlayerListForTeam(BuildContext context, List<Player> players, Team te
               style: infoTextStyle,
             ),
             new Text(
-              getRoleDisplayName(context, player.role),
+              Roles.getRoleDisplayName(context, player.role),
               style: new TextStyle(color: color),
             ),
           ],
@@ -130,8 +133,8 @@ Widget fullPlayerList(BuildContext context, Store<GameModel> store) {
         new Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            fullPlayerListForTeam(context, players, Team.THIEVES, Colors.pink),
-            fullPlayerListForTeam(context, players, Team.AGENTS, Colors.purple),
+            fullPlayerListForTeam(context, players, Team.SCARY, Colors.pink),
+            fullPlayerListForTeam(context, players, Team.FRIENDLY, Colors.purple),
           ],
         )
       ]),
@@ -140,8 +143,8 @@ Widget fullPlayerList(BuildContext context, Store<GameModel> store) {
 }
 
 Widget endgame(BuildContext context, Store<GameModel> store) {
-  List<Heist> heists = getHeists(store.state);
-  Score score = calculateScore(heists);
+  List<Haunt> haunts = getHaunts(store.state);
+  Score score = calculateScore(haunts);
 
   List<Widget> children = [
     winner(context, score),
@@ -149,12 +152,10 @@ Widget endgame(BuildContext context, Store<GameModel> store) {
   ];
 
   Map<String, List<Round>> rounds = getRounds(store.state);
-  for (Heist heist in heists) {
-    Round lastRound = rounds[heist.id].last;
-    children.add(heistSummary(context, store, heist, lastRound.pot));
+  for (Haunt haunt in haunts) {
+    Round lastRound = rounds[haunt.id].last;
+    children.add(heistSummary(context, store, haunt, lastRound.pot));
   }
 
-  return new ListView(
-    children: children,
-  );
+  return new ListView(children: children);
 }

@@ -84,7 +84,7 @@ class GameState extends State<Game> {
   Widget _gameLoop(MainBoardViewModel viewModel) {
     // team picking (not needed for auctions)
     if (!isAuction(_store.state) && viewModel.waitingForTeam) {
-      return new TeamSelection(_store, isMyGo(_store.state));
+      return TeamSelection(_store, isMyGo(_store.state));
     }
 
     // bidding
@@ -94,7 +94,7 @@ class GameState extends State<Game> {
 
     // resolve round
     if (!viewModel.roundComplete) {
-      return appendGameHistory(roundEnd(context, _store));
+      return appendGameHistory(RoundEnd(_store));
     }
 
     // resolve auction
@@ -109,7 +109,7 @@ class GameState extends State<Game> {
 
     // go to next heist
     if (viewModel.heistDecided && !viewModel.heistComplete) {
-      return appendGameHistory(new HeistEnd(_store));
+      return appendGameHistory(HeistEnd(_store));
     }
 
     return null;
@@ -190,6 +190,7 @@ class GameState extends State<Game> {
           gameOver(store.state), requestInProcess(store.state, Request.CompletingGame)),
       distinct: true,
       builder: (context, viewModel) {
+//        return new RoundEnd(_store);
         if (!viewModel.gameIsReady) {
           return _loadingScreen();
         }

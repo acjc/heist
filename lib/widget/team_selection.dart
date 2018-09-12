@@ -123,13 +123,9 @@ class GhostieState extends State<Ghostie> with SingleTickerProviderStateMixin {
         } else {
           _controller.reverse();
         }
-        return new AnimationListenable<Offset>(
-          animation: _animation,
-          builder: (context, value, child) => new SlideTransition(
-                position: _animation,
-                child: child,
-              ),
-          staticChild: new Transform.rotate(
+        return new SlideTransition(
+          position: _animation,
+          child: new Transform.rotate(
             angle: pi / 15.0,
             child: const Image(
               image: const AssetImage('assets/graphics/ghostie.png'),

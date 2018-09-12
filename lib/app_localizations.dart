@@ -335,16 +335,16 @@ class AppLocalizations {
       '...received by $brendaDisplayName',
       name: 'brendaReceived',
       args: [brendaDisplayName],
-      desc: 'Describe how much money the Brenda receives after a haunt',
+      desc: 'Describe how much money Brenda receives after a haunt',
     );
   }
 
   String sharedBetween(String bertieDisplayName, String stealOption) {
     return Intl.message(
-      '...shared between the $bertieDisplayName} and any players who chose $stealOption on the haunt:',
+      '...shared between $bertieDisplayName} and any players who chose $stealOption on the haunt:',
       name: 'sharedBetween',
       args: [bertieDisplayName, stealOption],
-      desc: 'Describe how much money gets split between the Bertie and those who stole',
+      desc: 'Describe how much money gets split between Bertie and those who stole',
     );
   }
 

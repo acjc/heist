@@ -132,7 +132,7 @@ enum Request {
   Bidding,
   Gifting,
   ResolvingAuction,
-  CompletingHeist,
+  CompletingHaunt,
   CompletingRound,
   CompletingGame,
   GuessingBrenda,

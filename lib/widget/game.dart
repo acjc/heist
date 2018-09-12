@@ -18,7 +18,7 @@ import 'package:heist/widget/decision.dart';
 import 'package:heist/widget/endgame.dart';
 import 'package:heist/widget/game_history.dart';
 import 'package:heist/widget/gifting.dart';
-import 'package:heist/widget/heist_end.dart';
+import 'package:heist/widget/haunt_end.dart';
 import 'package:heist/widget/round_end.dart';
 import 'package:heist/widget/secret_board.dart';
 import 'package:heist/widget/selection_board.dart';
@@ -102,14 +102,14 @@ class GameState extends State<Game> {
       return _resolveAuctionWinners(viewModel.resolvingAuction);
     }
 
-    // active heist
-    if (viewModel.heistIsActive) {
+    // active haunt
+    if (viewModel.hauntIsActive) {
       return appendGameHistory(activeHeist(context, _store));
     }
 
-    // go to next heist
-    if (viewModel.heistDecided && !viewModel.heistComplete) {
-      return appendGameHistory(new HeistEnd(_store));
+    // go to next haunt
+    if (viewModel.hauntDecided && !viewModel.hauntComplete) {
+      return appendGameHistory(new HauntEnd(_store));
     }
 
     return null;
@@ -125,16 +125,16 @@ class GameState extends State<Game> {
   Widget _mainBoardBody() => new StoreConnector<GameModel, MainBoardViewModel>(
         ignoreChange: (gameModel) => currentHaunt(gameModel) != null,
         converter: (store) {
-          Haunt heist = currentHaunt(store.state);
+          Haunt haunt = currentHaunt(store.state);
           Round round = currentRound(store.state);
           return new MainBoardViewModel._(
             waitingForTeam: !round.teamSubmitted,
             biddingComplete: biddingComplete(store.state),
             resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
             roundComplete: round.complete,
-            heistIsActive: hauntIsActive(store.state),
-            heistDecided: heist.allDecided,
-            heistComplete: heist.complete,
+            hauntIsActive: hauntIsActive(store.state),
+            hauntDecided: haunt.allDecided,
+            hauntComplete: haunt.complete,
           );
         },
         distinct: true,
@@ -283,18 +283,18 @@ class MainBoardViewModel {
   final bool biddingComplete;
   final bool resolvingAuction;
   final bool roundComplete;
-  final bool heistIsActive;
-  final bool heistDecided;
-  final bool heistComplete;
+  final bool hauntIsActive;
+  final bool hauntDecided;
+  final bool hauntComplete;
 
   MainBoardViewModel._(
       {@required this.waitingForTeam,
       @required this.biddingComplete,
       @required this.resolvingAuction,
       @required this.roundComplete,
-      @required this.heistIsActive,
-      @required this.heistDecided,
-      @required this.heistComplete});
+      @required this.hauntIsActive,
+      @required this.hauntDecided,
+      @required this.hauntComplete});
 
   @override
   bool operator ==(Object other) =>
@@ -305,9 +305,9 @@ class MainBoardViewModel {
           biddingComplete == other.biddingComplete &&
           resolvingAuction == other.resolvingAuction &&
           roundComplete == other.roundComplete &&
-          heistIsActive == other.heistIsActive &&
-          heistDecided == other.heistDecided &&
-          heistComplete == other.heistComplete;
+          hauntIsActive == other.hauntIsActive &&
+          hauntDecided == other.hauntDecided &&
+          hauntComplete == other.hauntComplete;
 
   @override
   int get hashCode =>
@@ -315,13 +315,13 @@ class MainBoardViewModel {
       biddingComplete.hashCode ^
       resolvingAuction.hashCode ^
       roundComplete.hashCode ^
-      heistIsActive.hashCode ^
-      heistDecided.hashCode ^
-      heistComplete.hashCode;
+      hauntIsActive.hashCode ^
+      hauntDecided.hashCode ^
+      hauntComplete.hashCode;
 
   @override
   String toString() {
-    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, heistIsActive: $heistIsActive, heistDecided: $heistDecided, heistComplete: $heistComplete}';
+    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, hauntIsActive: $hauntIsActive, hauntDecided: $hauntDecided, hauntComplete: $hauntComplete}';
   }
 }
 

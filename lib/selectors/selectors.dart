@@ -4,7 +4,7 @@ import 'package:reselect/reselect.dart';
 
 export 'bidding_selectors.dart';
 export 'gifting_selectors.dart';
-export 'heist_selectors.dart';
+export 'haunt_selectors.dart';
 export 'player_selectors.dart';
 export 'setup_selectors.dart';
 export 'team_picker_selectors.dart';

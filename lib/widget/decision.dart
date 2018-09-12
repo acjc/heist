@@ -83,9 +83,9 @@ Widget makeDecision(BuildContext context, Store<GameModel> store) =>
               new Column(
                 children: [],
               ),
-              decisionButton(context, store, Succeed, true),
+              decisionButton(context, store, Scare, true),
               decisionButton(context, store, Steal, me.role != Roles.brenda.roleId),
-              decisionButton(context, store, Fail, Roles.getTeam(me.role) == Team.FRIENDLY),
+              decisionButton(context, store, Tickle, Roles.getTeam(me.role) == Team.FRIENDLY),
             ]);
           }
           return new Card(

@@ -37,10 +37,10 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
 
   TeamSelectionState(this._store);
 
-  Animation<Color> _getPulseTween(bool goingOnHeist, bool fullTeam) {
+  Animation<Color> _getPulseTween(bool goingOnHaunt, bool fullTeam) {
     if (fullTeam) {
-      Color beginColor = goingOnHeist ? Colors.green : Colors.redAccent;
-      Color endColor = goingOnHeist ? HeistColors.green : HeistColors.peach;
+      Color beginColor = goingOnHaunt ? Colors.green : Colors.redAccent;
+      Color endColor = goingOnHaunt ? HeistColors.green : HeistColors.peach;
       return new ColorTween(begin: beginColor, end: endColor).animate(_pulseController)
         ..addStatusListener((status) {
           if (status == AnimationStatus.completed) {
@@ -50,19 +50,19 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
           }
         });
     }
-    return new ConstantTween<Color>(goingOnHeist ? HeistColors.green : HeistColors.peach)
+    return new ConstantTween<Color>(goingOnHaunt ? HeistColors.green : HeistColors.peach)
         .animate(_pulseController);
   }
 
   @protected
-  void _setUpPulse(bool goingOnHeist, bool fullTeam) {
+  void _setUpPulse(bool goingOnHaunt, bool fullTeam) {
     _pulseController?.dispose();
     _pulseController = null;
     _pulseController = new AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    _pulseAnimation = _getPulseTween(goingOnHeist, fullTeam);
+    _pulseAnimation = _getPulseTween(goingOnHaunt, fullTeam);
     _pulseController.forward();
   }
 
@@ -148,9 +148,9 @@ class WaitForTeamState extends TeamSelectionState {
         distinct: true,
         converter: (store) => goingOnHaunt(store.state),
         onInit: (store) => _setUpPulse(goingOnHaunt(store.state), currentTeamIsFull(store.state)),
-        onWillChange: (goingOnHeist) => _setUpPulse(goingOnHeist, currentTeamIsFull(_store.state)),
+        onWillChange: (goingOnHaunt) => _setUpPulse(goingOnHaunt, currentTeamIsFull(_store.state)),
         onDispose: (gameModel) => _pulseController?.dispose(),
-        builder: (context, goingOnHeist) {
+        builder: (context, goingOnHaunt) {
           int playersRequired = currentHaunt(_store.state).numPlayers;
           Player leader = currentLeader(_store.state);
           return new AnimationListenable<Color>(
@@ -158,7 +158,7 @@ class WaitForTeamState extends TeamSelectionState {
             builder: (context, value, child) => new Container(color: value, child: child),
             staticChild: new Column(
               children: [
-                _tokenCard(goingOnHeist, leader.name),
+                _tokenCard(goingOnHaunt, leader.name),
                 _ghosties(playersRequired),
               ],
             ),
@@ -166,9 +166,9 @@ class WaitForTeamState extends TeamSelectionState {
         },
       );
 
-  Widget _waitForTeamMessage(bool goingOnHeist, String leaderName) {
+  Widget _waitForTeamMessage(bool goingOnHaunt, String leaderName) {
     const TextStyle defaultTextStyle = const TextStyle(color: Colors.black87, fontSize: 16.0);
-    if (goingOnHeist) {
+    if (goingOnHaunt) {
       return new RichText(
         textAlign: TextAlign.center,
         text: new TextSpan(
@@ -202,7 +202,7 @@ class WaitForTeamState extends TeamSelectionState {
     );
   }
 
-  Widget _tokenCard(bool goingOnHeist, String leaderName) => new Expanded(
+  Widget _tokenCard(bool goingOnHaunt, String leaderName) => new Expanded(
         child: new Padding(
           padding: paddingMedium,
           child: new Card(
@@ -214,9 +214,9 @@ class WaitForTeamState extends TeamSelectionState {
                 children: [
                   new AnimationListenable<Color>(
                     animation: _pulseAnimation,
-                    builder: (context, value, _) => teamSelectionIcon(goingOnHeist, value, 250.0),
+                    builder: (context, value, _) => teamSelectionIcon(goingOnHaunt, value, 250.0),
                   ),
-                  _waitForTeamMessage(goingOnHeist, leaderName),
+                  _waitForTeamMessage(goingOnHaunt, leaderName),
                   new Column(
                     children: [
                       new Divider(),
@@ -249,20 +249,20 @@ class TeamPickerState extends TeamSelectionState {
       onDispose: (gameModel) => _pulseController?.dispose(),
       builder: (context, team) {
         int playersRequired = currentHaunt(_store.state).numPlayers;
-        bool amGoingOnHeist = goingOnHaunt(_store.state);
+        bool amGoingOnHaunt = goingOnHaunt(_store.state);
         return new AnimationListenable<Color>(
           animation: _pulseAnimation,
           builder: (context, value, child) => new Container(color: value, child: child),
           staticChild: new Column(
             children: [
-              _teamPickerCard(amGoingOnHeist, team, playersRequired),
+              _teamPickerCard(amGoingOnHaunt, team, playersRequired),
               _ghosties(playersRequired),
             ],
           ),
         );
       });
 
-  Widget _teamPickerCard(bool goingOnHeist, Set<Player> team, int playersRequired) => new Expanded(
+  Widget _teamPickerCard(bool goingOnHaunt, Set<Player> team, int playersRequired) => new Expanded(
         child: Padding(
           padding: paddingMedium,
           child: new Card(
@@ -274,7 +274,7 @@ class TeamPickerState extends TeamSelectionState {
                 children: [
                   new AnimationListenable<Color>(
                     animation: _pulseAnimation,
-                    builder: (context, value, _) => teamSelectionIcon(goingOnHeist, value, 100.0),
+                    builder: (context, value, _) => teamSelectionIcon(goingOnHaunt, value, 100.0),
                   ),
                   new Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,

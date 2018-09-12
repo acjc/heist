@@ -9,9 +9,9 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-List<Widget> playerDecisions(BuildContext context, Store<GameModel> store, Haunt heist) {
+List<Widget> playerDecisions(BuildContext context, Store<GameModel> store, Haunt haunt) {
   List<Widget> heistDecisions = [];
-  heist.decisions.forEach((playerId, decision) {
+  haunt.decisions.forEach((playerId, decision) {
     Player player = getPlayerById(store.state, playerId);
     heistDecisions.add(
       new Row(
@@ -46,26 +46,26 @@ Text heistResultText(BuildContext context, bool wasSuccess) {
         );
 }
 
-Widget heistSummary(BuildContext context, Store<GameModel> store, Haunt heist, int pot) => new Card(
+Widget heistSummary(BuildContext context, Store<GameModel> store, Haunt haunt, int pot) => new Card(
     elevation: 2.0,
     child: new Container(
       padding: paddingMedium,
       child: new Column(
         children: [
           new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            new Text(AppLocalizations.of(context).hauntTitle(heist.order), style: boldTextStyle),
-            heistResultText(context, heist.wasSuccess),
+            new Text(AppLocalizations.of(context).hauntTitle(haunt.order), style: boldTextStyle),
+            heistResultText(context, haunt.wasSuccess),
           ]),
           new Divider(),
           new Container(
             padding: paddingSmall,
             child: new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              new Text(AppLocalizations.of(context).hauntPrice(heist.price), style: infoTextStyle),
+              new Text(AppLocalizations.of(context).hauntPrice(haunt.price), style: infoTextStyle),
               new Text(AppLocalizations.of(context).hauntPot(pot), style: infoTextStyle),
             ]),
           ),
           new Column(
-            children: playerDecisions(context, store, heist),
+            children: playerDecisions(context, store, haunt),
           ),
         ],
       ),
@@ -143,8 +143,8 @@ Widget fullPlayerList(BuildContext context, Store<GameModel> store) {
 }
 
 Widget endgame(BuildContext context, Store<GameModel> store) {
-  List<Haunt> heists = getHaunts(store.state);
-  Score score = calculateScore(heists);
+  List<Haunt> haunts = getHaunts(store.state);
+  Score score = calculateScore(haunts);
 
   List<Widget> children = [
     winner(context, score),
@@ -152,12 +152,10 @@ Widget endgame(BuildContext context, Store<GameModel> store) {
   ];
 
   Map<String, List<Round>> rounds = getRounds(store.state);
-  for (Haunt heist in heists) {
-    Round lastRound = rounds[heist.id].last;
-    children.add(heistSummary(context, store, heist, lastRound.pot));
+  for (Haunt haunt in haunts) {
+    Round lastRound = rounds[haunt.id].last;
+    children.add(heistSummary(context, store, haunt, lastRound.pot));
   }
 
-  return new ListView(
-    children: children,
-  );
+  return new ListView(children: children);
 }

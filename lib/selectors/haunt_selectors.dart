@@ -26,17 +26,17 @@ class Score {
   Team get winner => scaryScore >= 3 ? Team.SCARY : Team.FRIENDLY;
 }
 
-final Selector<GameModel, bool> gameOver = createSelector1(getHaunts, (List<Haunt> heists) {
-  Score score = calculateScore(heists);
+final Selector<GameModel, bool> gameOver = createSelector1(getHaunts, (List<Haunt> haunts) {
+  Score score = calculateScore(haunts);
   return score.scaryScore >= 3 || score.friendlyScore >= 3;
 });
 
-Score calculateScore(List<Haunt> heists) {
+Score calculateScore(List<Haunt> haunts) {
   int scaryScore = 0;
   int friendlyScore = 0;
-  for (Haunt heist in heists) {
-    if (heist.allDecided) {
-      if (heist.wasSuccess) {
+  for (Haunt haunt in haunts) {
+    if (haunt.allDecided) {
+      if (haunt.wasSuccess) {
         scaryScore++;
       } else {
         friendlyScore++;

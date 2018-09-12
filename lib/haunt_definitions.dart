@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 
-const String Succeed = 'SCARE';
+const String Scare = 'SCARE';
 const String Steal = 'STEAL';
-const String Fail = 'TICKLE';
+const String Tickle = 'TICKLE';
 
 class HauntDefinition {
   final int numPlayers;
@@ -13,7 +13,7 @@ class HauntDefinition {
       {@required this.numPlayers, @required this.price, @required this.maximumBid});
 }
 
-/// total players -> { order -> heist }
+/// total players -> { order -> haunt }
 const Map<int, Map<int, HauntDefinition>> hauntDefinitions = {
   2: {
     1: const HauntDefinition(numPlayers: 2, price: 8, maximumBid: 5),

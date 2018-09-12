@@ -26,9 +26,9 @@ class MakeDecisionAction extends MiddlewareAction {
 class CompleteHauntAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
-    store.dispatch(new StartRequestAction(Request.CompletingHeist));
+    store.dispatch(new StartRequestAction(Request.CompletingHaunt));
 
-    return withRequest(Request.CompletingHeist, store, (store) async {
+    return withRequest(Request.CompletingHaunt, store, (store) async {
       String currentHauntId = currentHaunt(store.state).id;
       if (!gameOver(store.state)) {
         await toNextHaunt(store);

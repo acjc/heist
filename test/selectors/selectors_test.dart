@@ -110,14 +110,14 @@ void main() {
     // 8 + 7 (gift) - 10 (bid) + 2 (half of 13 split 3 ways) - 3 (gift) - 2 (proposed bid)
     expect(currentBalance(store.state), 2);
 
-    // 8 - 7 (gift) - bid (1) + 7 (half of 13) + 3 (gift)
-    expect(calculateBalanceFromStore(store, kingpin), 10);
+    // 8 - 7 (gift) - bid (1) + 6 (half of 13) + 3 (gift)
+    expect(calculateBalanceFromStore(store, kingpin), 9);
 
     // 8 - 1 (bid) + 2 (half of 13 split 3 ways)
     expect(calculateBalanceFromStore(store, leadAgent), 9);
 
-    // 8 - 1 (bid) + 2 (half of 13 split 3 ways)
-    expect(calculateBalanceFromStore(store, thief), 9);
+    // 8 - 1 (bid) + 3 (half of 13 split 3 ways)
+    expect(calculateBalanceFromStore(store, thief), 10);
   });
 
   test('randomly split', () {

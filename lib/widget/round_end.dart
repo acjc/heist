@@ -22,11 +22,10 @@ class RoundEnd extends StatefulWidget {
 }
 
 class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
-  static const double _barHeight = 350.0;
+  static const double _thresholdHeight = 250.0;
   static const double _barWidth = 75.0;
   static const double _labelContainerWidth = 75.0;
   static const double _labelContainerHeight = 100.0;
-  static const double _potLabelMaxOffset = _barHeight / _labelContainerHeight;
 
   static const double _fontSize = 50.0;
 
@@ -43,23 +42,24 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
   @override
   initState() {
     super.initState();
-    _controller =
-        new AnimationController(duration: const Duration(milliseconds: 4000), vsync: this);
-    _potAnimation = new Tween(begin: 1.0, end: _barHeight)
-        .animate(new CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
-    _potLabelAnimation = new Tween(
-      begin: Offset(0.0, 0.0),
-      end: Offset(0.0, -_potLabelMaxOffset),
-    ).animate(new CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
   }
 
-  void _setUpBidAnimation(double barHeight, double labelMaxOffset) {
-    _bidAnimation = new Tween(begin: 1.0, end: barHeight)
-        .animate(new CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
-    _bidLabelAnimation = new Tween(
+  void _setUpAnimation(double potBarHeight, double bidBarHeight) {
+    _controller = AnimationController(duration: const Duration(milliseconds: 4000), vsync: this);
+
+    _potAnimation = Tween(begin: 1.0, end: potBarHeight)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
+    _potLabelAnimation = Tween(
       begin: Offset(0.0, 0.0),
-      end: Offset(0.0, -labelMaxOffset),
-    ).animate(new CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
+      end: Offset(0.0, -(potBarHeight / _labelContainerHeight)),
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
+
+    _bidAnimation = Tween(begin: 1.0, end: bidBarHeight)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
+    _bidLabelAnimation = Tween(
+      begin: Offset(0.0, 0.0),
+      end: Offset(0.0, -(bidBarHeight / _labelContainerHeight)),
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
     _controller.repeat();
   }
 
@@ -89,11 +89,18 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
         : Colors.grey;
   }
 
-  Widget _potBarLabel(int pot, int price) => AnimationListenable(
-        animation: _potLabelAnimation,
+  int _potBarLabelAmount(int pot, int price, double potBarHeight, double value) {
+    if (value <= _thresholdHeight) {
+      return ((value / _thresholdHeight) * price).round();
+    }
+    return ((value / potBarHeight) * pot).round();
+  }
+
+  Widget _potBarLabel(int pot, int price, double potBarHeight) => AnimationListenable(
+        animation: _potAnimation,
         builder: (context, value, child) {
-          int ratio = ((value.distance / _potLabelMaxOffset) * pot).round();
-          Color color = _potBarColor(context, ratio >= price);
+          int amount = _potBarLabelAmount(pot, price, potBarHeight, value);
+          Color color = _potBarColor(context, amount >= price);
           return SlideTransition(
             position: _potLabelAnimation,
             child: Container(
@@ -102,7 +109,7 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    ratio.toString(),
+                    amount.toString(),
                     style: new TextStyle(
                       fontSize: _fontSize,
                       fontWeight: FontWeight.bold,
@@ -119,11 +126,11 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
         },
       );
 
-  Widget _potBarBox(int pot, int price) => AnimationListenable(
+  Widget _potBarBox(int pot, int price, double potBarHeight) => AnimationListenable(
         animation: _potAnimation,
         builder: (context, value, child) {
-          int ratio = ((value / _barHeight) * pot).round();
-          Color color = _potBarColor(context, ratio >= price);
+          int amount = ((value / potBarHeight) * pot).round();
+          Color color = _potBarColor(context, amount >= price);
           return Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -145,13 +152,13 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
         },
       );
 
-  Widget _potBar(int pot, int price) {
+  Widget _potBar(int pot, int price, double potBarHeight) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        _potBarLabel(pot, price),
-        _potBarBox(pot, price),
+        _potBarLabel(pot, price, potBarHeight),
+        _potBarBox(pot, price, potBarHeight),
         Container(width: _labelContainerWidth),
       ],
     );
@@ -166,8 +173,8 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
   Widget _bidBarBox(int bid, double bidBarHeight) => AnimationListenable(
         animation: _bidAnimation,
         builder: (context, value, child) {
-          int ratio = ((value / bidBarHeight) * bid).round();
-          Color barColor = _bidBarColor(ratio == bid);
+          int amount = ((value / bidBarHeight) * bid).round();
+          Color barColor = _bidBarColor(amount == bid);
           return Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -213,13 +220,13 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
         },
       );
 
-  Widget _bidBar(int bid, double bidBarHeight, double bidLabelMaxOffset) => Row(
+  Widget _bidBar(int bid, double bidBarHeight) => Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Container(width: _labelContainerWidth),
           _bidBarBox(bid, bidBarHeight),
-          _bidBarLabel(bid, bidLabelMaxOffset),
+          _bidBarLabel(bid, bidBarHeight / _labelContainerHeight),
         ],
       );
 
@@ -229,17 +236,48 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
         : null;
   }
 
+  Widget _thresholdLine(int price) => Row(
+        children: [
+          Column(
+            children: [
+              Text(
+                price.toString(),
+                style: const TextStyle(
+                  fontSize: 32.0,
+                  fontWeight: FontWeight.w300,
+                  color: HeistColors.amber,
+                ),
+              ),
+              Text('Price', style: const TextStyle(color: HeistColors.amber)),
+            ],
+          ),
+          Container(
+            margin: paddingMedium,
+            height: 1.5,
+            width: 225.0,
+            color: HeistColors.amber,
+          ),
+        ],
+      );
+
+  double getPotBarHeight(int pot, int price) {
+//    if (hauntIsActive(_store.state)) {
+    return pot == price ? _thresholdHeight : _thresholdHeight + 150.0;
+//    }
+    return (pot / price) * _thresholdHeight;
+  }
+
   Widget _barStack() {
     Haunt haunt = currentHaunt(_store.state);
     Round round = currentRound(_store.state);
     int pot = round.pot;
-    pot = 27;
+    pot = 30;
 //    int bid = myCurrentBid(_store.state).amount;
-    int bid = 9;
+    int bid = 5;
     Decoration background = _backgroundDecoration();
-    double bidBarHeight = (bid / pot) * _barHeight;
-    double bidLabelMaxOffset = bidBarHeight / _labelContainerHeight;
-    _setUpBidAnimation(bidBarHeight, bidLabelMaxOffset);
+    double potBarHeight = getPotBarHeight(pot, haunt.price);
+    double bidBarHeight = (bid / pot) * potBarHeight;
+    _setUpAnimation(potBarHeight, bidBarHeight);
     return Container(
       padding: paddingLarge,
       decoration: background,
@@ -248,9 +286,14 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
         child: Padding(
           padding: paddingTiny,
           child: Stack(
+            alignment: Alignment.bottomLeft,
             children: [
-              _potBar(pot, haunt.price),
-              _bidBar(bid, bidBarHeight, bidLabelMaxOffset),
+              _potBar(pot, haunt.price, potBarHeight),
+              _bidBar(bid, bidBarHeight),
+              Positioned(
+                bottom: _thresholdHeight,
+                child: _thresholdLine(haunt.price),
+              ),
             ],
           ),
         ),

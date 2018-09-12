@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-04T21:55:49.285905",
+  "@@last_modified": "2018-09-09T17:08:10.675824",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -378,17 +378,33 @@
       "recipientName": {}
     }
   },
-  "pickingTeam": "{name} is picking a team...",
-  "@pickingTeam": {
-    "description": "A player is picking a team",
+  "pickedYou": " picked you in the team!",
+  "@pickedYou": {
+    "description": "Leader picked you in the team",
     "type": "text",
-    "placeholders": {
-      "name": {}
-    }
+    "placeholders": {}
+  },
+  "notPicked": "You haven't been picked!",
+  "@notPicked": {
+    "description": "Leader has not picked you in the team",
+    "type": "text",
+    "placeholders": {}
+  },
+  "convince": "Convince ",
+  "@convince": {
+    "description": "Convince leader to pick you in the team (1 / 2)",
+    "type": "text",
+    "placeholders": {}
+  },
+  "putYouInTeam": " to put you in the team!",
+  "@putYouInTeam": {
+    "description": "Convince leader to pick you in the team (2 / 2)",
+    "type": "text",
+    "placeholders": {}
   },
   "pickATeam": "Pick a team: {playersPicked} / {teamSize}",
   "@pickATeam": {
-    "description": "Current team size over number of players needed, as seen by the team picker",
+    "description": "Team picker title",
     "type": "text",
     "placeholders": {
       "playersPicked": {},
@@ -397,7 +413,7 @@
   },
   "pickedTeamSize": "TEAM ({playersPicked} / {teamSize})",
   "@pickedTeamSize": {
-    "description": "Current team size over number of players needed, as seen by the players who aren't picking a team",
+    "description": "Selection board title",
     "type": "text",
     "placeholders": {
       "playersPicked": {},

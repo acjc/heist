@@ -8,7 +8,7 @@ import 'package:heist/heist_definitions.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
-import 'package:heist/widget/team_picker.dart';
+import 'package:heist/widget/selection_board.dart';
 import 'package:redux/redux.dart';
 
 Widget heistDecisions(Heist heist) {
@@ -25,7 +25,7 @@ Widget heistDecisions(Heist heist) {
           )),
     );
   });
-  return new HeistGridView(children, 8.0);
+  return new HeistGridView(children, childAspectRatio: 8.0);
 }
 
 Widget heistTeam(BuildContext context, Store<GameModel> store, Set<Player> team, Player leader) {

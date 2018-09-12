@@ -9,6 +9,7 @@ import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
+import 'package:heist/widget/game_history.dart';
 import 'package:heist/widget/player_info.dart';
 import 'package:redux/redux.dart';
 
@@ -52,7 +53,14 @@ class SecretBoardState extends State<SecretBoard> {
         _addLeadAgentCardIfNeeded(
             viewModel.me, children, viewModel.kingpinGuess, viewModel.guessingKingpin);
 
-        return new Column(children: children);
+        return new Column(children: [
+          new Expanded(
+            child: new ListView(
+              children: children,
+            ),
+          ),
+          gameHistory(_store),
+        ]);
       });
 
   Widget _playerList() => new StoreConnector<GameModel, List<Player>>(

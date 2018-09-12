@@ -66,6 +66,12 @@ class VerticalDivider extends StatelessWidget {
   }
 }
 
+Widget teamSelectionIcon(bool goingOnHeist, Color color, double size) {
+  return goingOnHeist
+      ? new Icon(Icons.check_circle, color: color, size: size)
+      : new Icon(Icons.do_not_disturb_alt, color: color, size: size);
+}
+
 Widget roundTitleIcon(IconData icon, String text) {
   return iconText(
     new Icon(icon, color: Colors.teal, size: 32.0),
@@ -73,7 +79,7 @@ Widget roundTitleIcon(IconData icon, String text) {
   );
 }
 
-Widget roundTitle(BuildContext context, Store<GameModel> store) {
+Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
   Heist heist = currentHeist(store.state);
   Round round = currentRound(store.state);
   String subtitle = round.isAuction
@@ -97,25 +103,27 @@ Widget roundTitle(BuildContext context, Store<GameModel> store) {
     roundTitleIcon(Icons.vertical_align_top, heist.maximumBid.toString()),
   ];
 
-  return new Card(
-    elevation: 2.0,
-    child: new Padding(
-      padding: paddingSmall,
-      child: new Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: children,
-      ),
-    ),
+  return new Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: children,
   );
 }
 
+Widget roundTitleCard(BuildContext context, Store<GameModel> store) => new Card(
+      elevation: 2.0,
+      child: new Padding(
+        padding: paddingSmall,
+        child: roundTitleContents(context, store),
+      ),
+    );
+
 /// Widget for showing a 2-column grid
 class HeistGridView extends GridView {
-  HeistGridView(List<Widget> children, [double childAspectRatio])
+  HeistGridView(List<Widget> children, {double childAspectRatio = 6.0})
       : super.count(
           padding: paddingMedium,
           shrinkWrap: true,
-          childAspectRatio: childAspectRatio ?? 6.0,
+          childAspectRatio: childAspectRatio,
           crossAxisCount: 2,
           primary: false,
           crossAxisSpacing: 10.0,

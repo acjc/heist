@@ -45,7 +45,7 @@ void main() {
 
     expect(store.state.subscriptions.subs, isNotEmpty);
     expect(store.state.room.numPlayers, 2);
-    expect(store.state.room.roles, new Set.of(['KINGPIN', 'LEAD_AGENT']));
+    expect(store.state.room.roles, new Set.of(['BRENDA', 'BERTIE']));
     expect(store.state.players.length, store.state.room.numPlayers);
     for (Player player in store.state.players) {
       expect(player.role, isNotNull);

@@ -41,23 +41,19 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m11(playersPicked, teamSize) => "TEAM (${playersPicked} / ${teamSize})";
 
-  static m12(name, amount) => "${name} bid ${amount}";
+  static m12(order) => "Player ${order}";
 
-  static m13(order) => "Player ${order}";
+  static m13(name, role) => "${name} (${role}) ->";
 
-  static m14(name, role) => "${name} (${role}) ->";
+  static m14(order) => "Round ${order}";
 
-  static m15(order) => "Round ${order}";
+  static m15(bertieDisplayName, stealOption) => "...shared between ${bertieDisplayName}} and any players who chose ${stealOption} on the haunt:";
 
-  static m16(bertieDisplayName, stealOption) => "...shared between the ${bertieDisplayName}} and any players who chose ${stealOption} on the haunt:";
+  static m16(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
 
-  static m17(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
+  static m17(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
 
-  static m18(pot, price) => "Total pot = ${pot} / ${price}";
-
-  static m19(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
-
-  static m20(winner) => "${winner} win!";
+  static m18(winner) => "${winner} win!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -93,6 +89,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "gameTab" : MessageLookupByLibrary.simpleMessage("GAME"),
     "giftAlreadySent" : m5,
     "giftingTitle" : MessageLookupByLibrary.simpleMessage("GIFTING"),
+    "goingAhead" : MessageLookupByLibrary.simpleMessage("The haunt is going ahead!"),
     "hauntInProgress" : MessageLookupByLibrary.simpleMessage("Haunt in progress..."),
     "hauntPot" : m6,
     "hauntPrice" : m7,
@@ -103,31 +100,34 @@ class MessageLookup extends MessageLookupByLibrary {
     "invalidCode" : MessageLookupByLibrary.simpleMessage("Invalid code"),
     "makeYourChoice" : MessageLookupByLibrary.simpleMessage("Make your choice..."),
     "noBid" : MessageLookupByLibrary.simpleMessage("No Bid"),
+    "notEnough" : MessageLookupByLibrary.simpleMessage("Not enough ectoplasm for this haunt!"),
     "notPicked" : MessageLookupByLibrary.simpleMessage("You haven\'t been picked!"),
     "otherIdentities" : MessageLookupByLibrary.simpleMessage("You also know these identities:"),
     "pickATeam" : m10,
     "pickedTeamSize" : m11,
     "pickedYou" : MessageLookupByLibrary.simpleMessage(" picked you in the team!"),
-    "playerBid" : m12,
-    "playerOrder" : m13,
-    "playerRole" : m14,
+    "playerOrder" : m12,
+    "playerRole" : m13,
     "players" : MessageLookupByLibrary.simpleMessage("Players"),
     "pleaseEnterAName" : MessageLookupByLibrary.simpleMessage("Please enter a name"),
+    "pot" : MessageLookupByLibrary.simpleMessage("Pot"),
+    "price" : MessageLookupByLibrary.simpleMessage("Price"),
     "putYouInTeam" : MessageLookupByLibrary.simpleMessage(" to put you in the team!"),
-    "roundTitle" : m15,
+    "roundTitle" : m14,
     "scaryGhost" : MessageLookupByLibrary.simpleMessage("Scary Ghost"),
     "secretTab" : MessageLookupByLibrary.simpleMessage("SECRET"),
-    "sharedBetween" : m16,
+    "sharedBetween" : m15,
     "submitBid" : MessageLookupByLibrary.simpleMessage("SUBMIT BID"),
     "submitTeam" : MessageLookupByLibrary.simpleMessage("SUBMIT TEAM"),
     "success" : MessageLookupByLibrary.simpleMessage("Success"),
-    "teamScores" : m17,
+    "teamScores" : m16,
     "title" : MessageLookupByLibrary.simpleMessage("Heist"),
-    "totalPot" : m18,
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),
-    "waitingForPlayers" : m19,
-    "winner" : m20,
+    "waitingForPlayers" : m17,
+    "winner" : m18,
+    "youAreGoing" : MessageLookupByLibrary.simpleMessage("You\'re going on a haunt!"),
     "youHaveMadeYourChoice" : MessageLookupByLibrary.simpleMessage("You have made your choice!"),
+    "yourBid" : MessageLookupByLibrary.simpleMessage("Your bid"),
     "yourRole" : MessageLookupByLibrary.simpleMessage("Your role is:"),
     "yourTeam" : MessageLookupByLibrary.simpleMessage("You are in team:")
   };

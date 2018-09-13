@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-09T17:11:19.947559",
+  "@@last_modified": "2018-09-13T23:39:03.972490",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -191,23 +191,38 @@
     "type": "text",
     "placeholders": {}
   },
-  "playerBid": "{name} bid {amount}",
-  "@playerBid": {
-    "description": "How much a player has bid",
+  "pot": "Pot",
+  "@pot": {
     "type": "text",
-    "placeholders": {
-      "name": {},
-      "amount": {}
-    }
+    "placeholders": {}
   },
-  "totalPot": "Total pot = {pot} / {price}",
-  "@totalPot": {
-    "description": "Round pot over round price",
+  "price": "Price",
+  "@price": {
     "type": "text",
-    "placeholders": {
-      "pot": {},
-      "price": {}
-    }
+    "placeholders": {}
+  },
+  "yourBid": "Your bid",
+  "@yourBid": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "youAreGoing": "You're going on a haunt!",
+  "@youAreGoing": {
+    "description": "Bidding phase result",
+    "type": "text",
+    "placeholders": {}
+  },
+  "goingAhead": "The haunt is going ahead!",
+  "@goingAhead": {
+    "description": "Bidding phase result",
+    "type": "text",
+    "placeholders": {}
+  },
+  "notEnough": "Not enough ectoplasm for this haunt!",
+  "@notEnough": {
+    "description": "Bidding phase result",
+    "type": "text",
+    "placeholders": {}
   },
   "hauntInProgress": "Haunt in progress...",
   "@hauntInProgress": {
@@ -229,15 +244,15 @@
   },
   "brendaReceived": "...received by {brendaDisplayName}",
   "@brendaReceived": {
-    "description": "Describe how much money the Brenda receives after a haunt",
+    "description": "Describe how much money Brenda receives after a haunt",
     "type": "text",
     "placeholders": {
       "brendaDisplayName": {}
     }
   },
-  "sharedBetween": "...shared between the {bertieDisplayName}} and any players who chose {stealOption} on the haunt:",
+  "sharedBetween": "...shared between {bertieDisplayName}} and any players who chose {stealOption} on the haunt:",
   "@sharedBetween": {
-    "description": "Describe how much money gets split between the Bertie and those who stole",
+    "description": "Describe how much money gets split between Bertie and those who stole",
     "type": "text",
     "placeholders": {
       "bertieDisplayName": {},

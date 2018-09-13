@@ -80,6 +80,16 @@ Widget roundTitleIcon(IconData icon, String text) {
   );
 }
 
+Widget titleSubtitle(String title, String subtitle) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      new Text(title, style: boldTextStyle),
+      new Text(subtitle, style: subtitleTextStyle),
+    ],
+  );
+}
+
 Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
   Haunt haunt = currentHaunt(store.state);
   Round round = currentRound(store.state);
@@ -88,16 +98,7 @@ Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
       : AppLocalizations.of(context).roundTitle(round.order);
 
   List<Widget> children = [
-    new Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        new Text(
-          AppLocalizations.of(context).hauntTitle(haunt.order),
-          style: boldTextStyle,
-        ),
-        new Text(subtitle, style: subtitleTextStyle),
-      ],
-    ),
+    titleSubtitle(AppLocalizations.of(context).hauntTitle(haunt.order), subtitle),
     new VerticalDivider(),
     roundTitleIcon(Icons.people, haunt.numPlayers.toString()),
     roundTitleIcon(Icons.bubble_chart, haunt.price.toString()),

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/animations/animation_listenable.dart';
@@ -22,7 +24,7 @@ class RoundEnd extends StatefulWidget {
 }
 
 class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
-  static const double _thresholdHeight = 250.0;
+  static const double _thresholdHeight = 225.0;
   static const double _barWidth = 75.0;
   static const double _labelContainerWidth = 75.0;
   static const double _labelContainerHeight = 100.0;
@@ -35,18 +37,25 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
   Animation<Offset> _potLabelAnimation;
   Animation<double> _bidAnimation;
   Animation<Offset> _bidLabelAnimation;
+
+  Animation<double> _iconAnimation;
+
   AnimationController _controller;
 
   _RoundEndState(this._store);
 
   @override
   initState() {
-    super.initState();
+    _controller = AnimationController(duration: const Duration(milliseconds: 4000), vsync: this);
+    _iconAnimation = Tween(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Interval(0.8, 1.0, curve: Curves.easeIn),
+      ),
+    );
   }
 
   void _setUpAnimation(double potBarHeight, double bidBarHeight) {
-    _controller = AnimationController(duration: const Duration(milliseconds: 4000), vsync: this);
-
     _potAnimation = Tween(begin: 1.0, end: potBarHeight)
         .animate(CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
     _potLabelAnimation = Tween(
@@ -230,9 +239,9 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
         ],
       );
 
-  Decoration _backgroundDecoration() {
-    return hauntIsActive(_store.state)
-        ? BoxDecoration(color: goingOnHaunt(_store.state) ? HeistColors.green : HeistColors.peach)
+  Decoration _backgroundDecoration(bool hauntIsActive, bool goingOnHaunt) {
+    return hauntIsActive
+        ? BoxDecoration(color: goingOnHaunt ? HeistColors.green : HeistColors.peach)
         : null;
   }
 
@@ -242,11 +251,7 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
             children: [
               Text(
                 price.toString(),
-                style: const TextStyle(
-                  fontSize: 32.0,
-                  fontWeight: FontWeight.w300,
-                  color: HeistColors.amber,
-                ),
+                style: const TextStyle(fontSize: 32.0, color: HeistColors.amber),
               ),
               Text('Price', style: const TextStyle(color: HeistColors.amber)),
             ],
@@ -260,9 +265,57 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
         ],
       );
 
-  double getPotBarHeight(int pot, int price) {
+  String _headerSummaryText(bool hauntIsActive, bool goingOnHaunt) {
+    return hauntIsActive
+        ? (goingOnHaunt ? "You're going on a haunt!" : 'The haunt is going ahead!')
+        : 'Not enough ectoplasm for this haunt!';
+  }
+
+  Widget _headerSummaryIcon(bool hauntIsActive, bool goingOnHaunt) {
+    double size = 80.0;
+    return hauntIsActive
+        ? teamSelectionIcon(
+            goingOnHaunt,
+            goingOnHaunt ? HeistColors.green : HeistColors.peach,
+            size,
+          )
+        : Icon(Icons.warning, color: Colors.grey, size: size);
+  }
+
+  Widget _header(Haunt haunt, Round round, bool hauntIsActive, bool goingOnHaunt) {
+    return Column(
+      children: [
+        Padding(
+          padding: paddingSmall,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              titleSubtitle(
+                AppLocalizations.of(context).hauntTitle(haunt.order),
+                AppLocalizations.of(context).roundTitle(round.order),
+              ),
+              FadeTransition(
+                opacity: _iconAnimation,
+                child: _headerSummaryIcon(hauntIsActive, goingOnHaunt),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: paddingSmall,
+          child: Text(
+            _headerSummaryText(hauntIsActive, goingOnHaunt),
+            style: infoTextStyle,
+          ),
+        ),
+      ],
+    );
+  }
+
+  double _getPotBarHeight(int pot, int price) {
 //    if (hauntIsActive(_store.state)) {
-    return pot == price ? _thresholdHeight : _thresholdHeight + 150.0;
+    double boost = min((pot - price) * 25.0, 125.0);
+    return _thresholdHeight + boost;
 //    }
     return (pot / price) * _thresholdHeight;
   }
@@ -270,12 +323,14 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
   Widget _barStack() {
     Haunt haunt = currentHaunt(_store.state);
     Round round = currentRound(_store.state);
+    bool hauntActive = hauntIsActive(_store.state);
+    bool amGoingOnHaunt = goingOnHaunt(_store.state);
     int pot = round.pot;
-    pot = 30;
+    pot = 9;
 //    int bid = myCurrentBid(_store.state).amount;
     int bid = 5;
-    Decoration background = _backgroundDecoration();
-    double potBarHeight = getPotBarHeight(pot, haunt.price);
+    Decoration background = _backgroundDecoration(hauntActive, amGoingOnHaunt);
+    double potBarHeight = _getPotBarHeight(pot, haunt.price);
     double bidBarHeight = (bid / pot) * potBarHeight;
     _setUpAnimation(potBarHeight, bidBarHeight);
     return Container(
@@ -285,14 +340,22 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
         elevation: 6.0,
         child: Padding(
           padding: paddingTiny,
-          child: Stack(
-            alignment: Alignment.bottomLeft,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _potBar(pot, haunt.price, potBarHeight),
-              _bidBar(bid, bidBarHeight),
-              Positioned(
-                bottom: _thresholdHeight,
-                child: _thresholdLine(haunt.price),
+              _header(haunt, round, hauntActive, amGoingOnHaunt),
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.bottomLeft,
+                  children: [
+                    _potBar(pot, haunt.price, potBarHeight),
+                    _bidBar(bid, bidBarHeight),
+                    Positioned(
+                      bottom: _thresholdHeight,
+                      child: _thresholdLine(haunt.price),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

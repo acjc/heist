@@ -46,7 +46,7 @@ Text heistResultText(BuildContext context, bool wasSuccess) {
         );
 }
 
-Widget heistSummary(BuildContext context, Store<GameModel> store, Haunt haunt, int pot) => new Card(
+Widget hauntSummary(BuildContext context, Store<GameModel> store, Haunt haunt, int pot) => new Card(
     elevation: 2.0,
     child: new Container(
       padding: paddingMedium,
@@ -154,7 +154,7 @@ Widget endgame(BuildContext context, Store<GameModel> store) {
   Map<String, List<Round>> rounds = getRounds(store.state);
   for (Haunt haunt in haunts) {
     Round lastRound = rounds[haunt.id].last;
-    children.add(heistSummary(context, store, haunt, lastRound.pot));
+    children.add(hauntSummary(context, store, haunt, lastRound.pot));
   }
 
   return new ListView(children: children);

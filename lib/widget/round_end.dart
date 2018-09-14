@@ -24,7 +24,9 @@ class RoundEnd extends StatefulWidget {
 }
 
 class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
+  /// Height of the bar indicating the price (not including bottom padding)
   static const double _thresholdHeight = 225.0;
+
   static const double _barWidth = 75.0;
   static const double _labelContainerWidth = 75.0;
   static const double _labelContainerHeight = 100.0;
@@ -57,6 +59,7 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
     );
   }
 
+  /// NB. Offset is a scaling factor rather than an absolute value. Negative y offset is upwards.
   void _setUpAnimation(double potBarHeight, double bidBarHeight, Color backgroundColor) {
     _potAnimation = Tween(begin: 1.0, end: potBarHeight)
         .animate(CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
@@ -92,21 +95,23 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Widget _continueButton() => new StoreConnector<GameModel, bool>(
+  Widget _continueButton() => StoreConnector<GameModel, bool>(
       converter: (store) => requestInProcess(store.state, Request.CompletingRound),
       distinct: true,
       builder: (context, completingGame) {
-        return new RaisedButton(
-          child: new Text(AppLocalizations.of(context).continueButton, style: buttonTextStyle),
+        return RaisedButton(
+          child: Text(AppLocalizations.of(context).continueButton, style: buttonTextStyle),
           onPressed: () {
             if (amOwner(_store.state) && !completingGame) {
-              _store.dispatch(new CompleteRoundAction());
+              _store.dispatch(CompleteRoundAction());
             }
             // TODO: store locally that user has continued
           },
         );
       });
 
+  /// Amount of the pot to display as the pot bar grows.
+  /// We want the amount to equal the price as the bar crosses the threshold line.
   int _potBarLabelAmount(int pot, int price, double potBarHeight, double value) {
     if (value <= _thresholdHeight) {
       return ((value / _thresholdHeight) * price).round();
@@ -147,14 +152,14 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
         },
       );
 
-  Widget _potBarBox(int pot, int price, double potBarHeight) => AnimationListenable(
-        animation: _potAnimation,
-        builder: (context, value, child) {
-          int amount = ((value / potBarHeight) * pot).round();
-          Color color = _potBarColor(amount, price);
-          return Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
+  Widget _potBarBox(int pot, int price, double potBarHeight) => Align(
+        alignment: Alignment.bottomCenter,
+        child: AnimationListenable(
+          animation: _potAnimation,
+          builder: (context, value, child) {
+            int amount = ((value / potBarHeight) * pot).round();
+            Color color = _potBarColor(amount, price);
+            return Container(
               margin: paddingMedium,
               width: _barWidth,
               height: value,
@@ -168,22 +173,20 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
                 ],
                 color: color,
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       );
 
-  Widget _potBar(int pot, int price, double potBarHeight) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        _potBarLabel(pot, price, potBarHeight),
-        _potBarBox(pot, price, potBarHeight),
-        Container(width: _labelContainerWidth),
-      ],
-    );
-  }
+  Widget _potBar(int pot, int price, double potBarHeight) => Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          _potBarLabel(pot, price, potBarHeight),
+          _potBarBox(pot, price, potBarHeight),
+          Container(width: _labelContainerWidth),
+        ],
+      );
 
   Widget _bidBarBox(int bid, double bidBarHeight, Color color) => Align(
         alignment: Alignment.bottomCenter,
@@ -294,40 +297,40 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
         : Icon(Icons.warning, color: HeistColors.blue, size: size);
   }
 
-  Widget _header(Haunt haunt, Round round, bool hauntIsActive, bool goingOnHaunt) {
-    return Column(
-      children: [
-        Padding(
-          padding: paddingTiny,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              titleSubtitle(
-                AppLocalizations.of(context).hauntTitle(haunt.order),
-                AppLocalizations.of(context).roundTitle(round.order),
-              ),
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: _headerSummaryIcon(hauntIsActive, goingOnHaunt),
-              ),
-            ],
+  Widget _header(Haunt haunt, Round round, bool hauntIsActive, bool goingOnHaunt) => Column(
+        children: [
+          Padding(
+            padding: paddingTiny,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                titleSubtitle(
+                  AppLocalizations.of(context).hauntTitle(haunt.order),
+                  AppLocalizations.of(context).roundTitle(round.order),
+                ),
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: _headerSummaryIcon(hauntIsActive, goingOnHaunt),
+                ),
+              ],
+            ),
           ),
-        ),
-        Padding(
-          padding: paddingTiny,
-          child: FadeTransition(
+          Padding(
+            padding: paddingTiny,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: _headerSummaryText(hauntIsActive, goingOnHaunt),
+            ),
+          ),
+          FadeTransition(
             opacity: _fadeAnimation,
-            child: _headerSummaryText(hauntIsActive, goingOnHaunt),
+            child: _continueButton(),
           ),
-        ),
-        FadeTransition(
-          opacity: _fadeAnimation,
-          child: _continueButton(),
-        ),
-      ],
-    );
-  }
+        ],
+      );
 
+  /// If the haunt is going ahead, we want the pot bar to proportionally exceed the threshold
+  /// line when it grows (also taking bottom padding into account).
   double _getPotBarHeight(int pot, int price, bool hauntIsActive) {
     double thresholdPlusPadding = _thresholdHeight + 24.0;
     if (hauntIsActive) {
@@ -337,11 +340,8 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
     return (pot / price) * thresholdPlusPadding;
   }
 
-  Color _bidBarColor(bool hauntIsActive, bool goingOnHaunt) {
-    return hauntIsActive
-        ? (goingOnHaunt ? HeistColors.green : HeistColors.peach)
-        : HeistColors.amber;
-  }
+  Color _bidBarColor(bool hauntIsActive, bool goingOnHaunt) =>
+      hauntIsActive ? (goingOnHaunt ? HeistColors.green : HeistColors.peach) : HeistColors.amber;
 
   Widget _barStack() {
     Haunt haunt = currentHaunt(_store.state);

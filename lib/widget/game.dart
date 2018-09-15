@@ -195,7 +195,6 @@ class GameState extends State<Game> {
           gameOver(store.state), requestInProcess(store.state, Request.CompletingGame)),
       distinct: true,
       builder: (context, viewModel) {
-//        return new RoundEnd(_store);
         if (!viewModel.gameIsReady) {
           return _loadingScreen();
         }

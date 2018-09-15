@@ -51,9 +51,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m16(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
 
-  static m17(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
+  static m17(owner) => "Waiting for ${owner} to continue...";
 
-  static m18(winner) => "${winner} win!";
+  static m18(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
+
+  static m19(winner) => "${winner} win!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -123,8 +125,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "teamScores" : m16,
     "title" : MessageLookupByLibrary.simpleMessage("Heist"),
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),
-    "waitingForPlayers" : m17,
-    "winner" : m18,
+    "waitingForOwner" : m17,
+    "waitingForPlayers" : m18,
+    "winner" : m19,
     "youAreGoing" : MessageLookupByLibrary.simpleMessage("You\'re going on a haunt!"),
     "youHaveMadeYourChoice" : MessageLookupByLibrary.simpleMessage("You have made your choice!"),
     "yourBid" : MessageLookupByLibrary.simpleMessage("Your bid"),

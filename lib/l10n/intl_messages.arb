@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-13T23:39:03.972490",
+  "@@last_modified": "2018-09-15T14:24:41.521672",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -35,6 +35,14 @@
     "description": "Scary Ghost role",
     "type": "text",
     "placeholders": {}
+  },
+  "waitingForOwner": "Waiting for {owner} to continue...",
+  "@waitingForOwner": {
+    "description": "Room owner needs to take an action",
+    "type": "text",
+    "placeholders": {
+      "owner": {}
+    }
   },
   "continueButton": "CONTINUE",
   "@continueButton": {

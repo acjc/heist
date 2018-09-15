@@ -83,6 +83,15 @@ class AppLocalizations {
 
   // Common
 
+  String waitingForOwner(String owner) {
+    return Intl.message(
+      'Waiting for $owner to continue...',
+      name: 'waitingForOwner',
+      args: [owner],
+      desc: 'Room owner needs to take an action',
+    );
+  }
+
   String get continueButton {
     return Intl.message(
       'CONTINUE',

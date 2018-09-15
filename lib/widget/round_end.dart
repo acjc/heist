@@ -7,6 +7,7 @@ import 'package:heist/app_localizations.dart';
 import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/round_end_middleware.dart';
+import 'package:heist/reducers/local_actions_reducers.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
@@ -19,12 +20,12 @@ class RoundEnd extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new _RoundEndState(_store);
+    return _RoundEndState(_store);
   }
 }
 
-class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
-  /// Height of the bar indicating the price (not including bottom padding)
+class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin {
+  /// Height of the bar indicating the price
   static const double _thresholdHeight = 225.0;
 
   static const double _barWidth = 75.0;
@@ -95,17 +96,28 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Widget _continueButton() => StoreConnector<GameModel, bool>(
-      converter: (store) => requestInProcess(store.state, Request.CompletingRound),
+  Widget _continueButton(Round round) => StoreConnector<GameModel, _ContinueButtonViewModel>(
+      converter: (store) => _ContinueButtonViewModel(
+            completingRound: requestInProcess(store.state, Request.CompletingRound),
+            roundComplete: currentRound(store.state).complete,
+          ),
       distinct: true,
-      builder: (context, completingGame) {
+      builder: (context, viewModel) {
+        bool owner = amOwner(_store.state);
+        if (!owner && !viewModel.roundComplete) {
+          return Text(
+            AppLocalizations.of(context).waitingForOwner(getOwner(_store.state).name),
+            style: TextStyle(fontStyle: FontStyle.italic),
+          );
+        }
         return RaisedButton(
           child: Text(AppLocalizations.of(context).continueButton, style: buttonTextStyle),
           onPressed: () {
-            if (amOwner(_store.state) && !completingGame) {
+            if (owner && !viewModel.completingRound) {
               _store.dispatch(CompleteRoundAction());
             }
-            // TODO: store locally that user has continued
+            _store.dispatch(
+                RecordLocalRoundActionAction(round.id, LocalRoundAction.RoundEndContinue));
           },
         );
       });
@@ -113,7 +125,7 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
   /// Amount of the pot to display as the pot bar grows.
   /// We want the amount to equal the price as the bar crosses the threshold line.
   int _potBarLabelAmount(int pot, int price, double potBarHeight, double value) {
-    if (value <= _thresholdHeight) {
+    if (pot >= price && value <= _thresholdHeight) {
       return ((value / _thresholdHeight) * price).round();
     }
     return ((value / potBarHeight) * pot).round();
@@ -252,6 +264,7 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
       hauntIsActive ? (goingOnHaunt ? HeistColors.green : HeistColors.peach) : Colors.transparent;
 
   Widget _thresholdLine(int price) => Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Column(
             children: [
@@ -267,7 +280,7 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
           ),
           Container(
             margin: paddingMedium,
-            height: 1.5,
+            height: 1.0,
             width: 225.0,
             color: HeistColors.amber,
           ),
@@ -324,20 +337,19 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
           ),
           FadeTransition(
             opacity: _fadeAnimation,
-            child: _continueButton(),
+            child: _continueButton(round),
           ),
         ],
       );
 
   /// If the haunt is going ahead, we want the pot bar to proportionally exceed the threshold
-  /// line when it grows (also taking bottom padding into account).
+  /// line when it grows.
   double _getPotBarHeight(int pot, int price, bool hauntIsActive) {
-    double thresholdPlusPadding = _thresholdHeight + 24.0;
     if (hauntIsActive) {
       double boost = min((pot - price) * 12.0, 60.0);
-      return thresholdPlusPadding + boost;
+      return _thresholdHeight + boost;
     }
-    return (pot / price) * thresholdPlusPadding;
+    return (pot / price) * _thresholdHeight;
   }
 
   Color _bidBarColor(bool hauntIsActive, bool goingOnHaunt) =>
@@ -346,16 +358,18 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
   Widget _barStack() {
     Haunt haunt = currentHaunt(_store.state);
     Round round = currentRound(_store.state);
+    int price = haunt.price;
     bool hauntActive = hauntIsActive(_store.state);
-    hauntActive = true;
     bool amGoingOnHaunt = goingOnHaunt(_store.state);
-    amGoingOnHaunt = true;
     int pot = round.pot;
-    pot = 12;
-//    int bid = myCurrentBid(_store.state).amount;
-    int bid = 5;
+    int bid = myCurrentBid(_store.state).amount;
+//    hauntActive = true;
+//    amGoingOnHaunt = true;
+//    price = 15;
+//    pot = 2;
+//    int bid = 5;
     Color backgroundColor = _backgroundColor(hauntActive, amGoingOnHaunt);
-    double potBarHeight = _getPotBarHeight(pot, haunt.price, hauntActive);
+    double potBarHeight = _getPotBarHeight(pot, price, hauntActive);
     double bidBarHeight = (bid / pot) * potBarHeight;
     _setUpAnimation(potBarHeight, bidBarHeight, backgroundColor);
     return DecoratedBoxTransition(
@@ -376,9 +390,9 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
                     children: [
                       Positioned(
                         bottom: _thresholdHeight,
-                        child: _thresholdLine(haunt.price),
+                        child: _thresholdLine(price),
                       ),
-                      _potBar(pot, haunt.price, potBarHeight),
+                      _potBar(pot, price, potBarHeight),
                       _bidBar(bid, bidBarHeight, _bidBarColor(hauntActive, amGoingOnHaunt)),
                     ],
                   ),
@@ -397,5 +411,28 @@ class _RoundEndState extends State<RoundEnd> with TickerProviderStateMixin {
       return loading();
     }
     return _barStack();
+  }
+}
+
+class _ContinueButtonViewModel {
+  final bool completingRound;
+  final bool roundComplete;
+
+  _ContinueButtonViewModel({this.completingRound, this.roundComplete});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _ContinueButtonViewModel &&
+          runtimeType == other.runtimeType &&
+          completingRound == other.completingRound &&
+          roundComplete == other.roundComplete;
+
+  @override
+  int get hashCode => completingRound.hashCode ^ roundComplete.hashCode;
+
+  @override
+  String toString() {
+    return '_ContinueButtonViewModel{completingRound: $completingRound, roundComplete: $roundComplete}';
   }
 }

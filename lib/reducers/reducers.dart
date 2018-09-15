@@ -4,6 +4,7 @@ import 'bid_amount_reducers.dart';
 import 'form_reducers.dart';
 import 'gift_amount_reducers.dart';
 import 'haunt_reducers.dart';
+import 'local_actions_reducers.dart';
 import 'player_reducers.dart';
 import 'request_reducers.dart';
 import 'room_reducers.dart';
@@ -20,6 +21,7 @@ GameModel gameModelReducer(GameModel gameModel, dynamic action) {
     bidAmount: bidAmountReducer(gameModel.bidAmount, action),
     giftAmount: giftAmountReducer(gameModel.giftAmount, action),
     requests: requestReducer(gameModel.requests, action),
+    localActions: localActionsReducer(gameModel.localActions, action),
     room: roomReducer(gameModel.room, action),
     players: playerReducer(gameModel.players, action),
     haunts: hauntReducer(gameModel.haunts, action),

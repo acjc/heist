@@ -138,7 +138,7 @@ class Room extends Document {
 
   @override
   String toString() {
-    return 'Room{code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles, visibleToAccountant: $visibleToAccountant, brendaGuess: $brendaGuess}';
+    return 'Room{id: $id, code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles, visibleToAccountant: $visibleToAccountant, brendaGuess: $brendaGuess}';
   }
 }
 
@@ -216,7 +216,7 @@ class Player extends Document {
 
   @override
   String toString() {
-    return 'Player{installId: $installId, room: $room, name: $name, initialBalance: $initialBalance, role: $role, order: $order}';
+    return 'Player{id: $id, installId: $installId, room: $room, name: $name, initialBalance: $initialBalance, role: $role, order: $order}';
   }
 }
 
@@ -315,7 +315,7 @@ class Haunt extends Document {
 
   @override
   String toString() {
-    return 'Haunt{room: $room, price: $price, numPlayers: $numPlayers, maximumBid: $maximumBid, order: $order, startedAt: $startedAt, decisions: $decisions, completedAt: $completedAt}';
+    return 'Haunt{id: $id, room: $room, price: $price, numPlayers: $numPlayers, maximumBid: $maximumBid, order: $order, startedAt: $startedAt, decisions: $decisions, completedAt: $completedAt}';
   }
 }
 
@@ -490,6 +490,6 @@ class Round extends Document {
 
   @override
   String toString() {
-    return 'Round{leader: $leader, order: $order, room: $room, haunt: $haunt, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts, completedAt: $completedAt}';
+    return 'Round{id: $id, leader: $leader, order: $order, room: $room, haunt: $haunt, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts, completedAt: $completedAt}';
   }
 }

@@ -93,7 +93,7 @@ class GameState extends State<Game> {
     }
 
     // resolve round
-    if (!viewModel.roundComplete) {
+    if (!viewModel.roundComplete || !viewModel.roundContinued) {
       return appendGameHistory(RoundEnd(_store));
     }
 
@@ -123,7 +123,7 @@ class GameState extends State<Game> {
       );
 
   Widget _mainBoardBody() => new StoreConnector<GameModel, MainBoardViewModel>(
-        ignoreChange: (gameModel) => currentHaunt(gameModel) != null,
+        ignoreChange: (gameModel) => currentHaunt(gameModel) == null,
         converter: (store) {
           Haunt haunt = currentHaunt(store.state);
           Round round = currentRound(store.state);
@@ -132,6 +132,11 @@ class GameState extends State<Game> {
             biddingComplete: biddingComplete(store.state),
             resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
             roundComplete: round.complete,
+            roundContinued: localRoundActionRecorded(
+              store.state,
+              round.id,
+              LocalRoundAction.RoundEndContinue,
+            ),
             hauntIsActive: hauntIsActive(store.state),
             hauntDecided: haunt.allDecided,
             hauntComplete: haunt.complete,
@@ -190,7 +195,7 @@ class GameState extends State<Game> {
           gameOver(store.state), requestInProcess(store.state, Request.CompletingGame)),
       distinct: true,
       builder: (context, viewModel) {
-        return new RoundEnd(_store);
+//        return new RoundEnd(_store);
         if (!viewModel.gameIsReady) {
           return _loadingScreen();
         }
@@ -284,6 +289,7 @@ class MainBoardViewModel {
   final bool biddingComplete;
   final bool resolvingAuction;
   final bool roundComplete;
+  final bool roundContinued;
   final bool hauntIsActive;
   final bool hauntDecided;
   final bool hauntComplete;
@@ -293,6 +299,7 @@ class MainBoardViewModel {
       @required this.biddingComplete,
       @required this.resolvingAuction,
       @required this.roundComplete,
+      @required this.roundContinued,
       @required this.hauntIsActive,
       @required this.hauntDecided,
       @required this.hauntComplete});
@@ -306,6 +313,7 @@ class MainBoardViewModel {
           biddingComplete == other.biddingComplete &&
           resolvingAuction == other.resolvingAuction &&
           roundComplete == other.roundComplete &&
+          roundContinued == other.roundContinued &&
           hauntIsActive == other.hauntIsActive &&
           hauntDecided == other.hauntDecided &&
           hauntComplete == other.hauntComplete;
@@ -316,13 +324,14 @@ class MainBoardViewModel {
       biddingComplete.hashCode ^
       resolvingAuction.hashCode ^
       roundComplete.hashCode ^
+      roundContinued.hashCode ^
       hauntIsActive.hashCode ^
       hauntDecided.hashCode ^
       hauntComplete.hashCode;
 
   @override
   String toString() {
-    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, hauntIsActive: $hauntIsActive, hauntDecided: $hauntDecided, hauntComplete: $hauntComplete}';
+    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, roundContinued: $roundContinued, hauntIsActive: $hauntIsActive, hauntDecided: $hauntDecided, hauntComplete: $hauntComplete}';
   }
 }
 
@@ -351,10 +360,12 @@ class GameActiveViewModel {
 }
 
 void resetGameStore(Store<GameModel> store) {
-  store.dispatch(new ClearAllPendingRequestsAction());
-  store.dispatch(new CancelSubscriptionsAction());
-  store.dispatch(new UpdateStateAction<Room>(new Room.initial(isDebugMode() ? 2 : minPlayers)));
-  store.dispatch(new UpdateStateAction<List<Player>>([]));
-  store.dispatch(new UpdateStateAction<List<Haunt>>([]));
-  store.dispatch(new UpdateStateAction<Map<Haunt, List<Round>>>({}));
+  store.dispatch(ClearAllPendingRequestsAction());
+  store.dispatch(CancelSubscriptionsAction());
+  store.dispatch(UpdateStateAction<LocalActions>(LocalActions.initial()));
+
+  store.dispatch(UpdateStateAction<Room>(Room.initial(isDebugMode() ? 2 : minPlayers)));
+  store.dispatch(UpdateStateAction<List<Player>>([]));
+  store.dispatch(UpdateStateAction<List<Haunt>>([]));
+  store.dispatch(UpdateStateAction<Map<Haunt, List<Round>>>({}));
 }

@@ -363,11 +363,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
     bool amGoingOnHaunt = goingOnHaunt(_store.state);
     int pot = round.pot;
     int bid = myCurrentBid(_store.state).amount;
-//    hauntActive = true;
-//    amGoingOnHaunt = true;
-//    price = 15;
-//    pot = 2;
-//    int bid = 5;
+
     Color backgroundColor = _backgroundColor(hauntActive, amGoingOnHaunt);
     double potBarHeight = _getPotBarHeight(pot, price, hauntActive);
     double bidBarHeight = (bid / pot) * potBarHeight;

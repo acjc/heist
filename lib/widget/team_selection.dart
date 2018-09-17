@@ -37,25 +37,25 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
   AnimationController _pulseController;
 
   @protected
-  Animation<double> _fadeAnimation;
+  Animation<double> _continueAnimation;
   @protected
-  AnimationController _fadeController;
+  AnimationController _continueController;
 
   TeamSelectionState(this._store);
 
   @override
   initState() {
     super.initState();
-    _fadeController =
+    _continueController =
         AnimationController(duration: const Duration(milliseconds: 2000), vsync: this);
-    _fadeAnimation = Tween(begin: 0.0, end: 1.0)
-        .animate(CurvedAnimation(parent: _fadeController, curve: Curves.ease));
+    _continueAnimation = Tween(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: _continueController, curve: Curves.ease));
   }
 
   @override
   dispose() {
-    _fadeController?.dispose();
-    _fadeController = null;
+    _continueController?.dispose();
+    _continueController = null;
     _pulseController?.dispose();
     _pulseController = null;
     super.dispose();
@@ -91,8 +91,15 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
   }
 
   @protected
+  void _runContinueButtonAnimation(bool teamSubmitted) {
+    if (teamSubmitted && _continueController.isDismissed) {
+      _continueController.forward();
+    }
+  }
+
+  @protected
   Widget _continueButton() => FadeTransition(
-        opacity: _fadeAnimation,
+        opacity: _continueAnimation,
         child: RaisedButton(
             child: Text(AppLocalizations.of(context).continueToBidding, style: buttonTextStyle),
             onPressed: () => _store.dispatch(RecordLocalRoundActionAction(
@@ -208,13 +215,10 @@ class _WaitForTeamState extends TeamSelectionState {
               teamSubmitted: currentRound(store.state).teamSubmitted,
             ),
         onInit: (store) => _setUpPulse(goingOnHaunt(store.state), currentTeamIsFull(store.state)),
+        onInitialBuild: (viewModel) => _runContinueButtonAnimation(viewModel.teamSubmitted),
         onWillChange: (viewModel) =>
             _setUpPulse(viewModel.goingOnHaunt, viewModel.currentTeamIsFull),
-        onDidChange: (viewModel) {
-          if (viewModel.teamSubmitted && _fadeController.isDismissed) {
-            _fadeController.forward();
-          }
-        },
+        onDidChange: (viewModel) => _runContinueButtonAnimation(viewModel.teamSubmitted),
         builder: (context, viewModel) {
           int playersRequired = currentHaunt(_store.state).numPlayers;
           Player leader = currentLeader(_store.state);
@@ -357,14 +361,9 @@ class TeamPickerState extends TeamSelectionState {
             submittingTeam: requestInProcess(store.state, Request.SubmittingTeam),
           ),
       onInit: (store) => _setUpPulse(goingOnHaunt(store.state), currentTeamIsFull(store.state)),
-      onWillChange: (_) {
-        _setUpPulse(goingOnHaunt(_store.state), currentTeamIsFull(_store.state));
-      },
-      onDidChange: (viewModel) {
-        if (viewModel.teamSubmitted && _fadeController.isDismissed) {
-          _fadeController.forward();
-        }
-      },
+      onInitialBuild: (viewModel) => _runContinueButtonAnimation(viewModel.teamSubmitted),
+      onWillChange: (_) => _setUpPulse(goingOnHaunt(_store.state), currentTeamIsFull(_store.state)),
+      onDidChange: (viewModel) => _runContinueButtonAnimation(viewModel.teamSubmitted),
       builder: (context, viewModel) {
         int playersRequired = currentHaunt(_store.state).numPlayers;
         bool amGoingOnHaunt = goingOnHaunt(_store.state);

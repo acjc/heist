@@ -319,7 +319,9 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
               children: [
                 titleSubtitle(
                   AppLocalizations.of(context).hauntTitle(haunt.order),
-                  AppLocalizations.of(context).roundTitle(round.order),
+                  round.isAuction
+                      ? AppLocalizations.of(context).auctionTitle
+                      : AppLocalizations.of(context).roundTitle(round.order),
                 ),
                 FadeTransition(
                   opacity: _fadeAnimation,

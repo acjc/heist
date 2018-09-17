@@ -29,5 +29,5 @@ bool requestInProcess(GameModel gameModel, Request request) =>
 // Reselect would not recognise changes to the current haunt
 final currentHaunt = (GameModel gameModel) => getHaunts(gameModel).last;
 
-final Selector<GameModel, Round> currentRound = createSelector2(
-    currentHaunt, getRounds, (currentHaunt, rounds) => rounds[currentHaunt.id].last);
+final Selector<GameModel, Round> currentRound = createSelector2(currentHaunt, getRounds,
+    (Haunt currentHaunt, Map<String, List<Round>> rounds) => rounds[currentHaunt.id].last);

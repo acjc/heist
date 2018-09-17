@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-15T14:24:41.521672",
+  "@@last_modified": "2018-09-17T19:12:56.180310",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -446,6 +446,12 @@
   "submitTeam": "SUBMIT TEAM",
   "@submitTeam": {
     "description": "Button for the team picker to confirm their team selection",
+    "type": "text",
+    "placeholders": {}
+  },
+  "continueToBidding": "CONTINUE TO BIDDING",
+  "@continueToBidding": {
+    "description": "Button for local continue from team selection",
     "type": "text",
     "placeholders": {}
   },

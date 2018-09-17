@@ -79,6 +79,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "chooseGiftRecipient" : MessageLookupByLibrary.simpleMessage("Choose a player to send a gift to:"),
     "chooseNumberOfPlayers" : MessageLookupByLibrary.simpleMessage("Choose number of players"),
     "continueButton" : MessageLookupByLibrary.simpleMessage("CONTINUE"),
+    "continueToBidding" : MessageLookupByLibrary.simpleMessage("CONTINUE TO BIDDING"),
     "convince" : MessageLookupByLibrary.simpleMessage("Convince "),
     "createRoom" : MessageLookupByLibrary.simpleMessage("CREATE ROOM"),
     "createRoomTitle" : MessageLookupByLibrary.simpleMessage("Heist: Create new room"),

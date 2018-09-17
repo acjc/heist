@@ -7,6 +7,7 @@ import 'package:heist/app_localizations.dart';
 import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/team_picker_middleware.dart';
+import 'package:heist/reducers/local_actions_reducers.dart';
 import 'package:heist/reducers/round_reducers.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -22,7 +23,7 @@ class TeamSelection extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _isMyGo ? new TeamPickerState(_store) : new WaitForTeamState(_store);
+    return _isMyGo ? TeamPickerState(_store) : _WaitForTeamState(_store);
   }
 }
 
@@ -35,13 +36,36 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
   @protected
   AnimationController _pulseController;
 
+  @protected
+  Animation<double> _fadeAnimation;
+  @protected
+  AnimationController _fadeController;
+
   TeamSelectionState(this._store);
+
+  @override
+  initState() {
+    super.initState();
+    _fadeController =
+        AnimationController(duration: const Duration(milliseconds: 2000), vsync: this);
+    _fadeAnimation = Tween(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: _fadeController, curve: Curves.ease));
+  }
+
+  @override
+  dispose() {
+    _fadeController?.dispose();
+    _fadeController = null;
+    _pulseController?.dispose();
+    _pulseController = null;
+    super.dispose();
+  }
 
   Animation<Color> _getPulseTween(bool goingOnHaunt, bool fullTeam) {
     if (fullTeam) {
       Color beginColor = goingOnHaunt ? Colors.green : Colors.redAccent;
       Color endColor = goingOnHaunt ? HeistColors.green : HeistColors.peach;
-      return new ColorTween(begin: beginColor, end: endColor).animate(_pulseController)
+      return ColorTween(begin: beginColor, end: endColor).animate(_pulseController)
         ..addStatusListener((status) {
           if (status == AnimationStatus.completed) {
             _pulseController.reverse();
@@ -50,7 +74,7 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
           }
         });
     }
-    return new ConstantTween<Color>(goingOnHaunt ? HeistColors.green : HeistColors.peach)
+    return ConstantTween<Color>(goingOnHaunt ? HeistColors.green : HeistColors.peach)
         .animate(_pulseController);
   }
 
@@ -58,7 +82,7 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
   void _setUpPulse(bool goingOnHaunt, bool fullTeam) {
     _pulseController?.dispose();
     _pulseController = null;
-    _pulseController = new AnimationController(
+    _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
@@ -67,16 +91,25 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
   }
 
   @protected
-  Widget _ghosties(int total) {
-    return Container(
-      height: 80.0,
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: new Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: new List.generate(total, (i) => new Ghostie(i)),
-      ),
-    );
-  }
+  Widget _continueButton() => FadeTransition(
+        opacity: _fadeAnimation,
+        child: RaisedButton(
+            child: Text(AppLocalizations.of(context).continueToBidding, style: buttonTextStyle),
+            onPressed: () => _store.dispatch(RecordLocalRoundActionAction(
+                  currentRound(_store.state).id,
+                  LocalRoundAction.TeamSelectionContinue,
+                ))),
+      );
+
+  @protected
+  Widget _ghosties(int total) => Container(
+        height: 80.0,
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(total, (i) => Ghostie(i)),
+        ),
+      );
 }
 
 class Ghostie extends StatefulWidget {
@@ -86,7 +119,7 @@ class Ghostie extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new GhostieState(_index);
+    return GhostieState(_index);
   }
 }
 
@@ -98,63 +131,99 @@ class GhostieState extends State<Ghostie> with SingleTickerProviderStateMixin {
 
   GhostieState(this._index);
 
-  @override
-  initState() {
-    super.initState();
-    _controller = new AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-    _animation = new Tween(begin: const Offset(0.0, 0.6), end: const Offset(0.0, 0.0))
-        .animate(new CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
+  void _setUpAnimation() {
+    _controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
+    _animation = Tween(begin: const Offset(0.0, 0.6), end: const Offset(0.0, 0.0))
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
+  }
+
+  void _runAnimation(bool active) {
+    if (active) {
+      _controller.forward();
+    } else {
+      _controller.reverse();
+    }
   }
 
   @override
-  dispose() {
-    _controller?.dispose();
-    _controller = null;
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => new StoreConnector<GameModel, bool>(
+  Widget build(BuildContext context) => StoreConnector<GameModel, bool>(
       distinct: true,
+      onInit: (store) => _setUpAnimation(),
+      onInitialBuild: _runAnimation,
+      onWillChange: _runAnimation,
+      onDispose: (_) {
+        _controller?.dispose();
+        _controller = null;
+      },
       converter: (store) => _index < currentTeam(store.state).length,
-      builder: (context, active) {
-        if (active) {
-          _controller.forward();
-        } else {
-          _controller.reverse();
-        }
-        return new SlideTransition(
-          position: _animation,
-          child: new Transform.rotate(
-            angle: pi / 15.0,
-            child: const Image(
-              image: const AssetImage('assets/graphics/ghostie.png'),
-              color: Colors.white,
+      builder: (context, active) => SlideTransition(
+            position: _animation,
+            child: Transform.rotate(
+              angle: pi / 15.0,
+              child: const Image(
+                image: const AssetImage('assets/graphics/ghostie.png'),
+                color: Colors.white,
+              ),
             ),
-          ),
-        );
-      });
+          ));
 }
 
-class WaitForTeamState extends TeamSelectionState {
-  WaitForTeamState(Store<GameModel> store) : super(store);
+class _WaitForTeamViewModel {
+  @required
+  bool goingOnHaunt;
+  @required
+  bool currentTeamIsFull;
+  @required
+  bool teamSubmitted;
+
+  _WaitForTeamViewModel({this.goingOnHaunt, this.currentTeamIsFull, this.teamSubmitted});
 
   @override
-  Widget build(BuildContext context) => new StoreConnector<GameModel, bool>(
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _WaitForTeamViewModel &&
+          runtimeType == other.runtimeType &&
+          goingOnHaunt == other.goingOnHaunt &&
+          currentTeamIsFull == other.currentTeamIsFull &&
+          teamSubmitted == other.teamSubmitted;
+
+  @override
+  int get hashCode => goingOnHaunt.hashCode ^ currentTeamIsFull.hashCode ^ teamSubmitted.hashCode;
+
+  @override
+  String toString() {
+    return '_WaitForTeamViewModel{goingOnHaunt: $goingOnHaunt, currentTeamIsFull: $currentTeamIsFull, teamSubmitted: $teamSubmitted}';
+  }
+}
+
+class _WaitForTeamState extends TeamSelectionState {
+  _WaitForTeamState(Store<GameModel> store) : super(store);
+
+  @override
+  Widget build(BuildContext context) => StoreConnector<GameModel, _WaitForTeamViewModel>(
         distinct: true,
-        converter: (store) => goingOnHaunt(store.state),
+        converter: (store) => _WaitForTeamViewModel(
+              goingOnHaunt: goingOnHaunt(store.state),
+              currentTeamIsFull: currentTeamIsFull(store.state),
+              teamSubmitted: currentRound(store.state).teamSubmitted,
+            ),
         onInit: (store) => _setUpPulse(goingOnHaunt(store.state), currentTeamIsFull(store.state)),
-        onWillChange: (goingOnHaunt) => _setUpPulse(goingOnHaunt, currentTeamIsFull(_store.state)),
-        onDispose: (gameModel) => _pulseController?.dispose(),
-        builder: (context, goingOnHaunt) {
+        onWillChange: (viewModel) =>
+            _setUpPulse(viewModel.goingOnHaunt, viewModel.currentTeamIsFull),
+        onDidChange: (viewModel) {
+          if (viewModel.teamSubmitted && _fadeController.isDismissed) {
+            _fadeController.forward();
+          }
+        },
+        builder: (context, viewModel) {
           int playersRequired = currentHaunt(_store.state).numPlayers;
           Player leader = currentLeader(_store.state);
-          return new AnimationListenable<Color>(
+          return AnimationListenable<Color>(
             animation: _pulseAnimation,
-            builder: (context, value, child) => new Container(color: value, child: child),
-            staticChild: new Column(
+            builder: (context, value, child) => Container(color: value, child: child),
+            staticChild: Column(
               children: [
-                _tokenCard(goingOnHaunt, leader.name),
+                _tokenCard(viewModel.goingOnHaunt, leader.name, viewModel.teamSubmitted),
                 _ghosties(playersRequired),
               ],
             ),
@@ -165,32 +234,32 @@ class WaitForTeamState extends TeamSelectionState {
   Widget _waitForTeamMessage(bool goingOnHaunt, String leaderName) {
     const TextStyle defaultTextStyle = const TextStyle(color: Colors.black87, fontSize: 16.0);
     if (goingOnHaunt) {
-      return new RichText(
+      return RichText(
         textAlign: TextAlign.center,
-        text: new TextSpan(
+        text: TextSpan(
           style: defaultTextStyle,
           children: [
-            new TextSpan(text: leaderName, style: boldTextStyle),
-            new TextSpan(text: AppLocalizations.of(context).pickedYou),
+            TextSpan(text: leaderName, style: boldTextStyle),
+            TextSpan(text: AppLocalizations.of(context).pickedYou),
           ],
         ),
       );
     }
 
-    return new Column(
+    return Column(
       children: [
-        new Padding(
+        Padding(
           padding: paddingSmall,
-          child: new Text(AppLocalizations.of(context).notPicked, style: infoTextStyle),
+          child: Text(AppLocalizations.of(context).notPicked, style: infoTextStyle),
         ),
-        new RichText(
+        RichText(
           textAlign: TextAlign.center,
-          text: new TextSpan(
+          text: TextSpan(
             style: defaultTextStyle,
             children: [
-              new TextSpan(text: AppLocalizations.of(context).convince),
-              new TextSpan(text: leaderName, style: boldTextStyle),
-              new TextSpan(text: AppLocalizations.of(context).putYouInTeam),
+              TextSpan(text: AppLocalizations.of(context).convince),
+              TextSpan(text: leaderName, style: boldTextStyle),
+              TextSpan(text: AppLocalizations.of(context).putYouInTeam),
             ],
           ),
         ),
@@ -198,24 +267,35 @@ class WaitForTeamState extends TeamSelectionState {
     );
   }
 
-  Widget _tokenCard(bool goingOnHaunt, String leaderName) => new Expanded(
-        child: new Padding(
+  Widget _tokenContinue(String leaderName, bool teamSubmitted) {
+    if (teamSubmitted) {
+      return _continueButton();
+    }
+    return Text(
+      AppLocalizations.of(context).waitingForTeamSubmission(leaderName),
+      style: TextStyle(fontStyle: FontStyle.italic),
+    );
+  }
+
+  Widget _tokenCard(bool goingOnHaunt, String leaderName, bool teamSubmitted) => Expanded(
+        child: Padding(
           padding: paddingMedium,
-          child: new Card(
+          child: Card(
             elevation: 6.0,
-            child: new Padding(
+            child: Padding(
               padding: paddingSmall,
-              child: new Column(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  new AnimationListenable<Color>(
+                  AnimationListenable<Color>(
                     animation: _pulseAnimation,
                     builder: (context, value, _) => teamSelectionIcon(goingOnHaunt, value, 250.0),
                   ),
                   _waitForTeamMessage(goingOnHaunt, leaderName),
-                  new Column(
+                  Column(
                     children: [
-                      new Divider(),
+                      _tokenContinue(leaderName, teamSubmitted),
+                      Divider(),
                       roundTitleContents(context, _store),
                     ],
                   ),
@@ -227,68 +307,123 @@ class WaitForTeamState extends TeamSelectionState {
       );
 }
 
+class _TeamPickerViewModel {
+  @required
+  Set<Player> team;
+  @required
+  bool teamSubmitted;
+  @required
+  bool submittingTeam;
+
+  _TeamPickerViewModel({this.team, this.teamSubmitted, this.submittingTeam});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _TeamPickerViewModel &&
+          runtimeType == other.runtimeType &&
+          team == other.team &&
+          teamSubmitted == other.teamSubmitted &&
+          submittingTeam == other.submittingTeam;
+
+  @override
+  int get hashCode => team.hashCode ^ teamSubmitted.hashCode ^ submittingTeam.hashCode;
+
+  @override
+  String toString() {
+    return '_TeamPickerViewModel{team: $team, teamSubmitted: $teamSubmitted, submittingTeam: $submittingTeam}';
+  }
+}
+
 class TeamPickerState extends TeamSelectionState {
   TeamPickerState(Store<GameModel> store) : super(store);
 
-  Widget _submitTeamButton(BuildContext context, bool enabled) => new RaisedButton(
-        onPressed: enabled ? () => _store.dispatch(new SubmitTeamAction()) : null,
-        child: new Text(AppLocalizations.of(context).submitTeam, style: buttonTextStyle),
-      );
+  Widget _actionButton(bool currentTeamIsFull, bool teamSubmitted, bool loading) {
+    if (teamSubmitted) {
+      return _continueButton();
+    }
+    return RaisedButton(
+      onPressed: currentTeamIsFull && !loading ? () => _store.dispatch(SubmitTeamAction()) : null,
+      child: Text(AppLocalizations.of(context).submitTeam, style: buttonTextStyle),
+    );
+  }
 
   @override
-  Widget build(BuildContext context) => new StoreConnector<GameModel, Set<Player>>(
+  Widget build(BuildContext context) => StoreConnector<GameModel, _TeamPickerViewModel>(
       distinct: true,
-      converter: (store) => currentTeam(store.state),
+      converter: (store) => _TeamPickerViewModel(
+            team: currentTeam(store.state),
+            teamSubmitted: currentRound(store.state).teamSubmitted,
+            submittingTeam: requestInProcess(store.state, Request.SubmittingTeam),
+          ),
       onInit: (store) => _setUpPulse(goingOnHaunt(store.state), currentTeamIsFull(store.state)),
-      onWillChange: (team) =>
-          _setUpPulse(goingOnHaunt(_store.state), currentTeamIsFull(_store.state)),
-      onDispose: (gameModel) => _pulseController?.dispose(),
-      builder: (context, team) {
+      onWillChange: (_) {
+        _setUpPulse(goingOnHaunt(_store.state), currentTeamIsFull(_store.state));
+      },
+      onDidChange: (viewModel) {
+        if (viewModel.teamSubmitted && _fadeController.isDismissed) {
+          _fadeController.forward();
+        }
+      },
+      builder: (context, viewModel) {
         int playersRequired = currentHaunt(_store.state).numPlayers;
         bool amGoingOnHaunt = goingOnHaunt(_store.state);
-        return new AnimationListenable<Color>(
+        return AnimationListenable<Color>(
           animation: _pulseAnimation,
-          builder: (context, value, child) => new Container(color: value, child: child),
-          staticChild: new Column(
+          builder: (context, value, child) => Container(color: value, child: child),
+          staticChild: Column(
             children: [
-              _teamPickerCard(amGoingOnHaunt, team, playersRequired),
+              _teamPickerCard(
+                amGoingOnHaunt,
+                viewModel.team,
+                playersRequired,
+                viewModel.teamSubmitted,
+                viewModel.submittingTeam,
+              ),
               _ghosties(playersRequired),
             ],
           ),
         );
       });
 
-  Widget _teamPickerCard(bool goingOnHaunt, Set<Player> team, int playersRequired) => new Expanded(
+  Widget _teamPickerCard(
+    bool goingOnHaunt,
+    Set<Player> team,
+    int playersRequired,
+    bool teamSubmitted,
+    bool submittingTeam,
+  ) =>
+      Expanded(
         child: Padding(
           padding: paddingMedium,
-          child: new Card(
+          child: Card(
             elevation: 6.0,
-            child: new Padding(
+            child: Padding(
               padding: paddingSmall,
-              child: new Column(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  new AnimationListenable<Color>(
+                  AnimationListenable<Color>(
                     animation: _pulseAnimation,
                     builder: (context, value, _) => teamSelectionIcon(goingOnHaunt, value, 100.0),
                   ),
-                  new Column(
+                  Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      new Text(
+                      Text(
                         AppLocalizations.of(context).pickATeam(team.length, playersRequired),
                         style: infoTextStyle,
                       ),
-                      new TeamGridView(
-                        _teamPickerChildren(context, team, playersRequired),
+                      TeamGridView(
+                        _teamPickerChildren(team, playersRequired, teamSubmitted, submittingTeam),
                         childAspectRatio: 5.0,
                       ),
                     ],
                   ),
-                  new Column(
+                  Column(
                     children: [
-                      _submitTeamButton(context, team.length == playersRequired),
-                      new Divider(),
+                      _actionButton(team.length == playersRequired, teamSubmitted, submittingTeam),
+                      Divider(),
                       roundTitleContents(context, _store),
                     ],
                   ),
@@ -299,28 +434,29 @@ class TeamPickerState extends TeamSelectionState {
         ),
       );
 
-  List<Widget> _teamPickerChildren(BuildContext context, Set<Player> team, int playersRequired) {
+  List<Widget> _teamPickerChildren(
+      Set<Player> team, int playersRequired, bool teamSubmitted, bool loading) {
     String roundId = currentRound(_store.state).id;
     List<Player> players = getPlayers(_store.state);
     Player leader = currentLeader(_store.state);
-    return new List.generate(players.length, (i) {
+    return List.generate(players.length, (i) {
       Player player = players[i];
       bool isInTeam = team.contains(player);
       bool isLeader = player.id == leader.id;
-      bool pickedEnough = !isInTeam && team.length == playersRequired;
-      return new InkWell(
-          onTap: pickedEnough ? null : () => _onTap(_store, roundId, player.id, isInTeam),
+      bool enabled = (isInTeam || team.length < playersRequired) && !teamSubmitted && !loading;
+      return InkWell(
+          onTap: enabled ? () => _onTap(_store, roundId, player.id, isInTeam) : null,
           child: playerTile(context, player.name, isInTeam, isLeader));
     });
   }
 
   void _onTap(Store<GameModel> store, String roundId, String playerId, bool isInTeam) {
     if (isInTeam) {
-      store.dispatch(new RemovePlayerAction(roundId, playerId));
-      store.dispatch(new RemovePlayerMiddlewareAction(playerId));
+      store.dispatch(RemovePlayerAction(roundId, playerId));
+      store.dispatch(RemovePlayerMiddlewareAction(playerId));
     } else {
-      store.dispatch(new PickPlayerAction(roundId, playerId));
-      store.dispatch(new PickPlayerMiddlewareAction(playerId));
+      store.dispatch(PickPlayerAction(roundId, playerId));
+      store.dispatch(PickPlayerMiddlewareAction(playerId));
     }
   }
 }

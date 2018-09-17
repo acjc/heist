@@ -83,7 +83,7 @@ class GameState extends State<Game> {
 
   Widget _gameLoop(MainBoardViewModel viewModel) {
     // team picking (not needed for auctions)
-    if (!isAuction(_store.state) && viewModel.waitingForTeam) {
+    if (!isAuction(_store.state) && (viewModel.waitingForTeam || !viewModel.teamSelected)) {
       return TeamSelection(_store, isMyGo(_store.state));
     }
 
@@ -109,7 +109,7 @@ class GameState extends State<Game> {
 
     // go to next haunt
     if (viewModel.hauntDecided && !viewModel.hauntComplete) {
-      return appendGameHistory(new HauntEnd(_store));
+      return appendGameHistory(HauntEnd(_store));
     }
 
     return null;
@@ -122,13 +122,18 @@ class GameState extends State<Game> {
         ],
       );
 
-  Widget _mainBoardBody() => new StoreConnector<GameModel, MainBoardViewModel>(
+  Widget _mainBoardBody() => StoreConnector<GameModel, MainBoardViewModel>(
         ignoreChange: (gameModel) => currentHaunt(gameModel) == null,
         converter: (store) {
           Haunt haunt = currentHaunt(store.state);
           Round round = currentRound(store.state);
-          return new MainBoardViewModel._(
+          return MainBoardViewModel._(
             waitingForTeam: !round.teamSubmitted,
+            teamSelected: localRoundActionRecorded(
+              store.state,
+              round.id,
+              LocalRoundAction.TeamSelectionContinue,
+            ),
             biddingComplete: biddingComplete(store.state),
             resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
             roundComplete: round.complete,
@@ -285,6 +290,7 @@ class LoadingScreenViewModel {
 
 class MainBoardViewModel {
   final bool waitingForTeam;
+  final bool teamSelected;
   final bool biddingComplete;
   final bool resolvingAuction;
   final bool roundComplete;
@@ -295,6 +301,7 @@ class MainBoardViewModel {
 
   MainBoardViewModel._(
       {@required this.waitingForTeam,
+      @required this.teamSelected,
       @required this.biddingComplete,
       @required this.resolvingAuction,
       @required this.roundComplete,
@@ -309,6 +316,7 @@ class MainBoardViewModel {
       other is MainBoardViewModel &&
           runtimeType == other.runtimeType &&
           waitingForTeam == other.waitingForTeam &&
+          teamSelected == other.teamSelected &&
           biddingComplete == other.biddingComplete &&
           resolvingAuction == other.resolvingAuction &&
           roundComplete == other.roundComplete &&
@@ -320,6 +328,7 @@ class MainBoardViewModel {
   @override
   int get hashCode =>
       waitingForTeam.hashCode ^
+      teamSelected.hashCode ^
       biddingComplete.hashCode ^
       resolvingAuction.hashCode ^
       roundComplete.hashCode ^
@@ -330,7 +339,7 @@ class MainBoardViewModel {
 
   @override
   String toString() {
-    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, roundContinued: $roundContinued, hauntIsActive: $hauntIsActive, hauntDecided: $hauntDecided, hauntComplete: $hauntComplete}';
+    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, teamSelected: $teamSelected, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, roundContinued: $roundContinued, hauntIsActive: $hauntIsActive, hauntDecided: $hauntDecided, hauntComplete: $hauntComplete}';
   }
 }
 

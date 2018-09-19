@@ -66,6 +66,7 @@ class ResolveAuctionWinnersAction extends MiddlewareAction {
 class SubmitTeamAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
-    return store.state.db.submitTeam(currentRound(store.state).id);
+    return withRequest(Request.SubmittingTeam, store,
+        (store) => store.state.db.submitTeam(currentRound(store.state).id));
   }
 }

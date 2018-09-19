@@ -55,7 +55,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m18(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
 
-  static m19(winner) => "${winner} win!";
+  static m19(leaderName) => "Waiting for ${leaderName} to submit team";
+
+  static m20(winner) => "${winner} win!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -79,6 +81,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "chooseGiftRecipient" : MessageLookupByLibrary.simpleMessage("Choose a player to send a gift to:"),
     "chooseNumberOfPlayers" : MessageLookupByLibrary.simpleMessage("Choose number of players"),
     "continueButton" : MessageLookupByLibrary.simpleMessage("CONTINUE"),
+    "continueToBidding" : MessageLookupByLibrary.simpleMessage("CONTINUE TO BIDDING"),
     "convince" : MessageLookupByLibrary.simpleMessage("Convince "),
     "createRoom" : MessageLookupByLibrary.simpleMessage("CREATE ROOM"),
     "createRoomTitle" : MessageLookupByLibrary.simpleMessage("Heist: Create new room"),
@@ -130,7 +133,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),
     "waitingForOwner" : m17,
     "waitingForPlayers" : m18,
-    "winner" : m19,
+    "waitingForTeamSubmission" : m19,
+    "winner" : m20,
     "youAreGoing" : MessageLookupByLibrary.simpleMessage("You\'re going on a haunt!"),
     "youHaveMadeYourChoice" : MessageLookupByLibrary.simpleMessage("You have made your choice!"),
     "yourBid" : MessageLookupByLibrary.simpleMessage("Your bid"),

@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-19T20:36:16.507995",
+  "@@last_modified": "2018-09-19T20:41:54.351419",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -431,6 +431,14 @@
     "type": "text",
     "placeholders": {}
   },
+  "waitingForTeamSubmission": "Waiting for {leaderName} to submit team",
+  "@waitingForTeamSubmission": {
+    "description": "Waiting for leader to submit team",
+    "type": "text",
+    "placeholders": {
+      "leaderName": {}
+    }
+  },
   "pickATeam": "Pick a team: {playersPicked} / {teamSize}",
   "@pickATeam": {
     "description": "Team picker title",
@@ -452,6 +460,12 @@
   "submitTeam": "SUBMIT TEAM",
   "@submitTeam": {
     "description": "Button for the team picker to confirm their team selection",
+    "type": "text",
+    "placeholders": {}
+  },
+  "continueToBidding": "CONTINUE TO BIDDING",
+  "@continueToBidding": {
+    "description": "Button for local continue from team selection",
     "type": "text",
     "placeholders": {}
   },

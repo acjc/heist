@@ -596,6 +596,15 @@ class AppLocalizations {
     );
   }
 
+  String waitingForTeamSubmission(String leaderName) {
+    return Intl.message(
+      'Waiting for $leaderName to submit team',
+      name: 'waitingForTeamSubmission',
+      args: [leaderName],
+      desc: 'Waiting for leader to submit team',
+    );
+  }
+
   String pickATeam(int playersPicked, int teamSize) {
     return Intl.message(
       'Pick a team: $playersPicked / $teamSize',
@@ -619,6 +628,14 @@ class AppLocalizations {
       'SUBMIT TEAM',
       name: 'submitTeam',
       desc: 'Button for the team picker to confirm their team selection',
+    );
+  }
+
+  String get continueToBidding {
+    return Intl.message(
+      'CONTINUE TO BIDDING',
+      name: 'continueToBidding',
+      desc: 'Button for local continue from team selection',
     );
   }
 

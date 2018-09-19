@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-15T14:24:41.521672",
+  "@@last_modified": "2018-09-19T20:36:16.507995",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -43,6 +43,12 @@
     "placeholders": {
       "owner": {}
     }
+  },
+  "okButton": "OK",
+  "@okButton": {
+    "description": "OK button in a dialog",
+    "type": "text",
+    "placeholders": {}
   },
   "continueButton": "CONTINUE",
   "@continueButton": {
@@ -490,5 +496,17 @@
       "thiefScore": {},
       "agentScore": {}
     }
+  },
+  "noConnectionDialogTitle": "No internet",
+  "@noConnectionDialogTitle": {
+    "description": "Title of the dialog telling the user they have lost their internet connection",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noConnectionDialogText": "You need to be connected to the internet to be able to play.",
+  "@noConnectionDialogText": {
+    "description": "Body of the dialog telling the user they have lost their internet connection",
+    "type": "text",
+    "placeholders": {}
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:heist/db/database.dart';
 import 'package:heist/db/database_model.dart';
@@ -10,6 +11,7 @@ import 'package:heist/reducers/form_reducers.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
+import 'package:heist/widget/common.dart';
 import 'package:heist/widget/game.dart';
 import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
@@ -18,8 +20,9 @@ import 'middleware.dart';
 
 class ValidateRoomAction extends MiddlewareAction {
   final BuildContext context;
+  final Function() connectivityFunction;
 
-  ValidateRoomAction(this.context);
+  ValidateRoomAction(this.context, this.connectivityFunction);
 
   void _showRoomValidationDialog(String message) {
     showDialog(
@@ -33,39 +36,49 @@ class ValidateRoomAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
     withRequest(Request.ValidatingRoom, store, (store) async {
-      FirestoreDb db = store.state.db;
-      String code = getRoom(store.state).code;
-      Room room = await db.getRoomByCode(code);
-      if (room == null) {
-        _showRoomValidationDialog('Room with code $code does not exist.');
-        return;
+      var connectivityResult = await (connectivityFunction());
+      if (connectivityResult != ConnectivityResult.none) {
+        FirestoreDb db = store.state.db;
+        String code = getRoom(store.state).code;
+        Room room = await db.getRoomByCode(code);
+        if (room == null) {
+          _showRoomValidationDialog('Room with code $code does not exist.');
+          return;
+        }
+        store.dispatch(new SavePlayerInstallIdAction(await installId()));
+        String iid = getPlayerInstallId(store.state);
+        bool playerExists = await db.playerExists(room.id, iid);
+        if (!playerExists) {
+          String playerName = getPlayerName(store.state);
+          if (playerName == null || playerName.isEmpty) {
+            _showRoomValidationDialog('Please enter a name.');
+            return;
+          }
+          int numExistingPlayers = await db.getNumPlayers(room.id);
+          if (numExistingPlayers >= room.numPlayers) {
+            _showRoomValidationDialog('Room is full.');
+            return;
+          }
+          bool nameAlreadyTaken = await db.playerExistsWithName(room.id, playerName);
+          if (nameAlreadyTaken) {
+            _showRoomValidationDialog('Name $playerName is already taken.');
+            return;
+          }
+        }
+        Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Game(store)));
+      } else {
+        showNoConnectionDialog(context);
       }
-      store.dispatch(new SavePlayerInstallIdAction(await installId()));
-      String iid = getPlayerInstallId(store.state);
-      bool playerExists = await db.playerExists(room.id, iid);
-      if (!playerExists) {
-        String playerName = getPlayerName(store.state);
-        if (playerName == null || playerName.isEmpty) {
-          _showRoomValidationDialog('Please enter a name.');
-          return;
-        }
-        int numExistingPlayers = await db.getNumPlayers(room.id);
-        if (numExistingPlayers >= room.numPlayers) {
-          _showRoomValidationDialog('Room is full.');
-          return;
-        }
-        bool nameAlreadyTaken = await db.playerExistsWithName(room.id, playerName);
-        if (nameAlreadyTaken) {
-          _showRoomValidationDialog('Name $playerName is already taken.');
-          return;
-        }
-      }
-      Navigator.of(context).push(new MaterialPageRoute(builder: (context) => new Game(store)));
     });
   }
 }
 
 class CreateRoomAction extends MiddlewareAction {
+  final BuildContext context;
+  final Function() connectivityFunction;
+
+  CreateRoomAction(this.context, this.connectivityFunction);
+
   Future<void> _createRoom(Store<GameModel> store, String code, String appVersion) async {
     Room room = new Room(
         code: code,
@@ -82,14 +95,19 @@ class CreateRoomAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
     await withRequest(Request.ValidatingRoom, store, (store) async {
-      store.dispatch(new SavePlayerInstallIdAction(await installId()));
-      String appVersion = await _getAppVersion();
-      String code = await _newRoomCode(store);
-      await _createRoom(store, code, appVersion);
+      var connectivityResult = await (connectivityFunction());
+      if (connectivityResult != ConnectivityResult.none) {
+        store.dispatch(new SavePlayerInstallIdAction(await installId()));
+        String appVersion = await _getAppVersion();
+        String code = await _newRoomCode(store);
+        await _createRoom(store, code, appVersion);
 
-      NavigatorState navigatorState = Keys.navigatorKey.currentState;
-      if (navigatorState != null) {
-        navigatorState.push(new MaterialPageRoute(builder: (context) => new Game(store)));
+        NavigatorState navigatorState = Keys.navigatorKey.currentState;
+        if (navigatorState != null) {
+          navigatorState.push(new MaterialPageRoute(builder: (context) => new Game(store)));
+        }
+      } else {
+        showNoConnectionDialog(context);
       }
     });
   }

@@ -55,7 +55,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m18(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
 
-  static m19(winner) => "${winner} win!";
+  static m19(leaderName) => "Waiting for ${leaderName} to submit team";
+
+  static m20(winner) => "${winner} win!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -103,8 +105,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "invalidCode" : MessageLookupByLibrary.simpleMessage("Invalid code"),
     "makeYourChoice" : MessageLookupByLibrary.simpleMessage("Make your choice..."),
     "noBid" : MessageLookupByLibrary.simpleMessage("No Bid"),
+    "noConnectionDialogText" : MessageLookupByLibrary.simpleMessage("You need to be connected to the internet to be able to play."),
+    "noConnectionDialogTitle" : MessageLookupByLibrary.simpleMessage("No internet"),
     "notEnough" : MessageLookupByLibrary.simpleMessage("Not enough ectoplasm for this haunt!"),
     "notPicked" : MessageLookupByLibrary.simpleMessage("You haven\'t been picked!"),
+    "okButton" : MessageLookupByLibrary.simpleMessage("OK"),
     "otherIdentities" : MessageLookupByLibrary.simpleMessage("You also know these identities:"),
     "pickATeam" : m10,
     "pickedTeamSize" : m11,
@@ -128,7 +133,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),
     "waitingForOwner" : m17,
     "waitingForPlayers" : m18,
-    "winner" : m19,
+    "waitingForTeamSubmission" : m19,
+    "winner" : m20,
     "youAreGoing" : MessageLookupByLibrary.simpleMessage("You\'re going on a haunt!"),
     "youHaveMadeYourChoice" : MessageLookupByLibrary.simpleMessage("You have made your choice!"),
     "yourBid" : MessageLookupByLibrary.simpleMessage("Your bid"),

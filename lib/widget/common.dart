@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:heist/app_localizations.dart';
 import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
+import 'package:heist/keys.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
@@ -158,4 +161,39 @@ Widget iconText(Icon icon, Text text, {bool trailingIcon = false}) {
     crossAxisAlignment: CrossAxisAlignment.center,
     children: children,
   );
+}
+
+Future<Null> showNoConnectionDialog(BuildContext context) async {
+  return showDialog<Null>(
+    context: context,
+    barrierDismissible: false, // not dismissable
+    builder: (BuildContext context) {
+      return WillPopScope(
+        onWillPop: () {
+          // intercept back button and go to home page when tapped
+          return new Future(() async {
+            _goBackToMainPage(context);
+            return false;
+          });
+        },
+        child: new AlertDialog(
+          key: Keys.noConnectionDialogKey,
+          title: new Text(AppLocalizations.of(context).noConnectionDialogTitle),
+          content: new Text(AppLocalizations.of(context).noConnectionDialogText),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text(AppLocalizations.of(context).okButton),
+              onPressed: () {
+                _goBackToMainPage(context);
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+_goBackToMainPage(BuildContext context) {
+  Navigator.popUntil(context, ModalRoute.withName('/'));
 }

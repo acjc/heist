@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
@@ -60,11 +61,12 @@ class CreateRoomPage extends StatelessWidget {
 
   Widget _createRoomButton(BuildContext context, Store<GameModel> store) => new RaisedButton(
         child: new Text(AppLocalizations.of(context).createRoom, style: buttonTextStyle),
-        onPressed: () {
+        onPressed: () async {
           FormState enterNameState = Keys.createRoomPageNameKey.currentState;
           if (enterNameState.validate()) {
             enterNameState.save();
-            store.dispatch(new CreateRoomAction());
+            store.dispatch(new CreateRoomAction(
+                context, () => new Connectivity().checkConnectivity()));
           }
         },
       );

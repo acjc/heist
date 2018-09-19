@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-17T19:12:56.180310",
+  "@@last_modified": "2018-09-19T20:41:54.351419",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -43,6 +43,12 @@
     "placeholders": {
       "owner": {}
     }
+  },
+  "okButton": "OK",
+  "@okButton": {
+    "description": "OK button in a dialog",
+    "type": "text",
+    "placeholders": {}
   },
   "continueButton": "CONTINUE",
   "@continueButton": {
@@ -425,6 +431,14 @@
     "type": "text",
     "placeholders": {}
   },
+  "waitingForTeamSubmission": "Waiting for {leaderName} to submit team",
+  "@waitingForTeamSubmission": {
+    "description": "Waiting for leader to submit team",
+    "type": "text",
+    "placeholders": {
+      "leaderName": {}
+    }
+  },
   "pickATeam": "Pick a team: {playersPicked} / {teamSize}",
   "@pickATeam": {
     "description": "Team picker title",
@@ -496,5 +510,17 @@
       "thiefScore": {},
       "agentScore": {}
     }
+  },
+  "noConnectionDialogTitle": "No internet",
+  "@noConnectionDialogTitle": {
+    "description": "Title of the dialog telling the user they have lost their internet connection",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noConnectionDialogText": "You need to be connected to the internet to be able to play.",
+  "@noConnectionDialogText": {
+    "description": "Body of the dialog telling the user they have lost their internet connection",
+    "type": "text",
+    "placeholders": {}
   }
 }

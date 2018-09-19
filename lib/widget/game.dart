@@ -1,8 +1,12 @@
+import 'dart:async';
+
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
 import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
+import 'package:heist/keys.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/game_middleware.dart';
 import 'package:heist/middleware/room_middleware.dart';
@@ -38,6 +42,8 @@ class Game extends StatefulWidget {
 
 class GameState extends State<Game> {
   final Store<GameModel> _store;
+  StreamSubscription _connectivitySubscription;
+  Timer _connectivityTimer;
 
   GameState(this._store);
 
@@ -45,10 +51,32 @@ class GameState extends State<Game> {
   void initState() {
     super.initState();
     _store.dispatch(new LoadGameAction());
+    _connectivitySubscription = new Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      // Note that on Android, this does not guarantee connection to Internet.
+      // For instance, the app might have wifi access but it might be a VPN or
+      // a hotel WiFi with no access.
+      debugPrint('Status changed: ' + result.toString());
+      if (result == ConnectivityResult.none) {
+        // connectivity was lost, start the timer
+        _connectivityTimer = new Timer(const Duration(seconds: 5), () => showNoConnectionDialog(context));
+      } else {
+        // connectivity is back, cancel the timer
+        _connectivityTimer.cancel();
+        // and dismiss the dialog if it's shown
+        if (Keys.noConnectionDialogKey.currentWidget != null) {
+          Navigator.pop(context);
+        }
+
+      }
+    });
   }
+
+
+
 
   @override
   void dispose() {
+    _connectivitySubscription.cancel();
     resetGameStore(_store);
     super.dispose();
   }

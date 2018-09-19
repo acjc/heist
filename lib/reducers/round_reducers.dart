@@ -18,8 +18,8 @@ class PickPlayerAction extends Action<Map<String, List<Round>>> {
   PickPlayerAction(this.roundId, this.playerId);
 
   @override
-  Map<String, List<Round>> reduce(Map<String, List<Round>> state, action) {
-    Map<String, List<Round>> updated = new Map.from(state);
+  Map<String, List<Round>> reduce(Map<String, List<Round>> rounds, action) {
+    Map<String, List<Round>> updated = new Map.from(rounds);
     Round round = findRound(updated, roundId);
     round.team.add(playerId);
     return updated;
@@ -33,8 +33,8 @@ class RemovePlayerAction extends Action<Map<String, List<Round>>> {
   RemovePlayerAction(this.roundId, this.playerId);
 
   @override
-  Map<String, List<Round>> reduce(Map<String, List<Round>> state, action) {
-    Map<String, List<Round>> updated = new Map.of(state);
+  Map<String, List<Round>> reduce(Map<String, List<Round>> rounds, action) {
+    Map<String, List<Round>> updated = new Map.of(rounds);
     Round round = findRound(updated, roundId);
     round.team.remove(playerId);
     return updated;

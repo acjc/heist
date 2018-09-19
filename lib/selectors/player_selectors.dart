@@ -25,6 +25,9 @@ final getPlayerByName =
 final Selector<GameModel, List<Player>> getOtherPlayers = createSelector2(getPlayers, getSelf,
     (List<Player> players, Player me) => players.where((Player p) => p.id != me.id).toList());
 
+final Selector<GameModel, Player> getOwner = createSelector2(getRoom, getPlayers,
+    (Room room, List<Player> players) => players.singleWhere((p) => p.installId == room.owner));
+
 final Selector<GameModel, bool> amOwner = createSelector2(
     getRoom, getPlayerInstallId, (Room room, String installId) => room.owner == installId);
 

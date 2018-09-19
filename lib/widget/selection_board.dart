@@ -57,7 +57,7 @@ Widget playerTileText(String playerName, bool isInTeam, bool isLeader) {
 }
 
 Widget playerTile(BuildContext context, String playerName, bool isInTeam, bool isLeader) {
-  Color backgroundColor = Theme.of(context).accentColor;
+  Color backgroundColor = Theme.of(context).primaryColor;
   return new Container(
       alignment: Alignment.center,
       decoration: new BoxDecoration(

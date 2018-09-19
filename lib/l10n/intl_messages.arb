@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-15T23:05:02.252363",
+  "@@last_modified": "2018-09-19T20:36:16.507995",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -35,6 +35,14 @@
     "description": "Scary Ghost role",
     "type": "text",
     "placeholders": {}
+  },
+  "waitingForOwner": "Waiting for {owner} to continue...",
+  "@waitingForOwner": {
+    "description": "Room owner needs to take an action",
+    "type": "text",
+    "placeholders": {
+      "owner": {}
+    }
   },
   "okButton": "OK",
   "@okButton": {
@@ -197,23 +205,38 @@
     "type": "text",
     "placeholders": {}
   },
-  "playerBid": "{name} bid {amount}",
-  "@playerBid": {
-    "description": "How much a player has bid",
+  "pot": "Pot",
+  "@pot": {
     "type": "text",
-    "placeholders": {
-      "name": {},
-      "amount": {}
-    }
+    "placeholders": {}
   },
-  "totalPot": "Total pot = {pot} / {price}",
-  "@totalPot": {
-    "description": "Round pot over round price",
+  "price": "Price",
+  "@price": {
     "type": "text",
-    "placeholders": {
-      "pot": {},
-      "price": {}
-    }
+    "placeholders": {}
+  },
+  "yourBid": "Your bid",
+  "@yourBid": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "youAreGoing": "You're going on a haunt!",
+  "@youAreGoing": {
+    "description": "Bidding phase result",
+    "type": "text",
+    "placeholders": {}
+  },
+  "goingAhead": "The haunt is going ahead!",
+  "@goingAhead": {
+    "description": "Bidding phase result",
+    "type": "text",
+    "placeholders": {}
+  },
+  "notEnough": "Not enough ectoplasm for this haunt!",
+  "@notEnough": {
+    "description": "Bidding phase result",
+    "type": "text",
+    "placeholders": {}
   },
   "hauntInProgress": "Haunt in progress...",
   "@hauntInProgress": {

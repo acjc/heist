@@ -83,6 +83,15 @@ class AppLocalizations {
 
   // Common
 
+  String waitingForOwner(String owner) {
+    return Intl.message(
+      'Waiting for $owner to continue...',
+      name: 'waitingForOwner',
+      args: [owner],
+      desc: 'Room owner needs to take an action',
+    );
+  }
+
   String get okButton {
     return Intl.message(
       'OK',
@@ -294,21 +303,48 @@ class AppLocalizations {
     );
   }
 
-  String playerBid(String name, int amount) {
+  String get pot {
     return Intl.message(
-      '$name bid $amount',
-      name: 'playerBid',
-      args: [name, amount],
-      desc: 'How much a player has bid',
+      'Pot',
+      name: 'pot',
     );
   }
 
-  String totalPot(int pot, int price) {
+  String get price {
     return Intl.message(
-      'Total pot = $pot / $price',
-      name: 'totalPot',
-      args: [pot, price],
-      desc: 'Round pot over round price',
+      'Price',
+      name: 'price',
+    );
+  }
+
+  String get yourBid {
+    return Intl.message(
+      'Your bid',
+      name: 'yourBid',
+    );
+  }
+
+  String get youAreGoing {
+    return Intl.message(
+      "You're going on a haunt!",
+      name: 'youAreGoing',
+      desc: 'Bidding phase result',
+    );
+  }
+
+  String get goingAhead {
+    return Intl.message(
+      'The haunt is going ahead!',
+      name: 'goingAhead',
+      desc: 'Bidding phase result',
+    );
+  }
+
+  String get notEnough {
+    return Intl.message(
+      'Not enough ectoplasm for this haunt!',
+      name: 'notEnough',
+      desc: 'Bidding phase result',
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:reselect/reselect.dart';
 export 'bidding_selectors.dart';
 export 'gifting_selectors.dart';
 export 'haunt_selectors.dart';
+export 'local_actions_selectors.dart';
 export 'player_selectors.dart';
 export 'setup_selectors.dart';
 export 'team_picker_selectors.dart';
@@ -20,6 +21,7 @@ final getBidAmount = (GameModel gameModel) => gameModel.bidAmount;
 final getGiftAmount = (GameModel gameModel) => gameModel.giftAmount;
 final getSubscriptions = (GameModel gameModel) => gameModel.subscriptions;
 final getRequests = (GameModel gameModel) => gameModel.requests;
+final getLocalActions = (GameModel gameModel) => gameModel.localActions;
 
 bool requestInProcess(GameModel gameModel, Request request) =>
     getRequests(gameModel).contains(request);

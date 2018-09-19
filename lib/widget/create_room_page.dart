@@ -62,15 +62,11 @@ class CreateRoomPage extends StatelessWidget {
   Widget _createRoomButton(BuildContext context, Store<GameModel> store) => new RaisedButton(
         child: new Text(AppLocalizations.of(context).createRoom, style: buttonTextStyle),
         onPressed: () async {
-          var connectivityResult = await (new Connectivity().checkConnectivity());
-          if (connectivityResult != ConnectivityResult.none) {
-            FormState enterNameState = Keys.createRoomPageNameKey.currentState;
-            if (enterNameState.validate()) {
-              enterNameState.save();
-              store.dispatch(new CreateRoomAction());
-            }
-          } else {
-            showNoConnectionDialog(context);
+          FormState enterNameState = Keys.createRoomPageNameKey.currentState;
+          if (enterNameState.validate()) {
+            enterNameState.save();
+            store.dispatch(new CreateRoomAction(
+                context, () => new Connectivity().checkConnectivity()));
           }
         },
       );

@@ -19,7 +19,7 @@ void main() {
     Store<GameModel> store = createStore(db, minPlayers);
     store.dispatch(new SavePlayerNameAction('_name'));
 
-    await handle(store, new CreateRoomAction());
+    await handle(store, new CreateRoomAction(null, () => true));
     expect(store.state.room.code.length, 4);
     expect(store.state.room.appVersion, isNotNull);
     expect(store.state.room.numPlayers, minPlayers);

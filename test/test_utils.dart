@@ -32,7 +32,7 @@ Future<Store<GameModel>> initGame() async {
   FirestoreDb db = new MockFirestoreDb.empty();
   Store<GameModel> store = createStore(db, minPlayers);
   store.dispatch(new SavePlayerNameAction('_name'));
-  await handle(store, new CreateRoomAction());
+  await handle(store, new CreateRoomAction(null, () => true));
   await new LoadGameAction().loadGame(store);
   await handle(store, new JoinGameAction());
   await addOtherPlayers(store);

@@ -13,7 +13,6 @@ import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/create_room_page.dart';
 import 'package:redux/redux.dart';
-import 'dart:async';
 
 import 'common.dart';
 
@@ -43,17 +42,13 @@ class HomePage extends StatelessWidget {
   Widget _enterRoomButton(BuildContext context, Store<GameModel> store) => new RaisedButton(
         child: Text(AppLocalizations.of(context).enterRoom, style: buttonTextStyle),
         onPressed: () async {
-          var connectivityResult = await (new Connectivity().checkConnectivity());
-          if (connectivityResult != ConnectivityResult.none) {
-            FormState enterCodeState = Keys.homePageCodeKey.currentState;
-            FormState enterNameState = Keys.homePageNameKey.currentState;
-            if (enterCodeState.validate()) {
-              enterCodeState.save();
-              enterNameState.save();
-              store.dispatch(new ValidateRoomAction(context));
-            }
-          } else {
-            showNoConnectionDialog(context);
+          FormState enterCodeState = Keys.homePageCodeKey.currentState;
+          FormState enterNameState = Keys.homePageNameKey.currentState;
+          if (enterCodeState.validate()) {
+            enterCodeState.save();
+            enterNameState.save();
+            store.dispatch(new ValidateRoomAction(
+                context, () => new Connectivity().checkConnectivity()));
           }
         },
       );

@@ -36,6 +36,12 @@
     "type": "text",
     "placeholders": {}
   },
+  "okButton": "OK",
+  "@okButton": {
+    "description": "OK button in a dialog",
+    "type": "text",
+    "placeholders": {}
+  },
   "continueButton": "CONTINUE",
   "@continueButton": {
     "description": "Button for the game organiser to move to the next round or haunt",
@@ -229,15 +235,15 @@
   },
   "brendaReceived": "...received by {brendaDisplayName}",
   "@brendaReceived": {
-    "description": "Describe how much money the Brenda receives after a haunt",
+    "description": "Describe how much money Brenda receives after a haunt",
     "type": "text",
     "placeholders": {
       "brendaDisplayName": {}
     }
   },
-  "sharedBetween": "...shared between the {bertieDisplayName}} and any players who chose {stealOption} on the haunt:",
+  "sharedBetween": "...shared between {bertieDisplayName}} and any players who chose {stealOption} on the haunt:",
   "@sharedBetween": {
-    "description": "Describe how much money gets split between the Bertie and those who stole",
+    "description": "Describe how much money gets split between Bertie and those who stole",
     "type": "text",
     "placeholders": {
       "bertieDisplayName": {},
@@ -467,5 +473,17 @@
       "thiefScore": {},
       "agentScore": {}
     }
+  },
+  "noConnectionDialogTitle": "No internet",
+  "@noConnectionDialogTitle": {
+    "description": "Title of the dialog telling the user they have lost their internet connection",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noConnectionDialogText": "You need to be connected to the internet to be able to play.",
+  "@noConnectionDialogText": {
+    "description": "Body of the dialog telling the user they have lost their internet connection",
+    "type": "text",
+    "placeholders": {}
   }
 }

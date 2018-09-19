@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -40,13 +41,14 @@ class HomePage extends StatelessWidget {
 
   Widget _enterRoomButton(BuildContext context, Store<GameModel> store) => new RaisedButton(
         child: Text(AppLocalizations.of(context).enterRoom, style: buttonTextStyle),
-        onPressed: () {
+        onPressed: () async {
           FormState enterCodeState = Keys.homePageCodeKey.currentState;
           FormState enterNameState = Keys.homePageNameKey.currentState;
           if (enterCodeState.validate()) {
             enterCodeState.save();
             enterNameState.save();
-            store.dispatch(new ValidateRoomAction(context));
+            store.dispatch(new ValidateRoomAction(
+                context, () => new Connectivity().checkConnectivity()));
           }
         },
       );

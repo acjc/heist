@@ -16,6 +16,7 @@ dependencies:
   flutter_redux_dev_tools: ^0.3.0
   flutter_localizations:
       sdk: flutter
+  connectivity: ^0.3.1
 
 dev_dependencies:
   flutter_test:

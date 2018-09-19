@@ -15,17 +15,18 @@ import '../test_utils.dart';
 
 void main() {
   test('test create and set up room', () async {
-    FirestoreDb db = new MockFirestoreDb.empty();
+    FirestoreDb db = MockFirestoreDb.empty();
     Store<GameModel> store = createStore(db, minPlayers);
-    store.dispatch(new SavePlayerNameAction('_name'));
+    store.dispatch(SavePlayerNameAction('_name'));
 
-    await handle(store, new CreateRoomAction(null, () => true));
-    expect(store.state.room.code.length, 4);
-    expect(store.state.room.appVersion, isNotNull);
-    expect(store.state.room.numPlayers, minPlayers);
+    await handle(store, CreateRoomAction(null, () => true));
+    Room room = getRoom(store.state);
+    expect(room.code.length, 4);
+    expect(room.appVersion, isNotNull);
+    expect(room.numPlayers, minPlayers);
     expect(
-        store.state.room.roles,
-        new Set.of([
+        room.roles,
+        Set.of([
           Roles.accountant.roleId,
           Roles.brenda.roleId,
           Roles.scaryGhost1.roleId,
@@ -34,33 +35,36 @@ void main() {
         ]));
 
     // Call loadGame() manually to avoid some async calls that we call manually later in the test
-    await new LoadGameAction().loadGame(store);
+    await LoadGameAction().loadGame(store);
     expect(store.state.subscriptions.subs, isNotEmpty);
 
-    await handle(store, new JoinGameAction());
+    await handle(store, JoinGameAction());
     expect(getSelf(store.state), isNotNull);
 
     await addOtherPlayers(store);
 
-    await handle(store, new SetUpNewGameAction());
-    expect(store.state.players.length, store.state.room.numPlayers);
+    await handle(store, SetUpNewGameAction());
+    List<Player> players = getPlayers(store.state);
+    expect(players.length, room.numPlayers);
     expect(waitingForPlayers(store.state), false);
-    for (Player player in store.state.players) {
+    for (Player player in players) {
       expect(player.role, isNotNull);
     }
-    expect(store.state.haunts.length, 1);
+    expect(getHaunts(store.state).length, 5);
+    expect(getRounds(store.state).length, 5);
+    expect(getRounds(store.state).values.expand((rs) => rs).length, 25);
   });
 
   test('add visible to accountant player', () async {
     Store<GameModel> store = await initGame();
-    expect(store.state.room.visibleToAccountant, null);
+    expect(getRoom(store.state).visibleToAccountant, null);
 
-    await handle(store, new AddVisibleToAccountantAction("player1"));
-    expect(store.state.room.visibleToAccountant.length, 1);
-    expect(store.state.room.visibleToAccountant.contains("player1"), true);
+    await handle(store, AddVisibleToAccountantAction('player1'));
+    expect(getRoom(store.state).visibleToAccountant.length, 1);
+    expect(getRoom(store.state).visibleToAccountant.contains('player1'), true);
 
-    await handle(store, new AddVisibleToAccountantAction("player2"));
-    expect(store.state.room.visibleToAccountant.length, 2);
-    expect(store.state.room.visibleToAccountant.containsAll(["player1", "player2"]), true);
+    await handle(store, AddVisibleToAccountantAction('player2'));
+    expect(getRoom(store.state).visibleToAccountant.length, 2);
+    expect(getRoom(store.state).visibleToAccountant.containsAll(['player1', 'player2']), true);
   });
 }

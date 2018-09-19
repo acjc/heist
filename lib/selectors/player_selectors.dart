@@ -68,12 +68,16 @@ int calculateBalance(
     if (rounds != null && rounds.isNotEmpty) {
       balance = resolveBalanceForGifts(player.id, rounds, balance);
 
-      Map<String, Bid> mostRecentBids = rounds.last.bids;
+      Round lastRound;
       if (haunt.allDecided) {
-        balance -= mostRecentBids[player.id].amount;
-        balance = resolveBalanceForHauntOutcome(players, player, haunt, rounds.last.pot, balance);
-      } else if (hasProposedBid(player.id, mostRecentBids, players.length)) {
-        balance -= mostRecentBids[player.id].amount;
+        lastRound = rounds.lastWhere((r) => r.complete);
+        balance -= lastRound.bids[player.id].amount;
+        balance = resolveBalanceForHauntOutcome(players, player, haunt, lastRound.pot, balance);
+      } else {
+        lastRound = rounds.firstWhere((r) => !r.complete);
+        if (hasProposedBid(player.id, lastRound.bids, players.length)) {
+          balance -= lastRound.bids[player.id].amount;
+        }
       }
     }
   });
@@ -93,7 +97,7 @@ int resolveBalanceForGifts(String playerId, List<Round> rounds, int balance) {
 }
 
 Random newRandomForHaunt(Haunt haunt) {
-  return new Random(haunt.id.hashCode);
+  return Random(haunt.id.hashCode);
 }
 
 int calculateBrendaPayout(Random random, int pot) {

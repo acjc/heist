@@ -66,34 +66,34 @@ class SetUpNewGameAction extends MiddlewareAction {
     }
   }
 
-  Future<String> _createFirstHaunt(Store<GameModel> store) async {
+  Future<String> _createHaunt(Store<GameModel> store, int order) async {
     FirestoreDb db = store.state.db;
     Room room = getRoom(store.state);
     List<Haunt> haunts = getHaunts(store.state);
-    if (haunts.isEmpty) {
-      Haunt haunt = await db.getHaunt(room.id, 1);
+    if (!haunts.any((h) => h.order == order)) {
+      Haunt haunt = await db.getHaunt(room.id, order);
       if (haunt != null) {
         return haunt.id;
       }
-      HauntDefinition hauntDefinition = hauntDefinitions[room.numPlayers][1];
-      Haunt newHaunt = new Haunt(
+      HauntDefinition hauntDefinition = hauntDefinitions[room.numPlayers][order];
+      Haunt newHaunt = Haunt(
           price: hauntDefinition.price,
           numPlayers: hauntDefinition.numPlayers,
           maximumBid: hauntDefinition.maximumBid,
-          order: 1,
+          order: order,
           startedAt: now());
       return db.upsertHaunt(newHaunt, room.id);
     }
-    return haunts[0].id;
+    return haunts.singleWhere((h) => h.order == order).id;
   }
 
-  Future<void> _createFirstRound(Store<GameModel> store, String hauntId) async {
+  Future<void> _createRound(Store<GameModel> store, String hauntId, int order) async {
     FirestoreDb db = store.state.db;
     String roomId = getRoom(store.state).id;
-    if (!hasRounds(store.state) && !(await db.roundExists(roomId, hauntId, 1))) {
-      String newLeader = getPlayers(store.state).singleWhere((p) => p.order == 1).id;
-      Round round =
-          new Round(order: 1, haunt: hauntId, leader: newLeader, team: new Set(), startedAt: now());
+    List<Round> roundsForHaunt = getRounds(store.state)[hauntId];
+    bool roundExistsLocally = roundsForHaunt != null && roundsForHaunt.any((r) => r.order == order);
+    if (!roundExistsLocally && !(await db.roundExists(roomId, hauntId, order))) {
+      Round round = Round(order: order, haunt: hauntId, team: Set(), startedAt: now());
       return db.upsertRound(round, roomId);
     }
   }
@@ -101,9 +101,12 @@ class SetUpNewGameAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
     _assignRoles(store);
-    // TODO: create all haunts now to minimise how often we have to create new documents in the database
-    String hauntId = await _createFirstHaunt(store);
-    return _createFirstRound(store, hauntId);
+    for (int i = 1; i <= 5; i++) {
+      String hauntId = await _createHaunt(store, i);
+      for (int j = 1; j <= 5; j++) {
+        await _createRound(store, hauntId, j);
+      }
+    }
   }
 }
 

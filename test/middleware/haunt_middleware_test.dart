@@ -13,17 +13,15 @@ void main() {
     Store<GameModel> store = await initGame();
     String myId = getSelf(store.state).id;
 
-    await handle(store, new MakeDecisionAction(Steal));
+    await handle(store, MakeDecisionAction(Steal));
     expect(currentHaunt(store.state).decisions[myId], Steal);
   });
 
-  test('test complete heist', () async {
+  test('test complete haunt', () async {
     Store<GameModel> store = await initGame();
 
-    expect(getHaunts(store.state).length, 1);
-    await handle(store, new CompleteHauntAction());
-    expect(getHaunts(store.state).length, 2);
-    expect(getRounds(store.state).values.length, 2);
+    expect(getHaunts(store.state).length, 5);
+    await handle(store, CompleteHauntAction());
 
     Haunt previousHaunt = getHaunts(store.state).singleWhere((h) => h.order == 1);
     expect(previousHaunt.completedAt, isNotNull);

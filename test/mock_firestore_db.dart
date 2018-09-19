@@ -133,7 +133,16 @@ class MockFirestoreDb implements FirestoreDb {
       }
       players
         ..removeWhere((p) => p.id == player.id)
-        ..add(player);
+        ..add(player)
+        ..sort((p1, p2) {
+          if (p1.order == null) {
+            return -1;
+          }
+          if (p2.order == null) {
+            return 1;
+          }
+          return p1.order.compareTo(p2.order);
+        });
       _postPlayers();
     });
   }
@@ -158,7 +167,8 @@ class MockFirestoreDb implements FirestoreDb {
       }
       haunts
         ..removeWhere((h) => h.id == haunt.id)
-        ..add(haunt);
+        ..add(haunt)
+        ..sort((h1, h2) => h1.order.compareTo(h2.order));
       _postHaunts();
       return haunt.id;
     });
@@ -173,7 +183,8 @@ class MockFirestoreDb implements FirestoreDb {
       if (rounds.containsKey(round.haunt)) {
         rounds[round.haunt]
           ..removeWhere((r) => r.id == round.id)
-          ..add(round);
+          ..add(round)
+          ..sort((r1, r2) => r1.order.compareTo(r2.order));
       } else {
         rounds[round.haunt] = [round];
       }

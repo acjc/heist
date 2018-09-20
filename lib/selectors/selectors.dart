@@ -27,7 +27,13 @@ bool requestInProcess(GameModel gameModel, Request request) =>
     getRequests(gameModel).contains(request);
 
 // Reselect would not recognise changes to the current haunt
-final currentHaunt = (GameModel gameModel) => getHaunts(gameModel).firstWhere((h) => !h.complete);
+Haunt currentHaunt(GameModel gameModel) => getHaunts(gameModel).firstWhere((h) => !h.complete);
+
+final Selector<GameModel, Round> currentRound = createSelector2(
+    currentHaunt,
+    getRounds,
+    (Haunt currentHaunt, Map<String, List<Round>> rounds) =>
+        rounds[currentHaunt.id].firstWhere((r) => !r.complete));
 
 Round lastRoundForHaunt(GameModel gameModel, Haunt haunt) {
   List<Round> rounds = getRounds(gameModel)[haunt.id];
@@ -45,9 +51,3 @@ final Selector<GameModel, Round> previousRound = createSelector3(
 
 Round roundByOrder(Haunt haunt, Map<String, List<Round>> rounds, int order) =>
     rounds[haunt.id].singleWhere((r) => r.order == order);
-
-final Selector<GameModel, Round> currentRound = createSelector2(
-    currentHaunt,
-    getRounds,
-    (Haunt currentHaunt, Map<String, List<Round>> rounds) =>
-        rounds[currentHaunt.id].firstWhere((r) => !r.complete));

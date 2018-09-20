@@ -4,35 +4,30 @@ import 'package:heist/db/database_model.dart';
 import 'package:heist/haunt_definitions.dart';
 import 'package:heist/role.dart';
 import 'package:heist/state.dart';
-import 'package:redux/redux.dart';
 import 'package:reselect/reselect.dart';
 
 import 'selectors.dart';
 
 // Selectors do not seem to work if you ever return null
-final getSelf = (GameModel gameModel) => getPlayers(gameModel)
+Player getSelf(GameModel gameModel) => getPlayers(gameModel)
     .singleWhere((p) => p.installId == getPlayerInstallId(gameModel), orElse: () => null);
 
-final getPlayerByRoleId =
-    (GameModel gameModel, String role) => getPlayers(gameModel).singleWhere((p) => p.role == role);
+Player getPlayerByRoleId(GameModel gameModel, String role) =>
+    getPlayers(gameModel).singleWhere((p) => p.role == role);
 
-final getPlayerById =
-    (GameModel gameModel, String id) => getPlayers(gameModel).singleWhere((p) => p.id == id);
+Player getPlayerById(GameModel gameModel, String id) =>
+    getPlayers(gameModel).singleWhere((p) => p.id == id);
 
-final getPlayerByName =
-    (GameModel gameModel, String name) => getPlayers(gameModel).singleWhere((p) => p.name == name);
+Player getPlayerByName(GameModel gameModel, String name) =>
+    getPlayers(gameModel).singleWhere((p) => p.name == name);
 
 final Selector<GameModel, List<Player>> getOtherPlayers = createSelector2(getPlayers, getSelf,
     (List<Player> players, Player me) => players.where((Player p) => p.id != me.id).toList());
 
-final Selector<GameModel, Player> getOwner = createSelector2(getRoom, getPlayers,
-    (Room room, List<Player> players) => players.singleWhere((p) => p.installId == room.owner));
-
 final Selector<GameModel, bool> amOwner = createSelector2(
     getRoom, getPlayerInstallId, (Room room, String installId) => room.owner == installId);
 
-final getBrenda = (GameModel gameModel) =>
-    getPlayers(gameModel).singleWhere((p) => p.role == Roles.brenda.roleId, orElse: null);
+Player getBrenda(GameModel gameModel) => getPlayerByRoleId(gameModel, Roles.brenda.roleId);
 
 final Selector<GameModel, bool> haveGuessedBrenda = createSelector3(
     getSelf,
@@ -51,8 +46,8 @@ final Selector<GameModel, int> currentBalance = createSelector4(
     (List<Player> players, Player me, List<Haunt> haunts, Map<String, List<Round>> rounds) =>
         calculateBalance(players, me, haunts, rounds));
 
-int calculateBalanceFromStore(Store<GameModel> store, Player player) => calculateBalance(
-    getPlayers(store.state), player, getHaunts(store.state), getRounds(store.state));
+int calculateBalanceFromState(GameModel gameModel, Player player) =>
+    calculateBalance(getPlayers(gameModel), player, getHaunts(gameModel), getRounds(gameModel));
 
 int calculateBalance(
     List<Player> players, Player player, List<Haunt> haunts, Map<String, List<Round>> allRounds) {
@@ -96,17 +91,12 @@ int resolveBalanceForGifts(String playerId, List<Round> rounds, int balance) {
   return balance;
 }
 
-Random newRandomForHaunt(Haunt haunt) {
-  return Random(haunt.id.hashCode);
-}
+Random newRandomForHaunt(Haunt haunt) => Random(haunt.id.hashCode);
 
-int calculateBrendaPayout(Random random, int pot) {
-  return randomlySplit(random, pot, 2)[0];
-}
+int calculateBrendaPayout(Random random, int pot) => randomlySplit(random, pot, 2)[0];
 
-bool hasProposedBid(String playerId, Map<String, Bid> bids, int numPlayers) {
-  return bids.length != numPlayers && bids.containsKey(playerId);
-}
+bool hasProposedBid(String playerId, Map<String, Bid> bids, int numPlayers) =>
+    bids.length != numPlayers && bids.containsKey(playerId);
 
 int resolveBalanceForHauntOutcome(
     List<Player> players, Player player, Haunt haunt, int pot, int balance) {
@@ -138,11 +128,11 @@ List<int> randomlySplit(Random random, int n, int ways) {
   bool splitsEvenly = remainder == 0;
   double portion = n / ways;
   if (splitsEvenly) {
-    return new List.generate(ways, (i) => portion.round());
+    return List.generate(ways, (i) => portion.round());
   }
-  List<int> ceilIndices = new List.generate(ways, (i) => i);
+  List<int> ceilIndices = List.generate(ways, (i) => i);
   ceilIndices.shuffle(random);
-  return new List.generate(ways, (i) {
+  return List.generate(ways, (i) {
     return ceilIndices.indexOf(i) < remainder ? portion.ceil() : portion.floor();
   });
 }

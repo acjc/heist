@@ -81,14 +81,14 @@ class GameState extends State<Game> {
 
   Widget _resolveEndgame(bool completingGame) {
     if (!getRoom(_store.state).complete && !completingGame) {
-      _store.dispatch(new CompleteGameAction());
+      _store.dispatch(CompleteGameAction());
     }
     return endgame(context, _store);
   }
 
   Widget _resolveAuctionWinners(bool resolvingAuction) {
     if (amOwner(_store.state) && !resolvingAuction) {
-      _store.dispatch(new ResolveAuctionWinnersAction());
+      _store.dispatch(ResolveAuctionWinnersAction());
     }
     return null;
   }
@@ -108,7 +108,8 @@ class GameState extends State<Game> {
   }
 
   Widget _gameLoop(MainBoardViewModel viewModel) {
-    // Allow local continues from bidding summary
+    // Show bidding summary of previous round (if it exists and as long as a team
+    // has not yet been selected for the current round)
     if (viewModel.waitingForTeam && !viewModel.previousRoundContinued) {
       return appendGameHistory(RoundEnd(_store, viewModel.currentRoundOrder - 1));
     }
@@ -147,9 +148,9 @@ class GameState extends State<Game> {
     return null;
   }
 
-  Widget appendGameHistory(Widget child) => new Column(
+  Widget appendGameHistory(Widget child) => Column(
         children: [
-          new Expanded(child: child),
+          Expanded(child: child),
           gameHistory(_store),
         ],
       );

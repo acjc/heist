@@ -7,8 +7,12 @@ import 'selectors.dart';
 final Selector<GameModel, bool> rolesAreAssigned = createSelector1(getPlayers,
     (List<Player> players) => players.every((p) => p.role != null && p.role.isNotEmpty));
 
-final Selector<GameModel, bool> isNewGame = createSelector3(rolesAreAssigned, getHaunts, hasRounds,
-    (rolesAreAssigned, haunts, hasRounds) => !rolesAreAssigned || haunts.length < 5 || !hasRounds);
+final Selector<GameModel, bool> isNewGame = createSelector3(
+    rolesAreAssigned,
+    getHaunts,
+    hasRounds,
+    (bool rolesAreAssigned, List<Haunt> haunts, bool hasRounds) =>
+        !rolesAreAssigned || haunts.length < 5 || !hasRounds);
 
 final Selector<GameModel, bool> hasRounds = createSelector1(
     getRounds,
@@ -27,8 +31,14 @@ final Selector<GameModel, bool> gameIsReady = createSelector5(
     isNewGame,
     getHaunts,
     hasRounds,
-    (roomIsAvailable, waitingForPlayers, isNewGame, haunts, hasRounds) =>
+    (
+      bool roomIsAvailable,
+      bool waitingForPlayers,
+      bool isNewGame,
+      List<Haunt> haunts,
+      bool hasRounds,
+    ) =>
         roomIsAvailable && !waitingForPlayers && !isNewGame && haunts.length == 5 && hasRounds);
 
-final Selector<GameModel, bool> haveJoinedGame =
-    createSelector2(getSelf, getRoom, (me, room) => me != null && me.room?.documentID == room.id);
+final Selector<GameModel, bool> haveJoinedGame = createSelector2(
+    getSelf, getRoom, (Player me, Room room) => me != null && me.room?.documentID == room.id);

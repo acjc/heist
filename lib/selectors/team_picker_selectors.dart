@@ -51,5 +51,5 @@ final Selector<GameModel, Set<Player>> currentTeam = createSelector2(
 final Selector<GameModel, bool> currentTeamIsFull = createSelector2(currentHaunt, currentTeam,
     (Haunt currentHaunt, Set<Player> currentTeam) => currentHaunt.numPlayers == currentTeam.length);
 
-final teamForRound = (GameModel gameModel, Round round) =>
+Set<Player> teamForRound(GameModel gameModel, Round round) =>
     getPlayers(gameModel).where((p) => round.team.contains(p.id)).toSet();

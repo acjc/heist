@@ -44,5 +44,5 @@ Score calculateScore(List<Haunt> haunts) {
       }
     }
   }
-  return new Score(scaryScore, friendlyScore);
+  return Score(scaryScore, friendlyScore);
 }

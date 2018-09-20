@@ -16,7 +16,8 @@ final Selector<GameModel, Set<String>> bidderNames =
 final Selector<GameModel, bool> biddingComplete = createSelector2(
     bidders, getRoom, (Set<Player> bidders, Room room) => bidders.length == room.numPlayers);
 
-final Selector<GameModel, Bid> myCurrentBid =
-    createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.bids[me.id]);
+final Selector<GameModel, Bid> myCurrentBid = createSelector2(
+    currentRound, getSelf, (Round currentRound, Player me) => currentRound.bids[me.id]);
 
-final isAuction = (GameModel gameModel) => currentRound(gameModel).isAuction;
+final Selector<GameModel, bool> isAuction =
+    createSelector1(currentRound, (Round currentRound) => currentRound.isAuction);

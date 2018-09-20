@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-20T17:40:32.782374",
+  "@@last_modified": "2018-09-20T18:47:32.089424",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -96,7 +96,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "homepageTitle": "Heist: Homepage",
+  "homepageTitle": "Homepage",
   "@homepageTitle": {
     "description": "Title for the homepage",
     "type": "text",
@@ -132,13 +132,13 @@
     "type": "text",
     "placeholders": {}
   },
-  "createRoomTitle": "Heist: Create new room",
+  "createRoomTitle": "Create new game",
   "@createRoomTitle": {
     "description": "Title for the page to create a room",
     "type": "text",
     "placeholders": {}
   },
-  "createRoom": "CREATE ROOM",
+  "createRoom": "CREATE NEW GAME",
   "@createRoom": {
     "description": "Button to create a new room",
     "type": "text",

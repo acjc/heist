@@ -31,10 +31,20 @@ final currentHaunt = (GameModel gameModel) => getHaunts(gameModel).firstWhere((h
 
 Round lastRoundForHaunt(GameModel gameModel, Haunt haunt) {
   List<Round> rounds = getRounds(gameModel)[haunt.id];
-  return haunt.allDecided
+  return haunt.complete
       ? rounds.lastWhere((r) => r.complete)
       : rounds.firstWhere((r) => !r.complete);
 }
+
+final Selector<GameModel, Round> previousRound = createSelector3(
+    currentHaunt,
+    getRounds,
+    currentRound,
+    (Haunt currentHaunt, Map<String, List<Round>> rounds, Round currentRound) =>
+        roundByOrder(currentHaunt, rounds, currentRound.order - 1));
+
+Round roundByOrder(Haunt haunt, Map<String, List<Round>> rounds, int order) =>
+    rounds[haunt.id].singleWhere((r) => r.order == order);
 
 final Selector<GameModel, Round> currentRound = createSelector2(
     currentHaunt,

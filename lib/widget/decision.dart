@@ -11,10 +11,10 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget activeHeist(BuildContext context, Store<GameModel> store) {
+Widget activeHaunt(BuildContext context, Store<GameModel> store) {
   List<Widget> children = [
     roundTitleCard(context, store),
-    observeHeist(store),
+    observeHaunt(store),
   ];
   if (goingOnHaunt(store.state)) {
     children.add(
@@ -24,7 +24,7 @@ Widget activeHeist(BuildContext context, Store<GameModel> store) {
   return new Column(children: children);
 }
 
-Widget observeHeist(Store<GameModel> store) {
+Widget observeHaunt(Store<GameModel> store) {
   return new StoreConnector<GameModel, Map<String, String>>(
       converter: (store) => currentHaunt(store.state).decisions,
       distinct: true,
@@ -36,7 +36,7 @@ Widget observeHeist(Store<GameModel> store) {
                 child: new Column(children: [
                   new Text(AppLocalizations.of(context).hauntInProgress, style: infoTextStyle),
                   new TeamGridView(
-                    observeHeistChildren(
+                    observeHauntChildren(
                       context,
                       currentTeam(store.state),
                       decisions,
@@ -46,7 +46,7 @@ Widget observeHeist(Store<GameModel> store) {
       });
 }
 
-List<Widget> observeHeistChildren(
+List<Widget> observeHauntChildren(
     BuildContext context, Set<Player> team, Map<String, String> decisions) {
   Color color = Theme.of(context).accentColor;
   return new List.generate(team.length, (i) {

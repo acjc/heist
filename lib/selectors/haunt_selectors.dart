@@ -6,13 +6,14 @@ import 'package:reselect/reselect.dart';
 import 'selectors.dart';
 
 final Selector<GameModel, bool> hauntIsActive = createSelector4(
-    currentRound,
-    currentHaunt,
-    biddingComplete,
-    isAuction,
-    (Round currentRound, Haunt currentHaunt, bool biddingComplete, bool isAuction) =>
-        ((isAuction && biddingComplete) || currentRound.pot >= currentHaunt.price) &&
-        !currentHaunt.allDecided);
+    getRounds, currentHaunt, biddingComplete, isAuction,
+    (Map<String, List<Round>> rounds, Haunt currentHaunt, bool biddingComplete, bool isAuction) {
+  bool priceMet = rounds[currentHaunt.id]
+      .any((r) => r.pot >= currentHaunt.price && r.teamSubmitted && r.complete);
+  return ((isAuction && biddingComplete) || priceMet) &&
+      !currentHaunt.complete &&
+      !currentHaunt.allDecided;
+});
 
 final Selector<GameModel, bool> goingOnHaunt =
     createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.team.contains(me.id));

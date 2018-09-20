@@ -74,7 +74,7 @@ class GameState extends State<Game> {
 
   @override
   void dispose() {
-    _connectivitySubscription.cancel();
+    _connectivitySubscription?.cancel();
     resetGameStore(_store);
     super.dispose();
   }
@@ -104,38 +104,44 @@ class GameState extends State<Game> {
       bidding(store),
     );
     children.add(gifting(store));
-    return new ListView(children: children);
+    return ListView(children: children);
   }
 
   Widget _gameLoop(MainBoardViewModel viewModel) {
-    // team picking (not needed for auctions)
-    if (!isAuction(_store.state) && (viewModel.waitingForTeam || !viewModel.teamSelected)) {
+    // Allow local continues from bidding summary
+    if (viewModel.waitingForTeam && !viewModel.previousRoundContinued) {
+      return appendGameHistory(RoundEnd(_store, viewModel.currentRoundOrder - 1));
+    }
+
+    // Current haunt has happened so ask to complete it
+    if (viewModel.hauntDecided && !viewModel.hauntComplete) {
+      return appendGameHistory(HauntEnd(_store));
+    }
+
+    // Haunt is currently happening
+    if (viewModel.hauntIsActive) {
+      return appendGameHistory(activeHaunt(context, _store));
+    }
+
+    // Team selection (not needed for auctions)
+    if (!isAuction(_store.state) &&
+        (viewModel.waitingForTeam || !viewModel.teamSelectionContinued)) {
       return TeamSelection(_store, isMyGo(_store.state));
     }
 
-    // bidding
+    // Bidding & gifting
     if (!viewModel.biddingComplete) {
       return appendGameHistory(_biddingAndGifting(_store));
     }
 
-    // resolve round
-    if (!viewModel.roundComplete || !viewModel.roundContinued) {
-      return appendGameHistory(RoundEnd(_store));
-    }
-
-    // resolve auction
+    // Select team from auction if necessary
     if (isAuction(_store.state) && viewModel.waitingForTeam) {
       return _resolveAuctionWinners(viewModel.resolvingAuction);
     }
 
-    // active haunt
-    if (viewModel.hauntIsActive) {
-      return appendGameHistory(activeHeist(context, _store));
-    }
-
-    // go to next haunt
-    if (viewModel.hauntDecided && !viewModel.hauntComplete) {
-      return appendGameHistory(HauntEnd(_store));
+    // Bidding summary
+    if (!viewModel.roundComplete) {
+      return appendGameHistory(RoundEnd(_store, viewModel.currentRoundOrder));
     }
 
     return null;
@@ -154,8 +160,15 @@ class GameState extends State<Game> {
           Haunt haunt = currentHaunt(store.state);
           Round round = currentRound(store.state);
           return MainBoardViewModel._(
+            currentRoundOrder: round.order,
+            previousRoundContinued: round.order == 1 ||
+                localRoundActionRecorded(
+                  store.state,
+                  previousRound(store.state).id,
+                  LocalRoundAction.RoundEndContinue,
+                ),
             waitingForTeam: !round.teamSubmitted,
-            teamSelected: localRoundActionRecorded(
+            teamSelectionContinued: localRoundActionRecorded(
               store.state,
               round.id,
               LocalRoundAction.TeamSelectionContinue,
@@ -163,11 +176,6 @@ class GameState extends State<Game> {
             biddingComplete: biddingComplete(store.state),
             resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
             roundComplete: round.complete,
-            roundContinued: localRoundActionRecorded(
-              store.state,
-              round.id,
-              LocalRoundAction.RoundEndContinue,
-            ),
             hauntIsActive: hauntIsActive(store.state),
             hauntDecided: haunt.allDecided,
             hauntComplete: haunt.complete,
@@ -185,23 +193,23 @@ class GameState extends State<Game> {
 
   Widget _waitingForPlayers(List<Player> playersSoFar, int numPlayers) {
     List<Widget> children = [
-      new Padding(
+      Padding(
         padding: paddingTitle,
-        child: new Text(
+        child: Text(
           AppLocalizations.of(context).waitingForPlayers(playersSoFar.length, numPlayers),
           style: titleTextStyle,
         ),
       ),
     ];
-    children.addAll(new List.generate(playersSoFar.length, (i) => new Text(playersSoFar[i].name)));
-    return new Column(
+    children.addAll(List.generate(playersSoFar.length, (i) => Text(playersSoFar[i].name)));
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: children,
     );
   }
 
-  Widget _loadingScreen() => new StoreConnector<GameModel, LoadingScreenViewModel>(
-        converter: (store) => new LoadingScreenViewModel._(roomIsAvailable(store.state),
+  Widget _loadingScreen() => StoreConnector<GameModel, LoadingScreenViewModel>(
+        converter: (store) => LoadingScreenViewModel._(roomIsAvailable(store.state),
             waitingForPlayers(store.state), isNewGame(store.state), getPlayers(store.state)),
         distinct: true,
         builder: (context, viewModel) {
@@ -221,9 +229,9 @@ class GameState extends State<Game> {
         },
       );
 
-  Widget _mainBoard() => new StoreConnector<GameModel, GameActiveViewModel>(
-      converter: (store) => new GameActiveViewModel._(gameIsReady(store.state),
-          gameOver(store.state), requestInProcess(store.state, Request.CompletingGame)),
+  Widget _mainBoard() => StoreConnector<GameModel, GameActiveViewModel>(
+      converter: (store) => GameActiveViewModel._(gameIsReady(store.state), gameOver(store.state),
+          requestInProcess(store.state, Request.CompletingGame)),
       distinct: true,
       builder: (context, viewModel) {
         if (!viewModel.gameIsReady) {
@@ -235,44 +243,44 @@ class GameState extends State<Game> {
         return _mainBoardBody();
       });
 
-  Widget _secretBoard() => new StoreConnector<GameModel, bool>(
+  Widget _secretBoard() => StoreConnector<GameModel, bool>(
         converter: (store) => gameIsReady(store.state),
         distinct: true,
-        builder: (context, gameIsReady) => gameIsReady ? new SecretBoard(_store) : _loadingScreen(),
+        builder: (context, gameIsReady) => gameIsReady ? SecretBoard(_store) : _loadingScreen(),
       );
 
-  Widget _secretTab() => new StoreConnector<GameModel, bool>(
+  Widget _secretTab() => StoreConnector<GameModel, bool>(
         converter: (store) =>
             getHaunts(store.state).isNotEmpty ? haveReceivedGiftThisRound(store.state) : false,
         distinct: true,
         builder: (context, haveReceivedGiftThisRound) {
-          Text title = new Text(AppLocalizations.of(context).secretTab);
-          return haveReceivedGiftThisRound ? iconText(new Icon(Icons.cake), title) : title;
+          Text title = Text(AppLocalizations.of(context).secretTab);
+          return haveReceivedGiftThisRound ? iconText(Icon(Icons.cake), title) : title;
         },
       );
 
   @override
   Widget build(BuildContext context) {
-    return new DefaultTabController(
+    return DefaultTabController(
       length: 2,
-      child: new Scaffold(
-        appBar: new AppBar(
-          leading: new Container(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: Container(
               alignment: Alignment.center,
               padding: paddingNano,
-              child: new Text(
+              child: Text(
                 getRoom(_store.state).code,
                 style: boldTextStyle,
               )),
-          title: new TabBar(
+          title: TabBar(
             tabs: [
-              new Tab(text: AppLocalizations.of(context).gameTab),
+              Tab(text: AppLocalizations.of(context).gameTab),
               _secretTab(),
             ],
           ),
         ),
-        endDrawer: isDebugMode() ? new Drawer(child: new ReduxDevTools<GameModel>(_store)) : null,
-        body: new TabBarView(
+        endDrawer: isDebugMode() ? Drawer(child: ReduxDevTools<GameModel>(_store)) : null,
+        body: TabBarView(
           children: [
             _mainBoard(),
             _secretBoard(),
@@ -315,23 +323,26 @@ class LoadingScreenViewModel {
 }
 
 class MainBoardViewModel {
+  final int currentRoundOrder;
+  final bool previousRoundContinued;
   final bool waitingForTeam;
-  final bool teamSelected;
+  final bool teamSelectionContinued;
   final bool biddingComplete;
   final bool resolvingAuction;
   final bool roundComplete;
-  final bool roundContinued;
+
   final bool hauntIsActive;
   final bool hauntDecided;
   final bool hauntComplete;
 
   MainBoardViewModel._(
-      {@required this.waitingForTeam,
-      @required this.teamSelected,
+      {@required this.currentRoundOrder,
+      @required this.previousRoundContinued,
+      @required this.waitingForTeam,
+      @required this.teamSelectionContinued,
       @required this.biddingComplete,
       @required this.resolvingAuction,
       @required this.roundComplete,
-      @required this.roundContinued,
       @required this.hauntIsActive,
       @required this.hauntDecided,
       @required this.hauntComplete});
@@ -341,31 +352,33 @@ class MainBoardViewModel {
       identical(this, other) ||
       other is MainBoardViewModel &&
           runtimeType == other.runtimeType &&
+          currentRoundOrder == other.currentRoundOrder &&
+          previousRoundContinued == other.previousRoundContinued &&
           waitingForTeam == other.waitingForTeam &&
-          teamSelected == other.teamSelected &&
+          teamSelectionContinued == other.teamSelectionContinued &&
           biddingComplete == other.biddingComplete &&
           resolvingAuction == other.resolvingAuction &&
           roundComplete == other.roundComplete &&
-          roundContinued == other.roundContinued &&
           hauntIsActive == other.hauntIsActive &&
           hauntDecided == other.hauntDecided &&
           hauntComplete == other.hauntComplete;
 
   @override
   int get hashCode =>
+      currentRoundOrder.hashCode ^
+      previousRoundContinued.hashCode ^
       waitingForTeam.hashCode ^
-      teamSelected.hashCode ^
+      teamSelectionContinued.hashCode ^
       biddingComplete.hashCode ^
       resolvingAuction.hashCode ^
       roundComplete.hashCode ^
-      roundContinued.hashCode ^
       hauntIsActive.hashCode ^
       hauntDecided.hashCode ^
       hauntComplete.hashCode;
 
   @override
   String toString() {
-    return 'MainBoardViewModel{waitingForTeam: $waitingForTeam, teamSelected: $teamSelected, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, roundContinued: $roundContinued, hauntIsActive: $hauntIsActive, hauntDecided: $hauntDecided, hauntComplete: $hauntComplete}';
+    return 'MainBoardViewModel{currentRoundOrder: $currentRoundOrder, previousRoundContinued: $previousRoundContinued, waitingForTeam: $waitingForTeam, teamSelectionContinued: $teamSelectionContinued, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, hauntIsActive: $hauntIsActive, hauntDecided: $hauntDecided, hauntComplete: $hauntComplete}';
   }
 }
 

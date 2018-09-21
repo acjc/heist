@@ -27,7 +27,8 @@ bool requestInProcess(GameModel gameModel, Request request) =>
     getRequests(gameModel).contains(request);
 
 // Reselect would not recognise changes to the current haunt
-Haunt currentHaunt(GameModel gameModel) => getHaunts(gameModel).firstWhere((h) => !h.complete);
+Haunt currentHaunt(GameModel gameModel) =>
+    getHaunts(gameModel).firstWhere((h) => !h.complete, orElse: null);
 
 final Selector<GameModel, Round> currentRound = createSelector2(
     currentHaunt,

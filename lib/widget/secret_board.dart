@@ -9,19 +9,17 @@ import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
-import 'package:heist/widget/game_history.dart';
 import 'package:heist/widget/player_info.dart';
 import 'package:redux/redux.dart';
 
 class SecretBoard extends StatefulWidget {
   final Store<GameModel> _store;
+  final Widget _footer;
 
-  SecretBoard(this._store);
+  SecretBoard(this._store, this._footer);
 
   @override
-  State<StatefulWidget> createState() {
-    return new SecretBoardState(_store);
-  }
+  State<StatefulWidget> createState() => SecretBoardState(_store);
 }
 
 class SecretBoardState extends State<SecretBoard> {
@@ -53,14 +51,16 @@ class SecretBoardState extends State<SecretBoard> {
         _addLeadAgentCardIfNeeded(
             viewModel.me, children, viewModel.brendaGuess, viewModel.guessingBrenda);
 
-        return new Column(children: [
-          new Expanded(
-            child: new ListView(
-              children: children,
+        return new Column(
+          children: [
+            new Expanded(
+              child: new ListView(
+                children: children,
+              ),
             ),
-          ),
-          gameHistory(_store),
-        ]);
+            widget._footer,
+          ],
+        );
       });
 
   Widget _playerList() => new StoreConnector<GameModel, List<Player>>(

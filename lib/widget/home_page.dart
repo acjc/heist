@@ -11,6 +11,7 @@ import 'package:heist/reducers/form_reducers.dart';
 import 'package:heist/reducers/room_reducers.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
+import 'package:heist/widget/background.dart';
 import 'package:heist/widget/create_room_page.dart';
 import 'package:redux/redux.dart';
 
@@ -40,15 +41,15 @@ class HomePage extends StatelessWidget {
       (oldValue, newValue) => newValue.copyWith(text: newValue.text.toUpperCase()));
 
   Widget _enterRoomButton(BuildContext context, Store<GameModel> store) => new RaisedButton(
-        child: Text(AppLocalizations.of(context).enterRoom, style: buttonTextStyle),
+        child: Text(AppLocalizations.of(context).joinGame, style: buttonTextStyle),
         onPressed: () async {
           FormState enterCodeState = Keys.homePageCodeKey.currentState;
           FormState enterNameState = Keys.homePageNameKey.currentState;
           if (enterCodeState.validate()) {
             enterCodeState.save();
             enterNameState.save();
-            store.dispatch(new ValidateRoomAction(
-                context, () => new Connectivity().checkConnectivity()));
+            store.dispatch(
+                new ValidateRoomAction(context, () => new Connectivity().checkConnectivity()));
           }
         },
       );
@@ -75,28 +76,36 @@ class HomePage extends StatelessWidget {
             store.dispatch(new SaveRoomCodeAction(value));
           }));
 
-  Widget _body(Store<GameModel> store) => new StoreConnector<GameModel, bool>(
-        converter: (store) => requestInProcess(store.state, Request.ValidatingRoom),
+  Widget _body(Store<GameModel> store) => StoreConnector<GameModel, bool>(
+        onInit: (_) => SystemChrome.setEnabledSystemUIOverlays([]),
         distinct: true,
+        converter: (store) => requestInProcess(store.state, Request.ValidatingRoom),
         builder: (context, validatingRoom) {
           if (validatingRoom) {
             return loading();
           }
-          return new Padding(
-            padding: paddingLarge,
-            child: new Column(
-              children: [
-                new Padding(
-                  padding: EdgeInsets.only(bottom: 24.0),
-                  child: enterNameForm(context, store, Keys.homePageNameKey),
-                ),
-                new Column(
+          return Center(
+            child: Card(
+              margin: paddingLarge,
+              elevation: 2.0,
+              child: Padding(
+                padding: paddingLarge,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    _enterCodeForm(context, store),
-                    _enterRoomButton(context, store),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 24.0),
+                      child: enterNameForm(context, store, Keys.homePageNameKey),
+                    ),
+                    Column(
+                      children: [
+                        _enterCodeForm(context, store),
+                        _enterRoomButton(context, store),
+                      ],
+                    )
                   ],
-                )
-              ],
+                ),
+              ),
             ),
           );
         },
@@ -105,16 +114,19 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(AppLocalizations.of(context).homepageTitle),
+    return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      endDrawer: isDebugMode() ? Drawer(child: ReduxDevTools<GameModel>(store)) : null,
+      floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: () =>
+              Navigator.push(context, MaterialPageRoute(builder: (context) => CreateRoomPage()))),
+      body: Stack(
+        children: [
+          staticBackground(),
+          _body(store),
+        ],
       ),
-      endDrawer: isDebugMode() ? new Drawer(child: new ReduxDevTools<GameModel>(store)) : null,
-      floatingActionButton: new FloatingActionButton(
-          child: new Icon(Icons.add),
-          onPressed: () => Navigator.push(
-              context, new MaterialPageRoute(builder: (context) => new CreateRoomPage()))),
-      body: _body(store),
     );
   }
 }

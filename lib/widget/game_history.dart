@@ -11,24 +11,158 @@ import 'package:heist/widget/common.dart';
 import 'package:heist/widget/selection_board.dart';
 import 'package:redux/redux.dart';
 
-Widget hauntDecisions(Haunt haunt) {
-  List<String> decisions = List.of(haunt.decisions.values.toList());
-  decisions.shuffle(Random(haunt.id.hashCode));
-  List<Widget> children = List.generate(decisions.length, (i) {
-    String decision = decisions[i];
-    return Center(
-      child: Text(decision,
-          style: TextStyle(
-            fontSize: 16.0,
-            color: decisionColour(decision),
-            fontWeight: FontWeight.bold,
-          )),
-    );
-  });
-  return TeamGridView(children, childAspectRatio: 8.0);
+class GameHistory extends StatefulWidget {
+  final Store<GameModel> _store;
+
+  GameHistory(this._store);
+
+  @override
+  State<StatefulWidget> createState() => _GameHistoryState();
 }
 
-Widget hauntTeam(BuildContext context, Store<GameModel> store, Set<Player> team, Player leader) {
+class _GameHistoryState extends State<GameHistory> {
+  Widget hauntDecisions(Haunt haunt) {
+    List<String> decisions = List.of(haunt.decisions.values.toList());
+    decisions.shuffle(Random(haunt.id.hashCode));
+    List<Widget> children = List.generate(decisions.length, (i) {
+      String decision = decisions[i];
+      return Center(
+        child: Text(decision,
+            style: TextStyle(
+              fontSize: 16.0,
+              color: decisionColour(decision),
+              fontWeight: FontWeight.bold,
+            )),
+      );
+    });
+    return TeamGridView(children, childAspectRatio: 8.0);
+  }
+
+  Widget hauntDetailsIcon(IconData icon, String text) => iconText(
+        Icon(icon, color: Colors.grey),
+        Text(text, style: subtitleTextStyle),
+      );
+
+  String getHeistStatus(BuildContext context, Haunt haunt, Round lastRound) {
+    if (haunt.complete) {
+      return haunt.wasSuccess
+          ? AppLocalizations.of(context).success
+          : AppLocalizations.of(context).fail;
+    }
+    if (lastRound.isAuction) {
+      return AppLocalizations.of(context).auctionTitle;
+    }
+    return AppLocalizations.of(context).roundTitle(lastRound.order);
+  }
+
+  Icon getHauntIcon(Haunt haunt, int currentHauntOrder) {
+    if (haunt.order > currentHauntOrder) {
+      return const Icon(Icons.remove, size: 32.0, color: Colors.grey);
+    }
+    if (!haunt.complete) {
+      return const Icon(Icons.adjust, color: HeistColors.blue);
+    }
+    if (haunt.wasSuccess) {
+      return const Icon(Icons.verified_user, color: HeistColors.green, size: 32.0);
+    }
+    return const Icon(Icons.cancel, color: Colors.red, size: 32.0);
+  }
+
+  Widget hauntPopup(int currentHauntOrder, Haunt haunt) {
+    Round lastRound = lastRoundForHaunt(widget._store.state, haunt);
+
+    List<Widget> title = [
+      Text(
+        AppLocalizations.of(context).hauntTitle(haunt.order),
+        style: boldTextStyle,
+      ),
+    ];
+
+    title.add(Text(
+      getHeistStatus(context, haunt, lastRound),
+      style: subtitleTextStyle,
+    ));
+
+    List<Widget> hauntDetailsChildren = [
+      getHauntIcon(haunt, currentHauntOrder),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: title,
+      ),
+      VerticalDivider(height: 40.0),
+      hauntDetailsIcon(Icons.people, haunt.numPlayers.toString()),
+      hauntDetailsIcon(Icons.bubble_chart, haunt.price.toString()),
+      hauntDetailsIcon(Icons.vertical_align_top, haunt.maximumBid.toString()),
+    ];
+
+    if (haunt.complete) {
+      hauntDetailsChildren.addAll([
+        VerticalDivider(height: 40.0),
+        iconText(Icon(Icons.bubble_chart, size: 32.0),
+            Text(lastRound.pot.toString(), style: bigNumberTextStyle)),
+      ]);
+    }
+
+    List<Widget> hauntPopupChildren = [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: hauntDetailsChildren,
+      ),
+    ];
+
+    if (haunt.complete) {
+      Set<Player> team = teamForRound(widget._store.state, lastRound);
+      Player leader = leaderForRound(widget._store.state, lastRound);
+      hauntPopupChildren.addAll([
+        Divider(),
+        hauntTeam(context, team, leader),
+        Divider(),
+        hauntDecisions(haunt),
+      ]);
+    }
+
+    return Padding(
+      padding: paddingMedium,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: hauntPopupChildren,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => StoreConnector<GameModel, List<Haunt>>(
+      distinct: true,
+      converter: (store) => getHaunts(store.state),
+      builder: (context, haunts) {
+        if (haunts.isEmpty) {
+          return Container();
+        }
+        int currentHauntOrder = currentHaunt(widget._store.state).order;
+        return Card(
+          elevation: 10.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(5, (i) {
+              Haunt haunt = haunts[i];
+              return InkWell(
+                onTap: () {
+                  showModalBottomSheet(
+                      context: context, builder: (context) => hauntPopup(currentHauntOrder, haunt));
+                  return;
+                },
+                child: Padding(
+                  padding: paddingMedium,
+                  child: getHauntIcon(haunt, currentHauntOrder),
+                ),
+              );
+            }),
+          ),
+        );
+      });
+}
+
+Widget hauntTeam(BuildContext context, Set<Player> team, Player leader) {
   List<Widget> gridChildren = List.generate(
     team.length,
     (i) {
@@ -43,131 +177,4 @@ Widget hauntTeam(BuildContext context, Store<GameModel> store, Set<Player> team,
   }
 
   return TeamGridView(gridChildren);
-}
-
-Widget hauntPopup(
-    BuildContext context, Store<GameModel> store, int currentHauntOrder, Haunt haunt) {
-  Round lastRound = lastRoundForHaunt(store.state, haunt);
-
-  List<Widget> title = [
-    Text(
-      AppLocalizations.of(context).hauntTitle(haunt.order),
-      style: boldTextStyle,
-    ),
-  ];
-
-  title.add(Text(
-    getHeistStatus(context, haunt, lastRound),
-    style: subtitleTextStyle,
-  ));
-
-  List<Widget> hauntDetailsChildren = [
-    getHauntIcon(haunt, currentHauntOrder),
-    Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: title,
-    ),
-    VerticalDivider(height: 40.0),
-    hauntDetailsIcon(Icons.people, haunt.numPlayers.toString()),
-    hauntDetailsIcon(Icons.bubble_chart, haunt.price.toString()),
-    hauntDetailsIcon(Icons.vertical_align_top, haunt.maximumBid.toString()),
-  ];
-
-  if (haunt.complete) {
-    hauntDetailsChildren.addAll([
-      VerticalDivider(height: 40.0),
-      iconText(Icon(Icons.bubble_chart, size: 32.0),
-          Text(lastRound.pot.toString(), style: bigNumberTextStyle)),
-    ]);
-  }
-
-  List<Widget> hauntPopupChildren = [
-    Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: hauntDetailsChildren,
-    ),
-  ];
-
-  if (haunt.complete) {
-    Set<Player> team = teamForRound(store.state, lastRound);
-    Player leader = leaderForRound(store.state, lastRound);
-    hauntPopupChildren.addAll([
-      Divider(),
-      hauntTeam(context, store, team, leader),
-      Divider(),
-      hauntDecisions(haunt),
-    ]);
-  }
-
-  return Padding(
-    padding: paddingMedium,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: hauntPopupChildren,
-    ),
-  );
-}
-
-Widget hauntDetailsIcon(IconData icon, String text) {
-  return iconText(
-    Icon(icon, color: Colors.grey),
-    Text(text, style: subtitleTextStyle),
-  );
-}
-
-String getHeistStatus(BuildContext context, Haunt haunt, Round lastRound) {
-  if (haunt.complete) {
-    return haunt.wasSuccess
-        ? AppLocalizations.of(context).success
-        : AppLocalizations.of(context).fail;
-  }
-  if (lastRound.isAuction) {
-    return AppLocalizations.of(context).auctionTitle;
-  }
-  return AppLocalizations.of(context).roundTitle(lastRound.order);
-}
-
-Icon getHauntIcon(Haunt haunt, int currentHauntOrder) {
-  if (haunt.order > currentHauntOrder) {
-    return const Icon(Icons.remove, size: 32.0, color: Colors.grey);
-  }
-  if (!haunt.complete) {
-    return const Icon(Icons.adjust, color: HeistColors.blue);
-  }
-  if (haunt.wasSuccess) {
-    return const Icon(Icons.verified_user, color: HeistColors.green, size: 32.0);
-  }
-  return const Icon(Icons.cancel, color: Colors.red, size: 32.0);
-}
-
-Widget gameHistory(Store<GameModel> store) {
-  return StoreConnector<GameModel, List<Haunt>>(
-      distinct: true,
-      converter: (store) => store.state.haunts,
-      builder: (context, haunts) {
-        if (haunts.isEmpty) {
-          return Container();
-        }
-        int currentHauntOrder = currentHaunt(store.state).order;
-        return Card(
-            elevation: 10.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(5, (i) {
-                Haunt haunt = haunts[i];
-                return InkWell(
-                  onTap: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (context) => hauntPopup(context, store, currentHauntOrder, haunt));
-                    return;
-                  },
-                  child: Padding(
-                    padding: paddingMedium,
-                    child: getHauntIcon(haunt, currentHauntOrder),
-                  ),
-                );
-              }),
-            ));
-      });
 }

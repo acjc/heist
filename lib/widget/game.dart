@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
 import 'package:heist/app_localizations.dart';
@@ -16,6 +17,7 @@ import 'package:heist/reducers/request_reducers.dart';
 import 'package:heist/reducers/subscription_reducers.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
+import 'package:heist/widget/background.dart';
 import 'package:heist/widget/bidding.dart';
 import 'package:heist/widget/common.dart';
 import 'package:heist/widget/decision.dart';
@@ -42,6 +44,7 @@ class Game extends StatefulWidget {
 
 class GameState extends State<Game> {
   final Store<GameModel> _store;
+  final PageController _controller = PageController();
   StreamSubscription _connectivitySubscription;
   Timer _connectivityTimer;
 
@@ -50,6 +53,7 @@ class GameState extends State<Game> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIOverlays([]);
     _store.dispatch(new LoadGameAction());
     _connectivitySubscription =
         new Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
@@ -111,17 +115,17 @@ class GameState extends State<Game> {
     // Show bidding summary of previous round (if it exists and as long as a team
     // has not yet been selected for the current round)
     if (viewModel.waitingForTeam && !viewModel.previousRoundContinued) {
-      return appendGameHistory(RoundEnd(_store, viewModel.currentRoundOrder - 1));
+      return appendFooter(RoundEnd(_store, viewModel.currentRoundOrder - 1));
     }
 
     // Current haunt has happened so ask to complete it
     if (viewModel.hauntDecided && !viewModel.hauntComplete) {
-      return appendGameHistory(HauntEnd(_store));
+      return appendFooter(HauntEnd(_store));
     }
 
     // Haunt is currently happening
     if (viewModel.hauntIsActive) {
-      return appendGameHistory(activeHaunt(context, _store));
+      return appendFooter(activeHaunt(context, _store));
     }
 
     // Team selection (not needed for auctions)
@@ -132,7 +136,7 @@ class GameState extends State<Game> {
 
     // Bidding & gifting
     if (!viewModel.biddingComplete) {
-      return appendGameHistory(_biddingAndGifting(_store));
+      return appendFooter(_biddingAndGifting(_store));
     }
 
     // Select team from auction if necessary
@@ -142,17 +146,59 @@ class GameState extends State<Game> {
 
     // Bidding summary
     if (!viewModel.roundComplete) {
-      return appendGameHistory(RoundEnd(_store, viewModel.currentRoundOrder));
+      return appendFooter(RoundEnd(_store, viewModel.currentRoundOrder));
     }
 
     return null;
   }
 
-  Widget appendGameHistory(Widget child) => Column(
-        children: [
-          Expanded(child: child),
-          gameHistory(_store),
-        ],
+  Widget appendFooter(Widget child, {bool indicatorOnRight = true}) {
+    return Column(
+      children: [
+        Expanded(child: child),
+        footer(indicatorOnRight),
+      ],
+    );
+  }
+
+  Widget footer(bool indicatorOnRight) {
+    List<Widget> children = indicatorOnRight
+        ? [GameHistory(_store), rightIndicator()]
+        : [leftIndicator(), GameHistory(_store)];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: children,
+    );
+  }
+
+  Widget rightIndicator() => Card(
+        elevation: 10.0,
+        child: InkWell(
+          onTap: () => _controller.nextPage(
+                duration: Duration(milliseconds: 500),
+                curve: Curves.fastOutSlowIn,
+              ),
+          child: Icon(
+            Icons.keyboard_arrow_right,
+            color: Theme.of(context).primaryColor,
+            size: 64.0,
+          ),
+        ),
+      );
+
+  Widget leftIndicator() => Card(
+        elevation: 10.0,
+        child: InkWell(
+          child: Icon(
+            Icons.keyboard_arrow_left,
+            color: Theme.of(context).primaryColor,
+            size: 64.0,
+          ),
+          onTap: () => _controller.previousPage(
+                duration: Duration(milliseconds: 500),
+                curve: Curves.fastOutSlowIn,
+              ),
+        ),
       );
 
   Widget _mainBoardBody() => StoreConnector<GameModel, MainBoardViewModel>(
@@ -201,11 +247,20 @@ class GameState extends State<Game> {
           style: titleTextStyle,
         ),
       ),
-    ];
-    children.addAll(List.generate(playersSoFar.length, (i) => Text(playersSoFar[i].name)));
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: children,
+    ]..addAll(List.generate(playersSoFar.length, (i) => Text(playersSoFar[i].name)));
+    return Center(
+      child: Card(
+        elevation: 2.0,
+        margin: paddingLarge,
+        child: Padding(
+          padding: paddingLarge,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: children,
+          ),
+        ),
+      ),
     );
   }
 
@@ -215,6 +270,7 @@ class GameState extends State<Game> {
         distinct: true,
         builder: (context, viewModel) {
           if (!viewModel.roomIsAvailable) {
+            debugPrint('Waiting for room...');
             return loading();
           }
 
@@ -223,7 +279,7 @@ class GameState extends State<Game> {
           }
 
           if (viewModel.isNewGame) {
-            return centeredMessage(AppLocalizations.of(context).initialisingGame);
+            debugPrint('Initialising game...');
           }
 
           return loading();
@@ -247,47 +303,51 @@ class GameState extends State<Game> {
   Widget _secretBoard() => StoreConnector<GameModel, bool>(
         converter: (store) => gameIsReady(store.state),
         distinct: true,
-        builder: (context, gameIsReady) => gameIsReady ? SecretBoard(_store) : _loadingScreen(),
+        builder: (context, gameIsReady) =>
+            gameIsReady ? SecretBoard(_store, footer(false)) : _loadingScreen(),
       );
 
   Widget _secretTab() => StoreConnector<GameModel, bool>(
-        converter: (store) =>
-            getHaunts(store.state).isNotEmpty ? haveReceivedGiftThisRound(store.state) : false,
         distinct: true,
+        ignoreChange: (gameModel) => !gameIsReady(gameModel),
+        converter: (store) => haveReceivedGiftThisRound(store.state),
         builder: (context, haveReceivedGiftThisRound) {
           Text title = Text(AppLocalizations.of(context).secretTab);
           return haveReceivedGiftThisRound ? iconText(Icon(Icons.cake), title) : title;
         },
       );
 
+  Widget _appBarTitle() => Container(
+        alignment: Alignment.center,
+        padding: paddingNano,
+        child: Text(
+          getRoom(_store.state).code,
+          style: boldTextStyle,
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: Container(
-              alignment: Alignment.center,
-              padding: paddingNano,
-              child: Text(
-                getRoom(_store.state).code,
-                style: boldTextStyle,
-              )),
-          title: TabBar(
-            tabs: [
-              Tab(text: AppLocalizations.of(context).gameTab),
-              _secretTab(),
-            ],
-          ),
-        ),
-        endDrawer: isDebugMode() ? Drawer(child: ReduxDevTools<GameModel>(_store)) : null,
-        body: TabBarView(
+    return Stack(
+      children: [
+        dynamicBackground(_controller),
+        PageView(
+          controller: _controller,
           children: [
-            _mainBoard(),
-            _secretBoard(),
+            Scaffold(
+              resizeToAvoidBottomPadding: false,
+              backgroundColor: Colors.transparent,
+              body: _mainBoard(),
+            ),
+            Scaffold(
+              resizeToAvoidBottomPadding: false,
+              backgroundColor: Colors.transparent,
+              endDrawer: isDebugMode() ? Drawer(child: ReduxDevTools<GameModel>(_store)) : null,
+              body: _secretBoard(),
+            ),
           ],
         ),
-      ),
+      ],
     );
   }
 }

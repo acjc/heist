@@ -163,36 +163,63 @@ class GameState extends State<Game> {
 
   Widget footer(bool indicatorOnRight) {
     List<Widget> children = indicatorOnRight
-        ? [GameHistory(_store), rightIndicator()]
-        : [leftIndicator(), GameHistory(_store)];
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: children,
+        ? [Expanded(child: GameHistory(_store)), rightIndicator()]
+        : [leftIndicator(), Expanded(child: GameHistory(_store))];
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
+      child: Row(children: children),
     );
   }
 
-  Widget rightIndicator() => Card(
-        elevation: 10.0,
-        child: InkWell(
-          onTap: () => _controller.nextPage(
-                duration: Duration(milliseconds: 500),
-                curve: Curves.fastOutSlowIn,
-              ),
-          child: Icon(
-            Icons.keyboard_arrow_right,
-            color: Theme.of(context).primaryColor,
-            size: 64.0,
+  static const EdgeInsets indicatorPadding =
+      const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0);
+
+  Widget rightIndicator() {
+    return StoreConnector<GameModel, bool>(
+      distinct: true,
+      ignoreChange: (gameModel) => !gameIsReady(gameModel),
+      converter: (store) => haveReceivedGiftThisRound(store.state),
+      builder: (context, haveReceivedGiftThisRound) {
+        List<Widget> children = [];
+        if (haveReceivedGiftThisRound) {
+          children.add(Icon(
+            Icons.cake,
+            color: Colors.grey,
+            size: 16.0,
+          ));
+        }
+        children.add(Icon(
+          Icons.keyboard_arrow_right,
+          color: Theme.of(context).primaryColor,
+          size: 32.0,
+        ));
+        return Card(
+          elevation: 10.0,
+          child: InkWell(
+            onTap: () => _controller.nextPage(
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.fastOutSlowIn,
+                ),
+            child: Padding(
+              padding: indicatorPadding,
+              child: Row(children: children),
+            ),
           ),
-        ),
-      );
+        );
+      },
+    );
+  }
 
   Widget leftIndicator() => Card(
         elevation: 10.0,
         child: InkWell(
-          child: Icon(
-            Icons.keyboard_arrow_left,
-            color: Theme.of(context).primaryColor,
-            size: 64.0,
+          child: Padding(
+            padding: indicatorPadding,
+            child: Icon(
+              Icons.keyboard_arrow_left,
+              color: Theme.of(context).primaryColor,
+              size: 32.0,
+            ),
           ),
           onTap: () => _controller.previousPage(
                 duration: Duration(milliseconds: 500),
@@ -305,25 +332,6 @@ class GameState extends State<Game> {
         distinct: true,
         builder: (context, gameIsReady) =>
             gameIsReady ? SecretBoard(_store, footer(false)) : _loadingScreen(),
-      );
-
-  Widget _secretTab() => StoreConnector<GameModel, bool>(
-        distinct: true,
-        ignoreChange: (gameModel) => !gameIsReady(gameModel),
-        converter: (store) => haveReceivedGiftThisRound(store.state),
-        builder: (context, haveReceivedGiftThisRound) {
-          Text title = Text(AppLocalizations.of(context).secretTab);
-          return haveReceivedGiftThisRound ? iconText(Icon(Icons.cake), title) : title;
-        },
-      );
-
-  Widget _appBarTitle() => Container(
-        alignment: Alignment.center,
-        padding: paddingNano,
-        child: Text(
-          getRoom(_store.state).code,
-          style: boldTextStyle,
-        ),
       );
 
   @override

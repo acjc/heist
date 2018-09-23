@@ -56,16 +56,17 @@ class _GameHistoryState extends State<GameHistory> {
   }
 
   Icon getHauntIcon(Haunt haunt, int currentHauntOrder) {
+    const double size = 32.0;
     if (haunt.order > currentHauntOrder) {
-      return const Icon(Icons.remove, size: 32.0, color: Colors.grey);
+      return const Icon(Icons.remove, size: size, color: Colors.grey);
     }
     if (!haunt.complete) {
       return const Icon(Icons.adjust, color: HeistColors.blue);
     }
     if (haunt.wasSuccess) {
-      return const Icon(Icons.verified_user, color: HeistColors.green, size: 32.0);
+      return const Icon(Icons.verified_user, color: HeistColors.green, size: size);
     }
-    return const Icon(Icons.cancel, color: Colors.red, size: 32.0);
+    return const Icon(Icons.cancel, color: Colors.red, size: size);
   }
 
   Widget hauntPopup(int currentHauntOrder, Haunt haunt) {
@@ -152,7 +153,7 @@ class _GameHistoryState extends State<GameHistory> {
                   return;
                 },
                 child: Padding(
-                  padding: paddingMedium,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
                   child: getHauntIcon(haunt, currentHauntOrder),
                 ),
               );

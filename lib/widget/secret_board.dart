@@ -51,11 +51,14 @@ class SecretBoardState extends State<SecretBoard> {
         _addLeadAgentCardIfNeeded(
             viewModel.me, children, viewModel.brendaGuess, viewModel.guessingBrenda);
 
-        return new Column(
+        return Column(
           children: [
-            new Expanded(
-              child: new ListView(
-                children: children,
+            Expanded(
+              child: Padding(
+                padding: paddingMedium,
+                child: ListView(
+                  children: children,
+                ),
               ),
             ),
             widget._footer,

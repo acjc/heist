@@ -10,26 +10,28 @@ import 'package:redux/redux.dart';
 import 'common.dart';
 
 Widget playerInfo(Store<GameModel> store) {
-  return new StoreConnector<GameModel, PlayerInfoViewModel>(
+  return StoreConnector<GameModel, PlayerInfoViewModel>(
       distinct: true,
-      converter: (store) => new PlayerInfoViewModel._(
+      converter: (store) => PlayerInfoViewModel._(
             getSelf(store.state),
             currentBalance(store.state),
             amountReceivedThisRound(store.state),
           ),
       builder: (context, viewModel) {
         if (viewModel.me == null) {
-          return new Container();
+          return Container();
         }
-        return new Card(
+        return Card(
           elevation: 2.0,
-          child: new Padding(
+          child: Padding(
             padding: paddingMedium,
-            child: new Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                roomCode(getRoom(store.state).code),
+                VerticalDivider(),
                 playerName(context, viewModel.me),
-                new VerticalDivider(),
+                VerticalDivider(),
                 playerBalance(viewModel.balance, viewModel.amountReceivedThisRound),
               ],
             ),
@@ -38,27 +40,34 @@ Widget playerInfo(Store<GameModel> store) {
       });
 }
 
+Widget roomCode(String code) => Column(
+      children: [
+        Text('Room', style: subtitleTextStyle),
+        Text(code, style: boldTextStyle),
+      ],
+    );
+
 Widget playerBalance(int balance, int amountReceivedThisRound) {
   List<Widget> children = [
-    new Icon(Icons.bubble_chart, size: 32.0),
-    new Text(balance.toString(), style: bigNumberTextStyle),
+    Icon(Icons.bubble_chart, size: 32.0),
+    Text(balance.toString(), style: bigNumberTextStyle),
   ];
   if (amountReceivedThisRound > 0) {
     children.addAll([
-      new Container(
-        child: new Text(
+      Container(
+        child: Text(
           '+$amountReceivedThisRound',
           style: const TextStyle(fontSize: 16.0, color: HeistColors.green),
         ),
         margin: const EdgeInsets.only(left: 8.0),
       ),
-      new Container(
-        child: new Icon(Icons.cake, size: 14.0, color: HeistColors.green),
+      Container(
+        child: Icon(Icons.cake, size: 14.0, color: HeistColors.green),
         margin: const EdgeInsets.only(left: 2.0),
       ),
     ]);
   }
-  return new Row(
+  return Row(
     mainAxisAlignment: MainAxisAlignment.center,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: children,
@@ -67,7 +76,7 @@ Widget playerBalance(int balance, int amountReceivedThisRound) {
 
 Widget playerName(BuildContext context, Player me) {
   List<Widget> children = [
-    new Text(
+    Text(
       me.name,
       style: boldTextStyle,
     ),
@@ -75,14 +84,14 @@ Widget playerName(BuildContext context, Player me) {
 
   if (me.order != null) {
     children.add(
-      new Text(
+      Text(
         AppLocalizations.of(context).playerOrder(me.order),
         style: subtitleTextStyle,
       ),
     );
   }
 
-  return new Column(
+  return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: children,
   );

@@ -194,7 +194,7 @@ enum Request {
   ValidatingRoom,
   CreatingNewRoom,
   JoiningGame,
-  SubmittingTeam,
+  SubmittingExclusions,
   Bidding,
   Gifting,
   ResolvingAuction,

@@ -9,13 +9,13 @@ final Selector<GameModel, bool> hauntIsActive = createSelector4(
     getRounds, currentHaunt, biddingComplete, isAuction,
     (Map<String, List<Round>> rounds, Haunt currentHaunt, bool biddingComplete, bool isAuction) {
   bool priceMet = rounds[currentHaunt.id]
-      .any((r) => r.pot >= currentHaunt.price && r.teamSubmitted && r.complete);
+      .any((r) => r.pot >= currentHaunt.price && r.exclusionsSubmitted && r.complete);
   return ((isAuction && biddingComplete) || priceMet) &&
       !currentHaunt.complete &&
       !currentHaunt.allDecided;
 });
 
-final Selector<GameModel, bool> goingOnHaunt =
+final Selector<GameModel, bool> haveBeenExcluded =
     createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.team.contains(me.id));
 
 class Score {

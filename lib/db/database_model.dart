@@ -112,6 +112,19 @@ class Room extends Document {
         'kingpinGuessed': brendaGuess,
       };
 
+  int get numExclusions {
+    if (numPlayers < 5) {
+      return 1;
+    }
+    if (numPlayers <= 6) {
+      return 2;
+    }
+    if (numPlayers <= 9) {
+      return 3;
+    }
+    return 4;
+  }
+
   bool get complete => completedAt != null;
 
   @override
@@ -382,7 +395,7 @@ class Round extends Document {
   final String haunt;
   final DateTime startedAt;
   final Set<String> team; // player IDs
-  final bool teamSubmitted;
+  final bool exclusionsSubmitted;
   final Map<String, Bid> bids; // player ID -> Bid
   final Map<String, Gift> gifts; // player ID -> Gift
   final DateTime completedAt;
@@ -394,7 +407,7 @@ class Round extends Document {
       @required this.haunt,
       @required this.startedAt,
       @required this.team,
-      this.teamSubmitted = false,
+      this.exclusionsSubmitted = false,
       this.bids = const {},
       this.gifts = const {},
       this.completedAt})
@@ -407,7 +420,7 @@ class Round extends Document {
     String haunt,
     DateTime startedAt,
     Set<String> team,
-    bool teamSubmitted,
+    bool exclusionsSubmitted,
     Map<String, Bid> bids,
     Map<String, Gift> gifts,
     DateTime completedAt,
@@ -419,7 +432,7 @@ class Round extends Document {
       haunt: haunt ?? this.haunt,
       startedAt: startedAt ?? this.startedAt,
       team: team ?? this.team,
-      teamSubmitted: teamSubmitted ?? this.teamSubmitted,
+      exclusionsSubmitted: exclusionsSubmitted ?? this.exclusionsSubmitted,
       bids: bids ?? this.bids,
       gifts: gifts ?? this.gifts,
       completedAt: completedAt ?? this.completedAt,
@@ -434,7 +447,7 @@ class Round extends Document {
         haunt = json['heist'],
         startedAt = json['startedAt'],
         team = _boolMapToSet(json['team'].cast<String, bool>()),
-        teamSubmitted = json['teamSubmitted'],
+        exclusionsSubmitted = json['teamSubmitted'],
         bids = _convertValues(json['bids']?.cast<String, dynamic>(),
             (v) => new Bid.fromJson(v.cast<String, dynamic>())),
         gifts = _convertValues(json['gifts']?.cast<String, dynamic>(),
@@ -448,7 +461,7 @@ class Round extends Document {
         'heist': haunt,
         'startedAt': startedAt,
         'team': _toBoolMap(team, team),
-        'teamSubmitted': teamSubmitted,
+        'teamSubmitted': exclusionsSubmitted,
         'bids': bids,
         'gifts': gifts,
         'completedAt': completedAt,
@@ -470,7 +483,7 @@ class Round extends Document {
       other is Round &&
           id == other.id &&
           team == other.team &&
-          teamSubmitted == other.teamSubmitted &&
+          exclusionsSubmitted == other.exclusionsSubmitted &&
           bids == other.bids &&
           gifts == other.gifts &&
           completedAt == other.completedAt;
@@ -479,13 +492,13 @@ class Round extends Document {
   int get hashCode =>
       id.hashCode ^
       team.hashCode ^
-      teamSubmitted.hashCode ^
+      exclusionsSubmitted.hashCode ^
       bids.hashCode ^
       gifts.hashCode ^
       completedAt.hashCode;
 
   @override
   String toString() {
-    return 'Round{id: $id, order: $order, room: $room, haunt: $haunt, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts, completedAt: $completedAt}';
+    return 'Round{id: $id, order: $order, room: $room, haunt: $haunt, startedAt: $startedAt, team: $team, exclusionsSubmitted: $exclusionsSubmitted, bids: $bids, gifts: $gifts, completedAt: $completedAt}';
   }
 }

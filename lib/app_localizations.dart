@@ -588,29 +588,29 @@ class AppLocalizations {
     );
   }
 
-  String pickATeam(int playersPicked, int teamSize) {
+  String pickExclusions(int playersPicked, int exclusionsSize) {
     return Intl.message(
-      'Pick a team: $playersPicked / $teamSize',
-      name: 'pickATeam',
-      args: [playersPicked, teamSize],
-      desc: 'Team picker title',
+      'Pick players to exclude: $playersPicked / $exclusionsSize',
+      name: 'pickExclusions',
+      args: [playersPicked, exclusionsSize],
+      desc: 'Exclusions picker title',
     );
   }
 
-  String pickedTeamSize(int playersPicked, int teamSize) {
+  String exclusionsSize(int playersPicked, int numExclusions) {
     return Intl.message(
-      'TEAM ($playersPicked / $teamSize)',
-      name: 'pickedTeamSize',
-      args: [playersPicked, teamSize],
+      'EXCLUSIONS ($playersPicked / $numExclusions)',
+      name: 'exclusionsSize',
+      args: [playersPicked, numExclusions],
       desc: 'Selection board title',
     );
   }
 
-  String get submitTeam {
+  String get submitExclusions {
     return Intl.message(
-      'SUBMIT TEAM',
-      name: 'submitTeam',
-      desc: 'Button for the team picker to confirm their team selection',
+      'SUBMIT EXCLUSIONS',
+      name: 'submitExclusions',
+      desc: 'Button for the leader to confirm their exclusions',
     );
   }
 

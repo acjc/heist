@@ -14,7 +14,7 @@ class PickPlayerMiddlewareAction extends MiddlewareAction {
 
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
-    return store.state.db.updateTeam(currentRound(store.state).id, playerId, true);
+    return store.state.db.updateExclusions(currentRound(store.state).id, playerId, true);
   }
 }
 
@@ -25,7 +25,7 @@ class RemovePlayerMiddlewareAction extends MiddlewareAction {
 
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
-    return store.state.db.updateTeam(currentRound(store.state).id, playerId, false);
+    return store.state.db.updateExclusions(currentRound(store.state).id, playerId, false);
   }
 }
 
@@ -56,17 +56,17 @@ class ResolveAuctionWinnersAction extends MiddlewareAction {
       int numPlayers = currentHaunt(store.state).numPlayers;
       List<String> winners = _winners(round.bids, numPlayers);
       for (String playerId in winners) {
-        await store.state.db.updateTeam(round.id, playerId, true);
+        await store.state.db.updateExclusions(round.id, playerId, true);
       }
-      await store.state.db.submitTeam(round.id);
+      await store.state.db.submitExclusions(round.id);
     });
   }
 }
 
-class SubmitTeamAction extends MiddlewareAction {
+class SubmitExclusionsAction extends MiddlewareAction {
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
-    return withRequest(Request.SubmittingTeam, store,
-        (store) => store.state.db.submitTeam(currentRound(store.state).id));
+    return withRequest(Request.SubmittingExclusions, store,
+        (store) => store.state.db.submitExclusions(currentRound(store.state).id));
   }
 }

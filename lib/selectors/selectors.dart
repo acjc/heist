@@ -8,7 +8,7 @@ export 'haunt_selectors.dart';
 export 'local_actions_selectors.dart';
 export 'player_selectors.dart';
 export 'setup_selectors.dart';
-export 'team_picker_selectors.dart';
+export 'team_selection_selectors.dart';
 
 final getRoom = (GameModel gameModel) => gameModel.room;
 final getPlayers = (GameModel gameModel) => gameModel.players;

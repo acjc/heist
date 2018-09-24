@@ -11,7 +11,7 @@ import 'package:heist/keys.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/game_middleware.dart';
 import 'package:heist/middleware/room_middleware.dart';
-import 'package:heist/middleware/team_picker_middleware.dart';
+import 'package:heist/middleware/team_selection_middleware.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/reducers/request_reducers.dart';
 import 'package:heist/reducers/subscription_reducers.dart';
@@ -22,13 +22,13 @@ import 'package:heist/widget/bidding.dart';
 import 'package:heist/widget/common.dart';
 import 'package:heist/widget/decision.dart';
 import 'package:heist/widget/endgame.dart';
+import 'package:heist/widget/exclusions.dart';
 import 'package:heist/widget/game_history.dart';
 import 'package:heist/widget/gifting.dart';
 import 'package:heist/widget/haunt_end.dart';
 import 'package:heist/widget/round_end.dart';
 import 'package:heist/widget/secret_board.dart';
 import 'package:heist/widget/selection_board.dart';
-import 'package:heist/widget/team_selection.dart';
 import 'package:redux/redux.dart';
 
 class Game extends StatefulWidget {
@@ -131,7 +131,7 @@ class GameState extends State<Game> {
     // Team selection (not needed for auctions)
     if (!isAuction(_store.state) &&
         (viewModel.waitingForTeam || !viewModel.teamSelectionContinued)) {
-      return TeamSelection(_store, isMyGo(_store.state));
+      return ExclusionsSelection(_store, isMyGo(_store.state));
     }
 
     // Bidding & gifting
@@ -241,7 +241,7 @@ class GameState extends State<Game> {
                   previousRound(store.state).id,
                   LocalRoundAction.RoundEndContinue,
                 ),
-            waitingForTeam: !round.teamSubmitted,
+            waitingForTeam: !round.exclusionsSubmitted,
             teamSelectionContinued: localRoundActionRecorded(
               store.state,
               round.id,

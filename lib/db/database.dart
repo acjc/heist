@@ -173,14 +173,14 @@ class FirestoreDb {
     return _updateRound(roundId, data);
   }
 
-  Future<void> updateTeam(String roundId, String playerId, bool inTeam) {
+  Future<void> updateExclusions(String roundId, String playerId, bool excluded) {
     Map<String, dynamic> data = {
-      'team': {playerId: inTeam}
+      'team': {playerId: excluded}
     };
     return _updateRound(roundId, data);
   }
 
-  Future<void> submitTeam(String roundId) {
+  Future<void> submitExclusions(String roundId) {
     Map<String, dynamic> data = {'teamSubmitted': true};
     return _updateRound(roundId, data);
   }

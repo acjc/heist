@@ -218,7 +218,7 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<void> updateTeam(String roundId, String playerId, bool inTeam) {
+  Future<void> updateExclusions(String roundId, String playerId, bool inTeam) {
     Round round = _getRound(roundId);
     Set<String> team = new Set.of(round.team ?? []);
     if (inTeam) {
@@ -230,9 +230,9 @@ class MockFirestoreDb implements FirestoreDb {
   }
 
   @override
-  Future<void> submitTeam(String roundId) {
+  Future<void> submitExclusions(String roundId) {
     Round round = _getRound(roundId);
-    return upsertRound(round.copyWith(teamSubmitted: true), null);
+    return upsertRound(round.copyWith(exclusionsSubmitted: true), null);
   }
 
   Haunt _getHaunt(String id) {

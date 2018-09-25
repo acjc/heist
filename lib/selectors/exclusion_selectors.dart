@@ -10,11 +10,8 @@ final Selector<GameModel, Set<Player>> currentExclusions = createSelector2(
     (List<Player> players, Round currentRound) =>
         players.where((Player p) => currentRound.team.contains(p.id)).toSet());
 
-final Selector<GameModel, bool> allExclusionsPicked = createSelector2(
-    currentHaunt,
-    currentExclusions,
-    (Haunt currentHaunt, Set<Player> currentExclusions) =>
-        currentHaunt.numPlayers == currentExclusions.length);
+final Selector<GameModel, bool> allExclusionsPicked = createSelector2(getRoom, currentExclusions,
+    (Room room, Set<Player> currentExclusions) => room.numExclusions == currentExclusions.length);
 
 Set<Player> exclusionsForRound(GameModel gameModel, Round round) =>
     getPlayers(gameModel).where((p) => round.team.contains(p.id)).toSet();

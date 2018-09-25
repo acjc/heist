@@ -140,7 +140,7 @@ class GhostieState extends State<Ghostie> with SingleTickerProviderStateMixin {
 
   void _setUpAnimation() {
     _controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-    _animation = Tween(begin: const Offset(0.0, 0.6), end: const Offset(0.0, 0.0))
+    _animation = Tween(begin: const Offset(0.0, 0.0), end: const Offset(0.0, 0.6))
         .animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
   }
 
@@ -223,7 +223,6 @@ class _WaitForExclusionsState extends ExclusionsState {
             _setUpPulse(viewModel.haveBeenExcluded, viewModel.allExclusionsPicked),
         onDidChange: (viewModel) => _runContinueButtonAnimation(viewModel.exclusionsSubmitted),
         builder: (context, viewModel) {
-          int playersRequired = currentHaunt(_store.state).numPlayers;
           Player leader = currentLeader(_store.state);
           return AnimationListenable<Color>(
             animation: _pulseAnimation,
@@ -231,7 +230,7 @@ class _WaitForExclusionsState extends ExclusionsState {
             staticChild: Column(
               children: [
                 _tokenCard(viewModel.haveBeenExcluded, leader.name, viewModel.exclusionsSubmitted),
-                _ghosties(playersRequired),
+                _ghosties(getRoom(_store.state).numExclusions),
               ],
             ),
           );
@@ -370,7 +369,7 @@ class ExclusionsPickerState extends ExclusionsState {
           _setUpPulse(haveBeenExcluded(_store.state), allExclusionsPicked(_store.state)),
       onDidChange: (viewModel) => _runContinueButtonAnimation(viewModel.exclusionsSubmitted),
       builder: (context, viewModel) {
-        int exclusionsRequired = getRoom(_store.state).numExclusions;
+        Room room = getRoom(_store.state);
         bool excluded = haveBeenExcluded(_store.state);
         return AnimationListenable<Color>(
           animation: _pulseAnimation,
@@ -380,11 +379,11 @@ class ExclusionsPickerState extends ExclusionsState {
               _exclusionsPickerCard(
                 excluded,
                 viewModel.exclusions,
-                exclusionsRequired,
+                room.numExclusions,
                 viewModel.exclusionsSubmitted,
                 viewModel.submittingExclusions,
               ),
-              _ghosties(exclusionsRequired),
+              _ghosties(room.numExclusions),
             ],
           ),
         );

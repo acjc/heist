@@ -11,34 +11,11 @@ void main() {
   test('test complete round', () async {
     Store<GameModel> store = await initGame();
 
-    await handle(store, new CompleteRoundAction());
+    expect(currentRound(store.state).complete, false);
+    await handle(store, CompleteRoundAction(currentRound(store.state).id));
     Round newRound = currentRound(store.state);
     expect(getRounds(store.state)[newRound.haunt].singleWhere((r) => r.order == 1).complete, true);
     expect(newRound.complete, false);
     expect(newRound.order, 2);
-  });
-
-  test('test next leader', () async {
-    Store<GameModel> store = await initGame();
-    List<Player> players = getPlayers(store.state);
-
-    expect(currentRound(store.state).leader, players.singleWhere((p) => p.order == 1).id);
-
-    expect(nextRoundLeader(players, 1, false), players.singleWhere((p) => p.order == 2).id);
-    expect(nextRoundLeader(players, players.length, false),
-        players.singleWhere((p) => p.order == 1).id);
-    expect(nextRoundLeader(players, 3, true), players.singleWhere((p) => p.order == 3).id);
-  });
-
-  test('test create new round', () async {
-    Store<GameModel> store = await initGame();
-    String myId = getSelf(store.state).id;
-
-    await createNewRound(store, currentHaunt(store.state).id, 2, myId);
-
-    Round round = currentRound(store.state);
-    expect(round.order, 2);
-    expect(round.leader, myId);
-    expect(getRounds(store.state)[round.haunt].length, 2);
   });
 }

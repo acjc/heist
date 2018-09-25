@@ -377,7 +377,6 @@ Map<String, Value> _convertValues<Value>(Map<String, dynamic> map, Value transfo
 
 @immutable
 class Round extends Document {
-  final String leader;
   final int order;
   final DocumentReference room;
   final String haunt;
@@ -390,7 +389,6 @@ class Round extends Document {
 
   Round(
       {id,
-      this.leader,
       @required this.order,
       this.room,
       @required this.haunt,
@@ -404,7 +402,6 @@ class Round extends Document {
 
   Round copyWith({
     String id,
-    String leader,
     int order,
     DocumentReference room,
     String haunt,
@@ -417,7 +414,6 @@ class Round extends Document {
   }) {
     return new Round(
       id: id ?? this.id,
-      leader: leader ?? this.leader,
       order: order ?? this.order,
       room: room ?? this.room,
       haunt: haunt ?? this.haunt,
@@ -433,8 +429,7 @@ class Round extends Document {
   Round.fromSnapshot(DocumentSnapshot snapshot) : this.fromJson(snapshot.documentID, snapshot.data);
 
   Round.fromJson(String id, Map<String, dynamic> json)
-      : leader = json['leader'],
-        order = json['order'],
+      : order = json['order'],
         room = json['room'],
         haunt = json['heist'],
         startedAt = json['startedAt'],
@@ -448,7 +443,6 @@ class Round extends Document {
         super(id: id);
 
   Map<String, dynamic> toJson() => {
-        'leader': leader,
         'order': order,
         'room': room,
         'heist': haunt,
@@ -467,6 +461,8 @@ class Round extends Document {
       : -1;
 
   bool get complete => completedAt != null;
+
+  bool get wasPlayerLed => complete && !isAuction;
 
   @override
   bool operator ==(Object other) =>
@@ -490,6 +486,6 @@ class Round extends Document {
 
   @override
   String toString() {
-    return 'Round{id: $id, leader: $leader, order: $order, room: $room, haunt: $haunt, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts, completedAt: $completedAt}';
+    return 'Round{id: $id, order: $order, room: $room, haunt: $haunt, startedAt: $startedAt, team: $team, teamSubmitted: $teamSubmitted, bids: $bids, gifts: $gifts, completedAt: $completedAt}';
   }
 }

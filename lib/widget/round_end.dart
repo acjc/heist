@@ -15,12 +15,13 @@ import 'package:redux/redux.dart';
 
 class RoundEnd extends StatefulWidget {
   final Store<GameModel> _store;
+  final int _roundOrder;
 
-  RoundEnd(this._store);
+  RoundEnd(this._store, this._roundOrder);
 
   @override
   State<StatefulWidget> createState() {
-    return _RoundEndState(_store);
+    return _RoundEndState(_store, _roundOrder);
   }
 }
 
@@ -35,6 +36,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
   static const double _labelFontSize = 50.0;
 
   final Store<GameModel> _store;
+  final int _roundOrder;
 
   Animation<double> _potAnimation;
   Animation<Offset> _potLabelAnimation;
@@ -46,7 +48,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
 
   AnimationController _controller;
 
-  _RoundEndState(this._store);
+  _RoundEndState(this._store, this._roundOrder);
 
   @override
   initState() {
@@ -96,31 +98,19 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  Widget _continueButton(Round round) => StoreConnector<GameModel, _ContinueButtonViewModel>(
-      converter: (store) => _ContinueButtonViewModel(
-            completingRound: requestInProcess(store.state, Request.CompletingRound),
-            roundComplete: currentRound(store.state).complete,
-          ),
+  Widget _continue(Round round) => StoreConnector<GameModel, bool>(
+      converter: (store) => requestInProcess(store.state, Request.CompletingRound),
       distinct: true,
-      builder: (context, viewModel) {
-        bool owner = amOwner(_store.state);
-        if (!owner && !viewModel.roundComplete) {
-          return Text(
-            AppLocalizations.of(context).waitingForOwner(getOwner(_store.state).name),
-            style: TextStyle(fontStyle: FontStyle.italic),
-          );
-        }
-        return RaisedButton(
-          child: Text(AppLocalizations.of(context).continueButton, style: buttonTextStyle),
-          onPressed: () {
-            if (owner && !viewModel.completingRound) {
-              _store.dispatch(CompleteRoundAction());
-            }
-            _store.dispatch(
-                RecordLocalRoundActionAction(round.id, LocalRoundAction.RoundEndContinue));
-          },
-        );
-      });
+      builder: (context, completingRound) => RaisedButton(
+            child: Text(AppLocalizations.of(context).continueButton, style: buttonTextStyle),
+            onPressed: () {
+              if (!round.complete && !completingRound) {
+                _store.dispatch(CompleteRoundAction(round.id));
+              }
+              _store.dispatch(
+                  RecordLocalRoundActionAction(round.id, LocalRoundAction.RoundEndContinue));
+            },
+          ));
 
   /// Amount of the pot to display as the pot bar grows.
   /// We want the amount to equal the price as the bar crosses the threshold line.
@@ -339,7 +329,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
           ),
           FadeTransition(
             opacity: _fadeAnimation,
-            child: _continueButton(round),
+            child: _continue(round),
           ),
         ],
       );
@@ -358,15 +348,16 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
       hauntIsActive ? (goingOnHaunt ? HeistColors.green : HeistColors.peach) : HeistColors.amber;
 
   Widget _barStack() {
+    Player me = getSelf(_store.state);
     Haunt haunt = currentHaunt(_store.state);
-    Round round = currentRound(_store.state);
+    Round round = roundByOrder(haunt, getRounds(_store.state), _roundOrder);
     int price = haunt.price;
     bool hauntActive = hauntIsActive(_store.state);
-    bool amGoingOnHaunt = goingOnHaunt(_store.state);
+    bool goingOnHaunt = round.team.contains(me.id);
     int pot = round.pot;
-    int bid = myCurrentBid(_store.state).amount;
+    int bid = round.bids[me.id].amount;
 
-    Color backgroundColor = _backgroundColor(hauntActive, amGoingOnHaunt);
+    Color backgroundColor = _backgroundColor(hauntActive, goingOnHaunt);
     double potBarHeight = _getPotBarHeight(pot, price, hauntActive);
     double bidBarHeight = (bid / pot) * potBarHeight;
     _setUpAnimation(potBarHeight, bidBarHeight, backgroundColor);
@@ -381,7 +372,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _header(haunt, round, hauntActive, amGoingOnHaunt),
+                _header(haunt, round, hauntActive, goingOnHaunt),
                 Expanded(
                   child: Stack(
                     alignment: Alignment.bottomLeft,
@@ -391,7 +382,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
                         child: _thresholdLine(price),
                       ),
                       _potBar(pot, price, potBarHeight),
-                      _bidBar(bid, bidBarHeight, _bidBarColor(hauntActive, amGoingOnHaunt)),
+                      _bidBar(bid, bidBarHeight, _bidBarColor(hauntActive, goingOnHaunt)),
                     ],
                   ),
                 ),
@@ -409,28 +400,5 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
       return loading();
     }
     return _barStack();
-  }
-}
-
-class _ContinueButtonViewModel {
-  final bool completingRound;
-  final bool roundComplete;
-
-  _ContinueButtonViewModel({this.completingRound, this.roundComplete});
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _ContinueButtonViewModel &&
-          runtimeType == other.runtimeType &&
-          completingRound == other.completingRound &&
-          roundComplete == other.roundComplete;
-
-  @override
-  int get hashCode => completingRound.hashCode ^ roundComplete.hashCode;
-
-  @override
-  String toString() {
-    return '_ContinueButtonViewModel{completingRound: $completingRound, roundComplete: $roundComplete}';
   }
 }

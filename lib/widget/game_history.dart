@@ -5,7 +5,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/app_localizations.dart';
 import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
-import 'package:heist/haunt_definitions.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
@@ -13,24 +12,24 @@ import 'package:heist/widget/selection_board.dart';
 import 'package:redux/redux.dart';
 
 Widget hauntDecisions(Haunt haunt) {
-  List<String> decisions = new List.of(haunt.decisions.values.toList());
-  decisions.shuffle(new Random(haunt.id.hashCode));
-  List<Widget> children = new List.generate(decisions.length, (i) {
+  List<String> decisions = List.of(haunt.decisions.values.toList());
+  decisions.shuffle(Random(haunt.id.hashCode));
+  List<Widget> children = List.generate(decisions.length, (i) {
     String decision = decisions[i];
-    return new Center(
-      child: new Text(decision,
-          style: new TextStyle(
+    return Center(
+      child: Text(decision,
+          style: TextStyle(
             fontSize: 16.0,
             color: decisionColour(decision),
             fontWeight: FontWeight.bold,
           )),
     );
   });
-  return new TeamGridView(children, childAspectRatio: 8.0);
+  return TeamGridView(children, childAspectRatio: 8.0);
 }
 
 Widget hauntTeam(BuildContext context, Store<GameModel> store, Set<Player> team, Player leader) {
-  List<Widget> gridChildren = new List.generate(
+  List<Widget> gridChildren = List.generate(
     team.length,
     (i) {
       Player player = team.elementAt(i);
@@ -43,72 +42,66 @@ Widget hauntTeam(BuildContext context, Store<GameModel> store, Set<Player> team,
     gridChildren.add(playerTile(context, leader.name, false, true));
   }
 
-  return new TeamGridView(gridChildren);
+  return TeamGridView(gridChildren);
 }
 
-Widget hauntPopup(BuildContext context, Store<GameModel> store, Haunt haunt, int order) {
-  int totalPlayers = getRoom(store.state).numPlayers;
-  int price = haunt?.price ?? hauntDefinitions[totalPlayers][order].price;
-  int numPlayers = haunt?.numPlayers ?? hauntDefinitions[totalPlayers][order].numPlayers;
-  int maximumBid = haunt?.maximumBid ?? hauntDefinitions[totalPlayers][order].maximumBid;
-  Round lastRound = haunt != null ? getRounds(store.state)[haunt.id].last : null;
-  int pot = lastRound != null && lastRound.bids.length == numPlayers ? lastRound.pot : null;
+Widget hauntPopup(
+    BuildContext context, Store<GameModel> store, int currentHauntOrder, Haunt haunt) {
+  Round lastRound = lastRoundForHaunt(store.state, haunt);
 
   List<Widget> title = [
-    new Text(
-      AppLocalizations.of(context).hauntTitle(order),
+    Text(
+      AppLocalizations.of(context).hauntTitle(haunt.order),
       style: boldTextStyle,
     ),
   ];
 
-  if (haunt != null) {
-    title.add(new Text(
-      getHeistStatus(context, haunt, lastRound),
-      style: subtitleTextStyle,
-    ));
-  }
+  title.add(Text(
+    getHeistStatus(context, haunt, lastRound),
+    style: subtitleTextStyle,
+  ));
 
   List<Widget> hauntDetailsChildren = [
-    getHauntIcon(haunt),
-    new Column(
+    getHauntIcon(haunt, currentHauntOrder),
+    Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: title,
     ),
-    new VerticalDivider(height: 40.0),
-    hauntDetailsIcon(Icons.people, numPlayers.toString()),
-    hauntDetailsIcon(Icons.bubble_chart, price.toString()),
-    hauntDetailsIcon(Icons.vertical_align_top, maximumBid.toString()),
+    VerticalDivider(height: 40.0),
+    hauntDetailsIcon(Icons.people, haunt.numPlayers.toString()),
+    hauntDetailsIcon(Icons.bubble_chart, haunt.price.toString()),
+    hauntDetailsIcon(Icons.vertical_align_top, haunt.maximumBid.toString()),
   ];
 
-  if (pot != null) {
+  if (haunt.complete) {
     hauntDetailsChildren.addAll([
-      new VerticalDivider(height: 40.0),
-      iconText(new Icon(Icons.bubble_chart, size: 32.0),
-          new Text(pot.toString(), style: bigNumberTextStyle)),
+      VerticalDivider(height: 40.0),
+      iconText(Icon(Icons.bubble_chart, size: 32.0),
+          Text(lastRound.pot.toString(), style: bigNumberTextStyle)),
     ]);
   }
 
   List<Widget> hauntPopupChildren = [
-    new Row(
+    Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: hauntDetailsChildren,
     ),
   ];
 
-  if (haunt != null && haunt.complete) {
+  if (haunt.complete) {
     Set<Player> team = teamForRound(store.state, lastRound);
     Player leader = leaderForRound(store.state, lastRound);
     hauntPopupChildren.addAll([
-      new Divider(),
+      Divider(),
       hauntTeam(context, store, team, leader),
-      new Divider(),
+      Divider(),
       hauntDecisions(haunt),
     ]);
   }
 
-  return new Container(
+  return Padding(
     padding: paddingMedium,
-    child: new Column(
+    child: Column(
       mainAxisSize: MainAxisSize.min,
       children: hauntPopupChildren,
     ),
@@ -117,8 +110,8 @@ Widget hauntPopup(BuildContext context, Store<GameModel> store, Haunt haunt, int
 
 Widget hauntDetailsIcon(IconData icon, String text) {
   return iconText(
-    new Icon(icon, color: Colors.grey),
-    new Text(text, style: subtitleTextStyle),
+    Icon(icon, color: Colors.grey),
+    Text(text, style: subtitleTextStyle),
   );
 }
 
@@ -128,17 +121,14 @@ String getHeistStatus(BuildContext context, Haunt haunt, Round lastRound) {
         ? AppLocalizations.of(context).success
         : AppLocalizations.of(context).fail;
   }
-  if (lastRound == null) {
-    return AppLocalizations.of(context).roundTitle(1);
-  }
   if (lastRound.isAuction) {
     return AppLocalizations.of(context).auctionTitle;
   }
   return AppLocalizations.of(context).roundTitle(lastRound.order);
 }
 
-Icon getHauntIcon(Haunt haunt) {
-  if (haunt == null) {
+Icon getHauntIcon(Haunt haunt, int currentHauntOrder) {
+  if (haunt.order > currentHauntOrder) {
     return const Icon(Icons.remove, size: 32.0, color: Colors.grey);
   }
   if (!haunt.complete) {
@@ -151,29 +141,30 @@ Icon getHauntIcon(Haunt haunt) {
 }
 
 Widget gameHistory(Store<GameModel> store) {
-  return new StoreConnector<GameModel, List<Haunt>>(
+  return StoreConnector<GameModel, List<Haunt>>(
       distinct: true,
       converter: (store) => store.state.haunts,
       builder: (context, haunts) {
         if (haunts.isEmpty) {
-          return new Container();
+          return Container();
         }
-        return new Card(
+        int currentHauntOrder = currentHaunt(store.state).order;
+        return Card(
             elevation: 10.0,
-            child: new Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: new List.generate(5, (i) {
-                Haunt haunt = i < haunts.length ? haunts[i] : null;
-                return new InkWell(
+              children: List.generate(5, (i) {
+                Haunt haunt = haunts[i];
+                return InkWell(
                   onTap: () {
                     showModalBottomSheet(
                         context: context,
-                        builder: (context) => hauntPopup(context, store, haunt, i + 1));
+                        builder: (context) => hauntPopup(context, store, currentHauntOrder, haunt));
                     return;
                   },
-                  child: new Container(
+                  child: Padding(
                     padding: paddingMedium,
-                    child: getHauntIcon(haunt),
+                    child: getHauntIcon(haunt, currentHauntOrder),
                   ),
                 );
               }),

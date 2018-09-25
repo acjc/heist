@@ -206,7 +206,7 @@ class SecretBoardState extends State<SecretBoard> {
         tiles.add(
           new ListTile(
             title: new Text(
-              '${player.name}: ${calculateBalanceFromStore(_store, player)}',
+              '${player.name}: ${calculateBalanceFromState(_store.state, player)}',
               style: infoTextStyle,
             ),
           ),

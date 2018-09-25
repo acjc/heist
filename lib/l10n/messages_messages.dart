@@ -51,13 +51,11 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m16(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
 
-  static m17(owner) => "Waiting for ${owner} to continue...";
+  static m17(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
 
-  static m18(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
+  static m18(leaderName) => "Waiting for ${leaderName} to submit team";
 
-  static m19(leaderName) => "Waiting for ${leaderName} to submit team";
-
-  static m20(winner) => "${winner} win!";
+  static m19(winner) => "${winner} win!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -83,8 +81,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "continueButton" : MessageLookupByLibrary.simpleMessage("CONTINUE"),
     "continueToBidding" : MessageLookupByLibrary.simpleMessage("CONTINUE TO BIDDING"),
     "convince" : MessageLookupByLibrary.simpleMessage("Convince "),
-    "createRoom" : MessageLookupByLibrary.simpleMessage("CREATE ROOM"),
-    "createRoomTitle" : MessageLookupByLibrary.simpleMessage("Heist: Create new room"),
+    "createRoom" : MessageLookupByLibrary.simpleMessage("CREATE NEW GAME"),
+    "createRoomTitle" : MessageLookupByLibrary.simpleMessage("Create new game"),
     "enterRoom" : MessageLookupByLibrary.simpleMessage("ENTER ROOM"),
     "enterRoomCode" : MessageLookupByLibrary.simpleMessage("Enter an existing room code"),
     "enterYourName" : MessageLookupByLibrary.simpleMessage("Enter your name"),
@@ -99,7 +97,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "hauntPot" : m6,
     "hauntPrice" : m7,
     "hauntTitle" : m8,
-    "homepageTitle" : MessageLookupByLibrary.simpleMessage("Heist: Homepage"),
+    "homepageTitle" : MessageLookupByLibrary.simpleMessage("Homepage"),
     "identity" : m9,
     "initialisingGame" : MessageLookupByLibrary.simpleMessage("Initialising game..."),
     "invalidCode" : MessageLookupByLibrary.simpleMessage("Invalid code"),
@@ -131,10 +129,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "teamScores" : m16,
     "title" : MessageLookupByLibrary.simpleMessage("Heist"),
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),
-    "waitingForOwner" : m17,
-    "waitingForPlayers" : m18,
-    "waitingForTeamSubmission" : m19,
-    "winner" : m20,
+    "waitingForPlayers" : m17,
+    "waitingForTeamSubmission" : m18,
+    "winner" : m19,
     "youAreGoing" : MessageLookupByLibrary.simpleMessage("You\'re going on a haunt!"),
     "youHaveMadeYourChoice" : MessageLookupByLibrary.simpleMessage("You have made your choice!"),
     "yourBid" : MessageLookupByLibrary.simpleMessage("Your bid"),

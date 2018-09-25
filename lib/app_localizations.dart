@@ -83,15 +83,6 @@ class AppLocalizations {
 
   // Common
 
-  String waitingForOwner(String owner) {
-    return Intl.message(
-      'Waiting for $owner to continue...',
-      name: 'waitingForOwner',
-      args: [owner],
-      desc: 'Room owner needs to take an action',
-    );
-  }
-
   String get okButton {
     return Intl.message(
       'OK',
@@ -171,7 +162,7 @@ class AppLocalizations {
 
   String get homepageTitle {
     return Intl.message(
-      'Heist: Homepage',
+      'Homepage',
       name: 'homepageTitle',
       desc: 'Title for the homepage',
     );
@@ -221,7 +212,7 @@ class AppLocalizations {
 
   String get createRoomTitle {
     return Intl.message(
-      'Heist: Create new room',
+      'Create new game',
       name: 'createRoomTitle',
       desc: 'Title for the page to create a room',
     );
@@ -229,7 +220,7 @@ class AppLocalizations {
 
   String get createRoom {
     return Intl.message(
-      'CREATE ROOM',
+      'CREATE NEW GAME',
       name: 'createRoom',
       desc: 'Button to create a new room',
     );

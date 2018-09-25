@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-20T18:47:32.089424",
+  "@@last_modified": "2018-09-21T19:01:46.816900",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -114,13 +114,13 @@
     "type": "text",
     "placeholders": {}
   },
-  "enterRoom": "ENTER ROOM",
-  "@enterRoom": {
+  "joinGame": "JOIN GAME",
+  "@joinGame": {
     "description": "Button to enter an existing room",
     "type": "text",
     "placeholders": {}
   },
-  "enterRoomCode": "Enter an existing room code",
+  "enterRoomCode": "Enter an existing game code",
   "@enterRoomCode": {
     "description": "Above the text field where the player writes an existing room code",
     "type": "text",
@@ -264,12 +264,6 @@
       "bertieDisplayName": {},
       "stealOption": {}
     }
-  },
-  "initialisingGame": "Initialising game...",
-  "@initialisingGame": {
-    "description": "Shown while roles and player order are being assigned",
-    "type": "text",
-    "placeholders": {}
   },
   "gameTab": "GAME",
   "@gameTab": {

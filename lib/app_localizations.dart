@@ -184,17 +184,17 @@ class AppLocalizations {
     );
   }
 
-  String get enterRoom {
+  String get joinGame {
     return Intl.message(
-      'ENTER ROOM',
-      name: 'enterRoom',
+      'JOIN GAME',
+      name: 'joinGame',
       desc: 'Button to enter an existing room',
     );
   }
 
   String get enterRoomCode {
     return Intl.message(
-      'Enter an existing room code',
+      'Enter an existing game code',
       name: 'enterRoomCode',
       desc: 'Above the text field where the player writes an existing room code',
     );
@@ -384,14 +384,6 @@ class AppLocalizations {
   }
 
   // Game
-
-  String get initialisingGame {
-    return Intl.message(
-      'Initialising game...',
-      name: 'initialisingGame',
-      desc: 'Shown while roles and player order are being assigned',
-    );
-  }
 
   String get gameTab {
     return Intl.message(

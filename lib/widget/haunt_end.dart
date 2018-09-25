@@ -97,7 +97,7 @@ class _HauntEndState extends State<HauntEnd> {
     List<Widget> children = [
       _hauntDetails(haunt, pot),
       new Divider(),
-      hauntTeam(context, _store, currentTeam(_store.state), currentLeader(_store.state)),
+      hauntTeam(context, currentTeam(_store.state), currentLeader(_store.state)),
       new Divider(),
     ];
 

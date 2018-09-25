@@ -10,6 +10,7 @@ import 'package:heist/middleware/room_middleware.dart';
 import 'package:heist/reducers/room_reducers.dart';
 import 'package:heist/role.dart';
 import 'package:heist/state.dart';
+import 'package:heist/widget/background.dart';
 import 'package:heist/widget/common.dart';
 import 'package:heist/widget/home_page.dart';
 import 'package:redux/redux.dart';
@@ -65,45 +66,54 @@ class CreateRoomPage extends StatelessWidget {
           FormState enterNameState = Keys.createRoomPageNameKey.currentState;
           if (enterNameState.validate()) {
             enterNameState.save();
-            store.dispatch(new CreateRoomAction(
-                context, () => new Connectivity().checkConnectivity()));
+            store.dispatch(
+                new CreateRoomAction(context, () => new Connectivity().checkConnectivity()));
           }
         },
       );
 
-  Widget _body(BuildContext context, Store<GameModel> store) {
-    return new Padding(
-      padding: paddingLarge,
-      child: new Column(
-        children: [
-          new Padding(
-            padding: EdgeInsets.only(bottom: 24.0),
-            child: enterNameForm(context, store, Keys.createRoomPageNameKey),
-          ),
-          new Padding(
-            padding: paddingMedium,
-            child: new Text(
-              AppLocalizations.of(context).chooseNumberOfPlayers,
-              style: infoTextStyle,
+  Widget _body(BuildContext context, Store<GameModel> store) => Center(
+        child: Card(
+          elevation: 2.0,
+          margin: paddingLarge,
+          child: Padding(
+            padding: paddingLarge,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(bottom: 24.0),
+                  child: enterNameForm(context, store, Keys.createRoomPageNameKey),
+                ),
+                Padding(
+                  padding: paddingMedium,
+                  child: Text(
+                    AppLocalizations.of(context).chooseNumberOfPlayers,
+                    style: infoTextStyle,
+                  ),
+                ),
+                _numPlayersSelector(store),
+                _rolesText(),
+                _createRoomButton(context, store),
+              ],
             ),
           ),
-          _numPlayersSelector(store),
-          _rolesText(),
-          _createRoomButton(context, store),
-        ],
-      ),
-    );
-  }
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(AppLocalizations.of(context).createRoomTitle),
+    return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      endDrawer: isDebugMode() ? Drawer(child: ReduxDevTools<GameModel>(store)) : null,
+      body: Stack(
+        children: [
+          staticBackground(),
+          AppBar(backgroundColor: Colors.transparent),
+          _body(context, store),
+        ],
       ),
-      endDrawer: isDebugMode() ? new Drawer(child: new ReduxDevTools<GameModel>(store)) : null,
-      body: _body(context, store),
     );
   }
 }

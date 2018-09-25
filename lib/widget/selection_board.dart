@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/app_localizations.dart';
-import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -22,10 +21,7 @@ Widget selectionBoard(Store<GameModel> store) => StoreConnector<GameModel, Set<P
               Container(
                 padding: paddingTitle,
                 child: Text(
-                    AppLocalizations.of(context).exclusionsSize(
-                      exclusions.length,
-                      getRoom(store.state).numExclusions,
-                    ),
+                    '${AppLocalizations.of(context).exclusionsTitle} (${getRoom(store.state).numExclusions})',
                     style: titleTextStyle),
               ),
               TeamGridView(selectionBoardChildren(context, players, exclusions, leader)),
@@ -39,7 +35,13 @@ List<Widget> selectionBoardChildren(
       Player player = players[i];
       bool hasBeenExcluded = team.contains(player);
       bool isLeader = player.id == leader.id;
-      return playerTile(context, player.name, hasBeenExcluded, isLeader);
+      return playerTile(
+        context,
+        player.name,
+        isLeader,
+        hasBeenExcluded,
+        Theme.of(context).accentColor,
+      );
     });
 
 Widget playerTileText(String playerName, bool hasBeenExcluded, bool isLeader) {
@@ -54,12 +56,12 @@ Widget playerTileText(String playerName, bool hasBeenExcluded, bool isLeader) {
   return text;
 }
 
-Widget playerTile(BuildContext context, String playerName, bool hasBeenExcluded, bool isLeader) =>
+Widget playerTile(BuildContext context, String playerName, bool isLeader, bool fill, Color color) =>
     Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          border: Border.all(color: HeistColors.peach),
+          border: Border.all(color: color),
           borderRadius: BorderRadius.circular(5.0),
-          color: hasBeenExcluded ? HeistColors.peach : null,
+          color: fill ? color : null,
         ),
-        child: playerTileText(playerName, hasBeenExcluded, isLeader));
+        child: playerTileText(playerName, fill, isLeader));

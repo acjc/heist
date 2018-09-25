@@ -334,30 +334,39 @@ class Haunt extends Document {
 
 @immutable
 class Bid {
+  @required
   final int amount;
+  @required
+  final String recipient;
+  @required
   final DateTime timestamp;
 
-  Bid(this.amount) : timestamp = now();
+  Bid(this.recipient, this.amount) : timestamp = now();
 
   Bid.fromJson(Map<String, dynamic> json)
       : amount = json['amount'],
+        recipient = json['recipient'],
         timestamp = json['timestamp'];
 
   Map<String, dynamic> toJson() => {
         'amount': amount,
+        'recipient': recipient,
         'timestamp': timestamp,
       };
 
   @override
   String toString() {
-    return 'Bid{amount: $amount, timestamp: $timestamp}';
+    return 'Bid{amount: $amount, recipient: $recipient, timestamp: $timestamp}';
   }
 }
 
 @immutable
 class Gift {
+  @required
   final int amount;
+  @required
   final String recipient;
+  @required
   final DateTime timestamp;
 
   Gift({this.amount, this.recipient}) : timestamp = now();
@@ -425,7 +434,7 @@ class Round extends Document {
     Map<String, Gift> gifts,
     DateTime completedAt,
   }) {
-    return new Round(
+    return Round(
       id: id ?? this.id,
       order: order ?? this.order,
       room: room ?? this.room,

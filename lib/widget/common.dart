@@ -22,6 +22,7 @@ const TextStyle boldTextStyle = const TextStyle(fontSize: 16.0, fontWeight: Font
 const TextStyle bigNumberTextStyle = const TextStyle(fontSize: 30.0, fontWeight: FontWeight.w300);
 const TextStyle titleTextStyle = const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
 const TextStyle subtitleTextStyle = const TextStyle(color: Colors.black54);
+const TextStyle dropdownTextStyle = const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold);
 const TextStyle buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
 const TextStyle chipTextStyle = const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
 

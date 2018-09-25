@@ -15,11 +15,11 @@ import 'package:heist/widget/common.dart';
 import 'package:heist/widget/selection_board.dart';
 import 'package:redux/redux.dart';
 
-class ExclusionsSelection extends StatefulWidget {
+class Exclusions extends StatefulWidget {
   final Store<GameModel> _store;
   final bool _isMyGo;
 
-  ExclusionsSelection(this._store, this._isMyGo);
+  Exclusions(this._store, this._isMyGo);
 
   @override
   State<StatefulWidget> createState() {
@@ -27,8 +27,7 @@ class ExclusionsSelection extends StatefulWidget {
   }
 }
 
-abstract class ExclusionsSelectionState extends State<ExclusionsSelection>
-    with TickerProviderStateMixin {
+abstract class ExclusionsState extends State<Exclusions> with TickerProviderStateMixin {
   @protected
   final Store<GameModel> _store;
 
@@ -42,7 +41,7 @@ abstract class ExclusionsSelectionState extends State<ExclusionsSelection>
   @protected
   AnimationController _continueController;
 
-  ExclusionsSelectionState(this._store);
+  ExclusionsState(this._store);
 
   @override
   initState() {
@@ -206,7 +205,7 @@ class _WaitForExclusionsViewModel {
   }
 }
 
-class _WaitForExclusionsState extends ExclusionsSelectionState {
+class _WaitForExclusionsState extends ExclusionsState {
   _WaitForExclusionsState(Store<GameModel> store) : super(store);
 
   @override
@@ -246,7 +245,7 @@ class _WaitForExclusionsState extends ExclusionsSelectionState {
         children: [
           Padding(
             padding: paddingSmall,
-            child: Text(AppLocalizations.of(context).notPicked, style: infoTextStyle),
+            child: Text(AppLocalizations.of(context).excluded, style: infoTextStyle),
           ),
           RichText(
             textAlign: TextAlign.center,
@@ -255,7 +254,7 @@ class _WaitForExclusionsState extends ExclusionsSelectionState {
               children: [
                 TextSpan(text: AppLocalizations.of(context).convince),
                 TextSpan(text: leaderName, style: boldTextStyle),
-                TextSpan(text: AppLocalizations.of(context).putYouInTeam),
+                TextSpan(text: AppLocalizations.of(context).notToExclude),
               ],
             ),
           ),
@@ -268,7 +267,7 @@ class _WaitForExclusionsState extends ExclusionsSelectionState {
         style: defaultTextStyle,
         children: [
           TextSpan(text: leaderName, style: boldTextStyle),
-          TextSpan(text: AppLocalizations.of(context).pickedYou),
+          TextSpan(text: AppLocalizations.of(context).didNotExclude),
         ],
       ),
     );
@@ -279,7 +278,7 @@ class _WaitForExclusionsState extends ExclusionsSelectionState {
       return _continueButton();
     }
     return Text(
-      AppLocalizations.of(context).waitingForTeamSubmission(leaderName),
+      AppLocalizations.of(context).waitingToConfirmExclusions(leaderName),
       style: TextStyle(fontStyle: FontStyle.italic),
     );
   }
@@ -342,7 +341,7 @@ class _ExclusionsPickerViewModel {
   }
 }
 
-class ExclusionsPickerState extends ExclusionsSelectionState {
+class ExclusionsPickerState extends ExclusionsState {
   ExclusionsPickerState(Store<GameModel> store) : super(store);
 
   Widget _actionButton(bool allExclusionsPicked, bool exclusionsSubmitted, bool loading) {
@@ -365,10 +364,10 @@ class ExclusionsPickerState extends ExclusionsSelectionState {
             submittingExclusions: requestInProcess(store.state, Request.SubmittingExclusions),
           ),
       onInit: (store) =>
-          _setUpPulse(!haveBeenExcluded(store.state), allExclusionsPicked(store.state)),
+          _setUpPulse(haveBeenExcluded(store.state), allExclusionsPicked(store.state)),
       onInitialBuild: (viewModel) => _runContinueButtonAnimation(viewModel.exclusionsSubmitted),
       onWillChange: (_) =>
-          _setUpPulse(!haveBeenExcluded(_store.state), allExclusionsPicked(_store.state)),
+          _setUpPulse(haveBeenExcluded(_store.state), allExclusionsPicked(_store.state)),
       onDidChange: (viewModel) => _runContinueButtonAnimation(viewModel.exclusionsSubmitted),
       builder: (context, viewModel) {
         int exclusionsRequired = getRoom(_store.state).numExclusions;
@@ -378,7 +377,7 @@ class ExclusionsPickerState extends ExclusionsSelectionState {
           builder: (context, value, child) => Container(color: value, child: child),
           staticChild: Column(
             children: [
-              _exclusionPickerCard(
+              _exclusionsPickerCard(
                 excluded,
                 viewModel.exclusions,
                 exclusionsRequired,
@@ -391,7 +390,7 @@ class ExclusionsPickerState extends ExclusionsSelectionState {
         );
       });
 
-  Widget _exclusionPickerCard(
+  Widget _exclusionsPickerCard(
     bool haveBeenExcluded,
     Set<Player> exclusions,
     int exclusionsRequired,
@@ -399,52 +398,49 @@ class ExclusionsPickerState extends ExclusionsSelectionState {
     bool submittingExclusions,
   ) =>
       Expanded(
-        child: Padding(
-          padding: paddingMedium,
-          child: Card(
-            elevation: 6.0,
-            child: Padding(
-              padding: paddingSmall,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AnimationListenable<Color>(
-                    animation: _pulseAnimation,
-                    builder: (context, value, _) =>
-                        teamSelectionIcon(haveBeenExcluded, value, 100.0),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)
-                            .pickExclusions(exclusions.length, exclusionsRequired),
-                        style: infoTextStyle,
-                      ),
-                      TeamGridView(
-                        _exclusionPickerChildren(
-                          exclusions,
-                          exclusionsRequired,
-                          exclusionsSubmitted,
-                          submittingExclusions,
-                        ),
-                        childAspectRatio: 5.0,
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      _actionButton(
-                        exclusions.length == exclusionsRequired,
+        child: Card(
+          margin: paddingMedium,
+          elevation: 6.0,
+          child: Padding(
+            padding: paddingSmall,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AnimationListenable<Color>(
+                  animation: _pulseAnimation,
+                  builder: (context, value, _) => teamSelectionIcon(haveBeenExcluded, value, 100.0),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)
+                          .pickExclusions(exclusions.length, exclusionsRequired),
+                      style: infoTextStyle,
+                    ),
+                    TeamGridView(
+                      _exclusionPickerChildren(
+                        exclusions,
+                        exclusionsRequired,
                         exclusionsSubmitted,
                         submittingExclusions,
                       ),
-                      Divider(),
-                      roundTitleContents(context, _store),
-                    ],
-                  ),
-                ],
-              ),
+                      childAspectRatio: 5.0,
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    _actionButton(
+                      exclusions.length == exclusionsRequired,
+                      exclusionsSubmitted,
+                      submittingExclusions,
+                    ),
+                    Divider(),
+                    roundTitleContents(context, _store),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
@@ -463,7 +459,13 @@ class ExclusionsPickerState extends ExclusionsSelectionState {
           (hasBeenExcluded || team.length < exclusionsRequired) && !exclusionsSubmitted && !loading;
       return InkWell(
           onTap: enabled ? () => _onTap(_store, roundId, player.id, hasBeenExcluded) : null,
-          child: playerTile(context, player.name, hasBeenExcluded, isLeader));
+          child: playerTile(
+            context,
+            player.name,
+            isLeader,
+            hasBeenExcluded,
+            Theme.of(context).accentColor,
+          ));
     });
   }
 

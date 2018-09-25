@@ -8,10 +8,11 @@ import 'package:redux/redux.dart';
 import 'middleware.dart';
 
 class SubmitBidAction extends MiddlewareAction {
-  final String playerId;
+  final String bidder;
+  final String recipient;
   final int amount;
 
-  SubmitBidAction(this.playerId, this.amount);
+  SubmitBidAction({this.bidder, this.recipient, this.amount});
 
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) async {
@@ -19,7 +20,7 @@ class SubmitBidAction extends MiddlewareAction {
         Request.Bidding,
         store,
         (store) =>
-            store.state.db.submitBid(currentRound(store.state).id, playerId, new Bid(amount)));
+            store.state.db.submitBid(currentRound(store.state).id, bidder, Bid(recipient, amount)));
   }
 }
 

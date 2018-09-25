@@ -97,18 +97,21 @@ class GameState extends State<Game> {
     return null;
   }
 
-  Widget _biddingAndGifting(Store<GameModel> store) {
+  Widget _biddingAndGifting() {
     List<Widget> children = [
-      roundTitleCard(context, store),
+      roundTitleCard(context, _store),
     ];
-    if (!isAuction(store.state)) {
+    if (!isAuction(_store.state)) {
       children.add(selectionBoard(_store));
     }
-    children.add(
-      bidding(store),
+    children.addAll([
+      Bidding(_store),
+      gifting(_store),
+    ]);
+    return Padding(
+      padding: paddingMedium,
+      child: ListView(children: children),
     );
-    children.add(gifting(store));
-    return ListView(children: children);
   }
 
   Widget _gameLoop(MainBoardViewModel viewModel) {
@@ -131,12 +134,12 @@ class GameState extends State<Game> {
     // Team selection (not needed for auctions)
     if (!isAuction(_store.state) &&
         (viewModel.waitingForTeam || !viewModel.teamSelectionContinued)) {
-      return ExclusionsSelection(_store, isMyGo(_store.state));
+      return Exclusions(_store, isMyGo(_store.state));
     }
 
     // Bidding & gifting
     if (!viewModel.biddingComplete) {
-      return appendFooter(_biddingAndGifting(_store));
+      return appendFooter(_biddingAndGifting());
     }
 
     // Select team from auction if necessary

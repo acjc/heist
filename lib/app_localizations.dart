@@ -547,19 +547,19 @@ class AppLocalizations {
 
   // Picking a team
 
-  String get pickedYou {
+  String get didNotExclude {
     return Intl.message(
-      ' picked you in the team!',
-      name: 'pickedYou',
-      desc: 'Leader picked you in the team',
+      ' did not exclude you from the haunt!',
+      name: 'didNotExclude',
+      desc: 'Leader did not exclude you',
     );
   }
 
-  String get notPicked {
+  String get excluded {
     return Intl.message(
-      "You haven't been picked!",
-      name: 'notPicked',
-      desc: 'Leader has not picked you in the team',
+      "You have been excluded from the haunt!",
+      name: 'excluded',
+      desc: 'Leader has excluded you',
     );
   }
 
@@ -567,24 +567,24 @@ class AppLocalizations {
     return Intl.message(
       'Convince ',
       name: 'convince',
-      desc: 'Convince leader to pick you in the team (1 / 2)',
+      desc: 'Convince leader not to exclude you (1 / 2)',
     );
   }
 
-  String get putYouInTeam {
+  String get notToExclude {
     return Intl.message(
-      ' to put you in the team!',
-      name: 'putYouInTeam',
-      desc: 'Convince leader to pick you in the team (2 / 2)',
+      ' not to exclude you!',
+      name: 'notToExclude',
+      desc: 'Convince leader not to exclude you (2 / 2)',
     );
   }
 
-  String waitingForTeamSubmission(String leaderName) {
+  String waitingToConfirmExclusions(String leaderName) {
     return Intl.message(
-      'Waiting for $leaderName to submit team',
-      name: 'waitingForTeamSubmission',
+      'Waiting for $leaderName to confirm exclusions',
+      name: 'waitingToConfirmExclusions',
       args: [leaderName],
-      desc: 'Waiting for leader to submit team',
+      desc: 'Waiting for leader to submit exclusions',
     );
   }
 
@@ -597,18 +597,17 @@ class AppLocalizations {
     );
   }
 
-  String exclusionsSize(int playersPicked, int numExclusions) {
+  String get exclusionsTitle {
     return Intl.message(
-      'EXCLUSIONS ($playersPicked / $numExclusions)',
-      name: 'exclusionsSize',
-      args: [playersPicked, numExclusions],
+      'EXCLUSIONS',
+      name: 'exclusionsTitle',
       desc: 'Selection board title',
     );
   }
 
   String get submitExclusions {
     return Intl.message(
-      'SUBMIT EXCLUSIONS',
+      'SUBMIT',
       name: 'submitExclusions',
       desc: 'Button for the leader to confirm their exclusions',
     );

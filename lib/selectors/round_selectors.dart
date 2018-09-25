@@ -39,17 +39,56 @@ Player leaderForRound(GameModel gameModel, Round round) {
   return players.singleWhere((Player p) => p.order == leaderOrder);
 }
 
-final Selector<GameModel, Set<Player>> currentExclusions = createSelector2(
+class BidTotal {
+  final String playerId;
+  final int amount;
+
+  BidTotal._(this.playerId, this.amount);
+}
+
+List<BidTotal> bidTotalsForRound(Round round) {
+  Map<String, int> bidTotalsPerPlayer = {};
+  round.bids.forEach((String playerId, Bid bid) {
+    bidTotalsPerPlayer.update(
+      bid.recipient,
+      (currentValue) => currentValue + bid.amount,
+      ifAbsent: () => bid.amount,
+    );
+  });
+  List<BidTotal> bidTotals = [];
+  bidTotalsPerPlayer.forEach((String recipient, int totalBid) {
+    bidTotals.add(BidTotal._(recipient, totalBid));
+  });
+  bidTotals.sort((bt1, bt2) => bt1.amount.compareTo(bt2.amount));
+  return bidTotals;
+}
+
+List<Player> winnersForRound(List<Player> players, Haunt haunt, Round round) {
+  List<BidTotal> bidTotals = bidTotalsForRound(round);
+  if (bidTotals.length < haunt.numPlayers) {
+    return [];
+  }
+  return bidTotals
+      .sublist(0, haunt.numPlayers)
+      .map((bt) => players.singleWhere((p) => p.id == bt.playerId))
+      .toList();
+}
+
+int potForRound(Haunt haunt, Round round) {
+  return bidTotalsForRound(round)
+      .sublist(0, haunt.numPlayers)
+      .fold(0, (int value, BidTotal bidTotal) => value + bidTotal.amount);
+}
+
+final Selector<GameModel, List<Player>> currentTeam = createSelector3(
     getPlayers,
-    currentRound,
-    (List<Player> players, Round currentRound) =>
-        players.where((Player p) => currentRound.team.contains(p.id)).toSet());
-
-final Selector<GameModel, bool> allExclusionsPicked = createSelector2(
     currentHaunt,
-    currentExclusions,
-    (Haunt currentHaunt, Set<Player> currentExclusions) =>
-        currentHaunt.numPlayers == currentExclusions.length);
+    currentRound,
+    (List<Player> players, Haunt currentHaunt, Round currentRound) =>
+        winnersForRound(players, currentHaunt, currentRound));
 
-Set<Player> exclusionsForRound(GameModel gameModel, Round round) =>
-    getPlayers(gameModel).where((p) => round.team.contains(p.id)).toSet();
+final Selector<GameModel, int> currentPot = createSelector2(currentHaunt, currentRound,
+    (Haunt currentHaunt, Round currentRound) => potForRound(currentHaunt, currentRound));
+
+final Selector<GameModel, bool> goingOnHaunt = createSelector2(
+    currentTeam, getSelf, (List<Player> currentTeam, Player me) => currentTeam.contains(me));

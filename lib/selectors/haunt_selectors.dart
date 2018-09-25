@@ -15,9 +15,6 @@ final Selector<GameModel, bool> hauntIsActive = createSelector4(
       !currentHaunt.allDecided;
 });
 
-final Selector<GameModel, bool> haveBeenExcluded =
-    createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.team.contains(me.id));
-
 class Score {
   int scaryScore;
   int friendlyScore;

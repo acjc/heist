@@ -12,104 +12,173 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget bidSelector(
-    BuildContext context, Store<GameModel> store, int bidAmount, int balance, int maximumBid) {
-  int upperBound = min(maximumBid, balance);
-  return new Row(
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    children: [
-      iconWidget(
-        context,
-        Icons.arrow_back,
-        () => store.dispatch(new DecrementBidAmountAction()),
-        bidAmount > 0,
-      ),
-      new Text(
-        bidAmount.toString(),
-        style: bigNumberTextStyle,
-      ),
-      iconWidget(
-        context,
-        Icons.arrow_forward,
-        () => store.dispatch(new IncrementBidAmountAction(upperBound)),
-        bidAmount < upperBound,
-      ),
-    ],
-  );
+class Bidding extends StatefulWidget {
+  final Store<GameModel> _store;
+
+  Bidding(this._store);
+
+  @override
+  State<StatefulWidget> createState() => _BiddingState(_store);
 }
 
-Widget submitButton(BuildContext context, Store<GameModel> store, bool loading, int bidAmount) =>
-    new RaisedButton(
-        child: Text(AppLocalizations.of(context).submitBid, style: buttonTextStyle),
-        onPressed: loading
-            ? null
-            : () => store.dispatch(new SubmitBidAction(getSelf(store.state).id, bidAmount)));
+class _BiddingState extends State<Bidding> {
+  final Store<GameModel> store;
+  Player bidRecipient;
 
-Widget cancelButton(BuildContext context, Store<GameModel> store, bool loading, Bid bid) =>
-    new RaisedButton(
-        color: Theme.of(context).accentColor,
-        child: new Text(AppLocalizations.of(context).cancelBid, style: buttonTextStyle),
-        onPressed: loading || bid == null ? null : () => store.dispatch(new CancelBidAction()));
+  _BiddingState(this.store) {
+    bidRecipient = getSelf(store.state);
+  }
 
-Widget bidding(Store<GameModel> store) {
-  return StoreConnector<GameModel, BiddingViewModel>(
-      converter: (store) => new BiddingViewModel._(
-            currentBalance(store.state),
-            getBidAmount(store.state),
-            requestInProcess(store.state, Request.Bidding),
-            myCurrentBid(store.state),
-            bidderNames(store.state),
-            haveGuessedBrenda(store.state),
+  Widget bidText(Bid bid) {
+    String proposedBidText =
+        bid == null ? AppLocalizations.of(context).noBid : bid.amount.toString();
+    List<Widget> children = [
+      iconText(
+        Icon(
+          Icons.attach_money,
+          size: 32.0,
+        ),
+        Text(
+          proposedBidText,
+          style: bigNumberTextStyle,
+        ),
+      )
+    ];
+    if (bid != null) {
+      children.add(Text('on ${getPlayerById(store.state, bid.recipient).name}'));
+    }
+    return Padding(
+      padding: paddingSmall,
+      child: Column(
+        children: children,
+      ),
+    );
+  }
+
+  Widget bidSelector(int bidAmount, int balance, int maximumBid) {
+    int upperBound = min(maximumBid, balance);
+    return Padding(
+      padding: paddingSmall,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          iconWidget(
+            context,
+            Icons.arrow_back,
+            () => widget._store.dispatch(DecrementBidAmountAction()),
+            bidAmount > 0,
           ),
+          Text(bidAmount.toString(), style: bigNumberTextStyle),
+          iconWidget(
+            context,
+            Icons.arrow_forward,
+            () => widget._store.dispatch(IncrementBidAmountAction(upperBound)),
+            bidAmount < upperBound,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget bidRecipientDropdown() {
+    Set<Player> included = currentInclusions(widget._store.state);
+    Player startingValue = included.contains(bidRecipient) ? bidRecipient : included.elementAt(0);
+    bidRecipient = startingValue;
+    return Padding(
+      padding: paddingSmall,
+      child: Column(
+        children: [
+          Text('Choose a player to bid on:', style: infoTextStyle),
+          DropdownButton<Player>(
+            items: included
+                .map((p) => DropdownMenuItem<Player>(
+                      value: p,
+                      child: Text(p.name, style: dropdownTextStyle),
+                    ))
+                .toList(),
+            onChanged: (newValue) => bidRecipient = newValue,
+            value: startingValue,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget submitButton(int bidAmount, bool enabled) => RaisedButton(
+      child: Text(AppLocalizations.of(context).submitBid, style: buttonTextStyle),
+      onPressed: enabled
+          ? () => widget._store.dispatch(SubmitBidAction(
+                bidder: getSelf(widget._store.state).id,
+                recipient: bidRecipient.id,
+                amount: bidAmount,
+              ))
+          : null);
+
+  Widget cancelButton(bool enabled) => RaisedButton(
+      color: Theme.of(context).accentColor,
+      child: Text(AppLocalizations.of(context).cancelBid, style: buttonTextStyle),
+      onPressed: enabled ? () => widget._store.dispatch(CancelBidAction()) : null);
+
+  Widget biddersSoFar(Set<String> bidderNames) => Padding(
+        padding: paddingSmall,
+        child: Column(
+          children: [
+            Text(
+                AppLocalizations.of(context)
+                    .bidders(bidderNames.length, getRoom(widget._store.state).numPlayers),
+                style: infoTextStyle),
+            Column(
+              children: List.generate(
+                bidderNames.length,
+                (i) => Text(bidderNames.elementAt(i), style: subtitleTextStyle),
+              ),
+            ),
+          ],
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) => StoreConnector<GameModel, BiddingViewModel>(
       distinct: true,
+      converter: (store) => BiddingViewModel._(
+            balance: currentBalance(store.state),
+            bidAmount: getBidAmount(store.state),
+            loading: requestInProcess(store.state, Request.Bidding),
+            bid: myCurrentBid(store.state),
+            bidderNames: bidderNames(store.state),
+            haveGuessedBrenda: haveGuessedBrenda(store.state),
+          ),
       builder: (context, viewModel) {
-        Haunt heist = currentHaunt(store.state);
-        bool auction = isAuction(store.state);
+        Haunt heist = currentHaunt(widget._store.state);
+        bool auction = isAuction(widget._store.state);
 
         List<Widget> children = auction
             ? [
-                new Container(
+                Container(
                   padding: paddingTitle,
-                  child: new Text(AppLocalizations.of(context).auctionTitle.toUpperCase(),
+                  child: Text(AppLocalizations.of(context).auctionTitle.toUpperCase(),
                       style: titleTextStyle),
                 ),
-                new Text(
+                Text(
                   AppLocalizations.of(context).auctionDescription(heist.numPlayers),
                   style: infoTextStyle,
                 ),
               ]
             : [
-                new Container(
+                Container(
                   padding: paddingTitle,
-                  child: new Text(
+                  child: Text(
                     AppLocalizations.of(context).bidding,
                     style: titleTextStyle,
                   ),
                 ),
               ];
 
-        String proposedBidText = viewModel.bid == null
-            ? AppLocalizations.of(context).noBid
-            : viewModel.bid.amount.toString();
-        children.addAll([
-          new Container(
-            padding: paddingSmall,
-            child: iconText(
-              new Icon(
-                Icons.attach_money,
-                size: 32.0,
-              ),
-              new Text(
-                proposedBidText,
-                style: bigNumberTextStyle,
-              ),
-            ),
-          ),
-        ]);
+        children.add(bidText(viewModel.bid));
 
-        if (auction || viewModel.haveGuessedKingpin) {
+        if (auction || viewModel.haveGuessedBrenda) {
           children.add(
-            new Text(
+            Text(
               AppLocalizations.of(context).unlimited,
               style: const TextStyle(fontStyle: FontStyle.italic),
             ),
@@ -118,71 +187,60 @@ Widget bidding(Store<GameModel> store) {
 
         int proposedBid = viewModel.bid == null ? 0 : viewModel.bid.amount;
         int potentialBalance = viewModel.balance + proposedBid;
-        int maximumBid = auction || viewModel.haveGuessedKingpin ? 999 : heist.maximumBid;
+        int maximumBid = auction || viewModel.haveGuessedBrenda ? 999 : heist.maximumBid;
         children.addAll([
           bidSelector(
-            context,
-            store,
             min(viewModel.bidAmount, min(maximumBid, potentialBalance)),
             potentialBalance,
             maximumBid,
           ),
-          new Padding(
+          bidRecipientDropdown(),
+          Padding(
             padding: paddingSmall,
-            child: new Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                cancelButton(context, store, viewModel.loading, viewModel.bid),
-                submitButton(context, store, viewModel.loading, viewModel.bidAmount),
+                cancelButton(!viewModel.loading && viewModel.bid != null),
+                submitButton(viewModel.bidAmount, !viewModel.loading),
               ],
             ),
           ),
-          new Padding(
-            padding: paddingSmall,
-            child: new Column(
-              children: [
-                new Text(
-                    AppLocalizations.of(context)
-                        .bidders(viewModel.bidders.length, getRoom(store.state).numPlayers),
-                    style: infoTextStyle),
-                new Column(
-                  children: new List.generate(
-                    viewModel.bidders.length,
-                    (i) => new Text(viewModel.bidders.elementAt(i), style: subtitleTextStyle),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          biddersSoFar(viewModel.bidderNames),
         ]);
 
-        return new Card(
+        return Card(
             elevation: 2.0,
-            child: new Container(
+            child: Container(
                 padding: paddingLarge,
                 alignment: Alignment.center,
-                child: new Column(
+                child: Column(
                   children: children,
                 )));
       });
 }
 
 class BiddingViewModel {
+  @required
   final int balance;
+  @required
   final int bidAmount;
+  @required
   final bool loading;
+  @required
   final Bid bid;
-  final Set<String> bidders;
-  final bool haveGuessedKingpin;
+  @required
+  final Set<String> bidderNames;
+  @required
+  final bool haveGuessedBrenda;
 
-  BiddingViewModel._(
+  BiddingViewModel._({
     this.balance,
     this.bidAmount,
     this.loading,
     this.bid,
-    this.bidders,
-    this.haveGuessedKingpin,
-  );
+    this.bidderNames,
+    this.haveGuessedBrenda,
+  });
 
   @override
   bool operator ==(Object other) =>
@@ -193,8 +251,8 @@ class BiddingViewModel {
           bidAmount == other.bidAmount &&
           loading == other.loading &&
           bid == other.bid &&
-          bidders == other.bidders &&
-          haveGuessedKingpin == other.haveGuessedKingpin;
+          bidderNames == other.bidderNames &&
+          haveGuessedBrenda == other.haveGuessedBrenda;
 
   @override
   int get hashCode =>
@@ -202,11 +260,11 @@ class BiddingViewModel {
       bidAmount.hashCode ^
       loading.hashCode ^
       bid.hashCode ^
-      bidders.hashCode ^
-      haveGuessedKingpin.hashCode;
+      bidderNames.hashCode ^
+      haveGuessedBrenda.hashCode;
 
   @override
   String toString() {
-    return 'BiddingViewModel{balance: $balance, bidAmount: $bidAmount, loading: $loading, bid: $bid, bidders: $bidders, haveGuessedKingpin: $haveGuessedKingpin}';
+    return 'BiddingViewModel{balance: $balance, bidAmount: $bidAmount, loading: $loading, bid: $bid, bidderNames: $bidderNames, haveGuessedBrenda: $haveGuessedBrenda}';
   }
 }

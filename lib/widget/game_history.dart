@@ -112,7 +112,7 @@ class _GameHistoryState extends State<GameHistory> {
     ];
 
     if (haunt.complete) {
-      Set<Player> team = teamForRound(widget._store.state, lastRound);
+      List<Player> team = winnersForRound(getPlayers(widget._store.state), haunt, lastRound);
       Player leader = leaderForRound(widget._store.state, lastRound);
       hauntPopupChildren.addAll([
         Divider(),
@@ -163,18 +163,18 @@ class _GameHistoryState extends State<GameHistory> {
       });
 }
 
-Widget hauntTeam(BuildContext context, Set<Player> team, Player leader) {
+Widget hauntTeam(BuildContext context, List<Player> team, Player leader) {
   List<Widget> gridChildren = List.generate(
     team.length,
     (i) {
       Player player = team.elementAt(i);
       bool isLeader = player.id == leader.id;
-      return playerTile(context, player.name, true, isLeader);
+      return playerTile(context, player.name, isLeader, true, Theme.of(context).primaryColor);
     },
   );
 
   if (!team.contains(leader)) {
-    gridChildren.add(playerTile(context, leader.name, false, true));
+    gridChildren.add(playerTile(context, leader.name, true, false, Theme.of(context).primaryColor));
   }
 
   return TeamGridView(gridChildren);

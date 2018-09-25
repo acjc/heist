@@ -3,12 +3,13 @@ import 'package:heist/state.dart';
 import 'package:reselect/reselect.dart';
 
 export 'bidding_selectors.dart';
+export 'exclusion_selectors.dart';
 export 'gifting_selectors.dart';
 export 'haunt_selectors.dart';
 export 'local_actions_selectors.dart';
 export 'player_selectors.dart';
+export 'round_selectors.dart';
 export 'setup_selectors.dart';
-export 'team_selection_selectors.dart';
 
 final getRoom = (GameModel gameModel) => gameModel.room;
 final getPlayers = (GameModel gameModel) => gameModel.players;
@@ -25,6 +26,9 @@ final getLocalActions = (GameModel gameModel) => gameModel.localActions;
 
 bool requestInProcess(GameModel gameModel, Request request) =>
     getRequests(gameModel).contains(request);
+
+Haunt hauntById(GameModel gameModel, String id) =>
+    getHaunts(gameModel).singleWhere((h) => h.id == id);
 
 // Reselect would not recognise changes to the current haunt
 Haunt currentHaunt(GameModel gameModel) =>

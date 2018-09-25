@@ -102,7 +102,7 @@ class GameState extends State<Game> {
       roundTitleCard(context, _store),
     ];
     if (!isAuction(_store.state)) {
-      children.add(selectionBoard(_store));
+      children.add(SelectionBoard(_store));
     }
     children.addAll([
       Bidding(_store),

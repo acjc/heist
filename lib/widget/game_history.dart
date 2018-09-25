@@ -169,12 +169,12 @@ Widget hauntTeam(BuildContext context, List<Player> team, Player leader) {
     (i) {
       Player player = team.elementAt(i);
       bool isLeader = player.id == leader.id;
-      return playerTile(context, player.name, isLeader, true, Theme.of(context).primaryColor);
+      return PlayerTile(player.name, isLeader, true, Theme.of(context).primaryColor);
     },
   );
 
   if (!team.contains(leader)) {
-    gridChildren.add(playerTile(context, leader.name, true, false, Theme.of(context).primaryColor));
+    gridChildren.add(PlayerTile(leader.name, true, false, Theme.of(context).primaryColor));
   }
 
   return TeamGridView(gridChildren);

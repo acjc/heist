@@ -459,8 +459,7 @@ class ExclusionsPickerState extends ExclusionsState {
           (hasBeenExcluded || team.length < exclusionsRequired) && !exclusionsSubmitted && !loading;
       return InkWell(
           onTap: enabled ? () => _onTap(_store, roundId, player.id, hasBeenExcluded) : null,
-          child: playerTile(
-            context,
+          child: PlayerTile(
             player.name,
             isLeader,
             hasBeenExcluded,

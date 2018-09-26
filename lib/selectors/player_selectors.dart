@@ -66,7 +66,11 @@ int calculateBalance(
       Round lastRound;
       if (haunt.allDecided) {
         lastRound = rounds.lastWhere((r) => r.complete);
-        balance -= lastRound.bids[player.id].amount;
+        Set<String> teamIds = winnersForRound(players, haunt, lastRound).map((p) => p.id).toSet();
+        Bid bid = lastRound.bids[player.id];
+        if (teamIds.contains(bid.recipient)) {
+          balance -= bid.amount;
+        }
         balance = resolveBalanceForHauntOutcome(players, player, haunt, lastRound.pot, balance);
       } else {
         lastRound = rounds.firstWhere((r) => !r.complete);

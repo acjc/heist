@@ -308,13 +308,6 @@ class AppLocalizations {
     );
   }
 
-  String get yourBid {
-    return Intl.message(
-      'Your bid',
-      name: 'yourBid',
-    );
-  }
-
   String get youAreGoing {
     return Intl.message(
       "You're going on a haunt!",

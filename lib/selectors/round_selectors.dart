@@ -80,6 +80,13 @@ int potForRound(Haunt haunt, Round round) {
       .fold(0, (int value, BidTotal bidTotal) => value + bidTotal.amount);
 }
 
+Map<String, Bid> bidsOnMeForRound(GameModel gameModel, Round round) {
+  String myId = getSelf(gameModel).id;
+  Map<String, Bid> bids = Map.of(round.bids);
+  bids.removeWhere((bidder, bid) => bid.recipient != myId);
+  return bids;
+}
+
 final Selector<GameModel, List<Player>> currentTeam = createSelector3(
     getPlayers,
     currentHaunt,

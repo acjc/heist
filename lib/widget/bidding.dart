@@ -188,13 +188,19 @@ class _BiddingState extends State<Bidding> {
         int proposedBid = viewModel.bid == null ? 0 : viewModel.bid.amount;
         int potentialBalance = viewModel.balance + proposedBid;
         int maximumBid = auction || viewModel.haveGuessedBrenda ? 999 : heist.maximumBid;
-        children.addAll([
+        children.add(
           bidSelector(
             min(viewModel.bidAmount, min(maximumBid, potentialBalance)),
             potentialBalance,
             maximumBid,
           ),
-          bidRecipientDropdown(),
+        );
+
+        if (!auction) {
+          children.add(bidRecipientDropdown());
+        }
+
+        children.addAll([
           Padding(
             padding: paddingSmall,
             child: Row(

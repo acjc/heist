@@ -424,7 +424,7 @@ class ExclusionsPickerState extends ExclusionsState {
                         exclusionsSubmitted,
                         submittingExclusions,
                       ),
-                      childAspectRatio: 5.0,
+                      childAspectRatio: 4.0,
                     ),
                   ],
                 ),

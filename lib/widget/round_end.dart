@@ -30,7 +30,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
   static const double _thresholdHeight = 225.0;
 
   static const double _barWidth = 75.0;
-  static const double _labelContainerWidth = 75.0;
+  static const double _labelContainerWidth = 100.0;
   static const double _labelContainerHeight = 100.0;
 
   static const double _labelFontSize = 50.0;
@@ -210,45 +210,55 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
         ),
       );
 
-  Widget _bidBarLabel(int bid, double bidLabelMaxOffset, Color color) => AnimationListenable(
+  Widget _bidBarLabel(int bid, String label, double bidLabelMaxOffset, Color color) =>
+      AnimationListenable(
         animation: _bidLabelAnimation,
         builder: (context, value, child) {
           int ratio = ((value.distance / bidLabelMaxOffset) * bid).round();
           Color barColor = ratio == bid ? color : Colors.amber;
-          return SlideTransition(
-            position: _bidLabelAnimation,
-            child: Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    ratio.toString(),
-                    style: TextStyle(
-                      fontSize: _labelFontSize,
-                      fontWeight: FontWeight.bold,
-                      color: barColor,
-                    ),
+          return Container(
+            margin: const EdgeInsets.only(bottom: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  ratio.toString(),
+                  style: TextStyle(
+                    fontSize: 36.0,
+                    fontWeight: FontWeight.bold,
+                    color: barColor,
                   ),
-                  Text(AppLocalizations.of(context).yourBid, style: TextStyle(color: barColor)),
-                ],
-              ),
-              width: _labelContainerWidth,
-              height: _labelContainerHeight,
+                ),
+                Text(label, style: TextStyle(color: barColor)),
+              ],
             ),
+            width: _labelContainerWidth,
           );
         },
       );
 
-  Widget _bidBar(int bid, double bidBarHeight, Color color) => Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Container(width: _labelContainerWidth),
-          _bidBarBox(bid, bidBarHeight, color),
-          _bidBarLabel(bid, bidBarHeight / _labelContainerHeight, color),
-        ],
+  Widget _bidBar(
+      Player me, Map<String, Bid> bidsOnMe, int totalBid, double bidBarHeight, Color color) {
+    List<Widget> bidBarLabels = [];
+    bidsOnMe.forEach((bidderId, bid) {
+      Player bidder = getPlayerById(_store.state, bidderId);
+      String bidderName = bidder.id == me.id ? 'You' : bidder.name;
+      bidBarLabels.add(
+        _bidBarLabel(bid.amount, bidderName, bidBarHeight / _labelContainerHeight, color),
       );
+    });
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(width: _labelContainerWidth),
+        _bidBarBox(totalBid, bidBarHeight, color),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: bidBarLabels,
+        ),
+      ],
+    );
+  }
 
   Color _backgroundColor(bool hauntIsActive, bool goingOnHaunt) =>
       hauntIsActive ? (goingOnHaunt ? HeistColors.green : HeistColors.peach) : Colors.transparent;
@@ -290,14 +300,14 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
   }
 
   Widget _headerSummaryIcon(bool hauntIsActive, bool goingOnHaunt) {
-    double size = 75.0;
+    const double size = 75.0;
     return hauntIsActive
         ? teamSelectionIcon(
             goingOnHaunt,
             goingOnHaunt ? HeistColors.green : HeistColors.peach,
             size,
           )
-        : Icon(Icons.warning, color: HeistColors.blue, size: size);
+        : const Icon(Icons.warning, color: HeistColors.blue, size: size);
   }
 
   Widget _header(Haunt haunt, Round round, bool hauntIsActive, bool goingOnHaunt) => Column(
@@ -338,7 +348,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
   /// line when it grows.
   double _getPotBarHeight(int pot, int price, bool hauntIsActive) {
     if (hauntIsActive) {
-      double boost = min((pot - price) * 12.0, 60.0);
+      double boost = min((pot - price) * 15.0, 75.0);
       return _thresholdHeight + boost;
     }
     return (pot / price) * _thresholdHeight;
@@ -355,11 +365,13 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
     bool hauntActive = hauntIsActive(_store.state);
     bool goingOnHaunt = round.team.contains(me.id);
     int pot = round.pot;
-    int bid = round.bids[me.id].amount;
+
+    Map<String, Bid> bidsOnMe = bidsOnMeForRound(_store.state, round);
+    int totalBid = bidsOnMe.values.fold(0, (value, bid) => value + bid.amount);
 
     Color backgroundColor = _backgroundColor(hauntActive, goingOnHaunt);
     double potBarHeight = _getPotBarHeight(pot, price, hauntActive);
-    double bidBarHeight = (bid / pot) * potBarHeight;
+    double bidBarHeight = (totalBid / pot) * potBarHeight;
     _setUpAnimation(potBarHeight, bidBarHeight, backgroundColor);
     return DecoratedBoxTransition(
       decoration: _backgroundAnimation,
@@ -382,7 +394,13 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
                         child: _thresholdLine(price),
                       ),
                       _potBar(pot, price, potBarHeight),
-                      _bidBar(bid, bidBarHeight, _bidBarColor(hauntActive, goingOnHaunt)),
+                      _bidBar(
+                        me,
+                        bidsOnMe,
+                        totalBid,
+                        bidBarHeight,
+                        _bidBarColor(hauntActive, goingOnHaunt),
+                      ),
                     ],
                   ),
                 ),

@@ -293,7 +293,8 @@ class _WaitForExclusionsState extends ExclusionsState {
               children: [
                 AnimationListenable<Color>(
                   animation: _pulseAnimation,
-                  builder: (context, value, _) => teamSelectionIcon(haveBeenExcluded, value, 250.0),
+                  builder: (context, value, _) =>
+                      teamSelectionIcon(!haveBeenExcluded, value, 250.0),
                 ),
                 _waitForTeamMessage(haveBeenExcluded, leaderName),
                 Column(
@@ -407,7 +408,8 @@ class ExclusionsPickerState extends ExclusionsState {
               children: [
                 AnimationListenable<Color>(
                   animation: _pulseAnimation,
-                  builder: (context, value, _) => teamSelectionIcon(haveBeenExcluded, value, 100.0),
+                  builder: (context, value, _) =>
+                      teamSelectionIcon(!haveBeenExcluded, value, 100.0),
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,

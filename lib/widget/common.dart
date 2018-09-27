@@ -71,10 +71,10 @@ class VerticalDivider extends StatelessWidget {
   }
 }
 
-Widget teamSelectionIcon(bool haveBeenExcluded, Color color, double size) {
-  return haveBeenExcluded
-      ? Icon(Icons.do_not_disturb_alt, color: color, size: size)
-      : Icon(Icons.check_circle, color: color, size: size);
+Widget teamSelectionIcon(bool positive, Color color, double size) {
+  return positive
+      ? Icon(Icons.check_circle, color: color, size: size)
+      : Icon(Icons.do_not_disturb_alt, color: color, size: size);
 }
 
 Widget roundTitleIcon(IconData icon, String text) {

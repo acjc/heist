@@ -325,7 +325,7 @@ class AppLocalizations {
 
   String get goingAhead {
     return Intl.message(
-      'The haunt is going ahead!',
+      'The haunt is going ahead without you!',
       name: 'goingAhead',
       desc: 'Bidding phase result',
     );

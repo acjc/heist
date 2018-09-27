@@ -118,18 +118,9 @@ class GameState extends State<Game> {
       return appendFooter(RoundEnd(_store, viewModel.currentRoundOrder - 1));
     }
 
-    // Current haunt has happened so ask to complete it
-    if (viewModel.hauntDecided && !viewModel.hauntComplete) {
-      return appendFooter(HauntEnd(_store));
-    }
-
-    // Haunt is currently happening
-    if (viewModel.hauntIsActive) {
-      return appendFooter(activeHaunt(context, _store));
-    }
-
     // Team selection (not needed for auctions)
     if (!isAuction(_store.state) &&
+        !viewModel.biddingComplete &&
         (viewModel.waitingForTeam || !viewModel.teamSelectionContinued)) {
       return TeamSelection(_store, isMyGo(_store.state));
     }
@@ -145,8 +136,18 @@ class GameState extends State<Game> {
     }
 
     // Bidding summary
-    if (!viewModel.roundComplete) {
+    if (!viewModel.roundComplete || !viewModel.currentRoundContinued) {
       return appendFooter(RoundEnd(_store, viewModel.currentRoundOrder));
+    }
+
+    // Haunt is currently happening
+    if (viewModel.hauntIsActive) {
+      return appendFooter(ActiveHaunt(_store));
+    }
+
+    // Current haunt has happened so ask to complete it
+    if (viewModel.hauntDecided && !viewModel.hauntComplete) {
+      return appendFooter(HauntEnd(_store));
     }
 
     return null;
@@ -174,41 +175,39 @@ class GameState extends State<Game> {
   static const EdgeInsets indicatorPadding =
       const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0);
 
-  Widget rightIndicator() {
-    return StoreConnector<GameModel, bool>(
-      distinct: true,
-      ignoreChange: (gameModel) => !gameIsReady(gameModel),
-      converter: (store) => haveReceivedGiftThisRound(store.state),
-      builder: (context, haveReceivedGiftThisRound) {
-        List<Widget> children = [];
-        if (haveReceivedGiftThisRound) {
+  Widget rightIndicator() => StoreConnector<GameModel, bool>(
+        distinct: true,
+        ignoreChange: (gameModel) => !gameIsReady(gameModel),
+        converter: (store) => haveReceivedGiftThisRound(store.state),
+        builder: (context, haveReceivedGiftThisRound) {
+          List<Widget> children = [];
+          if (haveReceivedGiftThisRound) {
+            children.add(Icon(
+              Icons.cake,
+              color: Colors.grey,
+              size: 16.0,
+            ));
+          }
           children.add(Icon(
-            Icons.cake,
-            color: Colors.grey,
-            size: 16.0,
+            Icons.keyboard_arrow_right,
+            color: Theme.of(context).primaryColor,
+            size: 32.0,
           ));
-        }
-        children.add(Icon(
-          Icons.keyboard_arrow_right,
-          color: Theme.of(context).primaryColor,
-          size: 32.0,
-        ));
-        return Card(
-          elevation: 10.0,
-          child: InkWell(
-            onTap: () => _controller.nextPage(
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.fastOutSlowIn,
-                ),
-            child: Padding(
-              padding: indicatorPadding,
-              child: Row(children: children),
+          return Card(
+            elevation: 10.0,
+            child: InkWell(
+              onTap: () => _controller.nextPage(
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.fastOutSlowIn,
+                  ),
+              child: Padding(
+                padding: indicatorPadding,
+                child: Row(children: children),
+              ),
             ),
-          ),
-        );
-      },
-    );
-  }
+          );
+        },
+      );
 
   Widget leftIndicator() => Card(
         elevation: 10.0,
@@ -235,6 +234,11 @@ class GameState extends State<Game> {
           Round round = currentRound(store.state);
           return MainBoardViewModel._(
             currentRoundOrder: round.order,
+            currentRoundContinued: localRoundActionRecorded(
+              store.state,
+              round.id,
+              LocalRoundAction.RoundEndContinue,
+            ),
             previousRoundContinued: round.order == 1 ||
                 localRoundActionRecorded(
                   store.state,
@@ -250,7 +254,7 @@ class GameState extends State<Game> {
             biddingComplete: biddingComplete(store.state),
             resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
             roundComplete: round.complete,
-            hauntIsActive: hauntIsActive(store.state),
+            hauntIsActive: currentHauntIsActive(store.state),
             hauntDecided: haunt.allDecided,
             hauntComplete: haunt.complete,
           );
@@ -393,19 +397,20 @@ class LoadingScreenViewModel {
 
 class MainBoardViewModel {
   final int currentRoundOrder;
+  final bool currentRoundContinued;
   final bool previousRoundContinued;
   final bool waitingForTeam;
   final bool teamSelectionContinued;
   final bool biddingComplete;
   final bool resolvingAuction;
   final bool roundComplete;
-
   final bool hauntIsActive;
   final bool hauntDecided;
   final bool hauntComplete;
 
   MainBoardViewModel._(
       {@required this.currentRoundOrder,
+      @required this.currentRoundContinued,
       @required this.previousRoundContinued,
       @required this.waitingForTeam,
       @required this.teamSelectionContinued,
@@ -422,6 +427,7 @@ class MainBoardViewModel {
       other is MainBoardViewModel &&
           runtimeType == other.runtimeType &&
           currentRoundOrder == other.currentRoundOrder &&
+          currentRoundContinued == other.currentRoundContinued &&
           previousRoundContinued == other.previousRoundContinued &&
           waitingForTeam == other.waitingForTeam &&
           teamSelectionContinued == other.teamSelectionContinued &&
@@ -435,6 +441,7 @@ class MainBoardViewModel {
   @override
   int get hashCode =>
       currentRoundOrder.hashCode ^
+      currentRoundContinued.hashCode ^
       previousRoundContinued.hashCode ^
       waitingForTeam.hashCode ^
       teamSelectionContinued.hashCode ^
@@ -447,7 +454,7 @@ class MainBoardViewModel {
 
   @override
   String toString() {
-    return 'MainBoardViewModel{currentRoundOrder: $currentRoundOrder, previousRoundContinued: $previousRoundContinued, waitingForTeam: $waitingForTeam, teamSelectionContinued: $teamSelectionContinued, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, hauntIsActive: $hauntIsActive, hauntDecided: $hauntDecided, hauntComplete: $hauntComplete}';
+    return 'MainBoardViewModel{currentRoundOrder: $currentRoundOrder, currentRoundContinued: $currentRoundContinued, previousRoundContinued: $previousRoundContinued, waitingForTeam: $waitingForTeam, teamSelectionContinued: $teamSelectionContinued, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, hauntIsActive: $hauntIsActive, hauntDecided: $hauntDecided, hauntComplete: $hauntComplete}';
   }
 }
 

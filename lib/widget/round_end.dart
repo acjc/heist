@@ -350,9 +350,9 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
   Widget _barStack() {
     Player me = getSelf(_store.state);
     Haunt haunt = currentHaunt(_store.state);
-    Round round = roundByOrder(haunt, getRounds(_store.state), _roundOrder);
+    Round round = roundByOrder(getRounds(_store.state), haunt, _roundOrder);
     int price = haunt.price;
-    bool hauntActive = hauntIsActive(_store.state);
+    bool hauntActive = currentHauntIsActive(_store.state);
     bool goingOnHaunt = round.team.contains(me.id);
     int pot = round.pot;
     int bid = round.bids[me.id].amount;

@@ -1,4 +1,5 @@
 import 'package:heist/db/database_model.dart';
+import 'package:heist/selectors/haunt_selectors.dart';
 import 'package:heist/state.dart';
 import 'package:reselect/reselect.dart';
 
@@ -30,25 +31,26 @@ bool requestInProcess(GameModel gameModel, Request request) =>
 Haunt currentHaunt(GameModel gameModel) =>
     getHaunts(gameModel).firstWhere((h) => !h.complete, orElse: null);
 
-final Selector<GameModel, Round> currentRound = createSelector2(
-    currentHaunt,
-    getRounds,
-    (Haunt currentHaunt, Map<String, List<Round>> rounds) =>
-        rounds[currentHaunt.id].firstWhere((r) => !r.complete));
-
-Round lastRoundForHaunt(GameModel gameModel, Haunt haunt) {
-  List<Round> rounds = getRounds(gameModel)[haunt.id];
-  return haunt.complete
-      ? rounds.lastWhere((r) => r.complete)
-      : rounds.firstWhere((r) => !r.complete);
+Round lastRoundForHaunt(Room room, Map<String, List<Round>> rounds, Haunt haunt) {
+  List<Round> roundsForHaunt = rounds[haunt.id];
+  return hauntHasActiveRound(room, haunt, rounds)
+      ? roundsForHaunt.lastWhere((r) => r.complete)
+      : roundsForHaunt.firstWhere((r) => !r.complete);
 }
 
-final Selector<GameModel, Round> previousRound = createSelector3(
-    currentHaunt,
+final Selector<GameModel, Round> currentRound = createSelector3(
+    getRoom,
     getRounds,
-    currentRound,
-    (Haunt currentHaunt, Map<String, List<Round>> rounds, Round currentRound) =>
-        roundByOrder(currentHaunt, rounds, currentRound.order - 1));
+    currentHaunt,
+    (Room room, Map<String, List<Round>> rounds, Haunt currentHaunt) =>
+        lastRoundForHaunt(room, rounds, currentHaunt));
 
-Round roundByOrder(Haunt haunt, Map<String, List<Round>> rounds, int order) =>
+final Selector<GameModel, Round> previousRound = createSelector3(
+    getRounds,
+    currentHaunt,
+    currentRound,
+    (Map<String, List<Round>> rounds, Haunt currentHaunt, Round currentRound) =>
+        roundByOrder(rounds, currentHaunt, currentRound.order - 1));
+
+Round roundByOrder(Map<String, List<Round>> rounds, Haunt haunt, int order) =>
     rounds[haunt.id].singleWhere((r) => r.order == order);

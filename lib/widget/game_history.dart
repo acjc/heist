@@ -70,7 +70,11 @@ class _GameHistoryState extends State<GameHistory> {
   }
 
   Widget hauntPopup(int currentHauntOrder, Haunt haunt) {
-    Round lastRound = lastRoundForHaunt(widget._store.state, haunt);
+    Round lastRound = lastRoundForHaunt(
+      getRoom(widget._store.state),
+      getRounds(widget._store.state),
+      haunt,
+    );
 
     List<Widget> title = [
       Text(

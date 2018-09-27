@@ -53,4 +53,4 @@ final Selector<GameModel, Round> previousRound = createSelector3(
         roundByOrder(rounds, currentHaunt, currentRound.order - 1));
 
 Round roundByOrder(Map<String, List<Round>> rounds, Haunt haunt, int order) =>
-    rounds[haunt.id].singleWhere((r) => r.order == order);
+    rounds[haunt.id].singleWhere((r) => r.order == order, orElse: null);

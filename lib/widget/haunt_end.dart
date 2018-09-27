@@ -21,9 +21,7 @@ class HauntEnd extends StatefulWidget {
   HauntEnd(this._store);
 
   @override
-  State<StatefulWidget> createState() {
-    return new _HauntEndState(_store);
-  }
+  State<StatefulWidget> createState() => _HauntEndState(_store);
 }
 
 class _HauntEndState extends State<HauntEnd> {
@@ -31,15 +29,15 @@ class _HauntEndState extends State<HauntEnd> {
 
   _HauntEndState(this._store);
 
-  List<Widget> _hauntDecisions(List<String> decisions) => new List.generate(
+  List<Widget> _hauntDecisions(List<String> decisions) => List.generate(
         decisions.length,
         (i) {
           String decision = decisions[i];
-          return new Container(
+          return Container(
             alignment: Alignment.center,
             padding: paddingTiny,
-            child: new Text(decision,
-                style: new TextStyle(
+            child: Text(decision,
+                style: TextStyle(
                   fontSize: 16.0,
                   color: decisionColour(decision),
                   fontWeight: FontWeight.bold,
@@ -48,57 +46,55 @@ class _HauntEndState extends State<HauntEnd> {
         },
       );
 
-  Widget _hauntContinueButton() {
-    return new StoreConnector<GameModel, bool>(
-        converter: (store) => requestInProcess(store.state, Request.CompletingHaunt),
-        distinct: true,
-        builder: (context, completingHeist) => new Padding(
-              padding: paddingSmall,
-              child: new RaisedButton(
-                child: new Text(
-                  AppLocalizations.of(context).continueButton,
-                  style: buttonTextStyle,
-                ),
-                onPressed:
-                    completingHeist ? null : () => _store.dispatch(new CompleteHauntAction()),
+  Widget _hauntContinueButton() => StoreConnector<GameModel, bool>(
+      distinct: true,
+      converter: (store) => requestInProcess(store.state, Request.CompletingHaunt),
+      builder: (context, completingHeist) => Padding(
+            padding: paddingSmall,
+            child: RaisedButton(
+              child: Text(
+                AppLocalizations.of(context).continueButton,
+                style: buttonTextStyle,
               ),
-            ));
-  }
+              onPressed: completingHeist ? null : () => _store.dispatch(CompleteHauntAction()),
+            ),
+          ));
 
   Widget _hauntIcon(bool wasSuccess) {
+    const double size = 40.0;
     return wasSuccess
-        ? const Icon(Icons.verified_user, color: HeistColors.green, size: 40.0)
-        : const Icon(Icons.cancel, color: Colors.red, size: 40.0);
+        ? const Icon(Icons.verified_user, color: HeistColors.green, size: size)
+        : const Icon(Icons.cancel, color: HeistColors.peach, size: size);
   }
 
-  Widget _hauntDetails(Haunt haunt, int pot) => new Row(
+  Widget _hauntDetails(Haunt haunt, int pot) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          new Text(AppLocalizations.of(context).hauntTitle(haunt.order), style: boldTextStyle),
-          new VerticalDivider(),
+          Text(AppLocalizations.of(context).hauntTitle(haunt.order), style: boldTextStyle),
+          VerticalDivider(),
           iconText(
-            new Icon(Icons.monetization_on, color: Colors.teal),
-            new Text(pot.toString(), style: bigNumberTextStyle),
+            Icon(Icons.bubble_chart),
+            Text(pot.toString(), style: bigNumberTextStyle),
           ),
-          new VerticalDivider(),
+          VerticalDivider(),
           _hauntIcon(haunt.wasSuccess),
         ],
       );
 
   Widget _hauntResult(BuildContext context) {
     Haunt haunt = currentHaunt(_store.state);
-    List<String> decisions = new List.of(haunt.decisions.values.toList());
+    List<String> decisions = List.of(haunt.decisions.values.toList());
     if (decisions.isEmpty) {
       return null;
     }
     int pot = currentRound(_store.state).pot;
-    decisions.shuffle(new Random(haunt.id.hashCode));
+    decisions.shuffle(Random(haunt.id.hashCode));
 
     List<Widget> children = [
       _hauntDetails(haunt, pot),
-      new Divider(),
+      Divider(),
       hauntTeam(context, currentTeam(_store.state), currentLeader(_store.state)),
-      new Divider(),
+      Divider(),
     ];
 
     children.addAll(_hauntDecisions(decisions));
@@ -111,16 +107,16 @@ class _HauntEndState extends State<HauntEnd> {
       color: Colors.teal,
     );
     children.addAll([
-      new Divider(),
-      new Padding(
+      Divider(),
+      Padding(
         padding: paddingSmall,
-        child: new Column(
+        child: Column(
           children: [
-            new Text(
+            Text(
               '+$brendaPayout',
               style: potResolutionTextStyle,
             ),
-            new Text(
+            Text(
               AppLocalizations.of(context)
                   .brendaReceived(Roles.getRoleDisplayName(context, Roles.brenda.roleId)),
               style: infoTextStyle,
@@ -128,15 +124,15 @@ class _HauntEndState extends State<HauntEnd> {
           ],
         ),
       ),
-      new Padding(
+      Padding(
         padding: paddingSmall,
-        child: new Column(
+        child: Column(
           children: [
-            new Text(
+            Text(
               '+$bertiePayout',
               style: potResolutionTextStyle,
             ),
-            new Text(
+            Text(
               AppLocalizations.of(context)
                   .sharedBetween(Roles.getRoleDisplayName(context, Roles.bertie.roleId), Steal),
               style: infoTextStyle,
@@ -150,11 +146,12 @@ class _HauntEndState extends State<HauntEnd> {
       children.add(_hauntContinueButton());
     }
 
-    return new Card(
+    return Card(
       elevation: 2.0,
-      child: new Container(
+      margin: paddingMedium,
+      child: Padding(
         padding: paddingMedium,
-        child: new Column(children: children),
+        child: Column(children: children),
       ),
     );
   }
@@ -162,8 +159,8 @@ class _HauntEndState extends State<HauntEnd> {
   @override
   Widget build(BuildContext context) {
     if (!gameIsReady(_store.state)) {
-      return new Container();
+      return Container();
     }
-    return new SingleChildScrollView(child: _hauntResult(context));
+    return SingleChildScrollView(child: _hauntResult(context));
   }
 }

@@ -87,7 +87,7 @@ class GameState extends State<Game> {
     if (!getRoom(_store.state).complete && !completingGame) {
       _store.dispatch(CompleteGameAction());
     }
-    return endgame(context, _store);
+    return Endgame(_store);
   }
 
   Widget _resolveAuctionWinners(bool resolvingAuction) {
@@ -115,7 +115,7 @@ class GameState extends State<Game> {
     // Show bidding summary of previous round (if it exists and as long as a team
     // has not yet been selected for the current round)
     if (viewModel.waitingForTeam && !viewModel.previousRoundContinued) {
-      return appendFooter(RoundEnd(_store, viewModel.currentRoundOrder - 1));
+      return RoundEnd(_store, viewModel.currentRoundOrder - 1);
     }
 
     // Team selection (not needed for auctions)
@@ -137,7 +137,7 @@ class GameState extends State<Game> {
 
     // Bidding summary
     if (!viewModel.roundComplete || !viewModel.currentRoundContinued) {
-      return appendFooter(RoundEnd(_store, viewModel.currentRoundOrder));
+      return RoundEnd(_store, viewModel.currentRoundOrder);
     }
 
     // Haunt is currently happening
@@ -153,14 +153,12 @@ class GameState extends State<Game> {
     return null;
   }
 
-  Widget appendFooter(Widget child, {bool indicatorOnRight = true}) {
-    return Column(
-      children: [
-        Expanded(child: child),
-        footer(indicatorOnRight),
-      ],
-    );
-  }
+  Widget appendFooter(Widget child, {bool indicatorOnRight = true}) => Column(
+        children: [
+          Expanded(child: child),
+          footer(indicatorOnRight),
+        ],
+      );
 
   Widget footer(bool indicatorOnRight) {
     List<Widget> children = indicatorOnRight

@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-21T19:01:46.816900",
+  "@@last_modified": "2018-09-28T00:33:47.741137",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -218,7 +218,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "goingAhead": "The haunt is going ahead!",
+  "goingAhead": "The haunt is going ahead without you!",
   "@goingAhead": {
     "description": "Bidding phase result",
     "type": "text",
@@ -256,7 +256,7 @@
       "brendaDisplayName": {}
     }
   },
-  "sharedBetween": "...shared between {bertieDisplayName}} and any players who chose {stealOption} on the haunt:",
+  "sharedBetween": "...shared between {bertieDisplayName} and any players who chose {stealOption} on the haunt:",
   "@sharedBetween": {
     "description": "Describe how much money gets split between Bertie and those who stole",
     "type": "text",
@@ -470,14 +470,6 @@
     "type": "text",
     "placeholders": {
       "price": {}
-    }
-  },
-  "hauntPot": "Pot: {pot}",
-  "@hauntPot": {
-    "description": "Pot of a haunt",
-    "type": "text",
-    "placeholders": {
-      "pot": {}
     }
   },
   "winner": "{winner} win!",

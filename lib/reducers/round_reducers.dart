@@ -1,15 +1,13 @@
 import 'package:heist/db/database_model.dart';
+import 'package:heist/selectors/selectors.dart';
 import 'package:redux/redux.dart';
 
 import 'reducers.dart';
 
 final roundReducer = combineReducers<Map<String, List<Round>>>([
-  new TypedReducer<Map<String, List<Round>>, UpdateStateAction<Map<String, List<Round>>>>(reduce),
-  new TypedReducer<Map<String, List<Round>>, PickPlayerAction>(reduce),
+  TypedReducer<Map<String, List<Round>>, UpdateStateAction<Map<String, List<Round>>>>(reduce),
+  TypedReducer<Map<String, List<Round>>, PickPlayerAction>(reduce),
 ]);
-
-Round findRound(Map<String, List<Round>> rounds, String roundId) =>
-    rounds.values.expand((rs) => rs).singleWhere((r) => r.id == roundId);
 
 class PickPlayerAction extends Action<Map<String, List<Round>>> {
   final String roundId;
@@ -19,8 +17,8 @@ class PickPlayerAction extends Action<Map<String, List<Round>>> {
 
   @override
   Map<String, List<Round>> reduce(Map<String, List<Round>> rounds, action) {
-    Map<String, List<Round>> updated = new Map.from(rounds);
-    Round round = findRound(updated, roundId);
+    Map<String, List<Round>> updated = Map.from(rounds);
+    Round round = roundById(updated, roundId);
     round.team.add(playerId);
     return updated;
   }
@@ -34,8 +32,8 @@ class RemovePlayerAction extends Action<Map<String, List<Round>>> {
 
   @override
   Map<String, List<Round>> reduce(Map<String, List<Round>> rounds, action) {
-    Map<String, List<Round>> updated = new Map.of(rounds);
-    Round round = findRound(updated, roundId);
+    Map<String, List<Round>> updated = Map.of(rounds);
+    Round round = roundById(updated, roundId);
     round.team.remove(playerId);
     return updated;
   }

@@ -166,7 +166,7 @@ class _EndgameState extends State<Endgame> {
     Map<String, List<Round>> rounds = getRounds(widget._store.state);
     for (Haunt haunt in haunts) {
       Round lastRound = lastRoundForHaunt(getRoom(widget._store.state), rounds, haunt);
-      children.add(hauntSummary(haunt, lastRound.pot));
+      children.add(hauntSummary(haunt, potForRound(haunt, lastRound)));
     }
 
     return Padding(

@@ -104,7 +104,7 @@ class _GameHistoryState extends State<GameHistory> {
       hauntDetailsChildren.addAll([
         VerticalDivider(height: 40.0),
         iconText(Icon(Icons.bubble_chart, size: 32.0),
-            Text(lastRound.pot.toString(), style: bigNumberTextStyle)),
+            Text(potForRound(haunt, lastRound).toString(), style: bigNumberTextStyle)),
       ]);
     }
 

@@ -364,7 +364,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
     int price = haunt.price;
     bool hauntActive = currentHauntIsActive(_store.state);
     bool goingOnHaunt = round.team.contains(me.id);
-    int pot = round.pot;
+    int pot = potForRound(haunt, round);
 
     Map<String, Bid> bidsOnMe = bidsOnMeForRound(_store.state, round);
     int totalBid = bidsOnMe.values.fold(0, (value, bid) => value + bid.amount);

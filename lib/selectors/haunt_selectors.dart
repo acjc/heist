@@ -10,7 +10,7 @@ bool hauntHasActiveRound(Room room, Map<String, List<Round>> rounds, Haunt haunt
         r.complete &&
         r.exclusionsSubmitted &&
         r.bids.length == room.numPlayers &&
-        (r.isAuction || r.pot >= haunt.price));
+        (r.isAuction || potForRound(haunt, r) >= haunt.price));
 
 final Selector<GameModel, bool> currentHauntIsActive = createSelector3(
     getRoom,

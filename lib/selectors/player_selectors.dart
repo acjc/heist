@@ -71,7 +71,8 @@ int calculateBalance(
         if (teamIds.contains(bid.recipient)) {
           balance -= bid.amount;
         }
-        balance = resolveBalanceForHauntOutcome(players, player, haunt, lastRound.pot, balance);
+        balance = resolveBalanceForHauntOutcome(
+            players, player, haunt, potForRound(haunt, lastRound), balance);
       } else {
         lastRound = rounds.firstWhere((r) => !r.complete);
         if (hasProposedBid(player.id, lastRound.bids, players.length)) {

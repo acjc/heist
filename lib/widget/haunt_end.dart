@@ -96,7 +96,7 @@ class _HauntEndState extends State<HauntEnd> {
       return null;
     }
     Round lastRound = lastRoundForHaunt(getRoom(_store.state), getRounds(_store.state), haunt);
-    int pot = lastRound.pot;
+    int pot = potForRound(haunt, lastRound);
     decisions.shuffle(Random(haunt.id.hashCode));
 
     List<Widget> children = [

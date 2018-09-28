@@ -457,10 +457,10 @@ class Round extends Document {
         startedAt = json['startedAt'],
         team = _boolMapToSet(json['team'].cast<String, bool>()),
         exclusionsSubmitted = json['teamSubmitted'],
-        bids = _convertValues(json['bids']?.cast<String, dynamic>(),
-            (v) => new Bid.fromJson(v.cast<String, dynamic>())),
+        bids = _convertValues(
+            json['bids']?.cast<String, dynamic>(), (v) => Bid.fromJson(v.cast<String, dynamic>())),
         gifts = _convertValues(json['gifts']?.cast<String, dynamic>(),
-            (v) => new Gift.fromJson(v.cast<String, dynamic>())),
+            (v) => Gift.fromJson(v.cast<String, dynamic>())),
         completedAt = json['completedAt'],
         super(id: id);
 
@@ -477,11 +477,6 @@ class Round extends Document {
       };
 
   bool get isAuction => order == 5;
-
-  // TODO: this is no longer useful
-  int get pot => bids.isNotEmpty
-      ? bids.values.fold(0, (previousValue, bid) => previousValue + bid.amount)
-      : -1;
 
   bool get complete => completedAt != null;
 

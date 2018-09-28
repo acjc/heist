@@ -44,6 +44,22 @@ class BidTotal {
   final int amount;
 
   BidTotal._(this.playerId, this.amount);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BidTotal &&
+          runtimeType == other.runtimeType &&
+          playerId == other.playerId &&
+          amount == other.amount;
+
+  @override
+  int get hashCode => playerId.hashCode ^ amount.hashCode;
+
+  @override
+  String toString() {
+    return 'BidTotal{playerId: $playerId, amount: $amount}';
+  }
 }
 
 List<BidTotal> bidTotalsForRound(Round round) {
@@ -75,7 +91,11 @@ List<Player> winnersForRound(List<Player> players, Haunt haunt, Round round) {
 }
 
 int potForRound(Haunt haunt, Round round) {
-  return bidTotalsForRound(round)
+  List<BidTotal> bidTotals = bidTotalsForRound(round);
+  if (bidTotals.length < haunt.numPlayers) {
+    return -1;
+  }
+  return bidTotals
       .sublist(0, haunt.numPlayers)
       .fold(0, (int value, BidTotal bidTotal) => value + bidTotal.amount);
 }
@@ -93,9 +113,6 @@ final Selector<GameModel, List<Player>> currentTeam = createSelector3(
     currentRound,
     (List<Player> players, Haunt currentHaunt, Round currentRound) =>
         winnersForRound(players, currentHaunt, currentRound));
-
-final Selector<GameModel, int> currentPot = createSelector2(currentHaunt, currentRound,
-    (Haunt currentHaunt, Round currentRound) => potForRound(currentHaunt, currentRound));
 
 final Selector<GameModel, bool> goingOnHaunt = createSelector2(
     currentTeam, getSelf, (List<Player> currentTeam, Player me) => currentTeam.contains(me));

@@ -27,7 +27,7 @@ class RoundEnd extends StatefulWidget {
 
 class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin {
   /// Height of the bar indicating the price
-  static const double _thresholdHeight = 225.0;
+  static const double _thresholdHeight = 275.0;
 
   static const double _barWidth = 75.0;
   static const double _labelContainerWidth = 100.0;
@@ -348,7 +348,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
   /// line when it grows.
   double _getPotBarHeight(int pot, int price, bool hauntIsActive) {
     if (hauntIsActive) {
-      double boost = min((pot - price) * 15.0, 75.0);
+      double boost = min((pot - price) * 20.0, 100.0);
       return _thresholdHeight + boost;
     }
     return (pot / price) * _thresholdHeight;
@@ -360,9 +360,9 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
   Widget _barStack() {
     Player me = getSelf(_store.state);
     Haunt haunt = currentHaunt(_store.state);
-    Round round = roundByOrder(haunt, getRounds(_store.state), _roundOrder);
+    Round round = roundByOrder(getRounds(_store.state), haunt, _roundOrder);
     int price = haunt.price;
-    bool hauntActive = hauntIsActive(_store.state);
+    bool hauntActive = currentHauntIsActive(_store.state);
     bool goingOnHaunt = round.team.contains(me.id);
     int pot = round.pot;
 

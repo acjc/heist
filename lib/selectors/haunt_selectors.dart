@@ -5,15 +5,22 @@ import 'package:reselect/reselect.dart';
 
 import 'selectors.dart';
 
-final Selector<GameModel, bool> hauntIsActive = createSelector4(
-    getRounds, currentHaunt, biddingComplete, isAuction,
-    (Map<String, List<Round>> rounds, Haunt currentHaunt, bool biddingComplete, bool isAuction) {
-  bool priceMet = rounds[currentHaunt.id]
-      .any((r) => r.pot >= currentHaunt.price && r.exclusionsSubmitted && r.complete);
-  return ((isAuction && biddingComplete) || priceMet) &&
-      !currentHaunt.complete &&
-      !currentHaunt.allDecided;
-});
+bool hauntHasActiveRound(Room room, Haunt haunt, Map<String, List<Round>> rounds) =>
+    rounds[haunt.id].any((r) =>
+        r.complete &&
+        r.exclusionsSubmitted &&
+        r.bids.length == room.numPlayers &&
+        (r.isAuction || r.pot >= haunt.price));
+
+bool hauntIsActive(Room room, Haunt haunt, Map<String, List<Round>> rounds) =>
+    hauntHasActiveRound(room, haunt, rounds) != null && !haunt.allDecided && !haunt.complete;
+
+final Selector<GameModel, bool> currentHauntIsActive = createSelector3(
+    getRoom,
+    currentHaunt,
+    getRounds,
+    (Room room, Haunt currentHaunt, Map<String, List<Round>> rounds) =>
+        hauntIsActive(room, currentHaunt, rounds));
 
 class Score {
   int scaryScore;
@@ -22,12 +29,12 @@ class Score {
   Score(this.scaryScore, this.friendlyScore);
 
   Team get winner => scaryScore >= 3 ? Team.SCARY : Team.FRIENDLY;
+
+  bool get gameOver => scaryScore >= 3 || friendlyScore >= 3;
 }
 
-final Selector<GameModel, bool> gameOver = createSelector1(getHaunts, (List<Haunt> haunts) {
-  Score score = calculateScore(haunts);
-  return score.scaryScore >= 3 || score.friendlyScore >= 3;
-});
+final Selector<GameModel, bool> gameOver =
+    createSelector1(getHaunts, (List<Haunt> haunts) => calculateScore(haunts).gameOver);
 
 Score calculateScore(List<Haunt> haunts) {
   int scaryScore = 0;

@@ -29,33 +29,31 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m5(amount, recipientName) => "You have already sent a gift this round of ${amount} to ${recipientName}";
 
-  static m6(pot) => "Pot: ${pot}";
+  static m6(price) => "Price: ${price}";
 
-  static m7(price) => "Price: ${price}";
+  static m7(order) => "Haunt ${order}";
 
-  static m8(order) => "Haunt ${order}";
+  static m8(name, role) => "${name} is the ${role} \n";
 
-  static m9(name, role) => "${name} is the ${role} \n";
+  static m9(playersPicked, teamSize) => "Pick a team: ${playersPicked} / ${teamSize}";
 
-  static m10(playersPicked, teamSize) => "Pick a team: ${playersPicked} / ${teamSize}";
+  static m10(playersPicked, teamSize) => "TEAM (${playersPicked} / ${teamSize})";
 
-  static m11(playersPicked, teamSize) => "TEAM (${playersPicked} / ${teamSize})";
+  static m11(order) => "Player ${order}";
 
-  static m12(order) => "Player ${order}";
+  static m12(name, role) => "${name} (${role}) ->";
 
-  static m13(name, role) => "${name} (${role}) ->";
+  static m13(order) => "Round ${order}";
 
-  static m14(order) => "Round ${order}";
+  static m14(bertieDisplayName, stealOption) => "...shared between ${bertieDisplayName} and any players who chose ${stealOption} on the haunt:";
 
-  static m15(bertieDisplayName, stealOption) => "...shared between ${bertieDisplayName}} and any players who chose ${stealOption} on the haunt:";
+  static m15(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
 
-  static m16(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
+  static m16(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
 
-  static m17(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
+  static m17(leaderName) => "Waiting for ${leaderName} to submit team";
 
-  static m18(leaderName) => "Waiting for ${leaderName} to submit team";
-
-  static m19(winner) => "${winner} win!";
+  static m18(winner) => "${winner} win!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -91,13 +89,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "gameTab" : MessageLookupByLibrary.simpleMessage("GAME"),
     "giftAlreadySent" : m5,
     "giftingTitle" : MessageLookupByLibrary.simpleMessage("GIFTING"),
-    "goingAhead" : MessageLookupByLibrary.simpleMessage("The haunt is going ahead!"),
+    "goingAhead" : MessageLookupByLibrary.simpleMessage("The haunt is going ahead without you!"),
     "hauntInProgress" : MessageLookupByLibrary.simpleMessage("Haunt in progress..."),
-    "hauntPot" : m6,
-    "hauntPrice" : m7,
-    "hauntTitle" : m8,
+    "hauntPrice" : m6,
+    "hauntTitle" : m7,
     "homepageTitle" : MessageLookupByLibrary.simpleMessage("Homepage"),
-    "identity" : m9,
+    "identity" : m8,
     "invalidCode" : MessageLookupByLibrary.simpleMessage("Invalid code"),
     "joinGame" : MessageLookupByLibrary.simpleMessage("JOIN GAME"),
     "makeYourChoice" : MessageLookupByLibrary.simpleMessage("Make your choice..."),
@@ -108,29 +105,29 @@ class MessageLookup extends MessageLookupByLibrary {
     "notPicked" : MessageLookupByLibrary.simpleMessage("You haven\'t been picked!"),
     "okButton" : MessageLookupByLibrary.simpleMessage("OK"),
     "otherIdentities" : MessageLookupByLibrary.simpleMessage("You also know these identities:"),
-    "pickATeam" : m10,
-    "pickedTeamSize" : m11,
+    "pickATeam" : m9,
+    "pickedTeamSize" : m10,
     "pickedYou" : MessageLookupByLibrary.simpleMessage(" picked you in the team!"),
-    "playerOrder" : m12,
-    "playerRole" : m13,
+    "playerOrder" : m11,
+    "playerRole" : m12,
     "players" : MessageLookupByLibrary.simpleMessage("Players"),
     "pleaseEnterAName" : MessageLookupByLibrary.simpleMessage("Please enter a name"),
     "pot" : MessageLookupByLibrary.simpleMessage("Pot"),
     "price" : MessageLookupByLibrary.simpleMessage("Price"),
     "putYouInTeam" : MessageLookupByLibrary.simpleMessage(" to put you in the team!"),
-    "roundTitle" : m14,
+    "roundTitle" : m13,
     "scaryGhost" : MessageLookupByLibrary.simpleMessage("Scary Ghost"),
     "secretTab" : MessageLookupByLibrary.simpleMessage("SECRET"),
-    "sharedBetween" : m15,
+    "sharedBetween" : m14,
     "submitBid" : MessageLookupByLibrary.simpleMessage("SUBMIT BID"),
     "submitTeam" : MessageLookupByLibrary.simpleMessage("SUBMIT TEAM"),
     "success" : MessageLookupByLibrary.simpleMessage("Success"),
-    "teamScores" : m16,
+    "teamScores" : m15,
     "title" : MessageLookupByLibrary.simpleMessage("Heist"),
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),
-    "waitingForPlayers" : m17,
-    "waitingForTeamSubmission" : m18,
-    "winner" : m19,
+    "waitingForPlayers" : m16,
+    "waitingForTeamSubmission" : m17,
+    "winner" : m18,
     "youAreGoing" : MessageLookupByLibrary.simpleMessage("You\'re going on a haunt!"),
     "youHaveMadeYourChoice" : MessageLookupByLibrary.simpleMessage("You have made your choice!"),
     "yourBid" : MessageLookupByLibrary.simpleMessage("Your bid"),

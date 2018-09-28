@@ -7,10 +7,11 @@ export 'bidding_selectors.dart';
 export 'exclusion_selectors.dart';
 export 'gifting_selectors.dart';
 export 'haunt_selectors.dart';
+export 'leader_selectors.dart';
 export 'local_actions_selectors.dart';
 export 'player_selectors.dart';
-export 'round_selectors.dart';
 export 'setup_selectors.dart';
+export 'team_selectors.dart';
 
 final getRoom = (GameModel gameModel) => gameModel.room;
 final getPlayers = (GameModel gameModel) => gameModel.players;

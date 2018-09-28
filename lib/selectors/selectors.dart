@@ -43,7 +43,7 @@ Haunt hauntByOrder(GameModel gameModel, int order) =>
 
 Round lastRoundForHaunt(Room room, Map<String, List<Round>> rounds, Haunt haunt) {
   List<Round> roundsForHaunt = rounds[haunt.id];
-  return hauntHasActiveRound(room, haunt, rounds)
+  return hauntHasActiveRound(room, rounds, haunt)
       ? roundsForHaunt.lastWhere((r) => r.complete)
       : roundsForHaunt.firstWhere((r) => !r.complete);
 }

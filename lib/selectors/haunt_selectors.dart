@@ -5,22 +5,21 @@ import 'package:reselect/reselect.dart';
 
 import 'selectors.dart';
 
-bool hauntHasActiveRound(Room room, Haunt haunt, Map<String, List<Round>> rounds) =>
+bool hauntHasActiveRound(Room room, Map<String, List<Round>> rounds, Haunt haunt) =>
     rounds[haunt.id].any((r) =>
         r.complete &&
         r.exclusionsSubmitted &&
         r.bids.length == room.numPlayers &&
         (r.isAuction || r.pot >= haunt.price));
 
-bool hauntIsActive(Room room, Haunt haunt, Map<String, List<Round>> rounds) =>
-    hauntHasActiveRound(room, haunt, rounds) != null && !haunt.allDecided && !haunt.complete;
-
 final Selector<GameModel, bool> currentHauntIsActive = createSelector3(
     getRoom,
-    currentHaunt,
     getRounds,
-    (Room room, Haunt currentHaunt, Map<String, List<Round>> rounds) =>
-        hauntIsActive(room, currentHaunt, rounds));
+    currentHaunt,
+    (Room room, Map<String, List<Round>> rounds, Haunt currentHaunt) =>
+        hauntHasActiveRound(room, rounds, currentHaunt) &&
+        !currentHaunt.allDecided &&
+        !currentHaunt.complete);
 
 class Score {
   int scaryScore;

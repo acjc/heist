@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -8,8 +9,11 @@ import 'package:redux/redux.dart';
 import 'middleware.dart';
 
 class SubmitBidAction extends MiddlewareAction {
+  @required
   final String bidder;
+  @required
   final String recipient;
+  @required
   final int amount;
 
   SubmitBidAction({this.bidder, this.recipient, this.amount});

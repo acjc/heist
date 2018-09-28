@@ -1,6 +1,5 @@
 import 'package:heist/db/database_model.dart';
-import 'package:heist/middleware/bidding_middleware.dart';
-import 'package:heist/middleware/team_selection_middleware.dart';
+import 'package:heist/middleware/exclusion_middleware.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
@@ -20,19 +19,5 @@ void main() {
 
     await handle(store, RemovePlayerMiddlewareAction(myId));
     expect(currentExclusions(store.state), isEmpty);
-  });
-
-  test('test resolve auction winners', () async {
-    Store<GameModel> store = await initGame();
-    Player me = getSelf(store.state);
-
-    List<Player> otherPlayers = getOtherPlayers(store.state);
-    for (Player player in otherPlayers) {
-      await handle(store, SubmitBidAction(player.id, 9));
-    }
-    await handle(store, SubmitBidAction(me.id, 10));
-
-    await handle(store, ResolveAuctionWinnersAction());
-    expect(currentTeam(store.state), containsAll([me, otherPlayers[0]]));
   });
 }

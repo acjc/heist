@@ -22,14 +22,14 @@ void main() {
   String hauntId1 = '#haunt1';
   String hauntId2 = '#haunt2';
 
-  Player kingpin = Player(
+  Player brenda = Player(
     id: brendaId,
     installId: uuid(),
     name: '_other1',
     role: Roles.brenda.roleId,
     order: 1,
   );
-  Player leadAgent = Player(
+  Player bertie = Player(
     id: bertieId,
     installId: uuid(),
     name: '_other2',
@@ -65,14 +65,14 @@ void main() {
               name: '_name',
               role: Roles.friendlyGhost1.roleId,
               order: 4),
-          kingpin,
-          leadAgent,
+          brenda,
+          bertie,
           thief,
         ],
         haunts: [
           Haunt(
             id: hauntId1,
-            price: 12,
+            price: 8,
             numPlayers: 4,
             maximumBid: 20,
             order: 1,
@@ -85,7 +85,7 @@ void main() {
             startedAt: now(),
             completedAt: now(),
           ),
-          Haunt(id: hauntId2, price: 12, numPlayers: 4, maximumBid: 20, order: 2, startedAt: now())
+          Haunt(id: hauntId2, price: 8, numPlayers: 4, maximumBid: 20, order: 2, startedAt: now())
         ],
         rounds: {
           hauntId1: [
@@ -104,7 +104,12 @@ void main() {
               order: 2,
               haunt: hauntId1,
               team: Set(),
-              bids: {myId: Bid(10), brendaId: Bid(1), bertieId: Bid(1), scaryId: Bid(1)},
+              bids: {
+                myId: Bid(myId, 7),
+                brendaId: Bid(brendaId, 1),
+                bertieId: Bid(bertieId, 1),
+                scaryId: Bid(scaryId, 1),
+              },
               gifts: {},
               startedAt: now(),
               completedAt: now(),
@@ -117,7 +122,7 @@ void main() {
               haunt: hauntId2,
               team: Set(),
               gifts: {myId: Gift(amount: 3, recipient: brendaId)},
-              bids: {myId: Bid(2)},
+              bids: {myId: Bid(myId, 2)},
               startedAt: now(),
             )
           ]
@@ -134,17 +139,17 @@ void main() {
   });
 
   test('calculate balance', () {
-    // 8 + 7 (gift) - 10 (bid) + 2 (half of 13 split 3 ways) - 3 (gift) - 2 (proposed bid)
-    expect(currentBalance(store.state), 2);
+    // 8 + 7 (gift) - 7 (bid) + 2 (half of 10 split 3 ways) - 3 (gift) - 2 (proposed bid)
+    expect(currentBalance(store.state), 5);
 
-    // 8 - 7 (gift) - bid (1) + 6 (half of 13) + 3 (gift)
-    expect(calculateBalanceFromState(store.state, kingpin), 9);
+    // 8 - 7 (gift) - 1 (bid) + 5 (half of 10) + 3 (gift)
+    expect(calculateBalanceFromState(store.state, brenda), 8);
 
-    // 8 - 1 (bid) + 2 (half of 13 split 3 ways)
-    expect(calculateBalanceFromState(store.state, leadAgent), 9);
+    // 8 - 1 (bid) + 1 (half of 10 split 3 ways)
+    expect(calculateBalanceFromState(store.state, bertie), 8);
 
-    // 8 - 1 (bid) + 3 (half of 13 split 3 ways)
-    expect(calculateBalanceFromState(store.state, thief), 10);
+    // 8 - 1 (bid) + 2 (half of 10 split 3 ways)
+    expect(calculateBalanceFromState(store.state, thief), 9);
   });
 
   test('randomly split', () {

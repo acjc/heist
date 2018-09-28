@@ -11,7 +11,6 @@ import 'package:heist/keys.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/game_middleware.dart';
 import 'package:heist/middleware/room_middleware.dart';
-import 'package:heist/middleware/team_selection_middleware.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/reducers/request_reducers.dart';
 import 'package:heist/reducers/subscription_reducers.dart';
@@ -90,13 +89,6 @@ class GameState extends State<Game> {
     return Endgame(_store);
   }
 
-  Widget _resolveAuctionWinners(bool resolvingAuction) {
-    if (amOwner(_store.state) && !resolvingAuction) {
-      _store.dispatch(ResolveAuctionWinnersAction());
-    }
-    return null;
-  }
-
   Widget _biddingAndGifting() {
     List<Widget> children = [
       roundTitleCard(context, _store),
@@ -140,11 +132,6 @@ class GameState extends State<Game> {
     // Bidding & gifting
     if (!viewModel.biddingComplete) {
       return appendFooter(_biddingAndGifting());
-    }
-
-    // Select team from auction if necessary
-    if (isAuction(_store.state) && !viewModel.currentRound.exclusionsSubmitted) {
-      return _resolveAuctionWinners(viewModel.resolvingAuction);
     }
 
     // Bidding summary

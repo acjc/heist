@@ -6,7 +6,7 @@ import 'package:heist/animations/animation_listenable.dart';
 import 'package:heist/app_localizations.dart';
 import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
-import 'package:heist/middleware/team_selection_middleware.dart';
+import 'package:heist/middleware/exclusion_middleware.dart';
 import 'package:heist/reducers/local_actions_reducers.dart';
 import 'package:heist/reducers/round_reducers.dart';
 import 'package:heist/selectors/selectors.dart';

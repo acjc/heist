@@ -6,12 +6,12 @@ import 'package:redux/redux.dart';
 import 'package:redux_logging/redux_logging.dart';
 
 import 'bidding_middleware.dart';
+import 'exclusion_middleware.dart';
 import 'game_middleware.dart';
 import 'gifting_middleware.dart';
 import 'haunt_middleware.dart';
 import 'room_middleware.dart';
 import 'round_end_middleware.dart';
-import 'team_selection_middleware.dart';
 
 List<Middleware<GameModel>> createMiddleware() {
   List<Middleware<GameModel>> middleware = [
@@ -27,7 +27,6 @@ List<Middleware<GameModel>> createMiddleware() {
     new TypedMiddleware<GameModel, RemovePlayerMiddlewareAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, SubmitExclusionsAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, MakeDecisionAction>(_dispatchMiddleware),
-    new TypedMiddleware<GameModel, ResolveAuctionWinnersAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, CompleteRoundAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, CompleteHauntAction>(_dispatchMiddleware),
     new TypedMiddleware<GameModel, CompleteGameAction>(_dispatchMiddleware),

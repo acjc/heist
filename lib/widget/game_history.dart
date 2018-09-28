@@ -116,7 +116,7 @@ class _GameHistoryState extends State<GameHistory> {
     ];
 
     if (haunt.complete) {
-      Set<Player> team = teamForRound(widget._store.state, lastRound);
+      Set<Player> team = teamForRound(getPlayers(widget._store.state), lastRound);
       Player leader = leaderForRound(widget._store.state, lastRound);
       hauntPopupChildren.addAll([
         Divider(),

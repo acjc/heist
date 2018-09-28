@@ -31,6 +31,12 @@ bool requestInProcess(GameModel gameModel, Request request) =>
 Haunt currentHaunt(GameModel gameModel) =>
     getHaunts(gameModel).firstWhere((h) => !h.complete, orElse: null);
 
+Haunt previousHaunt(GameModel gameModel) =>
+    hauntByOrder(gameModel, currentHaunt(gameModel).order - 1);
+
+Haunt hauntByOrder(GameModel gameModel, int order) =>
+    getHaunts(gameModel).singleWhere((h) => h.order == order, orElse: null);
+
 Round lastRoundForHaunt(Room room, Map<String, List<Round>> rounds, Haunt haunt) {
   List<Round> roundsForHaunt = rounds[haunt.id];
   return hauntHasActiveRound(room, haunt, rounds)

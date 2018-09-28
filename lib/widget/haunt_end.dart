@@ -7,6 +7,7 @@ import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/haunt_definitions.dart';
 import 'package:heist/middleware/haunt_middleware.dart';
+import 'package:heist/reducers/local_actions_reducers.dart';
 import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -17,8 +18,9 @@ import 'common.dart';
 
 class HauntEnd extends StatefulWidget {
   final Store<GameModel> _store;
+  final int _hauntOrder;
 
-  HauntEnd(this._store);
+  HauntEnd(this._store, this._hauntOrder);
 
   @override
   State<StatefulWidget> createState() => _HauntEndState(_store);
@@ -46,17 +48,23 @@ class _HauntEndState extends State<HauntEnd> {
         },
       );
 
-  Widget _hauntContinueButton() => StoreConnector<GameModel, bool>(
+  Widget _hauntContinueButton(Haunt haunt) => StoreConnector<GameModel, bool>(
       distinct: true,
       converter: (store) => requestInProcess(store.state, Request.CompletingHaunt),
-      builder: (context, completingHeist) => Padding(
+      builder: (context, completingHaunt) => Padding(
             padding: paddingSmall,
             child: RaisedButton(
               child: Text(
                 AppLocalizations.of(context).continueButton,
                 style: buttonTextStyle,
               ),
-              onPressed: completingHeist ? null : () => _store.dispatch(CompleteHauntAction()),
+              onPressed: () {
+                if (!haunt.complete && !completingHaunt) {
+                  _store.dispatch(CompleteHauntAction());
+                }
+                _store.dispatch(
+                    RecordLocalHauntActionAction(haunt.id, LocalHauntAction.HauntEndContinue));
+              },
             ),
           ));
 
@@ -82,22 +90,25 @@ class _HauntEndState extends State<HauntEnd> {
       );
 
   Widget _hauntResult(BuildContext context) {
-    Haunt haunt = currentHaunt(_store.state);
+    Haunt haunt = hauntByOrder(_store.state, widget._hauntOrder);
     List<String> decisions = List.of(haunt.decisions.values.toList());
     if (decisions.isEmpty) {
       return null;
     }
-    int pot = currentRound(_store.state).pot;
+    Round lastRound = lastRoundForHaunt(getRoom(_store.state), getRounds(_store.state), haunt);
+    int pot = lastRound.pot;
     decisions.shuffle(Random(haunt.id.hashCode));
 
     List<Widget> children = [
       _hauntDetails(haunt, pot),
       Divider(),
-      hauntTeam(context, currentTeam(_store.state), currentLeader(_store.state)),
+      hauntTeam(
+        context,
+        teamForRound(getPlayers(_store.state), lastRound),
+        leaderForRound(_store.state, lastRound),
+      ),
       Divider(),
-    ];
-
-    children.addAll(_hauntDecisions(decisions));
+    ]..addAll(_hauntDecisions(decisions));
 
     int brendaPayout = calculateBrendaPayout(newRandomForHaunt(haunt), pot);
     int bertiePayout = pot - brendaPayout;
@@ -106,45 +117,44 @@ class _HauntEndState extends State<HauntEnd> {
       fontWeight: FontWeight.w300,
       color: Colors.teal,
     );
-    children.addAll([
-      Divider(),
-      Padding(
-        padding: paddingSmall,
-        child: Column(
-          children: [
-            Text(
-              '+$brendaPayout',
-              style: potResolutionTextStyle,
-            ),
-            Text(
-              AppLocalizations.of(context)
-                  .brendaReceived(Roles.getRoleDisplayName(context, Roles.brenda.roleId)),
-              style: infoTextStyle,
-            ),
-          ],
+    children.addAll(
+      [
+        Divider(),
+        Padding(
+          padding: paddingSmall,
+          child: Column(
+            children: [
+              Text(
+                '+$brendaPayout',
+                style: potResolutionTextStyle,
+              ),
+              Text(
+                AppLocalizations.of(context)
+                    .brendaReceived(Roles.getRoleDisplayName(context, Roles.brenda.roleId)),
+                style: infoTextStyle,
+              ),
+            ],
+          ),
         ),
-      ),
-      Padding(
-        padding: paddingSmall,
-        child: Column(
-          children: [
-            Text(
-              '+$bertiePayout',
-              style: potResolutionTextStyle,
-            ),
-            Text(
-              AppLocalizations.of(context)
-                  .sharedBetween(Roles.getRoleDisplayName(context, Roles.bertie.roleId), Steal),
-              style: infoTextStyle,
-            ),
-          ],
+        Padding(
+          padding: paddingSmall,
+          child: Column(
+            children: [
+              Text(
+                '+$bertiePayout',
+                style: potResolutionTextStyle,
+              ),
+              Text(
+                AppLocalizations.of(context)
+                    .sharedBetween(Roles.getRoleDisplayName(context, Roles.bertie.roleId), Steal),
+                style: infoTextStyle,
+              ),
+            ],
+          ),
         ),
-      ),
-    ]);
-
-    if (amOwner(_store.state)) {
-      children.add(_hauntContinueButton());
-    }
+        _hauntContinueButton(haunt),
+      ],
+    );
 
     return Card(
       elevation: 2.0,

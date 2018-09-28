@@ -89,7 +89,7 @@ class _HauntEndState extends State<HauntEnd> {
         ],
       );
 
-  Widget _hauntResult(BuildContext context) {
+  Widget _hauntResult() {
     Haunt haunt = hauntByOrder(_store.state, widget._hauntOrder);
     List<String> decisions = List.of(haunt.decisions.values.toList());
     if (decisions.isEmpty) {
@@ -171,6 +171,6 @@ class _HauntEndState extends State<HauntEnd> {
     if (!gameIsReady(_store.state)) {
       return Container();
     }
-    return SingleChildScrollView(child: _hauntResult(context));
+    return SingleChildScrollView(child: _hauntResult());
   }
 }

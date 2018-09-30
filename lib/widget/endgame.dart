@@ -9,153 +9,169 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-List<Widget> playerDecisions(BuildContext context, Store<GameModel> store, Haunt haunt) {
-  List<Widget> heistDecisions = [];
-  haunt.decisions.forEach((playerId, decision) {
-    Player player = getPlayerById(store.state, playerId);
-    heistDecisions.add(
-      new Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          new Text('${player.name}:', style: infoTextStyle),
-          new Text(
-            ' $decision',
-            style: new TextStyle(
-              fontSize: 16.0,
-              color: decisionColour(decision),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  });
-  return heistDecisions;
+class Endgame extends StatefulWidget {
+  final Store<GameModel> _store;
+
+  Endgame(this._store);
+
+  @override
+  State<StatefulWidget> createState() => _EndgameState();
 }
 
-Text heistResultText(BuildContext context, bool wasSuccess) {
-  return wasSuccess
-      ? new Text(
-          AppLocalizations.of(context).success.toUpperCase(),
-          style: const TextStyle(
-              fontSize: 16.0, fontWeight: FontWeight.bold, color: HeistColors.green),
-        )
-      : new Text(
-          AppLocalizations.of(context).fail.toUpperCase(),
-          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.red),
-        );
-}
-
-Widget hauntSummary(BuildContext context, Store<GameModel> store, Haunt haunt, int pot) => new Card(
-    elevation: 2.0,
-    child: new Container(
-      padding: paddingMedium,
-      child: new Column(
-        children: [
-          new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            new Text(AppLocalizations.of(context).hauntTitle(haunt.order), style: boldTextStyle),
-            heistResultText(context, haunt.wasSuccess),
-          ]),
-          new Divider(),
-          new Container(
-            padding: paddingSmall,
-            child: new Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              new Text(AppLocalizations.of(context).hauntPrice(haunt.price), style: infoTextStyle),
-              new Text(AppLocalizations.of(context).hauntPot(pot), style: infoTextStyle),
-            ]),
-          ),
-          new Column(
-            children: playerDecisions(context, store, haunt),
-          ),
-        ],
-      ),
-    ));
-
-Widget winner(BuildContext context, Score score) => new Card(
-      elevation: 2.0,
-      child: new Container(
-        alignment: Alignment.center,
-        padding: paddingMedium,
-        child: new Column(
+class _EndgameState extends State<Endgame> {
+  List<Widget> playerDecisions(Haunt haunt) {
+    List<Widget> heistDecisions = [];
+    haunt.decisions.forEach((playerId, decision) {
+      Player player = getPlayerById(widget._store.state, playerId);
+      heistDecisions.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            new Container(
-                padding: paddingTitle,
-                child: new Text(AppLocalizations.of(context).winner(score.winner.toString()),
-                    style: titleTextStyle)),
-            new Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-              new Text(Team.SCARY.toString(), style: infoTextStyle),
-              new Text(
-                  AppLocalizations.of(context).teamScores(score.scaryScore, score.friendlyScore),
-                  style: new TextStyle(fontSize: 32.0)),
-              new Text(Team.FRIENDLY.toString(), style: infoTextStyle),
-            ])
-          ],
-        ),
-      ),
-    );
-
-Widget fullPlayerListForTeam(BuildContext context, List<Player> players, Team team, Color color) {
-  List<Player> playersInTeam = players.where((p) => Roles.getTeam(p.role) == team).toList();
-  return new Column(
-    children: new List.generate(playersInTeam.length + 1, (i) {
-      Player player = playersInTeam[0];
-      return new Padding(
-        padding: paddingBelowText,
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            new Text(
-              player.name,
-              style: infoTextStyle,
-            ),
-            new Text(
-              Roles.getRoleDisplayName(context, player.role),
-              style: new TextStyle(color: color),
+            Text('${player.name}:', style: infoTextStyle),
+            Text(
+              ' $decision',
+              style: TextStyle(
+                fontSize: 16.0,
+                color: decisionColour(decision),
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
       );
-    }),
-  );
-}
-
-Widget fullPlayerList(BuildContext context, Store<GameModel> store) {
-  List<Player> players = getPlayers(store.state);
-  return new Card(
-    elevation: 2.0,
-    child: new Padding(
-      padding: paddingMedium,
-      child: new Column(children: [
-        new Padding(
-          padding: paddingTitle,
-          child: new Text(AppLocalizations.of(context).players, style: titleTextStyle),
-        ),
-        new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            fullPlayerListForTeam(context, players, Team.SCARY, Colors.pink),
-            fullPlayerListForTeam(context, players, Team.FRIENDLY, Colors.purple),
-          ],
-        )
-      ]),
-    ),
-  );
-}
-
-Widget endgame(BuildContext context, Store<GameModel> store) {
-  List<Haunt> haunts = getHaunts(store.state);
-  Score score = calculateScore(haunts);
-
-  List<Widget> children = [
-    winner(context, score),
-    fullPlayerList(context, store),
-  ];
-
-  Map<String, List<Round>> rounds = getRounds(store.state);
-  for (Haunt haunt in haunts) {
-    Round lastRound = rounds[haunt.id].last;
-    children.add(hauntSummary(context, store, haunt, lastRound.pot));
+    });
+    return heistDecisions;
   }
 
-  return new ListView(children: children);
+  Text heistResultText(bool wasSuccess) => wasSuccess
+      ? Text(
+          AppLocalizations.of(context).success.toUpperCase(),
+          style: const TextStyle(
+              fontSize: 16.0, fontWeight: FontWeight.bold, color: HeistColors.green),
+        )
+      : Text(
+          AppLocalizations.of(context).fail.toUpperCase(),
+          style: const TextStyle(
+              fontSize: 16.0, fontWeight: FontWeight.bold, color: HeistColors.peach),
+        );
+
+  Widget hauntSummary(Haunt haunt, int pot) => Card(
+      elevation: 2.0,
+      child: Padding(
+        padding: paddingMedium,
+        child: Column(
+          children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Text(AppLocalizations.of(context).hauntTitle(haunt.order), style: boldTextStyle),
+              iconText(
+                Icon(Icons.bubble_chart),
+                Text(pot.toString(), style: infoTextStyle),
+              ),
+              heistResultText(haunt.wasSuccess),
+            ]),
+            Divider(),
+            Column(children: playerDecisions(haunt)),
+          ],
+        ),
+      ));
+
+  Widget winner(Score score) => Card(
+        elevation: 2.0,
+        child: Container(
+          alignment: Alignment.center,
+          padding: paddingMedium,
+          child: Column(
+            children: [
+              Padding(
+                padding: paddingTitle,
+                child: Text(
+                  AppLocalizations.of(context).winner(score.winner.toString()),
+                  style: titleTextStyle,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(Team.SCARY.toString(), style: infoTextStyle),
+                  Text(
+                    AppLocalizations.of(context).teamScores(score.scaryScore, score.friendlyScore),
+                    style: TextStyle(fontSize: 32.0),
+                  ),
+                  Text(Team.FRIENDLY.toString(), style: infoTextStyle),
+                ],
+              )
+            ],
+          ),
+        ),
+      );
+
+  Widget fullPlayerListForTeam(List<Player> players, Team team, Color color) {
+    List<Player> playersInTeam = players.where((p) => Roles.getTeam(p.role) == team).toList();
+    return Column(
+      children: List.generate(playersInTeam.length, (i) {
+        Player player = playersInTeam[i];
+        return Padding(
+          padding: paddingBelowText,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                player.name,
+                style: infoTextStyle,
+              ),
+              Text(
+                Roles.getRoleDisplayName(context, player.role),
+                style: TextStyle(color: color),
+              ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget fullPlayerList() {
+    List<Player> players = getPlayers(widget._store.state);
+    return Card(
+      elevation: 2.0,
+      child: Padding(
+        padding: paddingMedium,
+        child: Column(children: [
+          Padding(
+            padding: paddingTitle,
+            child: Text(AppLocalizations.of(context).players, style: titleTextStyle),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              fullPlayerListForTeam(players, Team.SCARY, Colors.pink),
+              fullPlayerListForTeam(players, Team.FRIENDLY, Colors.purple),
+            ],
+          )
+        ]),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<Haunt> haunts = getHaunts(widget._store.state);
+    Score score = calculateScore(haunts);
+
+    List<Widget> children = [
+      winner(score),
+      fullPlayerList(),
+    ];
+
+    Map<String, List<Round>> rounds = getRounds(widget._store.state);
+    for (Haunt haunt in haunts) {
+      Round lastRound = lastRoundForHaunt(getRoom(widget._store.state), rounds, haunt);
+      children.add(hauntSummary(haunt, lastRound.pot));
+    }
+
+    return Padding(
+      padding: paddingMedium,
+      child: ListView(children: children),
+    );
+  }
 }

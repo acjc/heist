@@ -39,17 +39,11 @@ Player leaderForRound(GameModel gameModel, Round round) {
   return players.singleWhere((Player p) => p.order == leaderOrder);
 }
 
-final Selector<GameModel, Set<Player>> currentTeam = createSelector2(
-    getPlayers,
-    currentRound,
-    (List<Player> players, Round currentRound) => players.where((Player p) {
-          // Reselect needed this bool explicitly typed
-          bool playerInTeam = currentRound.team.contains(p.id);
-          return playerInTeam;
-        }).toSet());
+final Selector<GameModel, Set<Player>> currentTeam = createSelector2(getPlayers, currentRound,
+    (List<Player> players, Round currentRound) => teamForRound(players, currentRound));
 
 final Selector<GameModel, bool> currentTeamIsFull = createSelector2(currentHaunt, currentTeam,
     (Haunt currentHaunt, Set<Player> currentTeam) => currentHaunt.numPlayers == currentTeam.length);
 
-Set<Player> teamForRound(GameModel gameModel, Round round) =>
-    getPlayers(gameModel).where((p) => round.team.contains(p.id)).toSet();
+Set<Player> teamForRound(List<Player> players, Round round) =>
+    players.where((p) => round.team.contains(p.id)).toSet();

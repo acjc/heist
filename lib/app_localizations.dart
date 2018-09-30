@@ -325,7 +325,7 @@ class AppLocalizations {
 
   String get goingAhead {
     return Intl.message(
-      'The haunt is going ahead!',
+      'The haunt is going ahead without you!',
       name: 'goingAhead',
       desc: 'Bidding phase result',
     );
@@ -376,7 +376,7 @@ class AppLocalizations {
 
   String sharedBetween(String bertieDisplayName, String stealOption) {
     return Intl.message(
-      '...shared between $bertieDisplayName} and any players who chose $stealOption on the haunt:',
+      '...shared between $bertieDisplayName and any players who chose $stealOption on the haunt:',
       name: 'sharedBetween',
       args: [bertieDisplayName, stealOption],
       desc: 'Describe how much money gets split between Bertie and those who stole',
@@ -639,15 +639,6 @@ class AppLocalizations {
       name: 'hauntPrice',
       args: [price],
       desc: 'Price of a haunt',
-    );
-  }
-
-  String hauntPot(int pot) {
-    return Intl.message(
-      'Pot: $pot',
-      name: 'hauntPot',
-      args: [pot],
-      desc: 'Pot of a haunt',
     );
   }
 

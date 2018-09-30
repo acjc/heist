@@ -5,18 +5,24 @@ import 'package:reselect/reselect.dart';
 
 import 'selectors.dart';
 
-final Selector<GameModel, bool> hauntIsActive = createSelector4(
-    getRounds, currentHaunt, biddingComplete, isAuction,
-    (Map<String, List<Round>> rounds, Haunt currentHaunt, bool biddingComplete, bool isAuction) {
-  bool priceMet = rounds[currentHaunt.id]
-      .any((r) => r.pot >= currentHaunt.price && r.teamSubmitted && r.complete);
-  return ((isAuction && biddingComplete) || priceMet) &&
-      !currentHaunt.complete &&
-      !currentHaunt.allDecided;
-});
+bool hauntHasActiveRound(Room room, Map<String, List<Round>> rounds, Haunt haunt) =>
+    rounds[haunt.id].any((r) =>
+        r.complete &&
+        r.teamSubmitted &&
+        r.bids.length == room.numPlayers &&
+        (r.isAuction || r.pot >= haunt.price));
 
-final Selector<GameModel, bool> goingOnHaunt =
-    createSelector2(currentRound, getSelf, (currentRound, me) => currentRound.team.contains(me.id));
+final Selector<GameModel, bool> currentHauntIsActive = createSelector3(
+    getRoom,
+    getRounds,
+    currentHaunt,
+    (Room room, Map<String, List<Round>> rounds, Haunt currentHaunt) =>
+        hauntHasActiveRound(room, rounds, currentHaunt) &&
+        !currentHaunt.allDecided &&
+        !currentHaunt.complete);
+
+final Selector<GameModel, bool> goingOnHaunt = createSelector2(
+    currentRound, getSelf, (Round currentRound, Player me) => currentRound.team.contains(me.id));
 
 class Score {
   int scaryScore;
@@ -25,12 +31,12 @@ class Score {
   Score(this.scaryScore, this.friendlyScore);
 
   Team get winner => scaryScore >= 3 ? Team.SCARY : Team.FRIENDLY;
+
+  bool get gameOver => scaryScore >= 3 || friendlyScore >= 3;
 }
 
-final Selector<GameModel, bool> gameOver = createSelector1(getHaunts, (List<Haunt> haunts) {
-  Score score = calculateScore(haunts);
-  return score.scaryScore >= 3 || score.friendlyScore >= 3;
-});
+final Selector<GameModel, bool> gameOver =
+    createSelector1(getHaunts, (List<Haunt> haunts) => calculateScore(haunts).gameOver);
 
 Score calculateScore(List<Haunt> haunts) {
   int scaryScore = 0;

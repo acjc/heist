@@ -70,7 +70,11 @@ class _GameHistoryState extends State<GameHistory> {
   }
 
   Widget hauntPopup(int currentHauntOrder, Haunt haunt) {
-    Round lastRound = lastRoundForHaunt(widget._store.state, haunt);
+    Round lastRound = lastRoundForHaunt(
+      getRoom(widget._store.state),
+      getRounds(widget._store.state),
+      haunt,
+    );
 
     List<Widget> title = [
       Text(
@@ -112,7 +116,7 @@ class _GameHistoryState extends State<GameHistory> {
     ];
 
     if (haunt.complete) {
-      Set<Player> team = teamForRound(widget._store.state, lastRound);
+      Set<Player> team = teamForRound(getPlayers(widget._store.state), lastRound);
       Player leader = leaderForRound(widget._store.state, lastRound);
       hauntPopupChildren.addAll([
         Divider(),

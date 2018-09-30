@@ -87,7 +87,7 @@ class GameState extends State<Game> {
     if (!getRoom(_store.state).complete && !completingGame) {
       _store.dispatch(CompleteGameAction());
     }
-    return endgame(context, _store);
+    return Endgame(_store);
   }
 
   Widget _resolveAuctionWinners(bool resolvingAuction) {
@@ -112,25 +112,25 @@ class GameState extends State<Game> {
   }
 
   Widget _gameLoop(MainBoardViewModel viewModel) {
-    // Show bidding summary of previous round (if it exists and as long as a team
-    // has not yet been selected for the current round)
-    if (viewModel.waitingForTeam && !viewModel.previousRoundContinued) {
-      return appendFooter(RoundEnd(_store, viewModel.currentRoundOrder - 1));
-    }
-
-    // Current haunt has happened so ask to complete it
-    if (viewModel.hauntDecided && !viewModel.hauntComplete) {
-      return appendFooter(HauntEnd(_store));
-    }
-
-    // Haunt is currently happening
-    if (viewModel.hauntIsActive) {
-      return appendFooter(activeHaunt(context, _store));
+    // If a team has not been selected for the current round
+    if (!viewModel.currentRound.teamSubmitted) {
+      // Show bidding summary of previous round
+      if (viewModel.currentRound.order > 1 &&
+          !roundContinued(viewModel.localActions, previousRound(_store.state))) {
+        return RoundEnd(_store, viewModel.currentRound.order - 1);
+      }
+      // Or haunt summary of previous haunt
+      if (viewModel.currentHaunt.order > 1 &&
+          !hauntContinued(viewModel.localActions, previousHaunt(_store.state))) {
+        return appendFooter(HauntEnd(_store, viewModel.currentHaunt.order - 1));
+      }
     }
 
     // Team selection (not needed for auctions)
     if (!isAuction(_store.state) &&
-        (viewModel.waitingForTeam || !viewModel.teamSelectionContinued)) {
+        !viewModel.biddingComplete &&
+        (!viewModel.currentRound.teamSubmitted ||
+            !teamSelectionContinued(viewModel.localActions, viewModel.currentRound))) {
       return TeamSelection(_store, isMyGo(_store.state));
     }
 
@@ -140,26 +140,35 @@ class GameState extends State<Game> {
     }
 
     // Select team from auction if necessary
-    if (isAuction(_store.state) && viewModel.waitingForTeam) {
+    if (isAuction(_store.state) && !viewModel.currentRound.teamSubmitted) {
       return _resolveAuctionWinners(viewModel.resolvingAuction);
     }
 
     // Bidding summary
-    if (!viewModel.roundComplete) {
-      return appendFooter(RoundEnd(_store, viewModel.currentRoundOrder));
+    if (!viewModel.currentRound.complete ||
+        !roundContinued(viewModel.localActions, viewModel.currentRound)) {
+      return RoundEnd(_store, viewModel.currentRound.order);
+    }
+
+    // Haunt is currently happening
+    if (viewModel.hauntIsActive) {
+      return appendFooter(ActiveHaunt(_store));
+    }
+
+    // Current haunt has happened so ask to complete it
+    if (viewModel.currentHaunt.allDecided && !viewModel.currentHaunt.complete) {
+      return appendFooter(HauntEnd(_store, viewModel.currentHaunt.order));
     }
 
     return null;
   }
 
-  Widget appendFooter(Widget child, {bool indicatorOnRight = true}) {
-    return Column(
-      children: [
-        Expanded(child: child),
-        footer(indicatorOnRight),
-      ],
-    );
-  }
+  Widget appendFooter(Widget child, {bool indicatorOnRight = true}) => Column(
+        children: [
+          Expanded(child: child),
+          footer(indicatorOnRight),
+        ],
+      );
 
   Widget footer(bool indicatorOnRight) {
     List<Widget> children = indicatorOnRight
@@ -174,41 +183,39 @@ class GameState extends State<Game> {
   static const EdgeInsets indicatorPadding =
       const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0);
 
-  Widget rightIndicator() {
-    return StoreConnector<GameModel, bool>(
-      distinct: true,
-      ignoreChange: (gameModel) => !gameIsReady(gameModel),
-      converter: (store) => haveReceivedGiftThisRound(store.state),
-      builder: (context, haveReceivedGiftThisRound) {
-        List<Widget> children = [];
-        if (haveReceivedGiftThisRound) {
+  Widget rightIndicator() => StoreConnector<GameModel, bool>(
+        distinct: true,
+        ignoreChange: (gameModel) => !gameIsReady(gameModel),
+        converter: (store) => haveReceivedGiftThisRound(store.state),
+        builder: (context, haveReceivedGiftThisRound) {
+          List<Widget> children = [];
+          if (haveReceivedGiftThisRound) {
+            children.add(Icon(
+              Icons.cake,
+              color: Colors.grey,
+              size: 16.0,
+            ));
+          }
           children.add(Icon(
-            Icons.cake,
-            color: Colors.grey,
-            size: 16.0,
+            Icons.keyboard_arrow_right,
+            color: Theme.of(context).primaryColor,
+            size: 32.0,
           ));
-        }
-        children.add(Icon(
-          Icons.keyboard_arrow_right,
-          color: Theme.of(context).primaryColor,
-          size: 32.0,
-        ));
-        return Card(
-          elevation: 10.0,
-          child: InkWell(
-            onTap: () => _controller.nextPage(
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.fastOutSlowIn,
-                ),
-            child: Padding(
-              padding: indicatorPadding,
-              child: Row(children: children),
+          return Card(
+            elevation: 10.0,
+            child: InkWell(
+              onTap: () => _controller.nextPage(
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.fastOutSlowIn,
+                  ),
+              child: Padding(
+                padding: indicatorPadding,
+                child: Row(children: children),
+              ),
             ),
-          ),
-        );
-      },
-    );
-  }
+          );
+        },
+      );
 
   Widget leftIndicator() => Card(
         elevation: 10.0,
@@ -234,25 +241,12 @@ class GameState extends State<Game> {
           Haunt haunt = currentHaunt(store.state);
           Round round = currentRound(store.state);
           return MainBoardViewModel._(
-            currentRoundOrder: round.order,
-            previousRoundContinued: round.order == 1 ||
-                localRoundActionRecorded(
-                  store.state,
-                  previousRound(store.state).id,
-                  LocalRoundAction.RoundEndContinue,
-                ),
-            waitingForTeam: !round.teamSubmitted,
-            teamSelectionContinued: localRoundActionRecorded(
-              store.state,
-              round.id,
-              LocalRoundAction.TeamSelectionContinue,
-            ),
+            currentHaunt: haunt,
+            currentRound: round,
+            localActions: getLocalActions(_store.state),
             biddingComplete: biddingComplete(store.state),
             resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
-            roundComplete: round.complete,
-            hauntIsActive: hauntIsActive(store.state),
-            hauntDecided: haunt.allDecided,
-            hauntComplete: haunt.complete,
+            hauntIsActive: currentHauntIsActive(store.state),
           );
         },
         distinct: true,
@@ -392,62 +386,46 @@ class LoadingScreenViewModel {
 }
 
 class MainBoardViewModel {
-  final int currentRoundOrder;
-  final bool previousRoundContinued;
-  final bool waitingForTeam;
-  final bool teamSelectionContinued;
+  final Haunt currentHaunt;
+  final Round currentRound;
+  final LocalActions localActions;
   final bool biddingComplete;
   final bool resolvingAuction;
-  final bool roundComplete;
-
   final bool hauntIsActive;
-  final bool hauntDecided;
-  final bool hauntComplete;
 
-  MainBoardViewModel._(
-      {@required this.currentRoundOrder,
-      @required this.previousRoundContinued,
-      @required this.waitingForTeam,
-      @required this.teamSelectionContinued,
-      @required this.biddingComplete,
-      @required this.resolvingAuction,
-      @required this.roundComplete,
-      @required this.hauntIsActive,
-      @required this.hauntDecided,
-      @required this.hauntComplete});
+  MainBoardViewModel._({
+    @required this.currentHaunt,
+    @required this.currentRound,
+    @required this.localActions,
+    @required this.biddingComplete,
+    @required this.resolvingAuction,
+    @required this.hauntIsActive,
+  });
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is MainBoardViewModel &&
           runtimeType == other.runtimeType &&
-          currentRoundOrder == other.currentRoundOrder &&
-          previousRoundContinued == other.previousRoundContinued &&
-          waitingForTeam == other.waitingForTeam &&
-          teamSelectionContinued == other.teamSelectionContinued &&
+          currentHaunt == other.currentHaunt &&
+          currentRound == other.currentRound &&
+          localActions == other.localActions &&
           biddingComplete == other.biddingComplete &&
           resolvingAuction == other.resolvingAuction &&
-          roundComplete == other.roundComplete &&
-          hauntIsActive == other.hauntIsActive &&
-          hauntDecided == other.hauntDecided &&
-          hauntComplete == other.hauntComplete;
+          hauntIsActive == other.hauntIsActive;
 
   @override
   int get hashCode =>
-      currentRoundOrder.hashCode ^
-      previousRoundContinued.hashCode ^
-      waitingForTeam.hashCode ^
-      teamSelectionContinued.hashCode ^
+      currentHaunt.hashCode ^
+      currentRound.hashCode ^
+      localActions.hashCode ^
       biddingComplete.hashCode ^
       resolvingAuction.hashCode ^
-      roundComplete.hashCode ^
-      hauntIsActive.hashCode ^
-      hauntDecided.hashCode ^
-      hauntComplete.hashCode;
+      hauntIsActive.hashCode;
 
   @override
   String toString() {
-    return 'MainBoardViewModel{currentRoundOrder: $currentRoundOrder, previousRoundContinued: $previousRoundContinued, waitingForTeam: $waitingForTeam, teamSelectionContinued: $teamSelectionContinued, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, roundComplete: $roundComplete, hauntIsActive: $hauntIsActive, hauntDecided: $hauntDecided, hauntComplete: $hauntComplete}';
+    return 'MainBoardViewModel{currentHaunt: $currentHaunt, currentRound: $currentRound, localActions: $localActions, biddingComplete: $biddingComplete, resolvingAuction: $resolvingAuction, hauntIsActive: $hauntIsActive}';
   }
 }
 

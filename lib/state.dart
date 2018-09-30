@@ -203,6 +203,8 @@ enum Request {
   CompletingGame,
   GuessingBrenda,
   SelectingVisibleToAccountant,
+  UpdatingRoles,
+  SubmittingRoles
 }
 
 enum LocalHauntAction {

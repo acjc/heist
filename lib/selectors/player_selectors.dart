@@ -27,6 +27,9 @@ final Selector<GameModel, List<Player>> getOtherPlayers = createSelector2(getPla
 final Selector<GameModel, bool> amOwner = createSelector2(
     getRoom, getPlayerInstallId, (Room room, String installId) => room.owner == installId);
 
+String getOwnerName(GameModel gameModel)
+    => getPlayers(gameModel).singleWhere((p) => p.installId == getRoom(gameModel).owner).name;
+
 Player getBrenda(GameModel gameModel) => getPlayerByRoleId(gameModel, Roles.brenda.roleId);
 
 final Selector<GameModel, bool> haveGuessedBrenda = createSelector3(

@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-28T00:33:47.741137",
+  "@@last_modified": "2018-09-30T18:23:38.135443",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -256,7 +256,7 @@
       "brendaDisplayName": {}
     }
   },
-  "sharedBetween": "...shared between {bertieDisplayName} and any players who chose {stealOption} on the haunt:",
+  "sharedBetween": "...shared between {bertieDisplayName} and any players who chose {stealOption} on the haunt",
   "@sharedBetween": {
     "description": "Describe how much money gets split between Bertie and those who stole",
     "type": "text",

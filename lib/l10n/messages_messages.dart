@@ -45,7 +45,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m13(order) => "Round ${order}";
 
-  static m14(bertieDisplayName, stealOption) => "...shared between ${bertieDisplayName} and any players who chose ${stealOption} on the haunt:";
+  static m14(bertieDisplayName, stealOption) => "...shared between ${bertieDisplayName} and any players who chose ${stealOption} on the haunt";
 
   static m15(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
 

@@ -115,7 +115,7 @@ class _HauntEndState extends State<HauntEnd> {
     TextStyle potResolutionTextStyle = const TextStyle(
       fontSize: 30.0,
       fontWeight: FontWeight.w300,
-      color: Colors.teal,
+      color: HeistColors.yellow,
     );
     children.addAll(
       [
@@ -128,11 +128,8 @@ class _HauntEndState extends State<HauntEnd> {
                 '+$brendaPayout',
                 style: potResolutionTextStyle,
               ),
-              Text(
-                AppLocalizations.of(context)
-                    .brendaReceived(Roles.getRoleDisplayName(context, Roles.brenda.roleId)),
-                style: infoTextStyle,
-              ),
+              Text(AppLocalizations.of(context)
+                  .brendaReceived(Roles.getRoleDisplayName(context, Roles.brenda.roleId))),
             ],
           ),
         ),
@@ -144,11 +141,8 @@ class _HauntEndState extends State<HauntEnd> {
                 '+$bertiePayout',
                 style: potResolutionTextStyle,
               ),
-              Text(
-                AppLocalizations.of(context)
-                    .sharedBetween(Roles.getRoleDisplayName(context, Roles.bertie.roleId), Steal),
-                style: infoTextStyle,
-              ),
+              Text(AppLocalizations.of(context)
+                  .sharedBetween(Roles.getRoleDisplayName(context, Roles.bertie.roleId), Steal)),
             ],
           ),
         ),
@@ -156,8 +150,7 @@ class _HauntEndState extends State<HauntEnd> {
       ],
     );
 
-    return Card(
-      elevation: 2.0,
+    return DarkCard(
       margin: paddingMedium,
       child: Padding(
         padding: paddingMedium,

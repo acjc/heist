@@ -21,8 +21,7 @@ Widget playerInfo(Store<GameModel> store) {
         if (viewModel.me == null) {
           return Container();
         }
-        return Card(
-          elevation: 2.0,
+        return DarkCard(
           child: Padding(
             padding: paddingMedium,
             child: Row(

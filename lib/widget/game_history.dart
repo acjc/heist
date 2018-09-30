@@ -40,7 +40,7 @@ class _GameHistoryState extends State<GameHistory> {
 
   Widget hauntDetailsIcon(IconData icon, String text) => iconText(
         Icon(icon, color: Colors.grey),
-        Text(text, style: subtitleTextStyle),
+        Text(text, style: subtitleTextStyleDark),
       );
 
   String getHeistStatus(BuildContext context, Haunt haunt, Round lastRound) {
@@ -79,13 +79,13 @@ class _GameHistoryState extends State<GameHistory> {
     List<Widget> title = [
       Text(
         AppLocalizations.of(context).hauntTitle(haunt.order),
-        style: boldTextStyle,
+        style: boldTextStyleDark,
       ),
     ];
 
     title.add(Text(
       getHeistStatus(context, haunt, lastRound),
-      style: subtitleTextStyle,
+      style: subtitleTextStyleDark,
     ));
 
     List<Widget> hauntDetailsChildren = [
@@ -94,7 +94,7 @@ class _GameHistoryState extends State<GameHistory> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: title,
       ),
-      VerticalDivider(height: 40.0),
+      VerticalDivider(height: 40.0, color: Colors.black12),
       hauntDetailsIcon(Icons.people, haunt.numPlayers.toString()),
       hauntDetailsIcon(Icons.bubble_chart, haunt.price.toString()),
       hauntDetailsIcon(Icons.vertical_align_top, haunt.maximumBid.toString()),
@@ -102,9 +102,9 @@ class _GameHistoryState extends State<GameHistory> {
 
     if (haunt.complete) {
       hauntDetailsChildren.addAll([
-        VerticalDivider(height: 40.0),
+        VerticalDivider(height: 40.0, color: Colors.black12),
         iconText(Icon(Icons.bubble_chart, size: 32.0),
-            Text(lastRound.pot.toString(), style: bigNumberTextStyle)),
+            Text(lastRound.pot.toString(), style: bigNumberTextStyleDark)),
       ]);
     }
 
@@ -119,9 +119,9 @@ class _GameHistoryState extends State<GameHistory> {
       Set<Player> team = teamForRound(getPlayers(widget._store.state), lastRound);
       Player leader = leaderForRound(widget._store.state, lastRound);
       hauntPopupChildren.addAll([
-        Divider(),
+        Divider(color: Colors.black54),
         hauntTeam(context, team, leader),
-        Divider(),
+        Divider(color: Colors.black54),
         hauntDecisions(haunt),
       ]);
     }
@@ -181,5 +181,5 @@ Widget hauntTeam(BuildContext context, Set<Player> team, Player leader) {
     gridChildren.add(playerTile(context, leader.name, false, true));
   }
 
-  return TeamGridView(gridChildren);
+  return TeamGridView(gridChildren, childAspectRatio: 5.0);
 }

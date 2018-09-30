@@ -21,9 +21,60 @@ const TextStyle infoTextStyle = const TextStyle(fontSize: 16.0);
 const TextStyle boldTextStyle = const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold);
 const TextStyle bigNumberTextStyle = const TextStyle(fontSize: 30.0, fontWeight: FontWeight.w300);
 const TextStyle titleTextStyle = const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
-const TextStyle subtitleTextStyle = const TextStyle(color: Colors.black54);
+const TextStyle subtitleTextStyle = const TextStyle(color: Colors.white54);
 const TextStyle buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
 const TextStyle chipTextStyle = const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
+
+const TextStyle infoTextStyleDark = const TextStyle(fontSize: 16.0, color: Colors.black87);
+const TextStyle boldTextStyleDark = const TextStyle(
+  fontSize: 16.0,
+  fontWeight: FontWeight.bold,
+  color: Colors.black87,
+);
+const TextStyle bigNumberTextStyleDark = const TextStyle(
+  fontSize: 30.0,
+  fontWeight: FontWeight.w300,
+  color: Colors.black87,
+);
+const TextStyle titleTextStyleDark = const TextStyle(
+  fontSize: 18.0,
+  fontWeight: FontWeight.bold,
+  color: Colors.black87,
+);
+const TextStyle subtitleTextStyleDark = const TextStyle(color: Colors.black54);
+
+/// elevation: 1.0
+const List<BoxShadow> tileShadow = [
+  BoxShadow(
+      offset: Offset(0.0, 2.0), blurRadius: 1.0, spreadRadius: -1.0, color: HeistColors.umbra),
+  BoxShadow(
+      offset: Offset(0.0, 1.0), blurRadius: 1.0, spreadRadius: 0.0, color: HeistColors.penumbra),
+  BoxShadow(
+      offset: Offset(0.0, 1.0), blurRadius: 3.0, spreadRadius: 0.0, color: HeistColors.ambient),
+];
+
+/// elevation: 4.0
+const List<BoxShadow> barShadow = [
+  BoxShadow(
+      offset: Offset(0.0, 2.0), blurRadius: 4.0, spreadRadius: -1.0, color: HeistColors.umbra),
+  BoxShadow(
+      offset: Offset(0.0, 4.0), blurRadius: 5.0, spreadRadius: 0.0, color: HeistColors.penumbra),
+  BoxShadow(
+      offset: Offset(0.0, 1.0), blurRadius: 10.0, spreadRadius: 0.0, color: HeistColors.ambient),
+];
+
+class DarkCard extends Card {
+  DarkCard({
+    @required Widget child,
+    double elevation = 2.0,
+    EdgeInsets margin,
+  }) : super(
+          elevation: elevation,
+          color: Colors.black12,
+          child: child,
+          margin: margin,
+        );
+}
 
 Widget iconWidget(BuildContext context, IconData icon, Function onPressed, [bool enabled = true]) {
   Color color = Theme.of(context).primaryColor;
@@ -47,24 +98,25 @@ Color decisionColour(String decision) {
     case 'SCARE':
       return HeistColors.green;
     case 'TICKLE':
-      return Colors.red;
+      return HeistColors.peach;
     case 'STEAL':
-      return HeistColors.blue;
+      return HeistColors.amber;
   }
-  throw new ArgumentError.value(decision, 'decision', 'Unknown decision');
+  throw ArgumentError.value(decision, 'decision', 'Unknown decision');
 }
 
 class VerticalDivider extends StatelessWidget {
   final double height;
+  final Color color;
 
-  VerticalDivider({this.height = 50.0});
+  VerticalDivider({this.height = 50.0, this.color});
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
+    return Container(
       height: height,
       width: 0.2,
-      color: Colors.grey,
+      color: color ?? Theme.of(context).dividerColor,
       margin: const EdgeInsets.only(left: 6.0, right: 6.0),
     );
   }

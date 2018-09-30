@@ -166,13 +166,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
               width: _barWidth,
               height: value,
               decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10.0,
-                    offset: new Offset(0.0, 10.0),
-                    color: Colors.black45,
-                  ),
-                ],
+                boxShadow: barShadow,
                 color: color,
               ),
             );

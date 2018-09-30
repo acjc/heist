@@ -11,13 +11,14 @@ import 'package:heist/keys.dart';
 import 'package:heist/middleware/middleware.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/state.dart';
+import 'package:heist/widget/common.dart';
 import 'package:heist/widget/home_page.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_dev_tools/redux_dev_tools.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-void main() => runApp(new MyApp(Firestore.instance));
+void main() => runApp(MyApp(Firestore.instance));
 
 const int minPlayers = 5;
 const int maxPlayers = 10;
@@ -33,7 +34,7 @@ bool isDebugMode() {
 }
 
 DateTime now() {
-  return new DateTime.now().toUtc();
+  return DateTime.now().toUtc();
 }
 
 Future<String> installId() async {
@@ -44,7 +45,7 @@ Future<String> installId() async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
   String installId = preferences.getString(PrefInstallId);
   if (installId == null) {
-    installId = new Uuid().v4();
+    installId = Uuid().v4();
     await preferences.setString(PrefInstallId, installId);
   }
   return installId;
@@ -52,16 +53,16 @@ Future<String> installId() async {
 
 Store<GameModel> createStore(FirestoreDb db, [int numPlayers]) {
   if (isDebugMode()) {
-    return new DevToolsStore<GameModel>(
+    return DevToolsStore<GameModel>(
       gameModelReducer,
-      initialState: new GameModel.initial(db, numPlayers ?? 2),
+      initialState: GameModel.initial(db, numPlayers ?? 2),
       middleware: createMiddleware(),
       distinct: true,
     );
   }
-  return new Store<GameModel>(
+  return Store<GameModel>(
     gameModelReducer,
-    initialState: new GameModel.initial(db, minPlayers),
+    initialState: GameModel.initial(db, minPlayers),
     middleware: createMiddleware(),
     distinct: true,
   );
@@ -70,24 +71,25 @@ Store<GameModel> createStore(FirestoreDb db, [int numPlayers]) {
 class MyApp extends StatelessWidget {
   final Store<GameModel> store;
 
-  MyApp(Firestore firestore) : store = createStore(new FirestoreDb(firestore));
+  MyApp(Firestore firestore) : store = createStore(FirestoreDb(firestore));
 
   @override
   Widget build(BuildContext context) {
     Color primaryColor = HeistColors.blue;
-    return new StoreProvider(
+    return StoreProvider(
       store: store,
-      child: new MaterialApp(
+      child: MaterialApp(
         navigatorKey: Keys.navigatorKey,
         title: 'Heist', // can't localise this one because stuff hasn't been set up yet
-        theme: new ThemeData(
+        theme: ThemeData(
+          brightness: Brightness.dark,
           primaryColor: primaryColor,
           accentColor: HeistColors.peach,
           iconTheme: const IconThemeData(color: HeistColors.peach),
+          textTheme: const TextTheme(body1: infoTextStyle),
           buttonColor: primaryColor,
-          indicatorColor: Colors.white,
         ),
-        home: new HomePage(),
+        home: HomePage(),
         localizationsDelegates: [
           // app-specific localization delegate[s]
           const AppLocalizationsDelegate(),

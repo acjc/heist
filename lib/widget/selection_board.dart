@@ -58,11 +58,12 @@ Widget playerTileText(String playerName, bool isInTeam, bool isLeader) {
 
 Widget playerTile(BuildContext context, String playerName, bool isInTeam, bool isLeader) {
   Color backgroundColor = Theme.of(context).primaryColor;
-  return new Container(
+  return Container(
       alignment: Alignment.center,
-      decoration: new BoxDecoration(
-        border: new Border.all(color: backgroundColor),
-        borderRadius: BorderRadius.circular(5.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: backgroundColor),
+        borderRadius: BorderRadius.circular(4.0),
+        boxShadow: isInTeam ? tileShadow : null,
         color: isInTeam ? backgroundColor : null,
       ),
       child: playerTileText(playerName, isInTeam, isLeader));

@@ -385,13 +385,8 @@ class TeamPickerState extends TeamSelectionState {
         );
       });
 
-  Widget _teamPickerCard(
-    bool goingOnHaunt,
-    Set<Player> team,
-    int playersRequired,
-    bool teamSubmitted,
-    bool submittingTeam,
-  ) =>
+  Widget _teamPickerCard(bool goingOnHaunt, Set<Player> team, int playersRequired,
+          bool teamSubmitted, bool submittingTeam) =>
       Expanded(
         child: Padding(
           padding: paddingMedium,
@@ -415,7 +410,7 @@ class TeamPickerState extends TeamSelectionState {
                       ),
                       TeamGridView(
                         _teamPickerChildren(team, playersRequired, teamSubmitted, submittingTeam),
-                        childAspectRatio: 5.0,
+                        childAspectRatio: 4.0,
                       ),
                     ],
                   ),

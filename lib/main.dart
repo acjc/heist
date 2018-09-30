@@ -37,6 +37,36 @@ DateTime now() {
   return DateTime.now().toUtc();
 }
 
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  canvasColor: Colors.white, // for the bottom sheet color
+  primaryColor: HeistColors.blue,
+  accentColor: HeistColors.amber,
+  iconTheme: const IconThemeData(color: HeistColors.amber),
+  textTheme: TextTheme(
+    subhead: boldTextStyle,
+    body1: infoTextStyle,
+    body2: infoTextStyle,
+    caption: subtitleTextStyle,
+  ),
+  buttonColor: HeistColors.blue,
+  cardColor: Colors.black12,
+);
+
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light,
+  primaryColor: HeistColors.blue,
+  accentColor: HeistColors.amber,
+  iconTheme: const IconThemeData(color: HeistColors.amber),
+  textTheme: TextTheme(
+    subhead: boldTextStyle,
+    body1: infoTextStyle,
+    body2: infoTextStyle,
+    caption: subtitleTextStyle,
+  ),
+  buttonColor: HeistColors.blue,
+);
+
 Future<String> installId() async {
   if (isDebugMode()) {
     return DebugInstallId;
@@ -74,36 +104,26 @@ class MyApp extends StatelessWidget {
   MyApp(Firestore firestore) : store = createStore(FirestoreDb(firestore));
 
   @override
-  Widget build(BuildContext context) {
-    Color primaryColor = HeistColors.blue;
-    return StoreProvider(
-      store: store,
-      child: MaterialApp(
-        navigatorKey: Keys.navigatorKey,
-        title: 'Heist', // can't localise this one because stuff hasn't been set up yet
-        theme: ThemeData(
-          brightness: Brightness.dark,
-          primaryColor: primaryColor,
-          accentColor: HeistColors.peach,
-          iconTheme: const IconThemeData(color: HeistColors.peach),
-          textTheme: const TextTheme(body1: infoTextStyle),
-          buttonColor: primaryColor,
+  Widget build(BuildContext context) => StoreProvider(
+        store: store,
+        child: MaterialApp(
+          navigatorKey: Keys.navigatorKey,
+          title: 'Heist', // can't localise this one because stuff hasn't been set up yet
+          theme: darkTheme,
+          home: HomePage(),
+          localizationsDelegates: [
+            // app-specific localization delegate[s]
+            const AppLocalizationsDelegate(),
+            // provides localized strings and other values for the Material Components library
+            GlobalMaterialLocalizations.delegate,
+            // defines the default text direction, either left to right or right to left, for the widgets library
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          supportedLocales: [
+            const Locale('en', ''), // English
+            const Locale('es', ''), // Spanish
+            // ... other locales the app supports
+          ],
         ),
-        home: HomePage(),
-        localizationsDelegates: [
-          // app-specific localization delegate[s]
-          const AppLocalizationsDelegate(),
-          // provides localized strings and other values for the Material Components library
-          GlobalMaterialLocalizations.delegate,
-          // defines the default text direction, either left to right or right to left, for the widgets library
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: [
-          const Locale('en', ''), // English
-          const Locale('es', ''), // Spanish
-          // ... other locales the app supports
-        ],
-      ),
-    );
-  }
+      );
 }

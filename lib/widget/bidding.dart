@@ -15,23 +15,23 @@ import 'common.dart';
 Widget bidSelector(
     BuildContext context, Store<GameModel> store, int bidAmount, int balance, int maximumBid) {
   int upperBound = min(maximumBid, balance);
-  return new Row(
+  return Row(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     children: [
       iconWidget(
         context,
         Icons.arrow_back,
-        () => store.dispatch(new DecrementBidAmountAction()),
+        () => store.dispatch(DecrementBidAmountAction()),
         bidAmount > 0,
       ),
-      new Text(
+      Text(
         bidAmount.toString(),
         style: bigNumberTextStyle,
       ),
       iconWidget(
         context,
         Icons.arrow_forward,
-        () => store.dispatch(new IncrementBidAmountAction(upperBound)),
+        () => store.dispatch(IncrementBidAmountAction(upperBound)),
         bidAmount < upperBound,
       ),
     ],
@@ -39,133 +39,134 @@ Widget bidSelector(
 }
 
 Widget submitButton(BuildContext context, Store<GameModel> store, bool loading, int bidAmount) =>
-    new RaisedButton(
+    RaisedButton(
         child: Text(AppLocalizations.of(context).submitBid, style: buttonTextStyle),
         onPressed: loading
             ? null
-            : () => store.dispatch(new SubmitBidAction(getSelf(store.state).id, bidAmount)));
+            : () => store.dispatch(SubmitBidAction(getSelf(store.state).id, bidAmount)));
 
 Widget cancelButton(BuildContext context, Store<GameModel> store, bool loading, Bid bid) =>
-    new RaisedButton(
+    RaisedButton(
         color: Theme.of(context).accentColor,
-        child: new Text(AppLocalizations.of(context).cancelBid, style: buttonTextStyle),
-        onPressed: loading || bid == null ? null : () => store.dispatch(new CancelBidAction()));
+        child: Text(AppLocalizations.of(context).cancelBid, style: buttonTextStyle),
+        onPressed: loading || bid == null ? null : () => store.dispatch(CancelBidAction()));
 
-Widget bidding(Store<GameModel> store) {
-  return StoreConnector<GameModel, BiddingViewModel>(
-      converter: (store) => new BiddingViewModel._(
-            currentBalance(store.state),
-            getBidAmount(store.state),
-            requestInProcess(store.state, Request.Bidding),
-            myCurrentBid(store.state),
-            bidderNames(store.state),
-            haveGuessedBrenda(store.state),
-          ),
-      distinct: true,
-      builder: (context, viewModel) {
-        Haunt heist = currentHaunt(store.state);
-        bool auction = isAuction(store.state);
+Widget bidding(Store<GameModel> store) => StoreConnector<GameModel, BiddingViewModel>(
+    converter: (store) => BiddingViewModel._(
+          currentBalance(store.state),
+          getBidAmount(store.state),
+          requestInProcess(store.state, Request.Bidding),
+          myCurrentBid(store.state),
+          bidderNames(store.state),
+          haveGuessedBrenda(store.state),
+        ),
+    distinct: true,
+    builder: (context, viewModel) {
+      Haunt heist = currentHaunt(store.state);
+      bool auction = isAuction(store.state);
 
-        List<Widget> children = auction
-            ? [
-                new Container(
-                  padding: paddingTitle,
-                  child: new Text(AppLocalizations.of(context).auctionTitle.toUpperCase(),
-                      style: titleTextStyle),
-                ),
-                new Text(
-                  AppLocalizations.of(context).auctionDescription(heist.numPlayers),
-                  style: infoTextStyle,
-                ),
-              ]
-            : [
-                new Container(
-                  padding: paddingTitle,
-                  child: new Text(
-                    AppLocalizations.of(context).bidding,
-                    style: titleTextStyle,
-                  ),
-                ),
-              ];
-
-        String proposedBidText = viewModel.bid == null
-            ? AppLocalizations.of(context).noBid
-            : viewModel.bid.amount.toString();
-        children.addAll([
-          new Container(
-            padding: paddingSmall,
-            child: iconText(
-              new Icon(
-                Icons.attach_money,
-                size: 32.0,
+      List<Widget> children = auction
+          ? [
+              Container(
+                padding: paddingTitle,
+                child: Text(AppLocalizations.of(context).auctionTitle.toUpperCase(),
+                    style: titleTextStyle),
               ),
-              new Text(
-                proposedBidText,
-                style: bigNumberTextStyle,
+              Text(
+                AppLocalizations.of(context).auctionDescription(heist.numPlayers),
+                style: infoTextStyle,
               ),
-            ),
-          ),
-        ]);
-
-        if (auction || viewModel.haveGuessedKingpin) {
-          children.add(
-            new Text(
-              AppLocalizations.of(context).unlimited,
-              style: const TextStyle(fontStyle: FontStyle.italic),
-            ),
-          );
-        }
-
-        int proposedBid = viewModel.bid == null ? 0 : viewModel.bid.amount;
-        int potentialBalance = viewModel.balance + proposedBid;
-        int maximumBid = auction || viewModel.haveGuessedKingpin ? 999 : heist.maximumBid;
-        children.addAll([
-          bidSelector(
-            context,
-            store,
-            min(viewModel.bidAmount, min(maximumBid, potentialBalance)),
-            potentialBalance,
-            maximumBid,
-          ),
-          new Padding(
-            padding: paddingSmall,
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                cancelButton(context, store, viewModel.loading, viewModel.bid),
-                submitButton(context, store, viewModel.loading, viewModel.bidAmount),
-              ],
-            ),
-          ),
-          new Padding(
-            padding: paddingSmall,
-            child: new Column(
-              children: [
-                new Text(
-                    AppLocalizations.of(context)
-                        .bidders(viewModel.bidders.length, getRoom(store.state).numPlayers),
-                    style: infoTextStyle),
-                new Column(
-                  children: new List.generate(
-                    viewModel.bidders.length,
-                    (i) => new Text(viewModel.bidders.elementAt(i), style: subtitleTextStyle),
-                  ),
+            ]
+          : [
+              Container(
+                padding: paddingTitle,
+                child: Text(
+                  AppLocalizations.of(context).bidding,
+                  style: titleTextStyle,
                 ),
-              ],
+              ),
+            ];
+
+      String proposedBidText = viewModel.bid == null
+          ? AppLocalizations.of(context).noBid
+          : viewModel.bid.amount.toString();
+      children.addAll([
+        Container(
+          padding: paddingSmall,
+          child: iconText(
+            Icon(
+              Icons.attach_money,
+              size: 32.0,
+            ),
+            Text(
+              proposedBidText,
+              style: bigNumberTextStyle,
             ),
           ),
-        ]);
+        ),
+      ]);
 
-        return new Card(
-            elevation: 2.0,
-            child: new Container(
-                padding: paddingLarge,
-                alignment: Alignment.center,
-                child: new Column(
-                  children: children,
-                )));
-      });
-}
+      if (auction || viewModel.haveGuessedKingpin) {
+        children.add(
+          Text(
+            AppLocalizations.of(context).unlimited,
+            style: Theme.of(context).textTheme.caption.copyWith(fontStyle: FontStyle.italic),
+          ),
+        );
+      }
+
+      int proposedBid = viewModel.bid == null ? 0 : viewModel.bid.amount;
+      int potentialBalance = viewModel.balance + proposedBid;
+      int maximumBid = auction || viewModel.haveGuessedKingpin ? 999 : heist.maximumBid;
+      children.addAll([
+        bidSelector(
+          context,
+          store,
+          min(viewModel.bidAmount, min(maximumBid, potentialBalance)),
+          potentialBalance,
+          maximumBid,
+        ),
+        Padding(
+          padding: paddingSmall,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              cancelButton(context, store, viewModel.loading, viewModel.bid),
+              submitButton(context, store, viewModel.loading, viewModel.bidAmount),
+            ],
+          ),
+        ),
+        Padding(
+          padding: paddingSmall,
+          child: Column(
+            children: [
+              Text(
+                  AppLocalizations.of(context)
+                      .bidders(viewModel.bidders.length, getRoom(store.state).numPlayers),
+                  style: infoTextStyle),
+              Column(
+                children: List.generate(
+                  viewModel.bidders.length,
+                  (i) => Text(
+                        viewModel.bidders.elementAt(i),
+                        style: Theme.of(context).textTheme.caption,
+                      ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ]);
+
+      return Card(
+          elevation: 2.0,
+          child: Container(
+              padding: paddingLarge,
+              alignment: Alignment.center,
+              child: Column(
+                children: children,
+              )));
+    });
 
 class BiddingViewModel {
   final int balance;

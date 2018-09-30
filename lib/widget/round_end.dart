@@ -302,6 +302,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 titleSubtitle(
+                  context,
                   AppLocalizations.of(context).hauntTitle(haunt.order),
                   round.isAuction
                       ? AppLocalizations.of(context).auctionTitle

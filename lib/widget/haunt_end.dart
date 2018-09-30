@@ -150,7 +150,7 @@ class _HauntEndState extends State<HauntEnd> {
       ],
     );
 
-    return DarkCard(
+    return HeistCard(
       margin: paddingMedium,
       child: Padding(
         padding: paddingMedium,

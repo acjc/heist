@@ -21,27 +21,9 @@ const TextStyle infoTextStyle = const TextStyle(fontSize: 16.0);
 const TextStyle boldTextStyle = const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold);
 const TextStyle bigNumberTextStyle = const TextStyle(fontSize: 30.0, fontWeight: FontWeight.w300);
 const TextStyle titleTextStyle = const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
-const TextStyle subtitleTextStyle = const TextStyle(color: Colors.white54);
+const TextStyle subtitleTextStyle = const TextStyle(fontSize: 13.0);
 const TextStyle buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
 const TextStyle chipTextStyle = const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
-
-const TextStyle infoTextStyleDark = const TextStyle(fontSize: 16.0, color: Colors.black87);
-const TextStyle boldTextStyleDark = const TextStyle(
-  fontSize: 16.0,
-  fontWeight: FontWeight.bold,
-  color: Colors.black87,
-);
-const TextStyle bigNumberTextStyleDark = const TextStyle(
-  fontSize: 30.0,
-  fontWeight: FontWeight.w300,
-  color: Colors.black87,
-);
-const TextStyle titleTextStyleDark = const TextStyle(
-  fontSize: 18.0,
-  fontWeight: FontWeight.bold,
-  color: Colors.black87,
-);
-const TextStyle subtitleTextStyleDark = const TextStyle(color: Colors.black54);
 
 /// elevation: 1.0
 const List<BoxShadow> tileShadow = [
@@ -63,27 +45,24 @@ const List<BoxShadow> barShadow = [
       offset: Offset(0.0, 1.0), blurRadius: 10.0, spreadRadius: 0.0, color: HeistColors.ambient),
 ];
 
-class DarkCard extends Card {
-  DarkCard({
+class HeistCard extends Card {
+  HeistCard({
     @required Widget child,
     double elevation = 2.0,
     EdgeInsets margin,
   }) : super(
           elevation: elevation,
-          color: Colors.black12,
           child: child,
           margin: margin,
         );
 }
 
-Widget iconWidget(BuildContext context, IconData icon, Function onPressed, [bool enabled = true]) {
-  Color color = Theme.of(context).primaryColor;
-  return new IconButton(
-    iconSize: 64.0,
-    onPressed: enabled ? onPressed : null,
-    icon: new Icon(icon, color: enabled ? color : Colors.grey),
-  );
-}
+Widget iconWidget(BuildContext context, IconData icon, Function onPressed, [bool enabled = true]) =>
+    IconButton(
+      iconSize: 64.0,
+      onPressed: enabled ? onPressed : null,
+      icon: Icon(icon, color: enabled ? Theme.of(context).iconTheme.color : Colors.grey),
+    );
 
 Widget centeredMessage(String text) {
   return new Center(child: new Text(text, style: infoTextStyle));
@@ -115,7 +94,7 @@ class VerticalDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: height,
-      width: 0.2,
+      width: 0.5,
       color: color ?? Theme.of(context).dividerColor,
       margin: const EdgeInsets.only(left: 6.0, right: 6.0),
     );
@@ -135,15 +114,13 @@ Widget roundTitleIcon(IconData icon, String text) {
   );
 }
 
-Widget titleSubtitle(String title, String subtitle) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      new Text(title, style: boldTextStyle),
-      new Text(subtitle, style: subtitleTextStyle),
-    ],
-  );
-}
+Widget titleSubtitle(BuildContext context, String title, String subtitle) => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: Theme.of(context).textTheme.subhead),
+        Text(subtitle, style: Theme.of(context).textTheme.caption),
+      ],
+    );
 
 Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
   Haunt haunt = currentHaunt(store.state);
@@ -153,8 +130,8 @@ Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
       : AppLocalizations.of(context).roundTitle(round.order);
 
   List<Widget> children = [
-    titleSubtitle(AppLocalizations.of(context).hauntTitle(haunt.order), subtitle),
-    new VerticalDivider(),
+    titleSubtitle(context, AppLocalizations.of(context).hauntTitle(haunt.order), subtitle),
+    VerticalDivider(),
     roundTitleIcon(Icons.people, haunt.numPlayers.toString()),
     roundTitleIcon(Icons.bubble_chart, haunt.price.toString()),
     roundTitleIcon(Icons.vertical_align_top, haunt.maximumBid.toString()),
@@ -176,7 +153,7 @@ Widget roundTitleCard(BuildContext context, Store<GameModel> store) => new Card(
 
 /// Widget for showing a 2-column grid
 class TeamGridView extends GridView {
-  TeamGridView(List<Widget> children, {double childAspectRatio = 6.0})
+  TeamGridView(List<Widget> children, {double childAspectRatio = 5.0})
       : super.count(
           padding: paddingMedium,
           shrinkWrap: true,

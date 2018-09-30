@@ -104,11 +104,16 @@ class GameState extends State<Game> {
     if (!isAuction(store.state)) {
       children.add(selectionBoard(_store));
     }
-    children.add(
-      bidding(store),
+    children.addAll(
+      [
+        bidding(store),
+        gifting(store),
+      ],
     );
-    children.add(gifting(store));
-    return ListView(children: children);
+    return Padding(
+      padding: paddingSmall,
+      child: ListView(children: children),
+    );
   }
 
   Widget _gameLoop(MainBoardViewModel viewModel) {
@@ -131,7 +136,7 @@ class GameState extends State<Game> {
         !viewModel.biddingComplete &&
         (!viewModel.currentRound.teamSubmitted ||
             !teamSelectionContinued(viewModel.localActions, viewModel.currentRound))) {
-      return TeamSelection(_store, isMyGo(_store.state));
+      return Theme(data: lightTheme, child: TeamSelection(_store, isMyGo(_store.state)));
     }
 
     // Bidding & gifting
@@ -171,9 +176,14 @@ class GameState extends State<Game> {
       );
 
   Widget footer(bool indicatorOnRight) {
+    Widget gameHistory = Theme(
+      data: lightTheme,
+      child: GameHistory(_store),
+    );
+
     List<Widget> children = indicatorOnRight
-        ? [Expanded(child: GameHistory(_store)), rightIndicator()]
-        : [leftIndicator(), Expanded(child: GameHistory(_store))];
+        ? [Expanded(child: gameHistory), rightIndicator()]
+        : [leftIndicator(), Expanded(child: gameHistory)];
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
       child: Row(children: children),
@@ -203,6 +213,7 @@ class GameState extends State<Game> {
           ));
           return Card(
             elevation: 10.0,
+            color: Colors.white,
             child: InkWell(
               onTap: () => _controller.nextPage(
                     duration: Duration(milliseconds: 500),
@@ -219,6 +230,7 @@ class GameState extends State<Game> {
 
   Widget leftIndicator() => Card(
         elevation: 10.0,
+        color: Colors.white,
         child: InkWell(
           child: Padding(
             padding: indicatorPadding,

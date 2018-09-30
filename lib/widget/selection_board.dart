@@ -41,17 +41,16 @@ List<Widget> selectionBoardChildren(
       return playerTile(context, player.name, isInTeam, isLeader);
     });
 
-Widget playerTileText(String playerName, bool isInTeam, bool isLeader) {
-  Color textColor = isInTeam ? Colors.white : Colors.black87;
-  Text text = new Text(
-    playerName,
-    style: new TextStyle(
-      color: textColor,
-      fontSize: 16.0,
-    ),
-  );
+Widget playerTileText(BuildContext context, String playerName, bool isInTeam, bool isLeader) {
+  Color iconColor = isInTeam
+      ? Colors.white
+      : (Theme.of(context).brightness == Brightness.light
+          ? Theme.of(context).primaryColor
+          : Colors.white);
+  TextStyle textStyle = isInTeam ? TextStyle(color: Colors.white, fontSize: 16.0) : null;
+  Text text = Text(playerName, style: textStyle);
   if (isLeader) {
-    return iconText(new Icon(Icons.star, color: textColor), text);
+    return iconText(Icon(Icons.star, color: iconColor), text);
   }
   return text;
 }
@@ -66,5 +65,5 @@ Widget playerTile(BuildContext context, String playerName, bool isInTeam, bool i
         boxShadow: isInTeam ? tileShadow : null,
         color: isInTeam ? backgroundColor : null,
       ),
-      child: playerTileText(playerName, isInTeam, isLeader));
+      child: playerTileText(context, playerName, isInTeam, isLeader));
 }

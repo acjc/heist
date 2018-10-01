@@ -207,8 +207,8 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
   Widget _bidBarLabel(int bid, double bidLabelMaxOffset, Color color) => AnimationListenable(
         animation: _bidLabelAnimation,
         builder: (context, value, child) {
-          int ratio = ((value.distance / bidLabelMaxOffset) * bid).round();
-          Color barColor = ratio == bid ? color : Colors.amber;
+          int amount = ((value.distance / bidLabelMaxOffset) * bid).round();
+          Color barColor = amount == bid ? color : Colors.amber;
           return SlideTransition(
             position: _bidLabelAnimation,
             child: Container(
@@ -217,7 +217,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    ratio.toString(),
+                    amount.toString(),
                     style: TextStyle(
                       fontSize: _labelFontSize,
                       fontWeight: FontWeight.bold,
@@ -273,8 +273,9 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
 
   Text _headerSummaryText(bool hauntIsActive, bool goingOnHaunt) {
     double fontSize = 16.0;
-    Color color =
-        hauntIsActive ? (goingOnHaunt ? HeistColors.green : HeistColors.peach) : HeistColors.blue;
+    Color color = hauntIsActive
+        ? (goingOnHaunt ? HeistColors.green : HeistColors.peach)
+        : Theme.of(context).primaryColor;
     TextStyle textStyle = TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, color: color);
     return hauntIsActive
         ? (goingOnHaunt
@@ -291,7 +292,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
             goingOnHaunt ? HeistColors.green : HeistColors.peach,
             size,
           )
-        : Icon(Icons.warning, color: HeistColors.blue, size: size);
+        : Icon(Icons.warning, color: Theme.of(context).primaryColor, size: size);
   }
 
   Widget _header(Haunt haunt, Round round, bool hauntIsActive, bool goingOnHaunt) => Column(

@@ -21,7 +21,7 @@ Widget playerInfo(Store<GameModel> store) {
         if (viewModel.me == null) {
           return Container();
         }
-        return HeistCard(
+        return GameCard(
           child: Padding(
             padding: paddingMedium,
             child: Row(

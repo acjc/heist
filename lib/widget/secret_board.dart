@@ -105,7 +105,7 @@ class SecretBoardState extends State<SecretBoard> {
               child: new Text('${player.order}. ${player.name}', style: textStyle),
             );
           }));
-          return new HeistCard(
+          return new GameCard(
             child: new Padding(
               padding: paddingMedium,
               child: new Column(children: children),
@@ -115,7 +115,7 @@ class SecretBoardState extends State<SecretBoard> {
       );
 
   Card _getTeamAndRoleCard(Player me) {
-    return new HeistCard(
+    return new GameCard(
         child: new Padding(
             padding: paddingMedium,
             child: new Row(
@@ -152,7 +152,7 @@ class SecretBoardState extends State<SecretBoard> {
   // show the identities the player knows, if any
   _addExtraIdsCardIfNeeded(final Player me, final List<Widget> children) {
     if (Roles.getKnownIds(me.role) != null) {
-      children.add(new HeistCard(
+      children.add(new GameCard(
           child: new Padding(
               padding: paddingMedium,
               child: new Column(children: [
@@ -243,7 +243,7 @@ class SecretBoardState extends State<SecretBoard> {
                     getPlayerByName(_store.state, _accountantSelection).id))));
       }
 
-      children.add(new HeistCard(
+      children.add(new GameCard(
           child: new Padding(padding: paddingMedium, child: new Column(children: tiles))));
     }
   }
@@ -299,7 +299,7 @@ class SecretBoardState extends State<SecretBoard> {
         ));
       }
 
-      children.add(new HeistCard(
+      children.add(new GameCard(
           child: new Padding(padding: paddingMedium, child: new Column(children: tiles))));
     }
   }

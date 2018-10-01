@@ -122,7 +122,7 @@ class GameState extends State<Game> {
       // Show bidding summary of previous round
       if (viewModel.currentRound.order > 1 &&
           !roundContinued(viewModel.localActions, previousRound(_store.state))) {
-        return RoundEnd(_store, viewModel.currentRound.order - 1);
+        return Theme(data: lightTheme, child: RoundEnd(_store, viewModel.currentRound.order - 1));
       }
       // Or haunt summary of previous haunt
       if (viewModel.currentHaunt.order > 1 &&
@@ -152,7 +152,7 @@ class GameState extends State<Game> {
     // Bidding summary
     if (!viewModel.currentRound.complete ||
         !roundContinued(viewModel.localActions, viewModel.currentRound)) {
-      return RoundEnd(_store, viewModel.currentRound.order);
+      return Theme(data: lightTheme, child: RoundEnd(_store, viewModel.currentRound.order));
     }
 
     // Haunt is currently happening
@@ -176,14 +176,15 @@ class GameState extends State<Game> {
       );
 
   Widget footer(bool indicatorOnRight) {
-    Widget gameHistory = Theme(
-      data: lightTheme,
-      child: GameHistory(_store),
+    Widget gameHistory = Expanded(
+      child: Theme(
+        data: lightTheme,
+        child: GameHistory(_store),
+      ),
     );
 
-    List<Widget> children = indicatorOnRight
-        ? [Expanded(child: gameHistory), rightIndicator()]
-        : [leftIndicator(), Expanded(child: gameHistory)];
+    List<Widget> children =
+        indicatorOnRight ? [gameHistory, rightIndicator()] : [leftIndicator(), gameHistory];
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
       child: Row(children: children),
@@ -202,18 +203,18 @@ class GameState extends State<Game> {
           if (haveReceivedGiftThisRound) {
             children.add(Icon(
               Icons.cake,
-              color: Colors.grey,
+              color: Colors.blueGrey,
               size: 16.0,
             ));
           }
           children.add(Icon(
             Icons.keyboard_arrow_right,
-            color: Theme.of(context).primaryColor,
+            color: Colors.blueGrey,
             size: 32.0,
           ));
           return Card(
             elevation: 10.0,
-            color: Colors.white,
+            color: Colors.white24,
             child: InkWell(
               onTap: () => _controller.nextPage(
                     duration: Duration(milliseconds: 500),
@@ -230,13 +231,13 @@ class GameState extends State<Game> {
 
   Widget leftIndicator() => Card(
         elevation: 10.0,
-        color: Colors.white,
+        color: Colors.white24,
         child: InkWell(
           child: Padding(
             padding: indicatorPadding,
             child: Icon(
               Icons.keyboard_arrow_left,
-              color: Theme.of(context).primaryColor,
+              color: Colors.blueGrey,
               size: 32.0,
             ),
           ),

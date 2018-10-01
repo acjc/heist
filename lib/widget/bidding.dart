@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/app_localizations.dart';
+import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/bidding_middleware.dart';
 import 'package:heist/reducers/bid_amount_reducers.dart';
@@ -47,7 +48,7 @@ Widget submitButton(BuildContext context, Store<GameModel> store, bool loading, 
 
 Widget cancelButton(BuildContext context, Store<GameModel> store, bool loading, Bid bid) =>
     RaisedButton(
-        color: Theme.of(context).accentColor,
+        color: HeistColors.peach,
         child: Text(AppLocalizations.of(context).cancelBid, style: buttonTextStyle),
         onPressed: loading || bid == null ? null : () => store.dispatch(CancelBidAction()));
 

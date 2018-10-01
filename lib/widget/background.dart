@@ -5,11 +5,6 @@ Widget dynamicBackground(PageController controller) => Stack(
         imageBackground('assets/graphics/background.png'),
         _ParallaxBackground(
           controller,
-          'assets/graphics/foreground.png',
-          speedCoefficient: 0.9,
-        ),
-        _ParallaxBackground(
-          controller,
           'assets/graphics/moon.png',
           speedCoefficient: 0.2,
         ),
@@ -18,15 +13,20 @@ Widget dynamicBackground(PageController controller) => Stack(
           'assets/graphics/clouds.png',
           speedCoefficient: 0.6,
         ),
+        _ParallaxBackground(
+          controller,
+          'assets/graphics/foreground.png',
+          speedCoefficient: 0.9,
+        ),
       ],
     );
 
 Widget staticBackground() => Stack(
       children: [
         imageBackground('assets/graphics/background.png', alignment: Alignment.centerLeft),
-        imageBackground('assets/graphics/foreground.png', alignment: Alignment.centerLeft),
         imageBackground('assets/graphics/moon.png', alignment: Alignment.centerLeft),
         imageBackground('assets/graphics/clouds.png', alignment: Alignment.centerLeft),
+        imageBackground('assets/graphics/foreground.png', alignment: Alignment.centerLeft),
       ],
     );
 
@@ -43,6 +43,7 @@ Widget imageBackground(String imagePath, {Alignment alignment = Alignment.center
 class _ParallaxBackground extends StatefulWidget {
   @required
   final ScrollController controller;
+  @required
   final String imagePath;
 
   /// How far / fast the image should move while scrolling

@@ -40,7 +40,7 @@ DateTime now() {
 final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
   canvasColor: Colors.white, // for the bottom sheet color
-  primaryColor: HeistColors.blue,
+  primaryColor: Colors.blueGrey,
   accentColor: HeistColors.amber,
   iconTheme: const IconThemeData(color: HeistColors.amber),
   textTheme: TextTheme(
@@ -49,13 +49,13 @@ final ThemeData darkTheme = ThemeData(
     body2: infoTextStyle,
     caption: subtitleTextStyle,
   ),
-  buttonColor: HeistColors.blue,
+  buttonColor: Colors.blueGrey,
   cardColor: Colors.black12,
 );
 
 final ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
-  primaryColor: HeistColors.blue,
+  primaryColor: Colors.blueGrey,
   accentColor: HeistColors.amber,
   iconTheme: const IconThemeData(color: HeistColors.amber),
   textTheme: TextTheme(
@@ -64,7 +64,7 @@ final ThemeData lightTheme = ThemeData(
     body2: infoTextStyle,
     caption: subtitleTextStyle,
   ),
-  buttonColor: HeistColors.blue,
+  buttonColor: Colors.blueGrey,
 );
 
 Future<String> installId() async {

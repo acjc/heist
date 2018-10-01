@@ -23,9 +23,8 @@ Widget enterNameForm(BuildContext context, Store<GameModel> store, GlobalKey<For
         child: TextFormField(
             initialValue: isDebugMode() ? 'Mordred' : getPlayerName(store.state),
             maxLength: 12,
-            decoration: new InputDecoration(
+            decoration: InputDecoration(
               labelText: AppLocalizations.of(context).enterYourName,
-              isDense: true,
             ),
             style: Theme.of(context).textTheme.headline,
             autocorrect: false,
@@ -60,7 +59,6 @@ class HomePage extends StatelessWidget {
           initialValue: isDebugMode() ? 'ABCD' : getRoomCode(store.state),
           decoration: InputDecoration(
             labelText: AppLocalizations.of(context).enterRoomCode,
-            isDense: true,
           ),
           style: Theme.of(context).textTheme.headline,
           maxLength: 4,

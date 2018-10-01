@@ -45,8 +45,8 @@ const List<BoxShadow> barShadow = [
       offset: Offset(0.0, 1.0), blurRadius: 10.0, spreadRadius: 0.0, color: HeistColors.ambient),
 ];
 
-class HeistCard extends Card {
-  HeistCard({
+class GameCard extends Card {
+  GameCard({
     @required Widget child,
     double elevation = 2.0,
     EdgeInsets margin,

@@ -45,6 +45,7 @@ const List<BoxShadow> barShadow = [
       offset: Offset(0.0, 1.0), blurRadius: 10.0, spreadRadius: 0.0, color: HeistColors.ambient),
 ];
 
+/// Most of our cards use the same elevation
 class GameCard extends Card {
   GameCard({
     @required Widget child,
@@ -57,6 +58,7 @@ class GameCard extends Card {
         );
 }
 
+/// A tappable icon, e.g. left and right arrows
 Widget iconWidget(BuildContext context, IconData icon, Function onPressed, [bool enabled = true]) =>
     IconButton(
       iconSize: 64.0,
@@ -64,14 +66,9 @@ Widget iconWidget(BuildContext context, IconData icon, Function onPressed, [bool
       icon: Icon(icon, color: enabled ? Theme.of(context).iconTheme.color : Colors.grey),
     );
 
-Widget centeredMessage(String text) {
-  return new Center(child: new Text(text, style: infoTextStyle));
-}
+Widget loading() => Center(child: CircularProgressIndicator());
 
-Widget loading() {
-  return new Center(child: new CircularProgressIndicator());
-}
-
+/// Text color for a haunt decision
 Color decisionColour(String decision) {
   switch (decision) {
     case 'SCARE':
@@ -101,25 +98,23 @@ class VerticalDivider extends StatelessWidget {
   }
 }
 
-Widget teamSelectionIcon(bool goingOnHaunt, Color color, double size) {
-  return goingOnHaunt
-      ? new Icon(Icons.check_circle, color: color, size: size)
-      : new Icon(Icons.do_not_disturb_alt, color: color, size: size);
-}
+/// Icon to indicate whether the player has been picked on a team
+Widget teamSelectionIcon(bool goingOnHaunt, Color color, double size) => goingOnHaunt
+    ? Icon(Icons.check_circle, color: color, size: size)
+    : Icon(Icons.do_not_disturb_alt, color: color, size: size);
 
-Widget roundTitleIcon(IconData icon, String text) {
-  return iconText(
-    new Icon(icon, size: 32.0),
-    new Text(text, style: infoTextStyle),
-  );
-}
-
+/// Two lines of text aligned vertically in a title followed by subtitle combination
 Widget titleSubtitle(BuildContext context, String title, String subtitle) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: Theme.of(context).textTheme.subhead),
         Text(subtitle, style: Theme.of(context).textTheme.caption),
       ],
+    );
+
+Widget roundTitleIcon(IconData icon, String text) => iconText(
+      Icon(icon, size: 32.0),
+      Text(text, style: infoTextStyle),
     );
 
 Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
@@ -137,15 +132,15 @@ Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
     roundTitleIcon(Icons.vertical_align_top, haunt.maximumBid.toString()),
   ];
 
-  return new Row(
+  return Row(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     children: children,
   );
 }
 
-Widget roundTitleCard(BuildContext context, Store<GameModel> store) => new Card(
-      elevation: 2.0,
-      child: new Padding(
+/// Card describing the current haunt and round
+Widget roundTitleCard(BuildContext context, Store<GameModel> store) => GameCard(
+      child: Padding(
         padding: paddingSmall,
         child: roundTitleContents(context, store),
       ),
@@ -166,26 +161,27 @@ class TeamGridView extends GridView {
         );
 }
 
+/// Text with an adjacent icon. Use 'trailingIcon' to put the icon on the right-hand side.
 Widget iconText(Icon icon, Text text, {bool trailingIcon = false}) {
   List<Widget> children = [];
   if (trailingIcon) {
     children.addAll([
       text,
-      new Container(
+      Container(
         child: icon,
         margin: const EdgeInsets.only(left: 4.0),
       )
     ]);
   } else {
     children.addAll([
-      new Container(
+      Container(
         child: icon,
         margin: const EdgeInsets.only(right: 4.0),
       ),
       text,
     ]);
   }
-  return new Row(
+  return Row(
     mainAxisAlignment: MainAxisAlignment.center,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: children,
@@ -200,18 +196,18 @@ Future<Null> showNoConnectionDialog(BuildContext context) async {
       return WillPopScope(
         onWillPop: () {
           // intercept back button and go to home page when tapped
-          return new Future(() async {
+          return Future(() async {
             _goBackToMainPage(context);
             return false;
           });
         },
-        child: new AlertDialog(
+        child: AlertDialog(
           key: Keys.noConnectionDialogKey,
-          title: new Text(AppLocalizations.of(context).noConnectionDialogTitle),
-          content: new Text(AppLocalizations.of(context).noConnectionDialogText),
+          title: Text(AppLocalizations.of(context).noConnectionDialogTitle),
+          content: Text(AppLocalizations.of(context).noConnectionDialogText),
           actions: <Widget>[
-            new FlatButton(
-              child: new Text(AppLocalizations.of(context).okButton),
+            FlatButton(
+              child: Text(AppLocalizations.of(context).okButton),
               onPressed: () {
                 _goBackToMainPage(context);
               },

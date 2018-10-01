@@ -112,10 +112,9 @@ class _HauntEndState extends State<HauntEnd> {
 
     int brendaPayout = calculateBrendaPayout(newRandomForHaunt(haunt), pot);
     int bertiePayout = pot - brendaPayout;
-    TextStyle potResolutionTextStyle = const TextStyle(
+    TextStyle potResolutionTextStyle = TextStyle(
       fontSize: 30.0,
-      fontWeight: FontWeight.w300,
-      color: HeistColors.yellow,
+      color: Theme.of(context).primaryColor,
     );
     children.addAll(
       [

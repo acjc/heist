@@ -17,13 +17,13 @@ typedef MessageIfAbsent(String message_str, List args);
 class MessageLookup extends MessageLookupByLibrary {
   get localeName => 'en';
 
-  static m0(maxBalances) => "You can also see the balance of up to ${maxBalances} people:";
+  static m0(maxBalances) => "You can also see the balance of up to ${maxBalances} people";
 
   static m1(numPlayers) => "There are ${numPlayers} spots available! Highest, then fastest, bids win!";
 
   static m2(name, result) => "You checked if ${name} is Brenda. This is ${result}";
 
-  static m3(length, numPlayers) => "Bidders so far (${length} / ${numPlayers}):";
+  static m3(length, numPlayers) => "Bidders so far (${length} / ${numPlayers})";
 
   static m4(brendaDisplayName) => "...received by ${brendaDisplayName}";
 
@@ -49,7 +49,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m15(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
 
-  static m16(playersSoFar, totalPlayers) => "Waiting for players: ${playersSoFar} / ${totalPlayers}";
+  static m16(playersSoFar, totalPlayers) => "Waiting for players (${playersSoFar} / ${totalPlayers})";
 
   static m17(leaderName) => "Waiting for ${leaderName} to submit team";
 
@@ -104,7 +104,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "notEnough" : MessageLookupByLibrary.simpleMessage("Not enough ectoplasm for this haunt!"),
     "notPicked" : MessageLookupByLibrary.simpleMessage("You haven\'t been picked!"),
     "okButton" : MessageLookupByLibrary.simpleMessage("OK"),
-    "otherIdentities" : MessageLookupByLibrary.simpleMessage("You also know these identities:"),
+    "otherIdentities" : MessageLookupByLibrary.simpleMessage("You also know these identities"),
     "pickATeam" : m9,
     "pickedTeamSize" : m10,
     "pickedYou" : MessageLookupByLibrary.simpleMessage(" picked you in the team!"),
@@ -131,7 +131,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "youAreGoing" : MessageLookupByLibrary.simpleMessage("You\'re going on a haunt!"),
     "youHaveMadeYourChoice" : MessageLookupByLibrary.simpleMessage("You have made your choice!"),
     "yourBid" : MessageLookupByLibrary.simpleMessage("Your bid"),
-    "yourRole" : MessageLookupByLibrary.simpleMessage("Your role is:"),
-    "yourTeam" : MessageLookupByLibrary.simpleMessage("You are in team:")
+    "yourRole" : MessageLookupByLibrary.simpleMessage("Your role"),
+    "yourTeam" : MessageLookupByLibrary.simpleMessage("Your team")
   };
 }

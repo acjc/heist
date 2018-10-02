@@ -278,7 +278,7 @@ class GameState extends State<Game> {
         padding: paddingTitle,
         child: Text(
           AppLocalizations.of(context).waitingForPlayers(playersSoFar.length, numPlayers),
-          style: titleTextStyle,
+          style: Theme.of(context).textTheme.title,
         ),
       ),
     ]..addAll(List.generate(playersSoFar.length, (i) => Text(playersSoFar[i].name)));

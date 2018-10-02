@@ -18,22 +18,21 @@ import 'package:redux/redux.dart';
 import 'common.dart';
 
 Widget enterNameForm(BuildContext context, Store<GameModel> store, GlobalKey<FormState> key) =>
-    new Form(
+    Form(
         key: key,
-        child: new TextFormField(
+        child: TextFormField(
             initialValue: isDebugMode() ? 'Mordred' : getPlayerName(store.state),
             maxLength: 12,
-            decoration: new InputDecoration(
+            decoration: InputDecoration(
               labelText: AppLocalizations.of(context).enterYourName,
-              isDense: true,
             ),
-            style: new TextStyle(color: Colors.black87, fontSize: 24.0),
+            style: Theme.of(context).textTheme.headline,
             autocorrect: false,
             textAlign: TextAlign.center,
             validator: (value) => value == null || value.isEmpty
                 ? AppLocalizations.of(context).pleaseEnterAName
                 : null,
-            onSaved: (value) => store.dispatch(new SavePlayerNameAction(value))));
+            onSaved: (value) => store.dispatch(SavePlayerNameAction(value))));
 
 class HomePage extends StatelessWidget {
   static final _onlyLetters = new RegExp(r"[A-Za-z]");
@@ -54,26 +53,25 @@ class HomePage extends StatelessWidget {
         },
       );
 
-  Form _enterCodeForm(BuildContext context, Store<GameModel> store) => new Form(
+  Form _enterCodeForm(BuildContext context, Store<GameModel> store) => Form(
       key: Keys.homePageCodeKey,
-      child: new TextFormField(
+      child: TextFormField(
           initialValue: isDebugMode() ? 'ABCD' : getRoomCode(store.state),
-          decoration: new InputDecoration(
+          decoration: InputDecoration(
             labelText: AppLocalizations.of(context).enterRoomCode,
-            isDense: true,
           ),
-          style: new TextStyle(color: Colors.black87, fontSize: 24.0),
+          style: Theme.of(context).textTheme.headline,
           maxLength: 4,
           autocorrect: false,
           textAlign: TextAlign.center,
           inputFormatters: [
-            new WhitelistingTextInputFormatter(_onlyLetters),
+            WhitelistingTextInputFormatter(_onlyLetters),
             _capitalFormatter,
           ],
           validator: (value) => value.length != 4 ? AppLocalizations.of(context).invalidCode : null,
           onSaved: (value) {
-            store.dispatch(new SetRoomCodeAction(value));
-            store.dispatch(new SaveRoomCodeAction(value));
+            store.dispatch(SetRoomCodeAction(value));
+            store.dispatch(SaveRoomCodeAction(value));
           }));
 
   Widget _body(Store<GameModel> store) => StoreConnector<GameModel, bool>(

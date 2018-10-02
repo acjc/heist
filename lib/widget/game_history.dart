@@ -40,7 +40,7 @@ class _GameHistoryState extends State<GameHistory> {
 
   Widget hauntDetailsIcon(IconData icon, String text) => iconText(
         Icon(icon, color: Colors.grey),
-        Text(text, style: subtitleTextStyle),
+        Text(text, style: Theme.of(context).textTheme.caption),
       );
 
   String getHeistStatus(BuildContext context, Haunt haunt, Round lastRound) {
@@ -58,15 +58,15 @@ class _GameHistoryState extends State<GameHistory> {
   Icon getHauntIcon(Haunt haunt, int currentHauntOrder) {
     const double size = 32.0;
     if (haunt.order > currentHauntOrder) {
-      return const Icon(Icons.remove, size: size, color: Colors.grey);
+      return const Icon(Icons.remove, size: size, color: Colors.blueGrey);
     }
     if (!haunt.complete) {
-      return const Icon(Icons.adjust, color: HeistColors.blue);
+      return const Icon(Icons.adjust, color: HeistColors.amber);
     }
     if (haunt.wasSuccess) {
       return const Icon(Icons.verified_user, color: HeistColors.green, size: size);
     }
-    return const Icon(Icons.cancel, color: Colors.red, size: size);
+    return const Icon(Icons.cancel, color: HeistColors.peach, size: size);
   }
 
   Widget hauntPopup(int currentHauntOrder, Haunt haunt) {
@@ -79,13 +79,13 @@ class _GameHistoryState extends State<GameHistory> {
     List<Widget> title = [
       Text(
         AppLocalizations.of(context).hauntTitle(haunt.order),
-        style: boldTextStyle,
+        style: Theme.of(context).textTheme.subhead,
       ),
     ];
 
     title.add(Text(
       getHeistStatus(context, haunt, lastRound),
-      style: subtitleTextStyle,
+      style: Theme.of(context).textTheme.caption,
     ));
 
     List<Widget> hauntDetailsChildren = [
@@ -146,6 +146,7 @@ class _GameHistoryState extends State<GameHistory> {
         int currentHauntOrder = currentHaunt(widget._store.state).order;
         return Card(
           elevation: 10.0,
+          color: Colors.white24,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(5, (i) {
@@ -173,12 +174,12 @@ Widget hauntTeam(BuildContext context, List<Player> team, Player leader) {
     (i) {
       Player player = team.elementAt(i);
       bool isLeader = player.id == leader.id;
-      return PlayerTile(player.name, isLeader, true, Theme.of(context).primaryColor);
+      return PlayerTile(context, player.name, isLeader, true, Theme.of(context).primaryColor);
     },
   );
 
   if (!team.contains(leader)) {
-    gridChildren.add(PlayerTile(leader.name, true, false, Theme.of(context).primaryColor));
+    gridChildren.add(PlayerTile(context, leader.name, true, false, Theme.of(context).primaryColor));
   }
 
   return TeamGridView(gridChildren);

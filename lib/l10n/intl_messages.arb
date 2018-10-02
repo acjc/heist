@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-09-28T00:33:47.741137",
+  "@@last_modified": "2018-10-02T09:45:19.138180",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -182,7 +182,7 @@
       "numPlayers": {}
     }
   },
-  "bidders": "Bidders so far ({length} / {numPlayers}):",
+  "bidders": "Bidders so far ({length} / {numPlayers})",
   "@bidders": {
     "description": "Number of players that have bid over the total number of players",
     "type": "text",
@@ -256,7 +256,7 @@
       "brendaDisplayName": {}
     }
   },
-  "sharedBetween": "...shared between {bertieDisplayName} and any players who chose {stealOption} on the haunt:",
+  "sharedBetween": "...shared between {bertieDisplayName} and any players who chose {stealOption} on the haunt",
   "@sharedBetween": {
     "description": "Describe how much money gets split between Bertie and those who stole",
     "type": "text",
@@ -277,19 +277,19 @@
     "type": "text",
     "placeholders": {}
   },
-  "yourTeam": "You are in team:",
+  "yourTeam": "Your team",
   "@yourTeam": {
     "description": "Next to your team in the secret board",
     "type": "text",
     "placeholders": {}
   },
-  "yourRole": "Your role is:",
+  "yourRole": "Your role",
   "@yourRole": {
     "description": "Next to your role in the secret board",
     "type": "text",
     "placeholders": {}
   },
-  "otherIdentities": "You also know these identities:",
+  "otherIdentities": "You also know these identities",
   "@otherIdentities": {
     "description": "Next to other identities a player might know",
     "type": "text",
@@ -304,7 +304,7 @@
       "role": {}
     }
   },
-  "accountantExplanation": "You can also see the balance of up to {maxBalances} people:",
+  "accountantExplanation": "You can also see the balance of up to {maxBalances} people",
   "@accountantExplanation": {
     "description": "Tells the accountant what they can do",
     "type": "text",
@@ -363,7 +363,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "waitingForPlayers": "Waiting for players: {playersSoFar} / {totalPlayers}",
+  "waitingForPlayers": "Waiting for players ({playersSoFar} / {totalPlayers})",
   "@waitingForPlayers": {
     "description": "Shown while players are joining the room",
     "type": "text",

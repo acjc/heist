@@ -461,6 +461,7 @@ class ExclusionsPickerState extends ExclusionsState {
       return InkWell(
           onTap: enabled ? () => _onTap(_store, roundId, player.id, hasBeenExcluded) : null,
           child: PlayerTile(
+            context,
             player.name,
             isLeader,
             hasBeenExcluded,

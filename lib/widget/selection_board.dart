@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/app_localizations.dart';
+import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -23,10 +24,11 @@ class _SelectionBoardState extends State<SelectionBoard> {
         bool hasBeenExcluded = team.contains(player);
         bool isLeader = player.id == leader.id;
         return PlayerTile(
+          context,
           player.name,
           isLeader,
           hasBeenExcluded,
-          Theme.of(context).accentColor,
+          HeistColors.peach,
         );
       });
 
@@ -55,21 +57,24 @@ class _SelectionBoardState extends State<SelectionBoard> {
 }
 
 class PlayerTile extends StatelessWidget {
+  final BuildContext context;
   final String playerName;
   final bool isLeader;
   final bool fill;
   final Color color;
 
-  PlayerTile(this.playerName, this.isLeader, this.fill, this.color);
+  PlayerTile(this.context, this.playerName, this.isLeader, this.fill, this.color);
 
   Widget _playerTileText() {
-    Color textColor = fill ? Colors.white : Colors.black87;
-    Text text = Text(
-      playerName,
-      style: TextStyle(color: textColor, fontSize: 16.0),
-    );
+    Color iconColor = fill
+        ? Colors.white
+        : (Theme.of(context).brightness == Brightness.light
+            ? Theme.of(context).primaryColor
+            : Colors.white);
+    TextStyle textStyle = fill ? TextStyle(color: Colors.white, fontSize: 16.0) : null;
+    Text text = Text(playerName, style: textStyle);
     if (isLeader) {
-      return iconText(Icon(Icons.star, color: textColor), text);
+      return iconText(Icon(Icons.star, color: iconColor), text);
     }
     return text;
   }
@@ -79,7 +84,8 @@ class PlayerTile extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         border: Border.all(color: color),
-        borderRadius: BorderRadius.circular(5.0),
+        borderRadius: BorderRadius.circular(4.0),
+        boxShadow: fill ? tileShadow : null,
         color: fill ? color : null,
       ),
       child: _playerTileText());

@@ -112,10 +112,9 @@ class _HauntEndState extends State<HauntEnd> {
 
     int brendaPayout = calculateBrendaPayout(newRandomForHaunt(haunt), pot);
     int bertiePayout = pot - brendaPayout;
-    TextStyle potResolutionTextStyle = const TextStyle(
+    TextStyle potResolutionTextStyle = TextStyle(
       fontSize: 30.0,
-      fontWeight: FontWeight.w300,
-      color: Colors.teal,
+      color: Theme.of(context).primaryColor,
     );
     children.addAll(
       [
@@ -128,11 +127,8 @@ class _HauntEndState extends State<HauntEnd> {
                 '+$brendaPayout',
                 style: potResolutionTextStyle,
               ),
-              Text(
-                AppLocalizations.of(context)
-                    .brendaReceived(Roles.getRoleDisplayName(context, Roles.brenda.roleId)),
-                style: infoTextStyle,
-              ),
+              Text(AppLocalizations.of(context)
+                  .brendaReceived(Roles.getRoleDisplayName(context, Roles.brenda.roleId))),
             ],
           ),
         ),
@@ -144,11 +140,8 @@ class _HauntEndState extends State<HauntEnd> {
                 '+$bertiePayout',
                 style: potResolutionTextStyle,
               ),
-              Text(
-                AppLocalizations.of(context)
-                    .sharedBetween(Roles.getRoleDisplayName(context, Roles.bertie.roleId), Steal),
-                style: infoTextStyle,
-              ),
+              Text(AppLocalizations.of(context)
+                  .sharedBetween(Roles.getRoleDisplayName(context, Roles.bertie.roleId), Steal)),
             ],
           ),
         ),
@@ -156,8 +149,7 @@ class _HauntEndState extends State<HauntEnd> {
       ],
     );
 
-    return Card(
-      elevation: 2.0,
+    return GameCard(
       margin: paddingMedium,
       child: Padding(
         padding: paddingMedium,

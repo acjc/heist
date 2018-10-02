@@ -59,7 +59,7 @@ class GameState extends State<Game> {
       // Note that on Android, this does not guarantee connection to Internet.
       // For instance, the app might have wifi access but it might be a VPN or
       // a hotel WiFi with no access.
-      debugPrint('Status changed: ' + result.toString());
+      debugPrint('Status changed: ${result.toString()}');
       if (result == ConnectivityResult.none) {
         // connectivity was lost, start the timer
         _connectivityTimer =
@@ -112,7 +112,7 @@ class GameState extends State<Game> {
       // Show bidding summary of previous round
       if (viewModel.currentRound.order > 1 &&
           !roundContinued(viewModel.localActions, previousRound(_store.state))) {
-        return RoundEnd(_store, viewModel.currentRound.order - 1);
+        return Theme(data: lightTheme, child: RoundEnd(_store, viewModel.currentRound.order - 1));
       }
       // Or haunt summary of previous haunt
       if (viewModel.currentHaunt.order > 1 &&
@@ -126,7 +126,7 @@ class GameState extends State<Game> {
         !viewModel.biddingComplete &&
         (!viewModel.currentRound.exclusionsSubmitted ||
             !teamSelectionContinued(viewModel.localActions, viewModel.currentRound))) {
-      return Exclusions(_store, isMyGo(_store.state));
+      return Theme(data: lightTheme, child: Exclusions(_store, isMyGo(_store.state)));
     }
 
     // Bidding & gifting
@@ -137,7 +137,7 @@ class GameState extends State<Game> {
     // Bidding summary
     if (!viewModel.currentRound.complete ||
         !roundContinued(viewModel.localActions, viewModel.currentRound)) {
-      return RoundEnd(_store, viewModel.currentRound.order);
+      return Theme(data: lightTheme, child: RoundEnd(_store, viewModel.currentRound.order));
     }
 
     // Haunt is currently happening
@@ -161,9 +161,15 @@ class GameState extends State<Game> {
       );
 
   Widget footer(bool indicatorOnRight) {
-    List<Widget> children = indicatorOnRight
-        ? [Expanded(child: GameHistory(_store)), rightIndicator()]
-        : [leftIndicator(), Expanded(child: GameHistory(_store))];
+    Widget gameHistory = Expanded(
+      child: Theme(
+        data: lightTheme,
+        child: GameHistory(_store),
+      ),
+    );
+
+    List<Widget> children =
+        indicatorOnRight ? [gameHistory, rightIndicator()] : [leftIndicator(), gameHistory];
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
       child: Row(children: children),
@@ -182,17 +188,18 @@ class GameState extends State<Game> {
           if (haveReceivedGiftThisRound) {
             children.add(Icon(
               Icons.cake,
-              color: Colors.grey,
+              color: Colors.blueGrey,
               size: 16.0,
             ));
           }
           children.add(Icon(
             Icons.keyboard_arrow_right,
-            color: Theme.of(context).primaryColor,
+            color: Colors.blueGrey,
             size: 32.0,
           ));
           return Card(
             elevation: 10.0,
+            color: Colors.white24,
             child: InkWell(
               onTap: () => _controller.nextPage(
                     duration: Duration(milliseconds: 500),
@@ -209,12 +216,13 @@ class GameState extends State<Game> {
 
   Widget leftIndicator() => Card(
         elevation: 10.0,
+        color: Colors.white24,
         child: InkWell(
           child: Padding(
             padding: indicatorPadding,
             child: Icon(
               Icons.keyboard_arrow_left,
-              color: Theme.of(context).primaryColor,
+              color: Colors.blueGrey,
               size: 32.0,
             ),
           ),
@@ -255,7 +263,7 @@ class GameState extends State<Game> {
         padding: paddingTitle,
         child: Text(
           AppLocalizations.of(context).waitingForPlayers(playersSoFar.length, numPlayers),
-          style: titleTextStyle,
+          style: Theme.of(context).textTheme.title,
         ),
       ),
     ]..addAll(List.generate(playersSoFar.length, (i) => Text(playersSoFar[i].name)));

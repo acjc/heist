@@ -7,7 +7,6 @@ import 'selectors.dart';
 
 bool hauntHasActiveRound(Room room, Map<String, List<Round>> rounds, Haunt haunt) =>
     rounds[haunt.id].any((r) =>
-        r.complete &&
         r.exclusionsSubmitted &&
         r.bids.length == room.numPlayers &&
         (r.isAuction || potForRound(haunt, r) >= haunt.price));

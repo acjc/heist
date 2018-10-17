@@ -196,7 +196,7 @@ class GameState extends State<Game> {
 
   Widget rightIndicator() => StoreConnector<GameModel, bool>(
         distinct: true,
-        ignoreChange: (gameModel) => !gameIsReady(gameModel),
+        ignoreChange: (gameModel) => gameIsReady(gameModel),
         converter: (store) => haveReceivedGiftThisRound(store.state),
         builder: (context, haveReceivedGiftThisRound) {
           List<Widget> children = [];
@@ -249,7 +249,7 @@ class GameState extends State<Game> {
       );
 
   Widget _mainBoardBody() => StoreConnector<GameModel, MainBoardViewModel>(
-        ignoreChange: (gameModel) => currentHaunt(gameModel) == null,
+        ignoreChange: (gameModel) => currentHaunt(gameModel) != null,
         converter: (store) {
           Haunt haunt = currentHaunt(store.state);
           Round round = currentRound(store.state);

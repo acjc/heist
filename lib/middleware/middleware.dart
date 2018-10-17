@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:heist/reducers/request_reducers.dart';
 import 'package:heist/state.dart';
@@ -40,7 +41,9 @@ List<Middleware<GameModel>> createMiddleware() {
 
   // asserts only work in debug mode
   assert(() {
-    middleware.add(new LoggingMiddleware.printer());
+    if (Platform.environment['CI'] != 'true') {
+      middleware.add(new LoggingMiddleware.printer());
+    }
     return true;
   }());
 

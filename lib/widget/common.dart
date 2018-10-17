@@ -38,6 +38,10 @@ Widget centeredMessage(String text) {
   return new Center(child: new Text(text, style: infoTextStyle));
 }
 
+Widget centeredTitle(String text) {
+  return new Center(child: new Text(text, style: titleTextStyle, textAlign: TextAlign.center));
+}
+
 Widget loading() {
   return new Center(child: new CircularProgressIndicator());
 }

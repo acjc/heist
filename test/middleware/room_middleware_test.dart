@@ -67,4 +67,38 @@ void main() {
     expect(getRoom(store.state).visibleToAccountant.length, 2);
     expect(getRoom(store.state).visibleToAccountant.containsAll(['player1', 'player2']), true);
   });
+
+  test('add and remove roles', () async {
+    Store<GameModel> store = await initGame();
+    expect(getRoom(store.state).roles.length, 5);
+    expect(getRoom(store.state).roles.contains(Roles.bertie.roleId), true);
+    expect(getRoom(store.state).roles.contains(Roles.friendlyGhost1.roleId), true);
+    expect(getRoom(store.state).roles.contains(Roles.brenda.roleId), true);
+    expect(getRoom(store.state).roles.contains(Roles.accountant.roleId), true);
+    expect(getRoom(store.state).roles.contains(Roles.scaryGhost1.roleId), true);
+
+    await handle(store, RemoveRoleAction(Roles.accountant.roleId));
+    expect(getRoom(store.state).roles.length, 4);
+    expect(getRoom(store.state).roles.contains(Roles.bertie.roleId), true);
+    expect(getRoom(store.state).roles.contains(Roles.friendlyGhost1.roleId), true);
+    expect(getRoom(store.state).roles.contains(Roles.brenda.roleId), true);
+    expect(getRoom(store.state).roles.contains(Roles.scaryGhost1.roleId), true);
+
+    await handle(store, AddRoleAction(Roles.scaryGhost3.roleId));
+    expect(getRoom(store.state).roles.length, 5);
+    expect(getRoom(store.state).roles.contains(Roles.bertie.roleId), true);
+    expect(getRoom(store.state).roles.contains(Roles.friendlyGhost1.roleId), true);
+    expect(getRoom(store.state).roles.contains(Roles.brenda.roleId), true);
+    expect(getRoom(store.state).roles.contains(Roles.scaryGhost1.roleId), true);
+    expect(getRoom(store.state).roles.contains(Roles.scaryGhost3.roleId), true);
+
+  });
+
+  test('submit roles', () async {
+    Store<GameModel> store = await initGame();
+    expect(getRoom(store.state).rolesSubmitted, false);
+
+    await handle(store, SubmitRolesAction());
+    expect(getRoom(store.state).rolesSubmitted, true);
+  });
 }

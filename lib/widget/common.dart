@@ -21,81 +21,104 @@ const TextStyle infoTextStyle = const TextStyle(fontSize: 16.0);
 const TextStyle boldTextStyle = const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold);
 const TextStyle bigNumberTextStyle = const TextStyle(fontSize: 30.0, fontWeight: FontWeight.w300);
 const TextStyle titleTextStyle = const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
-const TextStyle subtitleTextStyle = const TextStyle(color: Colors.black54);
+const TextStyle subtitleTextStyle = const TextStyle(fontSize: 13.0);
 const TextStyle buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
 const TextStyle chipTextStyle = const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
 
-Widget iconWidget(BuildContext context, IconData icon, Function onPressed, [bool enabled = true]) {
-  Color color = Theme.of(context).primaryColor;
-  return new IconButton(
-    iconSize: 64.0,
-    onPressed: enabled ? onPressed : null,
-    icon: new Icon(icon, color: enabled ? color : Colors.grey),
-  );
+/// elevation: 1.0
+const List<BoxShadow> tileShadow = [
+  BoxShadow(
+      offset: Offset(0.0, 2.0), blurRadius: 1.0, spreadRadius: -1.0, color: HeistColors.umbra),
+  BoxShadow(
+      offset: Offset(0.0, 1.0), blurRadius: 1.0, spreadRadius: 0.0, color: HeistColors.penumbra),
+  BoxShadow(
+      offset: Offset(0.0, 1.0), blurRadius: 3.0, spreadRadius: 0.0, color: HeistColors.ambient),
+];
+
+/// elevation: 4.0
+const List<BoxShadow> barShadow = [
+  BoxShadow(
+      offset: Offset(0.0, 2.0), blurRadius: 4.0, spreadRadius: -1.0, color: HeistColors.umbra),
+  BoxShadow(
+      offset: Offset(0.0, 4.0), blurRadius: 5.0, spreadRadius: 0.0, color: HeistColors.penumbra),
+  BoxShadow(
+      offset: Offset(0.0, 1.0), blurRadius: 10.0, spreadRadius: 0.0, color: HeistColors.ambient),
+];
+
+/// Most of our cards use the same elevation
+class GameCard extends Card {
+  GameCard({
+    @required Widget child,
+    double elevation = 2.0,
+    EdgeInsets margin,
+  }) : super(
+          elevation: elevation,
+          child: child,
+          margin: margin,
+        );
 }
 
-Widget centeredMessage(String text) {
-  return new Center(child: new Text(text, style: infoTextStyle));
-}
+/// A tappable icon, e.g. left and right arrows
+Widget iconWidget(BuildContext context, IconData icon, Function onPressed, [bool enabled = true]) =>
+    IconButton(
+      iconSize: 64.0,
+      onPressed: enabled ? onPressed : null,
+      icon: Icon(icon, color: enabled ? Theme.of(context).iconTheme.color : Colors.grey),
+    );
 
-Widget centeredTitle(String text) {
-  return new Center(child: new Text(text, style: titleTextStyle, textAlign: TextAlign.center));
-}
+Widget loading() => Center(child: CircularProgressIndicator());
 
-Widget loading() {
-  return new Center(child: new CircularProgressIndicator());
-}
+Widget centeredTitle(String text) =>
+    Center(child: Text(text, style: titleTextStyle, textAlign: TextAlign.center));
 
+/// Text color for a haunt decision
 Color decisionColour(String decision) {
   switch (decision) {
     case 'SCARE':
       return HeistColors.green;
     case 'TICKLE':
-      return Colors.red;
+      return HeistColors.peach;
     case 'STEAL':
-      return HeistColors.blue;
+      return HeistColors.amber;
   }
-  throw new ArgumentError.value(decision, 'decision', 'Unknown decision');
+  throw ArgumentError.value(decision, 'decision', 'Unknown decision');
 }
 
 class VerticalDivider extends StatelessWidget {
   final double height;
+  final Color color;
 
-  VerticalDivider({this.height = 50.0});
+  VerticalDivider({this.height = 50.0, this.color});
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
+    return Container(
       height: height,
-      width: 0.2,
-      color: Colors.grey,
+      width: 0.5,
+      color: color ?? Theme.of(context).dividerColor,
       margin: const EdgeInsets.only(left: 6.0, right: 6.0),
     );
   }
 }
 
-Widget teamSelectionIcon(bool goingOnHaunt, Color color, double size) {
-  return goingOnHaunt
-      ? new Icon(Icons.check_circle, color: color, size: size)
-      : new Icon(Icons.do_not_disturb_alt, color: color, size: size);
-}
+/// Icon to indicate whether the player has been picked on a team
+Widget teamSelectionIcon(bool goingOnHaunt, Color color, double size) => goingOnHaunt
+    ? Icon(Icons.check_circle, color: color, size: size)
+    : Icon(Icons.do_not_disturb_alt, color: color, size: size);
 
-Widget roundTitleIcon(IconData icon, String text) {
-  return iconText(
-    new Icon(icon, size: 32.0),
-    new Text(text, style: infoTextStyle),
-  );
-}
+/// Two lines of text aligned vertically in a title followed by subtitle combination
+Widget titleSubtitle(BuildContext context, String title, String subtitle) => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: Theme.of(context).textTheme.subhead),
+        Text(subtitle, style: Theme.of(context).textTheme.caption),
+      ],
+    );
 
-Widget titleSubtitle(String title, String subtitle) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      new Text(title, style: boldTextStyle),
-      new Text(subtitle, style: subtitleTextStyle),
-    ],
-  );
-}
+Widget roundTitleIcon(IconData icon, String text) => iconText(
+      Icon(icon, size: 32.0),
+      Text(text, style: infoTextStyle),
+    );
 
 Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
   Haunt haunt = currentHaunt(store.state);
@@ -105,22 +128,22 @@ Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
       : AppLocalizations.of(context).roundTitle(round.order);
 
   List<Widget> children = [
-    titleSubtitle(AppLocalizations.of(context).hauntTitle(haunt.order), subtitle),
-    new VerticalDivider(),
+    titleSubtitle(context, AppLocalizations.of(context).hauntTitle(haunt.order), subtitle),
+    VerticalDivider(),
     roundTitleIcon(Icons.people, haunt.numPlayers.toString()),
     roundTitleIcon(Icons.bubble_chart, haunt.price.toString()),
     roundTitleIcon(Icons.vertical_align_top, haunt.maximumBid.toString()),
   ];
 
-  return new Row(
+  return Row(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     children: children,
   );
 }
 
-Widget roundTitleCard(BuildContext context, Store<GameModel> store) => new Card(
-      elevation: 2.0,
-      child: new Padding(
+/// Card describing the current haunt and round
+Widget roundTitleCard(BuildContext context, Store<GameModel> store) => GameCard(
+      child: Padding(
         padding: paddingSmall,
         child: roundTitleContents(context, store),
       ),
@@ -128,7 +151,7 @@ Widget roundTitleCard(BuildContext context, Store<GameModel> store) => new Card(
 
 /// Widget for showing a 2-column grid
 class TeamGridView extends GridView {
-  TeamGridView(List<Widget> children, {double childAspectRatio = 6.0})
+  TeamGridView(List<Widget> children, {double childAspectRatio = 5.0})
       : super.count(
           padding: paddingMedium,
           shrinkWrap: true,
@@ -141,26 +164,27 @@ class TeamGridView extends GridView {
         );
 }
 
+/// Text with an adjacent icon. Use 'trailingIcon' to put the icon on the right-hand side.
 Widget iconText(Icon icon, Text text, {bool trailingIcon = false}) {
   List<Widget> children = [];
   if (trailingIcon) {
     children.addAll([
       text,
-      new Container(
+      Container(
         child: icon,
         margin: const EdgeInsets.only(left: 4.0),
       )
     ]);
   } else {
     children.addAll([
-      new Container(
+      Container(
         child: icon,
         margin: const EdgeInsets.only(right: 4.0),
       ),
       text,
     ]);
   }
-  return new Row(
+  return Row(
     mainAxisAlignment: MainAxisAlignment.center,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: children,
@@ -175,18 +199,18 @@ Future<Null> showNoConnectionDialog(BuildContext context) async {
       return WillPopScope(
         onWillPop: () {
           // intercept back button and go to home page when tapped
-          return new Future(() async {
+          return Future(() async {
             _goBackToMainPage(context);
             return false;
           });
         },
-        child: new AlertDialog(
+        child: AlertDialog(
           key: Keys.noConnectionDialogKey,
-          title: new Text(AppLocalizations.of(context).noConnectionDialogTitle),
-          content: new Text(AppLocalizations.of(context).noConnectionDialogText),
+          title: Text(AppLocalizations.of(context).noConnectionDialogTitle),
+          content: Text(AppLocalizations.of(context).noConnectionDialogText),
           actions: <Widget>[
-            new FlatButton(
-              child: new Text(AppLocalizations.of(context).okButton),
+            FlatButton(
+              child: Text(AppLocalizations.of(context).okButton),
               onPressed: () {
                 _goBackToMainPage(context);
               },

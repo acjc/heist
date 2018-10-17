@@ -279,7 +279,7 @@ class AppLocalizations {
 
   String bidders(int length, int numPlayers) {
     return Intl.message(
-      'Bidders so far ($length / $numPlayers):',
+      'Bidders so far ($length / $numPlayers)',
       name: 'bidders',
       args: [length, numPlayers],
       desc: 'Number of players that have bid over the total number of players',
@@ -376,7 +376,7 @@ class AppLocalizations {
 
   String sharedBetween(String bertieDisplayName, String stealOption) {
     return Intl.message(
-      '...shared between $bertieDisplayName and any players who chose $stealOption on the haunt:',
+      '...shared between $bertieDisplayName and any players who chose $stealOption on the haunt',
       name: 'sharedBetween',
       args: [bertieDisplayName, stealOption],
       desc: 'Describe how much money gets split between Bertie and those who stole',
@@ -403,7 +403,7 @@ class AppLocalizations {
 
   String get yourTeam {
     return Intl.message(
-      'You are in team:',
+      'Your team',
       name: 'yourTeam',
       desc: 'Next to your team in the secret board',
     );
@@ -411,7 +411,7 @@ class AppLocalizations {
 
   String get yourRole {
     return Intl.message(
-      'Your role is:',
+      'Your role',
       name: 'yourRole',
       desc: 'Next to your role in the secret board',
     );
@@ -419,7 +419,7 @@ class AppLocalizations {
 
   String get otherIdentities {
     return Intl.message(
-      'You also know these identities:',
+      'You also know these identities',
       name: 'otherIdentities',
       desc: 'Next to other identities a player might know',
     );
@@ -436,7 +436,7 @@ class AppLocalizations {
 
   String accountantExplanation(int maxBalances) {
     return Intl.message(
-      'You can also see the balance of up to $maxBalances people:',
+      'You can also see the balance of up to $maxBalances people',
       name: 'accountantExplanation',
       args: [maxBalances],
       desc: 'Tells the accountant what they can do',
@@ -511,7 +511,7 @@ class AppLocalizations {
 
   String waitingForPlayers(int playersSoFar, int totalPlayers) {
     return Intl.message(
-      'Waiting for players: $playersSoFar / $totalPlayers',
+      'Waiting for players ($playersSoFar / $totalPlayers)',
       name: 'waitingForPlayers',
       args: [playersSoFar, totalPlayers],
       desc: 'Shown while players are joining the room',

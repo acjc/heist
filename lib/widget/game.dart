@@ -56,16 +56,15 @@ class GameState extends State<Game> {
     super.initState();
     SystemChrome.setEnabledSystemUIOverlays([]);
     _store.dispatch(new LoadGameAction());
-    _connectivitySubscription = new Connectivity()
-        .onConnectivityChanged
-        .listen((ConnectivityResult result) {
+    _connectivitySubscription =
+        new Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       // Note that on Android, this does not guarantee connection to Internet.
       // For instance, the app might have wifi access but it might be a VPN or
       // a hotel WiFi with no access.
       if (result == ConnectivityResult.none) {
         // connectivity was lost, start the timer
-        _connectivityTimer = new Timer(
-            const Duration(seconds: 5), () => showNoConnectionDialog(context));
+        _connectivityTimer =
+            new Timer(const Duration(seconds: 5), () => showNoConnectionDialog(context));
       } else {
         // connectivity is back, cancel the timer
         _connectivityTimer?.cancel();
@@ -105,11 +104,16 @@ class GameState extends State<Game> {
     if (!isAuction(store.state)) {
       children.add(selectionBoard(_store));
     }
-    children.add(
-      bidding(store),
+    children.addAll(
+      [
+        bidding(store),
+        gifting(store),
+      ],
     );
-    children.add(gifting(store));
-    return ListView(children: children);
+    return Padding(
+      padding: paddingSmall,
+      child: ListView(children: children),
+    );
   }
 
   Widget _gameLoop(MainBoardViewModel viewModel) {
@@ -117,14 +121,12 @@ class GameState extends State<Game> {
     if (!viewModel.currentRound.teamSubmitted) {
       // Show bidding summary of previous round
       if (viewModel.currentRound.order > 1 &&
-          !roundContinued(
-              viewModel.localActions, previousRound(_store.state))) {
-        return RoundEnd(_store, viewModel.currentRound.order - 1);
+          !roundContinued(viewModel.localActions, previousRound(_store.state))) {
+        return Theme(data: lightTheme, child: RoundEnd(_store, viewModel.currentRound.order - 1));
       }
       // Or haunt summary of previous haunt
       if (viewModel.currentHaunt.order > 1 &&
-          !hauntContinued(
-              viewModel.localActions, previousHaunt(_store.state))) {
+          !hauntContinued(viewModel.localActions, previousHaunt(_store.state))) {
         return appendFooter(HauntEnd(_store, viewModel.currentHaunt.order - 1));
       }
     }
@@ -133,9 +135,8 @@ class GameState extends State<Game> {
     if (!isAuction(_store.state) &&
         !viewModel.biddingComplete &&
         (!viewModel.currentRound.teamSubmitted ||
-            !teamSelectionContinued(
-                viewModel.localActions, viewModel.currentRound))) {
-      return TeamSelection(_store, isMyGo(_store.state));
+            !teamSelectionContinued(viewModel.localActions, viewModel.currentRound))) {
+      return Theme(data: lightTheme, child: TeamSelection(_store, isMyGo(_store.state)));
     }
 
     // Bidding & gifting
@@ -151,7 +152,7 @@ class GameState extends State<Game> {
     // Bidding summary
     if (!viewModel.currentRound.complete ||
         !roundContinued(viewModel.localActions, viewModel.currentRound)) {
-      return RoundEnd(_store, viewModel.currentRound.order);
+      return Theme(data: lightTheme, child: RoundEnd(_store, viewModel.currentRound.order));
     }
 
     // Haunt is currently happening
@@ -175,9 +176,15 @@ class GameState extends State<Game> {
       );
 
   Widget footer(bool indicatorOnRight) {
-    List<Widget> children = indicatorOnRight
-        ? [Expanded(child: GameHistory(_store)), rightIndicator()]
-        : [leftIndicator(), Expanded(child: GameHistory(_store))];
+    Widget gameHistory = Expanded(
+      child: Theme(
+        data: lightTheme,
+        child: GameHistory(_store),
+      ),
+    );
+
+    List<Widget> children =
+        indicatorOnRight ? [gameHistory, rightIndicator()] : [leftIndicator(), gameHistory];
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
       child: Row(children: children),
@@ -189,24 +196,25 @@ class GameState extends State<Game> {
 
   Widget rightIndicator() => StoreConnector<GameModel, bool>(
         distinct: true,
-        ignoreChange: (gameModel) => !gameIsReady(gameModel),
+        ignoreChange: (gameModel) => gameIsReady(gameModel),
         converter: (store) => haveReceivedGiftThisRound(store.state),
         builder: (context, haveReceivedGiftThisRound) {
           List<Widget> children = [];
           if (haveReceivedGiftThisRound) {
             children.add(Icon(
               Icons.cake,
-              color: Colors.grey,
+              color: Colors.blueGrey,
               size: 16.0,
             ));
           }
           children.add(Icon(
             Icons.keyboard_arrow_right,
-            color: Theme.of(context).primaryColor,
+            color: Colors.blueGrey,
             size: 32.0,
           ));
           return Card(
             elevation: 10.0,
+            color: Colors.white24,
             child: InkWell(
               onTap: () => _controller.nextPage(
                     duration: Duration(milliseconds: 500),
@@ -223,12 +231,13 @@ class GameState extends State<Game> {
 
   Widget leftIndicator() => Card(
         elevation: 10.0,
+        color: Colors.white24,
         child: InkWell(
           child: Padding(
             padding: indicatorPadding,
             child: Icon(
               Icons.keyboard_arrow_left,
-              color: Theme.of(context).primaryColor,
+              color: Colors.blueGrey,
               size: 32.0,
             ),
           ),
@@ -240,7 +249,7 @@ class GameState extends State<Game> {
       );
 
   Widget _mainBoardBody() => StoreConnector<GameModel, MainBoardViewModel>(
-        ignoreChange: (gameModel) => currentHaunt(gameModel) == null,
+        ignoreChange: (gameModel) => currentHaunt(gameModel) != null,
         converter: (store) {
           Haunt haunt = currentHaunt(store.state);
           Round round = currentRound(store.state);
@@ -249,8 +258,7 @@ class GameState extends State<Game> {
             currentRound: round,
             localActions: getLocalActions(_store.state),
             biddingComplete: biddingComplete(store.state),
-            resolvingAuction:
-                requestInProcess(store.state, Request.ResolvingAuction),
+            resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
             hauntIsActive: currentHauntIsActive(store.state),
           );
         },
@@ -269,13 +277,11 @@ class GameState extends State<Game> {
       Padding(
         padding: paddingTitle,
         child: Text(
-          AppLocalizations.of(context)
-              .waitingForPlayers(playersSoFar.length, numPlayers),
-          style: titleTextStyle,
+          AppLocalizations.of(context).waitingForPlayers(playersSoFar.length, numPlayers),
+          style: Theme.of(context).textTheme.title,
         ),
       ),
-    ]..addAll(
-        List.generate(playersSoFar.length, (i) => Text(playersSoFar[i].name)));
+    ]..addAll(List.generate(playersSoFar.length, (i) => Text(playersSoFar[i].name)));
     return Center(
       child: Card(
         elevation: 2.0,
@@ -311,8 +317,7 @@ class GameState extends State<Game> {
           }
 
           if (viewModel.waitingForPlayers) {
-            return _waitingForPlayers(
-                viewModel.playersSoFar, getRoom(_store.state).numPlayers);
+            return _waitingForPlayers(viewModel.playersSoFar, getRoom(_store.state).numPlayers);
           }
 
           if (viewModel.isNewGame) {
@@ -324,9 +329,7 @@ class GameState extends State<Game> {
       );
 
   Widget _mainBoard() => StoreConnector<GameModel, GameActiveViewModel>(
-      converter: (store) => GameActiveViewModel._(
-          gameIsReady(store.state),
-          gameOver(store.state),
+      converter: (store) => GameActiveViewModel._(gameIsReady(store.state), gameOver(store.state),
           requestInProcess(store.state, Request.CompletingGame)),
       distinct: true,
       builder: (context, viewModel) {
@@ -362,9 +365,7 @@ class GameState extends State<Game> {
             Scaffold(
               resizeToAvoidBottomPadding: false,
               backgroundColor: Colors.transparent,
-              endDrawer: isDebugMode()
-                  ? Drawer(child: ReduxDevTools<GameModel>(_store))
-                  : null,
+              endDrawer: isDebugMode() ? Drawer(child: ReduxDevTools<GameModel>(_store)) : null,
               body: _secretBoard(),
             ),
           ],
@@ -381,8 +382,8 @@ class LoadingScreenViewModel {
   final bool isNewGame;
   final List<Player> playersSoFar;
 
-  LoadingScreenViewModel._(this.roomIsAvailable, this.rolesHaveBeenChosen,
-      this.waitingForPlayers, this.isNewGame, this.playersSoFar);
+  LoadingScreenViewModel._(this.roomIsAvailable, this.rolesHaveBeenChosen, this.waitingForPlayers,
+      this.isNewGame, this.playersSoFar);
 
   @override
   bool operator ==(Object other) =>
@@ -472,8 +473,7 @@ class GameActiveViewModel {
           completingGame == other.completingGame;
 
   @override
-  int get hashCode =>
-      gameIsReady.hashCode ^ gameOver.hashCode ^ completingGame.hashCode;
+  int get hashCode => gameIsReady.hashCode ^ gameOver.hashCode ^ completingGame.hashCode;
 
   @override
   String toString() {
@@ -486,8 +486,7 @@ void resetGameStore(Store<GameModel> store) {
   store.dispatch(CancelSubscriptionsAction());
   store.dispatch(UpdateStateAction<LocalActions>(LocalActions.initial()));
 
-  store.dispatch(
-      UpdateStateAction<Room>(Room.initial(isDebugMode() ? 2 : minPlayers)));
+  store.dispatch(UpdateStateAction<Room>(Room.initial(isDebugMode() ? 2 : minPlayers)));
   store.dispatch(UpdateStateAction<List<Player>>([]));
   store.dispatch(UpdateStateAction<List<Haunt>>([]));
   store.dispatch(UpdateStateAction<Map<Haunt, List<Round>>>({}));

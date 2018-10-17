@@ -11,13 +11,14 @@ import 'package:heist/keys.dart';
 import 'package:heist/middleware/middleware.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/state.dart';
+import 'package:heist/widget/common.dart';
 import 'package:heist/widget/home_page.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_dev_tools/redux_dev_tools.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-void main() => runApp(new MyApp(Firestore.instance));
+void main() => runApp(MyApp(Firestore.instance));
 
 const int minPlayers = 5;
 const int maxPlayers = 10;
@@ -33,8 +34,38 @@ bool isDebugMode() {
 }
 
 DateTime now() {
-  return new DateTime.now().toUtc();
+  return DateTime.now().toUtc();
 }
+
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  canvasColor: Colors.white, // for the bottom sheet color
+  primaryColor: Colors.blueGrey,
+  accentColor: HeistColors.amber,
+  iconTheme: const IconThemeData(color: HeistColors.amber),
+  textTheme: TextTheme(
+    subhead: boldTextStyle,
+    body1: infoTextStyle,
+    body2: infoTextStyle,
+    caption: subtitleTextStyle,
+  ),
+  buttonColor: Colors.blueGrey,
+  cardColor: Colors.black12,
+);
+
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light,
+  primaryColor: Colors.blueGrey,
+  accentColor: HeistColors.amber,
+  iconTheme: const IconThemeData(color: HeistColors.amber),
+  textTheme: TextTheme(
+    subhead: boldTextStyle,
+    body1: infoTextStyle,
+    body2: infoTextStyle,
+    caption: subtitleTextStyle,
+  ),
+  buttonColor: Colors.blueGrey,
+);
 
 Future<String> installId() async {
   if (isDebugMode()) {
@@ -44,7 +75,7 @@ Future<String> installId() async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
   String installId = preferences.getString(PrefInstallId);
   if (installId == null) {
-    installId = new Uuid().v4();
+    installId = Uuid().v4();
     await preferences.setString(PrefInstallId, installId);
   }
   return installId;
@@ -52,16 +83,16 @@ Future<String> installId() async {
 
 Store<GameModel> createStore(FirestoreDb db, [int numPlayers]) {
   if (isDebugMode()) {
-    return new DevToolsStore<GameModel>(
+    return DevToolsStore<GameModel>(
       gameModelReducer,
-      initialState: new GameModel.initial(db, numPlayers ?? 2),
+      initialState: GameModel.initial(db, numPlayers ?? 2),
       middleware: createMiddleware(),
       distinct: true,
     );
   }
-  return new Store<GameModel>(
+  return Store<GameModel>(
     gameModelReducer,
-    initialState: new GameModel.initial(db, minPlayers),
+    initialState: GameModel.initial(db, minPlayers),
     middleware: createMiddleware(),
     distinct: true,
   );
@@ -70,38 +101,29 @@ Store<GameModel> createStore(FirestoreDb db, [int numPlayers]) {
 class MyApp extends StatelessWidget {
   final Store<GameModel> store;
 
-  MyApp(Firestore firestore) : store = createStore(new FirestoreDb(firestore));
+  MyApp(Firestore firestore) : store = createStore(FirestoreDb(firestore));
 
   @override
-  Widget build(BuildContext context) {
-    Color primaryColor = HeistColors.blue;
-    return new StoreProvider(
-      store: store,
-      child: new MaterialApp(
-        navigatorKey: Keys.navigatorKey,
-        title: 'Heist', // can't localise this one because stuff hasn't been set up yet
-        theme: new ThemeData(
-          primaryColor: primaryColor,
-          accentColor: HeistColors.peach,
-          iconTheme: const IconThemeData(color: HeistColors.peach),
-          buttonColor: primaryColor,
-          indicatorColor: Colors.white,
+  Widget build(BuildContext context) => StoreProvider(
+        store: store,
+        child: MaterialApp(
+          navigatorKey: Keys.navigatorKey,
+          title: 'Heist', // can't localise this one because stuff hasn't been set up yet
+          theme: darkTheme,
+          home: HomePage(),
+          localizationsDelegates: [
+            // app-specific localization delegate[s]
+            const AppLocalizationsDelegate(),
+            // provides localized strings and other values for the Material Components library
+            GlobalMaterialLocalizations.delegate,
+            // defines the default text direction, either left to right or right to left, for the widgets library
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          supportedLocales: [
+            const Locale('en', ''), // English
+            const Locale('es', ''), // Spanish
+            // ... other locales the app supports
+          ],
         ),
-        home: new HomePage(),
-        localizationsDelegates: [
-          // app-specific localization delegate[s]
-          const AppLocalizationsDelegate(),
-          // provides localized strings and other values for the Material Components library
-          GlobalMaterialLocalizations.delegate,
-          // defines the default text direction, either left to right or right to left, for the widgets library
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: [
-          const Locale('en', ''), // English
-          const Locale('es', ''), // Spanish
-          // ... other locales the app supports
-        ],
-      ),
-    );
-  }
+      );
 }

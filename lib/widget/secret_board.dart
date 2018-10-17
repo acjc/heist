@@ -105,8 +105,7 @@ class SecretBoardState extends State<SecretBoard> {
               child: new Text('${player.order}. ${player.name}', style: textStyle),
             );
           }));
-          return new Card(
-            elevation: 2.0,
+          return new GameCard(
             child: new Padding(
               padding: paddingMedium,
               child: new Column(children: children),
@@ -116,8 +115,7 @@ class SecretBoardState extends State<SecretBoard> {
       );
 
   Card _getTeamAndRoleCard(Player me) {
-    return new Card(
-        elevation: 2.0,
+    return new GameCard(
         child: new Padding(
             padding: paddingMedium,
             child: new Row(
@@ -154,8 +152,7 @@ class SecretBoardState extends State<SecretBoard> {
   // show the identities the player knows, if any
   _addExtraIdsCardIfNeeded(final Player me, final List<Widget> children) {
     if (Roles.getKnownIds(me.role) != null) {
-      children.add(new Card(
-          elevation: 2.0,
+      children.add(new GameCard(
           child: new Padding(
               padding: paddingMedium,
               child: new Column(children: [
@@ -246,8 +243,7 @@ class SecretBoardState extends State<SecretBoard> {
                     getPlayerByName(_store.state, _accountantSelection).id))));
       }
 
-      children.add(new Card(
-          elevation: 2.0,
+      children.add(new GameCard(
           child: new Padding(padding: paddingMedium, child: new Column(children: tiles))));
     }
   }
@@ -258,18 +254,19 @@ class SecretBoardState extends State<SecretBoard> {
     if (me.role == Roles.bertie.roleId) {
       // the lead agent can try to guess who Brenda is once during a game
       List<Widget> tiles = [
-        new ListTile(
-          title: new Text(
-            AppLocalizations.of(context).bertieExplanation,
-            style: infoTextStyle,
-          ),
-        )
+        Padding(
+          padding: paddingTiny,
+          child: Text(AppLocalizations.of(context).bertieExplanation),
+        ),
       ];
 
       if (brendaGuess == null) {
         List<String> pickablePlayers = getOtherPlayers(_store.state).map((p) => p.name).toList();
         tiles.add(new DropdownButton<String>(
-            hint: new Text(AppLocalizations.of(context).bertiePickPlayer, style: infoTextStyle),
+            hint: Padding(
+              padding: paddingTiny,
+              child: Text(AppLocalizations.of(context).bertiePickPlayer),
+            ),
             value: _brendaGuess,
             items: pickablePlayers.map((String value) {
               return new DropdownMenuItem<String>(
@@ -296,18 +293,13 @@ class SecretBoardState extends State<SecretBoard> {
         final String result = haveGuessedBrenda(_store.state)
             ? AppLocalizations.of(context).bertieResultRight
             : AppLocalizations.of(context).bertieResultWrong;
-        tiles.add(
-          new ListTile(
-            title: new Text(
-              AppLocalizations.of(context).bertieResult(brendaGuessName, result),
-              style: infoTextStyle,
-            ),
-          ),
-        );
+        tiles.add(Padding(
+          padding: paddingTiny,
+          child: new Text(AppLocalizations.of(context).bertieResult(brendaGuessName, result)),
+        ));
       }
 
-      children.add(new Card(
-          elevation: 2.0,
+      children.add(new GameCard(
           child: new Padding(padding: paddingMedium, child: new Column(children: tiles))));
     }
   }

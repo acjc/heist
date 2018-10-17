@@ -7,4 +7,8 @@ class HeistColors {
   static const Color amber = const Color(0xFFFFB248);
   static const Color yellow = const Color(0xFFFFD702);
   static const Color green = const Color(0xFF9BC758);
+
+  static const Color umbra = const Color(0x33000000);
+  static const Color penumbra = const Color(0x24000000);
+  static const Color ambient = const Color(0x1F000000);
 }

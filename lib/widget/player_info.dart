@@ -21,14 +21,13 @@ Widget playerInfo(Store<GameModel> store) {
         if (viewModel.me == null) {
           return Container();
         }
-        return Card(
-          elevation: 2.0,
+        return GameCard(
           child: Padding(
             padding: paddingMedium,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                roomCode(getRoom(store.state).code),
+                roomCode(context, getRoom(store.state).code),
                 VerticalDivider(),
                 playerName(context, viewModel.me),
                 VerticalDivider(),
@@ -40,10 +39,10 @@ Widget playerInfo(Store<GameModel> store) {
       });
 }
 
-Widget roomCode(String code) => Column(
+Widget roomCode(BuildContext context, String code) => Column(
       children: [
-        Text('Room', style: subtitleTextStyle),
-        Text(code, style: boldTextStyle),
+        Text('Room', style: Theme.of(context).textTheme.caption),
+        Text(code, style: Theme.of(context).textTheme.subhead),
       ],
     );
 
@@ -78,7 +77,7 @@ Widget playerName(BuildContext context, Player me) {
   List<Widget> children = [
     Text(
       me.name,
-      style: boldTextStyle,
+      style: Theme.of(context).textTheme.subhead,
     ),
   ];
 
@@ -86,7 +85,7 @@ Widget playerName(BuildContext context, Player me) {
     children.add(
       Text(
         AppLocalizations.of(context).playerOrder(me.order),
-        style: subtitleTextStyle,
+        style: Theme.of(context).textTheme.caption,
       ),
     );
   }

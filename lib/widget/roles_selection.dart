@@ -61,9 +61,10 @@ class _RolesSelectionState extends State<RolesSelection> {
         Padding(
             padding: paddingMedium,
             child: centeredTitle(amOwner
-                ? AppLocalizations.of(context).chooseGameRoles
-                : AppLocalizations.of(context)
-                    .someoneElseChoosesGameRoles(getOwnerName(_store.state)))),
+                ? AppLocalizations.of(context)
+                    .chooseGameRoles(getRoom(_store.state).code)
+                : AppLocalizations.of(context).someoneElseChoosesGameRoles(
+                    getRoom(_store.state).code, getOwnerName(_store.state)))),
         Padding(
             padding: paddingSmall,
             child: Text(

@@ -53,62 +53,67 @@ class _RolesSelectionState extends State<RolesSelection> {
     final List<Widget> scaryRolesList = getRolesList(
         Team.SCARY, HeistColors.purple, currentRoleIds, numScaryRoles, amOwner);
 
+    final List<Widget> children = [
+      Padding(
+          padding: paddingMedium,
+          child: centeredTitle(amOwner
+              ? AppLocalizations.of(context)
+              .chooseGameRoles(getRoom(_store.state).code)
+              : AppLocalizations.of(context).someoneElseChoosesGameRoles(
+              getRoom(_store.state).code, getOwnerName(_store.state)))),
+      Padding(
+          padding: paddingSmall,
+          child: Text(
+            AppLocalizations.of(context).friendlyTeam(numFriendlyRoles),
+            style: titleTextStyle,
+          )),
+      MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: GridView.count(
+            shrinkWrap: true,
+            crossAxisCount: 2, // 2 columns
+            childAspectRatio: 3.0,
+            children: friendlyRolesList,
+          )),
+      Padding(
+          padding: paddingSmall,
+          child: Text(
+            AppLocalizations.of(context).scaryTeam(numScaryRoles),
+            style: titleTextStyle,
+          )),
+      MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: GridView.count(
+            shrinkWrap: true,
+            crossAxisCount: 2, // 2 columns
+            childAspectRatio: 3.0,
+            children: scaryRolesList,
+          )),
+    ];
+
+    if (amOwner) {
+      children.add(RaisedButton(
+        color: Theme.of(context).accentColor,
+        child: Text(
+          AppLocalizations.of(context).submit,
+          style: buttonTextStyle,
+        ),
+        onPressed: (getNumRolesInTeam(currentRoleIds, Team.FRIENDLY) ==
+            numFriendlyRoles &&
+            getNumRolesInTeam(currentRoleIds, Team.SCARY) ==
+                numScaryRoles)
+            ? () => _store.dispatch(SubmitRolesAction())
+            : null,
+      ));
+    }
+
     return Center(
         child: Card(
       elevation: 2.0,
       margin: paddingMedium,
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Padding(
-            padding: paddingMedium,
-            child: centeredTitle(amOwner
-                ? AppLocalizations.of(context)
-                    .chooseGameRoles(getRoom(_store.state).code)
-                : AppLocalizations.of(context).someoneElseChoosesGameRoles(
-                    getRoom(_store.state).code, getOwnerName(_store.state)))),
-        Padding(
-            padding: paddingSmall,
-            child: Text(
-              AppLocalizations.of(context).friendlyTeam(numFriendlyRoles),
-              style: titleTextStyle,
-            )),
-        MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 2, // 2 columns
-              childAspectRatio: 3.0,
-              children: friendlyRolesList,
-            )),
-        Padding(
-            padding: paddingSmall,
-            child: Text(
-              AppLocalizations.of(context).scaryTeam(numScaryRoles),
-              style: titleTextStyle,
-            )),
-        MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 2, // 2 columns
-              childAspectRatio: 3.0,
-              children: scaryRolesList,
-            )),
-        RaisedButton(
-          color: Theme.of(context).accentColor,
-          child: Text(
-            AppLocalizations.of(context).submit,
-            style: buttonTextStyle,
-          ),
-          onPressed: (getNumRolesInTeam(currentRoleIds, Team.FRIENDLY) ==
-                      numFriendlyRoles &&
-                  getNumRolesInTeam(currentRoleIds, Team.SCARY) ==
-                      numScaryRoles)
-              ? () => _store.dispatch(SubmitRolesAction())
-              : null,
-        ),
-      ]),
+      child: Column(mainAxisSize: MainAxisSize.min, children: children),
     ));
   }
 

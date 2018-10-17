@@ -43,6 +43,7 @@ class Room extends Document {
   final Set<String> roles;
   final Set<String> visibleToAccountant;
   final String brendaGuess; // player ID
+  final bool rolesSubmitted;
 
   Room({
     id,
@@ -55,10 +56,12 @@ class Room extends Document {
     @required this.roles,
     this.visibleToAccountant,
     this.brendaGuess,
+    this.rolesSubmitted = false,
   }) : super(id: id);
 
   factory Room.initial(int numPlayers) =>
-      Room(numPlayers: numPlayers, roles: Roles.getRoleIds(Roles.numPlayersToRolesMap[numPlayers]));
+      Room(numPlayers: numPlayers,
+          roles: Roles.getRoleIds(Roles.numPlayersToRolesMap[numPlayers]));
 
   Room copyWith({
     String id,
@@ -71,6 +74,7 @@ class Room extends Document {
     Set<String> roles,
     Set<String> visibleToAccountant,
     String brendaGuess,
+    bool rolesSubmitted,
   }) {
     return new Room(
       id: id ?? this.id,
@@ -83,6 +87,7 @@ class Room extends Document {
       roles: roles ?? this.roles,
       visibleToAccountant: visibleToAccountant ?? this.visibleToAccountant,
       brendaGuess: brendaGuess ?? this.brendaGuess,
+      rolesSubmitted: rolesSubmitted ?? this.rolesSubmitted,
     );
   }
 
@@ -98,6 +103,7 @@ class Room extends Document {
         roles = _boolMapToSet(json['roles']?.cast<String, bool>()),
         visibleToAccountant = _boolMapToSet(json['visibleToAccountant']?.cast<String, bool>()),
         brendaGuess = json['kingpinGuess'],
+        rolesSubmitted = json['rolesSubmitted'],
         super(id: id);
 
   Map<String, dynamic> toJson() => {
@@ -110,6 +116,7 @@ class Room extends Document {
         'roles': _toBoolMap(roles, Roles.getRoleIds(Roles.allRoles)),
         'visibleToAccountant': _toBoolMap(visibleToAccountant, visibleToAccountant),
         'kingpinGuessed': brendaGuess,
+        'rolesSubmitted': rolesSubmitted,
       };
 
   bool get complete => completedAt != null;
@@ -124,7 +131,8 @@ class Room extends Document {
           roles == other.roles &&
           completedAt == other.completedAt &&
           visibleToAccountant == other.visibleToAccountant &&
-          brendaGuess == other.brendaGuess;
+          brendaGuess == other.brendaGuess &&
+          rolesSubmitted == other.rolesSubmitted;
 
   @override
   int get hashCode =>
@@ -134,11 +142,12 @@ class Room extends Document {
       roles.hashCode ^
       completedAt.hashCode ^
       visibleToAccountant.hashCode ^
-      brendaGuess.hashCode;
+      brendaGuess.hashCode ^
+      rolesSubmitted.hashCode;
 
   @override
   String toString() {
-    return 'Room{id: $id, code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles, visibleToAccountant: $visibleToAccountant, brendaGuess: $brendaGuess}';
+    return 'Room{id: $id, code: $code, createdAt: $createdAt, appVersion: $appVersion, owner: $owner, completedAt: $completedAt, numPlayers: $numPlayers, roles: $roles, visibleToAccountant: $visibleToAccountant, brendaGuess: $brendaGuess, rolesSubmitted: $rolesSubmitted}';
   }
 }
 

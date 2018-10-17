@@ -25,6 +25,7 @@ import 'package:heist/widget/endgame.dart';
 import 'package:heist/widget/game_history.dart';
 import 'package:heist/widget/gifting.dart';
 import 'package:heist/widget/haunt_end.dart';
+import 'package:heist/widget/roles_selection.dart';
 import 'package:heist/widget/round_end.dart';
 import 'package:heist/widget/secret_board.dart';
 import 'package:heist/widget/selection_board.dart';
@@ -60,7 +61,6 @@ class GameState extends State<Game> {
       // Note that on Android, this does not guarantee connection to Internet.
       // For instance, the app might have wifi access but it might be a VPN or
       // a hotel WiFi with no access.
-      debugPrint('Status changed: ' + result.toString());
       if (result == ConnectivityResult.none) {
         // connectivity was lost, start the timer
         _connectivityTimer =
@@ -299,13 +299,21 @@ class GameState extends State<Game> {
   }
 
   Widget _loadingScreen() => StoreConnector<GameModel, LoadingScreenViewModel>(
-        converter: (store) => LoadingScreenViewModel._(roomIsAvailable(store.state),
-            waitingForPlayers(store.state), isNewGame(store.state), getPlayers(store.state)),
+        converter: (store) => LoadingScreenViewModel._(
+            roomIsAvailable(store.state),
+            rolesSubmitted(store.state),
+            waitingForPlayers(store.state),
+            isNewGame(store.state),
+            getPlayers(store.state)),
         distinct: true,
         builder: (context, viewModel) {
           if (!viewModel.roomIsAvailable) {
             debugPrint('Waiting for room...');
             return loading();
+          }
+
+          if (!viewModel.rolesHaveBeenChosen) {
+            return RolesSelection(_store);
           }
 
           if (viewModel.waitingForPlayers) {
@@ -369,18 +377,20 @@ class GameState extends State<Game> {
 
 class LoadingScreenViewModel {
   final bool roomIsAvailable;
+  final bool rolesHaveBeenChosen;
   final bool waitingForPlayers;
   final bool isNewGame;
   final List<Player> playersSoFar;
 
-  LoadingScreenViewModel._(
-      this.roomIsAvailable, this.waitingForPlayers, this.isNewGame, this.playersSoFar);
+  LoadingScreenViewModel._(this.roomIsAvailable, this.rolesHaveBeenChosen, this.waitingForPlayers,
+      this.isNewGame, this.playersSoFar);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is LoadingScreenViewModel &&
           roomIsAvailable == other.roomIsAvailable &&
+          rolesHaveBeenChosen == other.rolesHaveBeenChosen &&
           waitingForPlayers == other.waitingForPlayers &&
           isNewGame == other.isNewGame &&
           playersSoFar == other.playersSoFar;
@@ -388,13 +398,18 @@ class LoadingScreenViewModel {
   @override
   int get hashCode =>
       roomIsAvailable.hashCode ^
+      rolesHaveBeenChosen.hashCode ^
       waitingForPlayers.hashCode ^
       isNewGame.hashCode ^
       playersSoFar.hashCode;
 
   @override
   String toString() {
-    return 'LoadingScreenViewModel{roomIsAvailable: $roomIsAvailable, waitingForPlayers: $waitingForPlayers, isNewGame: $isNewGame, playersSoFar: $playersSoFar}';
+    return 'LoadingScreenViewModel{roomIsAvailable: $roomIsAvailable,'
+        ' rolesHaveBeenChosen: $rolesHaveBeenChosen,'
+        ' waitingForPlayers: $waitingForPlayers,'
+        ' isNewGame: $isNewGame,'
+        ' playersSoFar: $playersSoFar}';
   }
 }
 

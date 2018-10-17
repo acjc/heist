@@ -677,6 +677,85 @@ class AppLocalizations {
       desc: 'Body of the dialog telling the user they have lost their internet connection',
     );
   }
+
+  // Choose roles
+
+  String get chooseGameRoles {
+    return Intl.message(
+      'Choose the game roles',
+      name: 'chooseGameRoles',
+      desc: 'The room owner has to pick the roles that will be in the game',
+    );
+  }
+
+  String someoneElseChoosesGameRoles(String owner) {
+    return Intl.message(
+      '$owner is choosing the game roles',
+      name: 'someoneElseChoosesGameRoles',
+      args: [owner],
+      desc: 'The room owner has to pick the roles that will be in the game and this person isn\'t the owner',
+    );
+  }
+
+  String get submit {
+    return Intl.message(
+      'SUBMIT',
+      name: 'submit',
+      desc: 'Button to submit the roles choice',
+    );
+  }
+
+  String friendlyTeam(int numRoles) {
+    return Intl.message(
+      'FRIENDLY TEAM ($numRoles)',
+      name: 'friendlyTeam',
+      args: [numRoles],
+      desc: 'Title over the available roles in the friendly team',
+    );
+  }
+
+  String scaryTeam(int numRoles) {
+    return Intl.message(
+      'SCARY TEAM ($numRoles)',
+      name: 'scaryTeam',
+      args: [numRoles],
+      desc: 'Title over the available roles in the scary team',
+    );
+  }
+
+  String get notAllowed {
+    return Intl.message(
+      'You can\'t do that',
+      name: 'notAllowed',
+      desc: 'Title of the dialog that pops up when users try to do something they can\'t do',
+    );
+  }
+
+  String compulsoryRoles(String bertie, String brenda) {
+    return Intl.message(
+      '$brenda and $bertie have to be in the game.',
+      name: 'compulsoryRoles',
+      args: [bertie, brenda],
+      desc: 'Content of the dialog that pops up when someone tries to deselect Brenda or Bertie in a game',
+    );
+  }
+
+  String get fullTeam {
+    return Intl.message(
+      'This team is full. Remove another role before adding this one.',
+      name: 'fullTeam',
+      desc: 'Content of the dialog that pops up when users try to add a role to a team that is already full',
+    );
+  }
+
+  String get onlyOwnerModifies {
+    return Intl.message(
+      'Only the person who created the room can choose roles.',
+      name: 'onlyOwnerModifies',
+      desc: 'Content of the dialog that pops up when a user that is not the owner tries to choose roles',
+    );
+  }
+
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

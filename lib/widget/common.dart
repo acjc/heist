@@ -68,6 +68,9 @@ Widget iconWidget(BuildContext context, IconData icon, Function onPressed, [bool
 
 Widget loading() => Center(child: CircularProgressIndicator());
 
+Widget centeredTitle(String text) =>
+    Center(child: Text(text, style: titleTextStyle, textAlign: TextAlign.center));
+
 /// Text color for a haunt decision
 Color decisionColour(String decision) {
   switch (decision) {

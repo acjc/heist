@@ -680,19 +680,20 @@ class AppLocalizations {
 
   // Choose roles
 
-  String get chooseGameRoles {
+  String chooseGameRoles(String roomCode) {
     return Intl.message(
-      'Choose the game roles',
+      'Room $roomCode: Choose the game roles',
       name: 'chooseGameRoles',
+      args: [roomCode],
       desc: 'The room owner has to pick the roles that will be in the game',
     );
   }
 
-  String someoneElseChoosesGameRoles(String owner) {
+  String someoneElseChoosesGameRoles(String roomCode, String owner) {
     return Intl.message(
-      '$owner is choosing the game roles',
+      'Room $roomCode: $owner is choosing the game roles',
       name: 'someoneElseChoosesGameRoles',
-      args: [owner],
+      args: [roomCode, owner],
       desc: 'The room owner has to pick the roles that will be in the game and this person isn\'t the owner',
     );
   }

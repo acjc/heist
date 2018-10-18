@@ -40,7 +40,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m10(order) => "Haunt ${order}";
 
-  static m11(name, role) => "${name} is the ${role} \n";
+  static m11(name, role) => "${name} is ${role} \n";
 
   static m12(playersPicked, teamSize) => "Pick a team: ${playersPicked} / ${teamSize}";
 
@@ -76,7 +76,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "bertie" : MessageLookupByLibrary.simpleMessage("Bertie"),
     "bertieConfirmPlayer" : MessageLookupByLibrary.simpleMessage("CONFIRM GUESS"),
     "bertieExplanation" : MessageLookupByLibrary.simpleMessage("You can try to guess who Brenda is ONCE during the game. If you get it right, you will no longer be restricted by maximum bid limits."),
-    "bertiePickPlayer" : MessageLookupByLibrary.simpleMessage("SELECT YOUR KINGPIN GUESS"),
+    "bertiePickPlayer" : MessageLookupByLibrary.simpleMessage("SELECT YOUR BRENDA GUESS"),
     "bertieResult" : m2,
     "bertieResultRight" : MessageLookupByLibrary.simpleMessage("CORRECT!"),
     "bertieResultWrong" : MessageLookupByLibrary.simpleMessage("INCORRECT! :("),

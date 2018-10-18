@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-10-17T22:48:07.049737",
+  "@@last_modified": "2018-10-19T00:19:10.907209",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -295,7 +295,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "identity": "{name} is the {role} \n",
+  "identity": "{name} is {role} \n",
   "@identity": {
     "description": "Identity a player might know",
     "type": "text",
@@ -330,7 +330,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "bertiePickPlayer": "SELECT YOUR KINGPIN GUESS",
+  "bertiePickPlayer": "SELECT YOUR BRENDA GUESS",
   "@bertiePickPlayer": {
     "description": "Dropdown button where Bertie selects a player",
     "type": "text",

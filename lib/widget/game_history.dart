@@ -58,7 +58,7 @@ class _GameHistoryState extends State<GameHistory> {
   Icon getHauntIcon(Haunt haunt, int currentHauntOrder) {
     const double size = 32.0;
     if (haunt.order > currentHauntOrder) {
-      return const Icon(Icons.remove, size: size, color: Colors.blueGrey);
+      return const Icon(Icons.remove, size: size, color: Colors.white70);
     }
     if (!haunt.complete) {
       return const Icon(Icons.adjust, color: HeistColors.amber);

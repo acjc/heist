@@ -196,20 +196,20 @@ class GameState extends State<Game> {
 
   Widget rightIndicator() => StoreConnector<GameModel, bool>(
         distinct: true,
-        ignoreChange: (gameModel) => gameIsReady(gameModel),
+        ignoreChange: (gameModel) => !gameIsReady(gameModel),
         converter: (store) => haveReceivedGiftThisRound(store.state),
         builder: (context, haveReceivedGiftThisRound) {
           List<Widget> children = [];
           if (haveReceivedGiftThisRound) {
             children.add(Icon(
               Icons.cake,
-              color: Colors.blueGrey,
+              color: Colors.white70,
               size: 16.0,
             ));
           }
           children.add(Icon(
             Icons.keyboard_arrow_right,
-            color: Colors.blueGrey,
+            color: Colors.white70,
             size: 32.0,
           ));
           return Card(
@@ -237,7 +237,7 @@ class GameState extends State<Game> {
             padding: indicatorPadding,
             child: Icon(
               Icons.keyboard_arrow_left,
-              color: Colors.blueGrey,
+              color: Colors.white70,
               size: 32.0,
             ),
           ),
@@ -249,7 +249,7 @@ class GameState extends State<Game> {
       );
 
   Widget _mainBoardBody() => StoreConnector<GameModel, MainBoardViewModel>(
-        ignoreChange: (gameModel) => currentHaunt(gameModel) != null,
+        ignoreChange: (gameModel) => currentHaunt(gameModel) == null,
         converter: (store) {
           Haunt haunt = currentHaunt(store.state);
           Round round = currentRound(store.state);

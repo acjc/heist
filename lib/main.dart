@@ -40,7 +40,7 @@ DateTime now() {
 final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
   canvasColor: Colors.white, // for the bottom sheet color
-  primaryColor: Colors.blueGrey,
+  primaryColor: HeistColors.amber,
   accentColor: HeistColors.amber,
   iconTheme: const IconThemeData(color: HeistColors.amber),
   textTheme: TextTheme(
@@ -48,8 +48,9 @@ final ThemeData darkTheme = ThemeData(
     body1: infoTextStyle,
     body2: infoTextStyle,
     caption: subtitleTextStyle,
+    button: buttonTextStyle,
   ),
-  buttonColor: Colors.blueGrey,
+  buttonColor: HeistColors.amber,
   cardColor: Colors.black12,
 );
 
@@ -63,6 +64,7 @@ final ThemeData lightTheme = ThemeData(
     body1: infoTextStyle,
     body2: infoTextStyle,
     caption: subtitleTextStyle,
+    button: buttonTextStyleLight,
   ),
   buttonColor: Colors.blueGrey,
 );
@@ -108,7 +110,7 @@ class MyApp extends StatelessWidget {
         store: store,
         child: MaterialApp(
           navigatorKey: Keys.navigatorKey,
-          title: 'Heist', // can't localise this one because stuff hasn't been set up yet
+          title: 'Ghost Game', // can't localise this one because stuff hasn't been set up yet
           theme: darkTheme,
           home: HomePage(),
           localizationsDelegates: [

@@ -427,7 +427,7 @@ class AppLocalizations {
 
   String identity(String name, String role) {
     return Intl.message(
-      '$name is the $role \n',
+      '$name is $role \n',
       name: 'identity',
       args: [name, role],
       desc: 'Identity a player might know',
@@ -470,7 +470,7 @@ class AppLocalizations {
 
   String get bertiePickPlayer {
     return Intl.message(
-      'SELECT YOUR KINGPIN GUESS',
+      'SELECT YOUR BRENDA GUESS',
       name: 'bertiePickPlayer',
       desc: 'Dropdown button where Bertie selects a player',
     );
@@ -694,7 +694,8 @@ class AppLocalizations {
       'Room $roomCode: $owner is choosing the game roles',
       name: 'someoneElseChoosesGameRoles',
       args: [roomCode, owner],
-      desc: 'The room owner has to pick the roles that will be in the game and this person isn\'t the owner',
+      desc:
+          "The room owner has to pick the roles that will be in the game and this person isn't the owner",
     );
   }
 
@@ -737,7 +738,8 @@ class AppLocalizations {
       '$brenda and $bertie have to be in the game.',
       name: 'compulsoryRoles',
       args: [bertie, brenda],
-      desc: 'Content of the dialog that pops up when someone tries to deselect Brenda or Bertie in a game',
+      desc:
+          'Content of the dialog that pops up when someone tries to deselect Brenda or Bertie in a game',
     );
   }
 
@@ -745,7 +747,8 @@ class AppLocalizations {
     return Intl.message(
       'This team is full. Remove another role before adding this one.',
       name: 'fullTeam',
-      desc: 'Content of the dialog that pops up when users try to add a role to a team that is already full',
+      desc:
+          'Content of the dialog that pops up when users try to add a role to a team that is already full',
     );
   }
 
@@ -753,10 +756,10 @@ class AppLocalizations {
     return Intl.message(
       'Only the person who created the room can choose roles.',
       name: 'onlyOwnerModifies',
-      desc: 'Content of the dialog that pops up when a user that is not the owner tries to choose roles',
+      desc:
+          'Content of the dialog that pops up when a user that is not the owner tries to choose roles',
     );
   }
-
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

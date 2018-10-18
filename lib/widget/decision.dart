@@ -44,8 +44,11 @@ class _ActiveHauntState extends State<ActiveHaunt> {
       bool decisionMade = decisions[player.id] != null;
       return Container(
           alignment: Alignment.center,
-          decoration:
-              BoxDecoration(border: Border.all(color: color), color: decisionMade ? color : null),
+          decoration: BoxDecoration(
+            border: Border.all(color: color),
+            borderRadius: BorderRadius.circular(4.0),
+            color: decisionMade ? color : null,
+          ),
           child: Text(
             player.name,
             style: TextStyle(fontSize: 16.0, color: decisionMade ? Colors.white : null),

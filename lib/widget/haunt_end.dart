@@ -56,7 +56,7 @@ class _HauntEndState extends State<HauntEnd> {
             child: RaisedButton(
               child: Text(
                 AppLocalizations.of(context).continueButton,
-                style: buttonTextStyle,
+                style: Theme.of(context).textTheme.button,
               ),
               onPressed: () {
                 if (!haunt.complete && !completingHaunt) {

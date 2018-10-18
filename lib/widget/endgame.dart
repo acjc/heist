@@ -144,7 +144,7 @@ class _EndgameState extends State<Endgame> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              fullPlayerListForTeam(players, Team.SCARY, Colors.pink),
+              fullPlayerListForTeam(players, Team.SCARY, HeistColors.peach),
               fullPlayerListForTeam(players, Team.FRIENDLY, Colors.purple),
             ],
           )

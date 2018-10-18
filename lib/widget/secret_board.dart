@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
+import 'package:heist/main.dart';
 import 'package:heist/middleware/room_middleware.dart';
 import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
@@ -224,7 +225,7 @@ class SecretBoardState extends State<SecretBoard> {
             items: pickablePlayers.map((String value) {
               return new DropdownMenuItem<String>(
                 value: value,
-                child: new Text(value),
+                child: new Text(value, style: lightTheme.textTheme.subhead),
               );
             }).toList(),
             onChanged: (String newValue) {
@@ -235,7 +236,7 @@ class SecretBoardState extends State<SecretBoard> {
         tiles.add(new RaisedButton(
             child: new Text(
               AppLocalizations.of(context).accountantConfirmPlayer,
-              style: buttonTextStyle,
+              style: Theme.of(context).textTheme.button,
             ),
             onPressed: selectingVisibleToAccountant
                 ? null
@@ -282,7 +283,7 @@ class SecretBoardState extends State<SecretBoard> {
         tiles.add(new RaisedButton(
             child: new Text(
               AppLocalizations.of(context).bertieConfirmPlayer,
-              style: buttonTextStyle,
+              style: Theme.of(context).textTheme.button,
             ),
             onPressed: guessingKingpin
                 ? null

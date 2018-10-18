@@ -24,43 +24,35 @@ class _RolesSelectionState extends State<RolesSelection> {
   _RolesSelectionState(this._store);
 
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<GameModel, RolesSelectionModel>(
-          converter: (store) => RolesSelectionModel._(
-              getRoom(store.state).numPlayers,
-              amOwner(store.state),
-              getRoom(store.state).roles),
-          distinct: true,
-          builder: (context, viewModel) {
-            if (getPlayers(_store.state).isNotEmpty) {
-              return choosingRoles(
-                  viewModel.numPlayers, viewModel.amOwner, viewModel.roleIds);
-            } else {
-              return loading();
-            }
-          });
+  Widget build(BuildContext context) => StoreConnector<GameModel, RolesSelectionModel>(
+      converter: (store) => RolesSelectionModel._(
+          getRoom(store.state).numPlayers, amOwner(store.state), getRoom(store.state).roles),
+      distinct: true,
+      builder: (context, viewModel) {
+        if (getPlayers(_store.state).isNotEmpty) {
+          return choosingRoles(viewModel.numPlayers, viewModel.amOwner, viewModel.roleIds);
+        } else {
+          return loading();
+        }
+      });
 
-  Widget choosingRoles(final int numPlayers, final bool amOwner,
-      final Set<String> currentRoleIds) {
+  Widget choosingRoles(final int numPlayers, final bool amOwner, final Set<String> currentRoleIds) {
     final Set<Role> defaultRoles = Roles.numPlayersToRolesMap[numPlayers];
-    final int numFriendlyRoles =
-        getNumRolesInTeam(Roles.getRoleIds(defaultRoles), Team.FRIENDLY);
-    final int numScaryRoles =
-        getNumRolesInTeam(Roles.getRoleIds(defaultRoles), Team.SCARY);
+    final int numFriendlyRoles = getNumRolesInTeam(Roles.getRoleIds(defaultRoles), Team.FRIENDLY);
+    final int numScaryRoles = getNumRolesInTeam(Roles.getRoleIds(defaultRoles), Team.SCARY);
 
-    final List<Widget> friendlyRolesList = getRolesList(Team.FRIENDLY,
-        HeistColors.peach, currentRoleIds, numFriendlyRoles, amOwner);
-    final List<Widget> scaryRolesList = getRolesList(
-        Team.SCARY, HeistColors.purple, currentRoleIds, numScaryRoles, amOwner);
+    final List<Widget> friendlyRolesList =
+        getRolesList(Team.FRIENDLY, HeistColors.peach, currentRoleIds, numFriendlyRoles, amOwner);
+    final List<Widget> scaryRolesList =
+        getRolesList(Team.SCARY, HeistColors.purple, currentRoleIds, numScaryRoles, amOwner);
 
     final List<Widget> children = [
       Padding(
           padding: paddingMedium,
           child: centeredTitle(amOwner
-              ? AppLocalizations.of(context)
-              .chooseGameRoles(getRoom(_store.state).code)
+              ? AppLocalizations.of(context).chooseGameRoles(getRoom(_store.state).code)
               : AppLocalizations.of(context).someoneElseChoosesGameRoles(
-              getRoom(_store.state).code, getOwnerName(_store.state)))),
+                  getRoom(_store.state).code, getOwnerName(_store.state)))),
       Padding(
           padding: paddingSmall,
           child: Text(
@@ -95,15 +87,12 @@ class _RolesSelectionState extends State<RolesSelection> {
 
     if (amOwner) {
       children.add(RaisedButton(
-        color: Theme.of(context).accentColor,
         child: Text(
           AppLocalizations.of(context).submit,
-          style: buttonTextStyle,
+          style: Theme.of(context).textTheme.button,
         ),
-        onPressed: (getNumRolesInTeam(currentRoleIds, Team.FRIENDLY) ==
-            numFriendlyRoles &&
-            getNumRolesInTeam(currentRoleIds, Team.SCARY) ==
-                numScaryRoles)
+        onPressed: (getNumRolesInTeam(currentRoleIds, Team.FRIENDLY) == numFriendlyRoles &&
+                getNumRolesInTeam(currentRoleIds, Team.SCARY) == numScaryRoles)
             ? () => _store.dispatch(SubmitRolesAction())
             : null,
       ));
@@ -118,31 +107,22 @@ class _RolesSelectionState extends State<RolesSelection> {
   }
 
   int getNumRolesInTeam(final Set<String> roleIds, final Team team) {
-    return roleIds
-        .where((roleId) => Roles.getTeam(roleId) == team)
-        .toList()
-        .length;
+    return roleIds.where((roleId) => Roles.getTeam(roleId) == team).toList().length;
   }
 
-  List<Widget> getRolesList(
-      final Team team,
-      final Color color,
-      final Set<String> selectedRoleIds,
-      final int numRolesInTeam,
-      final bool amOwner) {
-    final List<Role> teamRoles = Roles.allRoles
-        .where((role) => Roles.getTeam(role.roleId) == team)
-        .toList();
+  List<Widget> getRolesList(final Team team, final Color color, final Set<String> selectedRoleIds,
+      final int numRolesInTeam, final bool amOwner) {
+    final List<Role> teamRoles =
+        Roles.allRoles.where((role) => Roles.getTeam(role.roleId) == team).toList();
     final List<Widget> rolesList = [];
     rolesList.addAll(List.generate(teamRoles.length, (i) {
       final Role role = teamRoles.elementAt(i);
       final String roleId = role.roleId;
       final bool compulsory = role.compulsory;
       final Text text = Text(Roles.getRoleDisplayName(context, roleId),
-          style: buttonTextStyle, textAlign: TextAlign.center);
-      final Widget content = compulsory
-          ? iconText(Icon(Icons.star, color: Colors.white), text)
-          : text;
+          style: Theme.of(context).textTheme.button, textAlign: TextAlign.center);
+      final Widget content =
+          compulsory ? iconText(Icon(Icons.star, color: Colors.white), text) : text;
       return Padding(
           padding: paddingNano,
           child: RaisedButton(
@@ -151,20 +131,14 @@ class _RolesSelectionState extends State<RolesSelection> {
               onPressed: () => amOwner
                   ? selectedRoleIds.contains(roleId)
                       ? compulsory
-                          ? showCantDoActionDialog(AppLocalizations.of(context)
-                              .compulsoryRoles(
-                                  Roles.getRoleDisplayName(
-                                      context, Roles.bertie.roleId),
-                                  Roles.getRoleDisplayName(
-                                      context, Roles.brenda.roleId)))
+                          ? showCantDoActionDialog(AppLocalizations.of(context).compulsoryRoles(
+                              Roles.getRoleDisplayName(context, Roles.bertie.roleId),
+                              Roles.getRoleDisplayName(context, Roles.brenda.roleId)))
                           : _store.dispatch(RemoveRoleAction(roleId))
-                      : getNumRolesInTeam(selectedRoleIds, team) ==
-                              numRolesInTeam
-                          ? showCantDoActionDialog(
-                              AppLocalizations.of(context).fullTeam)
+                      : getNumRolesInTeam(selectedRoleIds, team) == numRolesInTeam
+                          ? showCantDoActionDialog(AppLocalizations.of(context).fullTeam)
                           : _store.dispatch(AddRoleAction(roleId))
-                  : showCantDoActionDialog(
-                      AppLocalizations.of(context).onlyOwnerModifies)));
+                  : showCantDoActionDialog(AppLocalizations.of(context).onlyOwnerModifies)));
     }));
     return rolesList;
   }

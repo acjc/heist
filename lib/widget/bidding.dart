@@ -41,7 +41,10 @@ Widget bidSelector(
 
 Widget submitButton(BuildContext context, Store<GameModel> store, bool loading, int bidAmount) =>
     RaisedButton(
-        child: Text(AppLocalizations.of(context).submitBid, style: buttonTextStyle),
+        child: Text(
+          AppLocalizations.of(context).submitBid,
+          style: Theme.of(context).textTheme.button,
+        ),
         onPressed: loading
             ? null
             : () => store.dispatch(SubmitBidAction(getSelf(store.state).id, bidAmount)));
@@ -49,7 +52,10 @@ Widget submitButton(BuildContext context, Store<GameModel> store, bool loading, 
 Widget cancelButton(BuildContext context, Store<GameModel> store, bool loading, Bid bid) =>
     RaisedButton(
         color: HeistColors.peach,
-        child: Text(AppLocalizations.of(context).cancelBid, style: buttonTextStyle),
+        child: Text(
+          AppLocalizations.of(context).cancelBid,
+          style: Theme.of(context).textTheme.button,
+        ),
         onPressed: loading || bid == null ? null : () => store.dispatch(CancelBidAction()));
 
 Widget bidding(Store<GameModel> store) => StoreConnector<GameModel, BiddingViewModel>(

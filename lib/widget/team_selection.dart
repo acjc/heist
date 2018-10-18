@@ -101,7 +101,10 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
   Widget _continueButton() => FadeTransition(
         opacity: _continueAnimation,
         child: RaisedButton(
-            child: Text(AppLocalizations.of(context).continueToBidding, style: buttonTextStyle),
+            child: Text(
+              AppLocalizations.of(context).continueToBidding,
+              style: Theme.of(context).textTheme.button,
+            ),
             onPressed: () => _store.dispatch(RecordLocalRoundActionAction(
                   currentRound(_store.state).id,
                   LocalRoundAction.TeamSelectionContinue,
@@ -348,7 +351,10 @@ class TeamPickerState extends TeamSelectionState {
     }
     return RaisedButton(
       onPressed: currentTeamIsFull && !loading ? () => _store.dispatch(SubmitTeamAction()) : null,
-      child: Text(AppLocalizations.of(context).submitTeam, style: buttonTextStyle),
+      child: Text(
+        AppLocalizations.of(context).submitTeam,
+        style: Theme.of(context).textTheme.button,
+      ),
     );
   }
 

@@ -40,7 +40,10 @@ class HomePage extends StatelessWidget {
       (oldValue, newValue) => newValue.copyWith(text: newValue.text.toUpperCase()));
 
   Widget _enterRoomButton(BuildContext context, Store<GameModel> store) => new RaisedButton(
-        child: Text(AppLocalizations.of(context).joinGame, style: buttonTextStyle),
+        child: Text(
+          AppLocalizations.of(context).joinGame,
+          style: Theme.of(context).textTheme.button,
+        ),
         onPressed: () async {
           FormState enterCodeState = Keys.homePageCodeKey.currentState;
           FormState enterNameState = Keys.homePageNameKey.currentState;

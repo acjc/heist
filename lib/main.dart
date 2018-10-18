@@ -39,7 +39,7 @@ DateTime now() {
 
 final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
-  canvasColor: Colors.white, // for the bottom sheet color
+  canvasColor: Colors.grey[850], // for the bottom sheet color
   primaryColor: HeistColors.amber,
   accentColor: HeistColors.amber,
   iconTheme: const IconThemeData(color: HeistColors.amber),

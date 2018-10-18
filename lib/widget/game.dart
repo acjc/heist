@@ -177,10 +177,7 @@ class GameState extends State<Game> {
 
   Widget footer(bool indicatorOnRight) {
     Widget gameHistory = Expanded(
-      child: Theme(
-        data: lightTheme,
-        child: GameHistory(_store),
-      ),
+      child: GameHistory(_store),
     );
 
     List<Widget> children =

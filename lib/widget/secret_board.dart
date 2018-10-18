@@ -236,7 +236,7 @@ class SecretBoardState extends State<SecretBoard> {
         tiles.add(new RaisedButton(
             child: new Text(
               AppLocalizations.of(context).accountantConfirmPlayer,
-              style: buttonTextStyle,
+              style: Theme.of(context).textTheme.button,
             ),
             onPressed: selectingVisibleToAccountant
                 ? null
@@ -283,7 +283,7 @@ class SecretBoardState extends State<SecretBoard> {
         tiles.add(new RaisedButton(
             child: new Text(
               AppLocalizations.of(context).bertieConfirmPlayer,
-              style: buttonTextStyle,
+              style: Theme.of(context).textTheme.button,
             ),
             onPressed: guessingKingpin
                 ? null

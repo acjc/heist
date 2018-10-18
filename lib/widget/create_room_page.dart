@@ -61,7 +61,10 @@ class CreateRoomPage extends StatelessWidget {
           ));
 
   Widget _createRoomButton(BuildContext context, Store<GameModel> store) => new RaisedButton(
-        child: new Text(AppLocalizations.of(context).createRoom, style: buttonTextStyle),
+        child: new Text(
+          AppLocalizations.of(context).createRoom,
+          style: Theme.of(context).textTheme.button,
+        ),
         onPressed: () async {
           FormState enterNameState = Keys.createRoomPageNameKey.currentState;
           if (enterNameState.validate()) {

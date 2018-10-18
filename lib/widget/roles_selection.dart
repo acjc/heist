@@ -89,7 +89,7 @@ class _RolesSelectionState extends State<RolesSelection> {
       children.add(RaisedButton(
         child: Text(
           AppLocalizations.of(context).submit,
-          style: buttonTextStyle,
+          style: Theme.of(context).textTheme.button,
         ),
         onPressed: (getNumRolesInTeam(currentRoleIds, Team.FRIENDLY) == numFriendlyRoles &&
                 getNumRolesInTeam(currentRoleIds, Team.SCARY) == numScaryRoles)
@@ -120,7 +120,7 @@ class _RolesSelectionState extends State<RolesSelection> {
       final String roleId = role.roleId;
       final bool compulsory = role.compulsory;
       final Text text = Text(Roles.getRoleDisplayName(context, roleId),
-          style: buttonTextStyle, textAlign: TextAlign.center);
+          style: Theme.of(context).textTheme.button, textAlign: TextAlign.center);
       final Widget content =
           compulsory ? iconText(Icon(Icons.star, color: Colors.white), text) : text;
       return Padding(

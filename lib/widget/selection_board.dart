@@ -42,15 +42,12 @@ List<Widget> selectionBoardChildren(
     });
 
 Widget playerTileText(BuildContext context, String playerName, bool isInTeam, bool isLeader) {
-  Color iconColor = isInTeam
-      ? Colors.white
-      : (Theme.of(context).brightness == Brightness.light
-          ? Theme.of(context).primaryColor
-          : Colors.white);
-  TextStyle textStyle = isInTeam ? TextStyle(color: Colors.white, fontSize: 16.0) : null;
-  Text text = Text(playerName, style: textStyle);
+  Color color = Theme.of(context).brightness == Brightness.light
+      ? (isInTeam ? Colors.white : Theme.of(context).textTheme.body1.color)
+      : (isInTeam ? Colors.black87 : Theme.of(context).textTheme.body1.color);
+  Text text = Text(playerName, style: TextStyle(color: color, fontSize: 16.0));
   if (isLeader) {
-    return iconText(Icon(Icons.star, color: iconColor), text);
+    return iconText(Icon(Icons.star, color: color), text);
   }
   return text;
 }

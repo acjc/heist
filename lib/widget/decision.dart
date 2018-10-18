@@ -90,7 +90,7 @@ class _ActiveHauntState extends State<ActiveHaunt> {
       padding: paddingSmall,
       child: RaisedButton(
         onPressed: enabled ? () => widget._store.dispatch(MakeDecisionAction(decision)) : null,
-        child: Text(decision, style: buttonTextStyle),
+        child: Text(decision, style: Theme.of(context).textTheme.button),
       ));
 
   @override

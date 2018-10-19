@@ -85,9 +85,8 @@ class CreateRoomAction extends MiddlewareAction {
         createdAt: now(),
         appVersion: appVersion,
         owner: getPlayerInstallId(store.state),
-        numPlayers: store.state.room.numPlayers,
-        roles: store.state.room.roles,
-        visibleToAccountant: store.state.room.visibleToAccountant);
+        numPlayers: getRoom(store.state).numPlayers,
+        roles: getRoom(store.state).roles);
     String roomId = await store.state.db.upsertRoom(room);
     store.dispatch(new UpdateStateAction<Room>(room.copyWith(id: roomId)));
   }
@@ -170,5 +169,37 @@ class GuessBrendaAction extends MiddlewareAction {
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
     return withRequest(Request.GuessingBrenda, store,
         (store) => store.state.db.guessBrenda(getRoom(store.state).id, playerId));
+  }
+}
+
+class AddRoleAction extends MiddlewareAction {
+  final String roleId;
+
+  AddRoleAction(this.roleId);
+
+  @override
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
+    return withRequest(Request.UpdatingRoles, store,
+            (store) => store.state.db.updateRole(getRoom(store.state).id, roleId, true));
+  }
+}
+
+class RemoveRoleAction extends MiddlewareAction {
+  final String roleId;
+
+  RemoveRoleAction(this.roleId);
+
+  @override
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
+    return withRequest(Request.UpdatingRoles, store,
+            (store) => store.state.db.updateRole(getRoom(store.state).id, roleId, false));
+  }
+}
+
+class SubmitRolesAction extends MiddlewareAction {
+  @override
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
+    return withRequest(Request.SubmittingRoles, store,
+            (store) => store.state.db.submitRoles(getRoom(store.state).id));
   }
 }

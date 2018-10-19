@@ -101,7 +101,10 @@ abstract class ExclusionsState extends State<Exclusions> with TickerProviderStat
   Widget _continueButton() => FadeTransition(
         opacity: _continueAnimation,
         child: RaisedButton(
-            child: Text(AppLocalizations.of(context).continueToBidding, style: buttonTextStyle),
+            child: Text(
+              AppLocalizations.of(context).continueToBidding,
+              style: Theme.of(context).textTheme.button,
+            ),
             onPressed: () => _store.dispatch(RecordLocalRoundActionAction(
                   currentRound(_store.state).id,
                   LocalRoundAction.TeamSelectionContinue,
@@ -351,7 +354,10 @@ class ExclusionsPickerState extends ExclusionsState {
     return RaisedButton(
       onPressed:
           allExclusionsPicked && !loading ? () => _store.dispatch(SubmitExclusionsAction()) : null,
-      child: Text(AppLocalizations.of(context).submitExclusions, style: buttonTextStyle),
+      child: Text(
+        AppLocalizations.of(context).submitExclusions,
+        style: Theme.of(context).textTheme.button,
+      ),
     );
   }
 

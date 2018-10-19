@@ -276,4 +276,20 @@ class MockFirestoreDb implements FirestoreDb {
   Future<void> guessBrenda(String id, String playerId) {
     return upsertRoom(room.copyWith(brendaGuess: playerId));
   }
+
+  @override
+  Future<void> updateRole(String id, String roleId, bool selected) {
+    Set<String> roles = Set.of(room.roles);
+    if (selected) {
+      roles.add(roleId);
+    } else {
+      roles.remove(roleId);
+    }
+    return upsertRoom(room.copyWith(roles: roles));
+  }
+
+  @override
+  Future<void> submitRoles(String id) {
+    return upsertRoom(room.copyWith(rolesSubmitted: true));
+  }
 }

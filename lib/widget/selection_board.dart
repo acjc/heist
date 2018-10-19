@@ -66,15 +66,12 @@ class PlayerTile extends StatelessWidget {
   PlayerTile(this.context, this.playerName, this.isLeader, this.fill, this.color);
 
   Widget _playerTileText() {
-    Color iconColor = fill
-        ? Colors.white
-        : (Theme.of(context).brightness == Brightness.light
-            ? Theme.of(context).primaryColor
-            : Colors.white);
-    TextStyle textStyle = fill ? TextStyle(color: Colors.white, fontSize: 16.0) : null;
-    Text text = Text(playerName, style: textStyle);
+    Color color = Theme.of(context).brightness == Brightness.light
+        ? (fill ? Colors.white : Theme.of(context).textTheme.body1.color)
+        : (fill ? Colors.black87 : Theme.of(context).textTheme.body1.color);
+    Text text = Text(playerName, style: TextStyle(color: color, fontSize: 16.0));
     if (isLeader) {
-      return iconText(Icon(Icons.star, color: iconColor), text);
+      return iconText(Icon(Icons.star, color: color), text);
     }
     return text;
   }

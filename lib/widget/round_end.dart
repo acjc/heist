@@ -102,7 +102,10 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
       converter: (store) => requestInProcess(store.state, Request.CompletingRound),
       distinct: true,
       builder: (context, completingRound) => RaisedButton(
-            child: Text(AppLocalizations.of(context).continueButton, style: buttonTextStyle),
+            child: Text(
+              AppLocalizations.of(context).continueButton,
+              style: Theme.of(context).textTheme.button,
+            ),
             onPressed: () {
               if (!round.complete && !completingRound) {
                 _store.dispatch(CompleteRoundAction(round.id));

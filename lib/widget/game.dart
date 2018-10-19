@@ -25,6 +25,7 @@ import 'package:heist/widget/exclusions.dart';
 import 'package:heist/widget/game_history.dart';
 import 'package:heist/widget/gifting.dart';
 import 'package:heist/widget/haunt_end.dart';
+import 'package:heist/widget/roles_selection.dart';
 import 'package:heist/widget/round_end.dart';
 import 'package:heist/widget/secret_board.dart';
 import 'package:heist/widget/selection_board.dart';
@@ -162,10 +163,7 @@ class GameState extends State<Game> {
 
   Widget footer(bool indicatorOnRight) {
     Widget gameHistory = Expanded(
-      child: Theme(
-        data: lightTheme,
-        child: GameHistory(_store),
-      ),
+      child: GameHistory(_store),
     );
 
     List<Widget> children =
@@ -188,13 +186,13 @@ class GameState extends State<Game> {
           if (haveReceivedGiftThisRound) {
             children.add(Icon(
               Icons.cake,
-              color: Colors.blueGrey,
+              color: Colors.white70,
               size: 16.0,
             ));
           }
           children.add(Icon(
             Icons.keyboard_arrow_right,
-            color: Colors.blueGrey,
+            color: Colors.white70,
             size: 32.0,
           ));
           return Card(
@@ -222,7 +220,7 @@ class GameState extends State<Game> {
             padding: indicatorPadding,
             child: Icon(
               Icons.keyboard_arrow_left,
-              color: Colors.blueGrey,
+              color: Colors.white70,
               size: 32.0,
             ),
           ),
@@ -284,13 +282,21 @@ class GameState extends State<Game> {
   }
 
   Widget _loadingScreen() => StoreConnector<GameModel, LoadingScreenViewModel>(
-        converter: (store) => LoadingScreenViewModel._(roomIsAvailable(store.state),
-            waitingForPlayers(store.state), isNewGame(store.state), getPlayers(store.state)),
+        converter: (store) => LoadingScreenViewModel._(
+            roomIsAvailable(store.state),
+            rolesSubmitted(store.state),
+            waitingForPlayers(store.state),
+            isNewGame(store.state),
+            getPlayers(store.state)),
         distinct: true,
         builder: (context, viewModel) {
           if (!viewModel.roomIsAvailable) {
             debugPrint('Waiting for room...');
             return loading();
+          }
+
+          if (!viewModel.rolesHaveBeenChosen) {
+            return RolesSelection(_store);
           }
 
           if (viewModel.waitingForPlayers) {
@@ -354,18 +360,20 @@ class GameState extends State<Game> {
 
 class LoadingScreenViewModel {
   final bool roomIsAvailable;
+  final bool rolesHaveBeenChosen;
   final bool waitingForPlayers;
   final bool isNewGame;
   final List<Player> playersSoFar;
 
-  LoadingScreenViewModel._(
-      this.roomIsAvailable, this.waitingForPlayers, this.isNewGame, this.playersSoFar);
+  LoadingScreenViewModel._(this.roomIsAvailable, this.rolesHaveBeenChosen, this.waitingForPlayers,
+      this.isNewGame, this.playersSoFar);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is LoadingScreenViewModel &&
           roomIsAvailable == other.roomIsAvailable &&
+          rolesHaveBeenChosen == other.rolesHaveBeenChosen &&
           waitingForPlayers == other.waitingForPlayers &&
           isNewGame == other.isNewGame &&
           playersSoFar == other.playersSoFar;
@@ -373,13 +381,18 @@ class LoadingScreenViewModel {
   @override
   int get hashCode =>
       roomIsAvailable.hashCode ^
+      rolesHaveBeenChosen.hashCode ^
       waitingForPlayers.hashCode ^
       isNewGame.hashCode ^
       playersSoFar.hashCode;
 
   @override
   String toString() {
-    return 'LoadingScreenViewModel{roomIsAvailable: $roomIsAvailable, waitingForPlayers: $waitingForPlayers, isNewGame: $isNewGame, playersSoFar: $playersSoFar}';
+    return 'LoadingScreenViewModel{roomIsAvailable: $roomIsAvailable,'
+        ' rolesHaveBeenChosen: $rolesHaveBeenChosen,'
+        ' waitingForPlayers: $waitingForPlayers,'
+        ' isNewGame: $isNewGame,'
+        ' playersSoFar: $playersSoFar}';
   }
 }
 

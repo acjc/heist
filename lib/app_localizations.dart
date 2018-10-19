@@ -420,7 +420,7 @@ class AppLocalizations {
 
   String identity(String name, String role) {
     return Intl.message(
-      '$name is the $role \n',
+      '$name is $role \n',
       name: 'identity',
       args: [name, role],
       desc: 'Identity a player might know',
@@ -463,7 +463,7 @@ class AppLocalizations {
 
   String get bertiePickPlayer {
     return Intl.message(
-      'SELECT YOUR KINGPIN GUESS',
+      'SELECT YOUR BRENDA GUESS',
       name: 'bertiePickPlayer',
       desc: 'Dropdown button where Bertie selects a player',
     );
@@ -667,6 +667,89 @@ class AppLocalizations {
       'You need to be connected to the internet to be able to play.',
       name: 'noConnectionDialogText',
       desc: 'Body of the dialog telling the user they have lost their internet connection',
+    );
+  }
+
+  // Choose roles
+
+  String chooseGameRoles(String roomCode) {
+    return Intl.message(
+      'Room $roomCode: Choose the game roles',
+      name: 'chooseGameRoles',
+      args: [roomCode],
+      desc: 'The room owner has to pick the roles that will be in the game',
+    );
+  }
+
+  String someoneElseChoosesGameRoles(String roomCode, String owner) {
+    return Intl.message(
+      'Room $roomCode: $owner is choosing the game roles',
+      name: 'someoneElseChoosesGameRoles',
+      args: [roomCode, owner],
+      desc:
+          "The room owner has to pick the roles that will be in the game and this person isn't the owner",
+    );
+  }
+
+  String get submit {
+    return Intl.message(
+      'SUBMIT',
+      name: 'submit',
+      desc: 'Button to submit the roles choice',
+    );
+  }
+
+  String friendlyTeam(int numRoles) {
+    return Intl.message(
+      'FRIENDLY TEAM ($numRoles)',
+      name: 'friendlyTeam',
+      args: [numRoles],
+      desc: 'Title over the available roles in the friendly team',
+    );
+  }
+
+  String scaryTeam(int numRoles) {
+    return Intl.message(
+      'SCARY TEAM ($numRoles)',
+      name: 'scaryTeam',
+      args: [numRoles],
+      desc: 'Title over the available roles in the scary team',
+    );
+  }
+
+  String get notAllowed {
+    return Intl.message(
+      'You can\'t do that',
+      name: 'notAllowed',
+      desc: 'Title of the dialog that pops up when users try to do something they can\'t do',
+    );
+  }
+
+  String compulsoryRoles(String bertie, String brenda) {
+    return Intl.message(
+      '$brenda and $bertie have to be in the game.',
+      name: 'compulsoryRoles',
+      args: [bertie, brenda],
+      desc:
+          'Content of the dialog that pops up when someone tries to deselect Brenda or Bertie in a game',
+    );
+  }
+
+  String get fullTeam {
+    return Intl.message(
+      'This team is full. Remove another role before adding this one.',
+      name: 'fullTeam',
+      desc:
+          'Content of the dialog that pops up when users try to add a role to a team that is already full',
+    );
+  }
+
+  String get onlyOwnerModifies {
+    return Intl.message(
+      'Only the person who created the room can choose roles.',
+      name: 'onlyOwnerModifies',
+      desc:
+          'Content of the dialog that pops up when a user that is not the owner tries to choose roles',
     );
   }
 }

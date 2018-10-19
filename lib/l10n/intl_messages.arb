@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-10-02T09:45:19.138180",
+  "@@last_modified": "2018-10-19T00:19:10.907209",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -295,7 +295,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "identity": "{name} is the {role} \n",
+  "identity": "{name} is {role} \n",
   "@identity": {
     "description": "Identity a player might know",
     "type": "text",
@@ -330,7 +330,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "bertiePickPlayer": "SELECT YOUR KINGPIN GUESS",
+  "bertiePickPlayer": "SELECT YOUR BRENDA GUESS",
   "@bertiePickPlayer": {
     "description": "Dropdown button where Bertie selects a player",
     "type": "text",
@@ -498,6 +498,72 @@
   "noConnectionDialogText": "You need to be connected to the internet to be able to play.",
   "@noConnectionDialogText": {
     "description": "Body of the dialog telling the user they have lost their internet connection",
+    "type": "text",
+    "placeholders": {}
+  },
+  "chooseGameRoles": "Room {roomCode}: Choose the game roles",
+  "@chooseGameRoles": {
+    "description": "The room owner has to pick the roles that will be in the game",
+    "type": "text",
+    "placeholders": {
+      "roomCode": {}
+    }
+  },
+  "someoneElseChoosesGameRoles": "Room {roomCode}: {owner} is choosing the game roles",
+  "@someoneElseChoosesGameRoles": {
+    "description": "The room owner has to pick the roles that will be in the game and this person isn't the owner",
+    "type": "text",
+    "placeholders": {
+      "roomCode": {},
+      "owner": {}
+    }
+  },
+  "submit": "SUBMIT",
+  "@submit": {
+    "description": "Button to submit the roles choice",
+    "type": "text",
+    "placeholders": {}
+  },
+  "friendlyTeam": "FRIENDLY TEAM ({numRoles})",
+  "@friendlyTeam": {
+    "description": "Title over the available roles in the friendly team",
+    "type": "text",
+    "placeholders": {
+      "numRoles": {}
+    }
+  },
+  "scaryTeam": "SCARY TEAM ({numRoles})",
+  "@scaryTeam": {
+    "description": "Title over the available roles in the scary team",
+    "type": "text",
+    "placeholders": {
+      "numRoles": {}
+    }
+  },
+  "notAllowed": "You can't do that",
+  "@notAllowed": {
+    "description": "Title of the dialog that pops up when users try to do something they can't do",
+    "type": "text",
+    "placeholders": {}
+  },
+  "compulsoryRoles": "{brenda} and {bertie} have to be in the game.",
+  "@compulsoryRoles": {
+    "description": "Content of the dialog that pops up when someone tries to deselect Brenda or Bertie in a game",
+    "type": "text",
+    "placeholders": {
+      "bertie": {},
+      "brenda": {}
+    }
+  },
+  "fullTeam": "This team is full. Remove another role before adding this one.",
+  "@fullTeam": {
+    "description": "Content of the dialog that pops up when users try to add a role to a team that is already full",
+    "type": "text",
+    "placeholders": {}
+  },
+  "onlyOwnerModifies": "Only the person who created the room can choose roles.",
+  "@onlyOwnerModifies": {
+    "description": "Content of the dialog that pops up when a user that is not the owner tries to choose roles",
     "type": "text",
     "placeholders": {}
   }

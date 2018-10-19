@@ -138,6 +138,8 @@ class Role {
   final Set<String> knownIds;
 
   Role({@required this.roleId, @required this.displayNameFunc, @required this.team, this.knownIds});
+
+  bool get compulsory => roleId == Roles.bertie.roleId || roleId == Roles.brenda.roleId;
 }
 
 @immutable

@@ -32,12 +32,13 @@ Widget giftSelector(BuildContext context, Store<GameModel> store, int giftAmount
       ],
     );
 
-Widget recipientSelection(Store<GameModel> store, int giftAmount, bool loading) {
+Widget recipientSelection(
+    BuildContext context, Store<GameModel> store, int giftAmount, bool loading) {
   List<Player> otherPlayers = getOtherPlayers(store.state);
   return new TeamGridView(new List.generate(otherPlayers.length, (i) {
     Player player = otherPlayers[i];
     return new RaisedButton(
-      child: new Text(player.name, style: buttonTextStyle),
+      child: new Text(player.name, style: Theme.of(context).textTheme.button),
       onPressed: loading || giftAmount <= 0
           ? null
           : () => store.dispatch(new SendGiftAction(player.id, giftAmount)),
@@ -72,7 +73,7 @@ Widget gifting(Store<GameModel> store) => new StoreConnector<GameModel, GiftingV
           giftSelector(
               context, store, min(viewModel.giftAmount, viewModel.balance), viewModel.balance),
           new Text(AppLocalizations.of(context).chooseGiftRecipient, style: infoTextStyle),
-          recipientSelection(store, viewModel.giftAmount, viewModel.loading),
+          recipientSelection(context, store, viewModel.giftAmount, viewModel.loading),
         ]);
       }
 

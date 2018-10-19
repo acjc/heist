@@ -227,6 +227,20 @@ class FirestoreDb {
     return _updateRoom(id, data);
   }
 
+  Future<void> updateRole(String id, String roleId, bool selected) {
+    Map<String, dynamic> data = {
+      'roles': {roleId: selected},
+    };
+    return _updateRoom(id, data);
+  }
+
+  Future<void> submitRoles(String id) {
+    Map<String, dynamic> data = {
+      'rolesSubmitted': true,
+    };
+    return _updateRoom(id, data);
+  }
+
   Future<void> _updateHaunt(String hauntId, Map<String, dynamic> data) {
     return _firestore.collection('heists').document(hauntId).setData(data, merge: true);
   }

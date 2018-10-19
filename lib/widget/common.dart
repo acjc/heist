@@ -23,7 +23,8 @@ const TextStyle bigNumberTextStyle = const TextStyle(fontSize: 30.0, fontWeight:
 const TextStyle titleTextStyle = const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold);
 const TextStyle subtitleTextStyle = const TextStyle(fontSize: 13.0);
 const TextStyle dropdownTextStyle = const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold);
-const TextStyle buttonTextStyle = const TextStyle(color: Colors.white, fontSize: 16.0);
+const TextStyle buttonTextStyle = const TextStyle(color: Colors.black87, fontSize: 16.0);
+const TextStyle buttonTextStyleLight = const TextStyle(color: Colors.white, fontSize: 16.0);
 const TextStyle chipTextStyle = const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
 
 /// elevation: 1.0
@@ -68,6 +69,9 @@ Widget iconWidget(BuildContext context, IconData icon, Function onPressed, [bool
     );
 
 Widget loading() => Center(child: CircularProgressIndicator());
+
+Widget centeredTitle(String text) =>
+    Center(child: Text(text, style: titleTextStyle, textAlign: TextAlign.center));
 
 /// Text color for a haunt decision
 Color decisionColour(String decision) {

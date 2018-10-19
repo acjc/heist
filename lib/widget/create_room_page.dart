@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_dev_tools/flutter_redux_dev_tools.dart';
 import 'package:heist/app_localizations.dart';
-import 'package:heist/colors.dart';
 import 'package:heist/keys.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/room_middleware.dart';
 import 'package:heist/reducers/room_reducers.dart';
-import 'package:heist/role.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/background.dart';
 import 'package:heist/widget/common.dart';
@@ -16,52 +14,32 @@ import 'package:heist/widget/home_page.dart';
 import 'package:redux/redux.dart';
 
 class CreateRoomPage extends StatelessWidget {
-  Widget _numPlayersSelector(Store<GameModel> store) {
-    return new StoreConnector<GameModel, int>(
-        distinct: true,
-        converter: (store) => store.state.room.numPlayers,
-        builder: (context, int numPlayers) {
-          return new Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              iconWidget(
-                context,
-                Icons.arrow_back,
-                () => store.dispatch(new DecrementNumPlayersAction()),
-                numPlayers > minPlayers,
-              ),
-              new Text(numPlayers.toString(), style: bigNumberTextStyle),
-              iconWidget(
-                context,
-                Icons.arrow_forward,
-                () => store.dispatch(new IncrementNumPlayersAction()),
-                numPlayers < maxPlayers,
-              ),
-            ],
-          );
-        });
-  }
-
-  Widget _rolesText() => new StoreConnector<GameModel, Set<String>>(
+  Widget _numPlayersSelector(Store<GameModel> store) => StoreConnector<GameModel, int>(
       distinct: true,
-      converter: (store) => store.state.room.roles,
-      builder: (context, Set<String> roles) => new Padding(
-            padding: paddingMedium,
-            child: new Column(
-              children: new List.generate(roles.length, (i) {
-                String roleId = roles.elementAt(i);
-                Color color =
-                    Roles.getTeam(roleId) == Team.SCARY ? HeistColors.purple : HeistColors.peach;
-                return new Text(
-                  Roles.getRoleDisplayName(context, roleId),
-                  style: new TextStyle(fontSize: 16.0, color: color, fontWeight: FontWeight.bold),
-                );
-              }),
+      converter: (store) => store.state.room.numPlayers,
+      builder: (context, int numPlayers) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            iconWidget(
+              context,
+              Icons.arrow_back,
+              () => store.dispatch(DecrementNumPlayersAction()),
+              numPlayers > minPlayers,
             ),
-          ));
+            Text(numPlayers.toString(), style: bigNumberTextStyle),
+            iconWidget(
+              context,
+              Icons.arrow_forward,
+              () => store.dispatch(IncrementNumPlayersAction()),
+              numPlayers < maxPlayers,
+            ),
+          ],
+        );
+      });
 
-  Widget _createRoomButton(BuildContext context, Store<GameModel> store) => new RaisedButton(
-        child: new Text(
+  Widget _createRoomButton(BuildContext context, Store<GameModel> store) => RaisedButton(
+        child: Text(
           AppLocalizations.of(context).createRoom,
           style: Theme.of(context).textTheme.button,
         ),
@@ -69,8 +47,7 @@ class CreateRoomPage extends StatelessWidget {
           FormState enterNameState = Keys.createRoomPageNameKey.currentState;
           if (enterNameState.validate()) {
             enterNameState.save();
-            store.dispatch(
-                new CreateRoomAction(context, () => new Connectivity().checkConnectivity()));
+            store.dispatch(CreateRoomAction(context, () => Connectivity().checkConnectivity()));
           }
         },
       );
@@ -96,7 +73,6 @@ class CreateRoomPage extends StatelessWidget {
                   ),
                 ),
                 _numPlayersSelector(store),
-                _rolesText(),
                 _createRoomButton(context, store),
               ],
             ),
@@ -107,16 +83,21 @@ class CreateRoomPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Store<GameModel> store = StoreProvider.of<GameModel>(context);
-    return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      endDrawer: isDebugMode() ? Drawer(child: ReduxDevTools<GameModel>(store)) : null,
-      body: Stack(
-        children: [
-          staticBackground(),
-          AppBar(backgroundColor: Colors.transparent),
-          _body(context, store),
-        ],
-      ),
+    return Stack(
+      children: [
+        staticBackground(),
+        Scaffold(
+          resizeToAvoidBottomPadding: false,
+          endDrawer: isDebugMode() ? Drawer(child: ReduxDevTools<GameModel>(store)) : null,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0.0,
+            iconTheme: const IconThemeData(color: Colors.white),
+          ),
+          backgroundColor: Colors.transparent,
+          body: _body(context, store),
+        ),
+      ],
     );
   }
 }

@@ -113,7 +113,7 @@ class _EndgameState extends State<Endgame> {
         return Padding(
           padding: paddingBelowText,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 player.name,

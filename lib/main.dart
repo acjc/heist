@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:heist/app_localizations.dart';
@@ -18,7 +19,10 @@ import 'package:redux_dev_tools/redux_dev_tools.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-void main() => runApp(MyApp(Firestore.instance));
+void main() {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) => runApp(MyApp(Firestore.instance)));
+}
 
 const int minPlayers = 5;
 const int maxPlayers = 10;

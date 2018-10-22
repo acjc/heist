@@ -12,6 +12,7 @@ import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
 import 'package:redux/redux.dart';
+import 'package:screen/screen.dart';
 
 class RoundEnd extends StatefulWidget {
   final Store<GameModel> _store;
@@ -60,6 +61,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
         curve: Interval(0.5, 1.0, curve: Curves.ease),
       ),
     );
+    Screen.keepOn(true);
   }
 
   /// NB. Offset is a scaling factor rather than an absolute value. Negative y offset is upwards.
@@ -93,6 +95,7 @@ class _RoundEndState extends State<RoundEnd> with SingleTickerProviderStateMixin
 
   @override
   dispose() {
+    Screen.keepOn(false);
     _controller?.dispose();
     _controller = null;
     super.dispose();

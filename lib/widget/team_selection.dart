@@ -14,6 +14,7 @@ import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
 import 'package:heist/widget/selection_board.dart';
 import 'package:redux/redux.dart';
+import 'package:screen/screen.dart';
 
 class TeamSelection extends StatefulWidget {
   final Store<GameModel> _store;
@@ -50,10 +51,12 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
         AnimationController(duration: const Duration(milliseconds: 2000), vsync: this);
     _continueAnimation = Tween(begin: 0.0, end: 1.0)
         .animate(CurvedAnimation(parent: _continueController, curve: Curves.ease));
+    Screen.keepOn(true);
   }
 
   @override
   dispose() {
+    Screen.keepOn(false);
     _continueController?.dispose();
     _continueController = null;
     _pulseController?.dispose();

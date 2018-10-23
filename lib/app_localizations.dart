@@ -530,7 +530,7 @@ class AppLocalizations {
 
   String get chooseGiftRecipient {
     return Intl.message(
-      'Choose a player to send a gift to:',
+      'Choose a player to send a gift to',
       name: 'chooseGiftRecipient',
       desc: 'Next to the list of players where you select who to send a gift to',
     );
@@ -573,27 +573,49 @@ class AppLocalizations {
 
   String get putYouInTeam {
     return Intl.message(
-      ' to put you in the team!',
+      " to pick you and tap JOIN TEAM below",
       name: 'putYouInTeam',
       desc: 'Convince leader to pick you in the team (2 / 2)',
     );
   }
 
+  String get joinTeam {
+    return Intl.message(
+      'JOIN TEAM',
+      name: 'joinTeam',
+      desc: 'JOIN TEAM button',
+    );
+  }
+
+  String get leaveTeam {
+    return Intl.message(
+      'LEAVE TEAM',
+      name: 'leaveTeam',
+      desc: 'LEAVE TEAM button',
+    );
+  }
+
   String waitingForTeamSubmission(String leaderName) {
     return Intl.message(
-      'Waiting for $leaderName to submit team',
+      'Waiting for $leaderName to submit their team',
       name: 'waitingForTeamSubmission',
       args: [leaderName],
       desc: 'Waiting for leader to submit team',
     );
   }
 
-  String pickATeam(int playersPicked, int teamSize) {
+  String get pickATeam => Intl.message(
+        "It's your turn to pick a team!",
+        name: 'pickATeam',
+        desc: 'Team picker title',
+      );
+
+  String addPlayersInstructions(int playersPicked, int teamSize) {
     return Intl.message(
-      'Pick a team: $playersPicked / $teamSize',
-      name: 'pickATeam',
+      "Add a player to your team by tapping JOIN TEAM on their screen ($playersPicked / $teamSize)",
+      name: 'addPlayersInstructions',
       args: [playersPicked, teamSize],
-      desc: 'Team picker title',
+      desc: 'Team picker instructions',
     );
   }
 

@@ -11,23 +11,21 @@ import 'room_reducers.dart';
 import 'round_reducers.dart';
 import 'subscription_reducers.dart';
 
-GameModel gameModelReducer(GameModel gameModel, dynamic action) {
-  return new GameModel(
-    db: gameModel.db,
-    subscriptions: subscriptionReducer(gameModel.subscriptions, action),
-    playerInstallId: playerInstallIdReducer(gameModel.playerInstallId, action),
-    playerName: playerNameReducer(gameModel.playerName, action),
-    roomCode: roomCodeReducer(gameModel.roomCode, action),
-    bidAmount: bidAmountReducer(gameModel.bidAmount, action),
-    giftAmount: giftAmountReducer(gameModel.giftAmount, action),
-    requests: requestReducer(gameModel.requests, action),
-    localActions: localActionsReducer(gameModel.localActions, action),
-    room: roomReducer(gameModel.room, action),
-    players: playerReducer(gameModel.players, action),
-    haunts: hauntReducer(gameModel.haunts, action),
-    rounds: roundReducer(gameModel.rounds, action),
-  );
-}
+GameModel gameModelReducer(GameModel gameModel, dynamic action) => GameModel(
+      db: gameModel.db,
+      subscriptions: subscriptionReducer(gameModel.subscriptions, action),
+      playerInstallId: playerInstallIdReducer(gameModel.playerInstallId, action),
+      playerName: playerNameReducer(gameModel.playerName, action),
+      roomCode: roomCodeReducer(gameModel.roomCode, action),
+      bidAmount: bidAmountReducer(gameModel.bidAmount, action),
+      giftAmount: giftAmountReducer(gameModel.giftAmount, action),
+      requests: requestReducer(gameModel.requests, action),
+      localActions: localActionsReducer(gameModel.localActions, action),
+      room: roomReducer(gameModel.room, action),
+      players: playerReducer(gameModel.players, action),
+      haunts: hauntReducer(gameModel.haunts, action),
+      rounds: roundReducer(gameModel.rounds, action),
+    );
 
 /// Actions know how to reduce themselves.
 abstract class Action<State> {
@@ -46,23 +44,5 @@ class UpdateStateAction<State> extends Action<State> {
   @override
   State reduce(State state, action) {
     return this.state ?? state;
-  }
-}
-
-/// Use to replace a value for a key in map state.
-class UpdateMapEntryAction<Key, Value> extends Action<Map<Key, Value>> {
-  final Key key;
-  final Value value;
-
-  UpdateMapEntryAction(this.key, this.value);
-
-  @override
-  Map<Key, Value> reduce(Map<Key, Value> state, action) {
-    if (value == null) {
-      return state;
-    }
-    Map<Key, Value> updated = state != null ? new Map.from(state) : new Map();
-    updated[key] = value;
-    return updated;
   }
 }

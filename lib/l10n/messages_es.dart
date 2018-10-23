@@ -20,29 +20,29 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(maxBalances) => "You can also see the balance of up to ${maxBalances} people";
 
-  static m1(numPlayers) => "There are ${numPlayers} spots available! Highest, then fastest, bids win!";
+  static m1(playersPicked, teamSize) => "Add a player to your team by tapping JOIN TEAM on their screen (${playersPicked} / ${teamSize})";
 
-  static m2(name, result) => "You checked if ${name} is Brenda. This is ${result}";
+  static m2(numPlayers) => "There are ${numPlayers} spots available! Highest, then fastest, bids win!";
 
-  static m3(length, numPlayers) => "Bidders so far (${length} / ${numPlayers})";
+  static m3(name, result) => "You checked if ${name} is Brenda. This is ${result}";
 
-  static m4(brendaDisplayName) => "...received by ${brendaDisplayName}";
+  static m4(length, numPlayers) => "Bidders so far (${length} / ${numPlayers})";
 
-  static m5(roomCode) => "Room ${roomCode}: Choose the game roles";
+  static m5(brendaDisplayName) => "...received by ${brendaDisplayName}";
 
-  static m6(bertie, brenda) => "${brenda} and ${bertie} have to be in the game.";
+  static m6(roomCode) => "Room ${roomCode}: Choose the game roles";
 
-  static m7(numRoles) => "FRIENDLY TEAM (${numRoles})";
+  static m7(bertie, brenda) => "${brenda} and ${bertie} have to be in the game.";
 
-  static m8(amount, recipientName) => "You have already sent a gift this round of ${amount} to ${recipientName}";
+  static m8(numRoles) => "FRIENDLY TEAM (${numRoles})";
 
-  static m9(price) => "Price: ${price}";
+  static m9(amount, recipientName) => "You have already sent a gift this round of ${amount} to ${recipientName}";
 
-  static m10(order) => "Haunt ${order}";
+  static m10(price) => "Price: ${price}";
 
-  static m11(name, role) => "${name} is ${role} \n";
+  static m11(order) => "Haunt ${order}";
 
-  static m12(playersPicked, teamSize) => "Pick a team: ${playersPicked} / ${teamSize}";
+  static m12(name, role) => "${name} is ${role} \n";
 
   static m13(playersPicked, teamSize) => "TEAM (${playersPicked} / ${teamSize})";
 
@@ -62,7 +62,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m21(playersSoFar, totalPlayers) => "Waiting for players (${playersSoFar} / ${totalPlayers})";
 
-  static m22(leaderName) => "Waiting for ${leaderName} to submit team";
+  static m22(leaderName) => "Waiting for ${leaderName} to submit their team";
 
   static m23(winner) => "${winner} win!";
 
@@ -71,24 +71,25 @@ class MessageLookup extends MessageLookupByLibrary {
     "accountantConfirmPlayer" : MessageLookupByLibrary.simpleMessage("CONFIRM SELECTION"),
     "accountantExplanation" : m0,
     "accountantPickPlayer" : MessageLookupByLibrary.simpleMessage("PICK BALANCE TO SEE"),
-    "auctionDescription" : m1,
+    "addPlayersInstructions" : m1,
+    "auctionDescription" : m2,
     "auctionTitle" : MessageLookupByLibrary.simpleMessage("Auction!"),
     "bertie" : MessageLookupByLibrary.simpleMessage("Bertie"),
     "bertieConfirmPlayer" : MessageLookupByLibrary.simpleMessage("CONFIRM GUESS"),
     "bertieExplanation" : MessageLookupByLibrary.simpleMessage("You can try to guess who Brenda is ONCE during the game. If you get it right, you will no longer be restricted by maximum bid limits."),
     "bertiePickPlayer" : MessageLookupByLibrary.simpleMessage("SELECT YOUR BRENDA GUESS"),
-    "bertieResult" : m2,
+    "bertieResult" : m3,
     "bertieResultRight" : MessageLookupByLibrary.simpleMessage("CORRECT!"),
     "bertieResultWrong" : MessageLookupByLibrary.simpleMessage("INCORRECT! :("),
-    "bidders" : m3,
+    "bidders" : m4,
     "bidding" : MessageLookupByLibrary.simpleMessage("BIDDING"),
     "brenda" : MessageLookupByLibrary.simpleMessage("Brenda"),
-    "brendaReceived" : m4,
+    "brendaReceived" : m5,
     "cancelBid" : MessageLookupByLibrary.simpleMessage("CANCEL BID"),
-    "chooseGameRoles" : m5,
-    "chooseGiftRecipient" : MessageLookupByLibrary.simpleMessage("Choose a player to send a gift to:"),
+    "chooseGameRoles" : m6,
+    "chooseGiftRecipient" : MessageLookupByLibrary.simpleMessage("Choose a player to send a gift to"),
     "chooseNumberOfPlayers" : MessageLookupByLibrary.simpleMessage("Choose number of players"),
-    "compulsoryRoles" : m6,
+    "compulsoryRoles" : m7,
     "continueButton" : MessageLookupByLibrary.simpleMessage("CONTINUE"),
     "continueToBidding" : MessageLookupByLibrary.simpleMessage("CONTINUE TO BIDDING"),
     "convince" : MessageLookupByLibrary.simpleMessage("Convince "),
@@ -99,19 +100,21 @@ class MessageLookup extends MessageLookupByLibrary {
     "fail" : MessageLookupByLibrary.simpleMessage("Fail"),
     "formerAccountantGhost" : MessageLookupByLibrary.simpleMessage("Former Accountant Ghost"),
     "friendlyGhost" : MessageLookupByLibrary.simpleMessage("Friendly Ghost"),
-    "friendlyTeam" : m7,
+    "friendlyTeam" : m8,
     "fullTeam" : MessageLookupByLibrary.simpleMessage("This team is full. Remove another role before adding this one."),
     "gameTab" : MessageLookupByLibrary.simpleMessage("GAME"),
-    "giftAlreadySent" : m8,
+    "giftAlreadySent" : m9,
     "giftingTitle" : MessageLookupByLibrary.simpleMessage("GIFTING"),
     "goingAhead" : MessageLookupByLibrary.simpleMessage("The haunt is going ahead without you!"),
     "hauntInProgress" : MessageLookupByLibrary.simpleMessage("Haunt in progress..."),
-    "hauntPrice" : m9,
-    "hauntTitle" : m10,
+    "hauntPrice" : m10,
+    "hauntTitle" : m11,
     "homepageTitle" : MessageLookupByLibrary.simpleMessage("Homepage"),
-    "identity" : m11,
+    "identity" : m12,
     "invalidCode" : MessageLookupByLibrary.simpleMessage("Invalid code"),
     "joinGame" : MessageLookupByLibrary.simpleMessage("JOIN GAME"),
+    "joinTeam" : MessageLookupByLibrary.simpleMessage("JOIN TEAM"),
+    "leaveTeam" : MessageLookupByLibrary.simpleMessage("LEAVE TEAM"),
     "makeYourChoice" : MessageLookupByLibrary.simpleMessage("Make your choice..."),
     "noBid" : MessageLookupByLibrary.simpleMessage("No Bid"),
     "noConnectionDialogText" : MessageLookupByLibrary.simpleMessage("You need to be connected to the internet to be able to play."),
@@ -122,7 +125,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "okButton" : MessageLookupByLibrary.simpleMessage("OK"),
     "onlyOwnerModifies" : MessageLookupByLibrary.simpleMessage("Only the person who created the room can choose roles."),
     "otherIdentities" : MessageLookupByLibrary.simpleMessage("You also know these identities"),
-    "pickATeam" : m12,
+    "pickATeam" : MessageLookupByLibrary.simpleMessage("It\'s your turn to pick a team!"),
     "pickedTeamSize" : m13,
     "pickedYou" : MessageLookupByLibrary.simpleMessage(" picked you in the team!"),
     "playerOrder" : m14,
@@ -131,7 +134,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "pleaseEnterAName" : MessageLookupByLibrary.simpleMessage("Please enter a name"),
     "pot" : MessageLookupByLibrary.simpleMessage("Pot"),
     "price" : MessageLookupByLibrary.simpleMessage("Price"),
-    "putYouInTeam" : MessageLookupByLibrary.simpleMessage(" to put you in the team!"),
+    "putYouInTeam" : MessageLookupByLibrary.simpleMessage(" to pick you and tap JOIN TEAM below"),
     "roundTitle" : m16,
     "scaryGhost" : MessageLookupByLibrary.simpleMessage("Scary Ghost"),
     "scaryTeam" : m17,

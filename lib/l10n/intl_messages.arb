@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-10-19T00:19:10.907209",
+  "@@last_modified": "2018-10-23T17:08:40.350",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -378,7 +378,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "chooseGiftRecipient": "Choose a player to send a gift to:",
+  "chooseGiftRecipient": "Choose a player to send a gift to",
   "@chooseGiftRecipient": {
     "description": "Next to the list of players where you select who to send a gift to",
     "type": "text",
@@ -411,13 +411,25 @@
     "type": "text",
     "placeholders": {}
   },
-  "putYouInTeam": " to put you in the team!",
+  "putYouInTeam": " to pick you and tap JOIN TEAM below",
   "@putYouInTeam": {
     "description": "Convince leader to pick you in the team (2 / 2)",
     "type": "text",
     "placeholders": {}
   },
-  "waitingForTeamSubmission": "Waiting for {leaderName} to submit team",
+  "joinTeam": "JOIN TEAM",
+  "@joinTeam": {
+    "description": "JOIN TEAM button",
+    "type": "text",
+    "placeholders": {}
+  },
+  "leaveTeam": "LEAVE TEAM",
+  "@leaveTeam": {
+    "description": "LEAVE TEAM button",
+    "type": "text",
+    "placeholders": {}
+  },
+  "waitingForTeamSubmission": "Waiting for {leaderName} to submit their team",
   "@waitingForTeamSubmission": {
     "description": "Waiting for leader to submit team",
     "type": "text",
@@ -425,9 +437,15 @@
       "leaderName": {}
     }
   },
-  "pickATeam": "Pick a team: {playersPicked} / {teamSize}",
+  "pickATeam": "It's your turn to pick a team!",
   "@pickATeam": {
     "description": "Team picker title",
+    "type": "text",
+    "placeholders": {}
+  },
+  "addPlayersInstructions": "Add a player to your team by tapping JOIN TEAM on their screen ({playersPicked} / {teamSize})",
+  "@addPlayersInstructions": {
+    "description": "Team picker instructions",
     "type": "text",
     "placeholders": {
       "playersPicked": {},

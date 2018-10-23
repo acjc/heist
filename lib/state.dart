@@ -145,7 +145,7 @@ class Subscriptions {
 
   @override
   String toString() {
-    return 'Subscriptions{subs: $subs}';
+    return 'Subscriptions{numSubs: ${subs.length}}';
   }
 }
 

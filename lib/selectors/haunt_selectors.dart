@@ -20,8 +20,8 @@ final Selector<GameModel, bool> currentHauntIsActive = createSelector3(
         !currentHaunt.allDecided &&
         !currentHaunt.complete);
 
-final Selector<GameModel, bool> goingOnHaunt = createSelector2(
-    currentRound, getSelf, (Round currentRound, Player me) => currentRound.team.contains(me.id));
+bool goingOnHaunt(GameModel gameModel) =>
+    currentRound(gameModel).team.contains(getSelf(gameModel).id);
 
 class Score {
   int scaryScore;

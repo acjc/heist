@@ -4,8 +4,9 @@ import 'package:redux/redux.dart';
 import 'reducers.dart';
 
 final roundReducer = combineReducers<Map<String, List<Round>>>([
-  new TypedReducer<Map<String, List<Round>>, UpdateStateAction<Map<String, List<Round>>>>(reduce),
-  new TypedReducer<Map<String, List<Round>>, PickPlayerAction>(reduce),
+  TypedReducer<Map<String, List<Round>>, PickPlayerAction>(reduce),
+  TypedReducer<Map<String, List<Round>>, RemovePlayerAction>(reduce),
+  TypedReducer<Map<String, List<Round>>, UpdateStateAction<Map<String, List<Round>>>>(reduce),
 ]);
 
 Round findRound(Map<String, List<Round>> rounds, String roundId) =>
@@ -19,7 +20,7 @@ class PickPlayerAction extends Action<Map<String, List<Round>>> {
 
   @override
   Map<String, List<Round>> reduce(Map<String, List<Round>> rounds, action) {
-    Map<String, List<Round>> updated = new Map.from(rounds);
+    Map<String, List<Round>> updated = new Map.of(rounds);
     Round round = findRound(updated, roundId);
     round.team.add(playerId);
     return updated;

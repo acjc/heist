@@ -11,14 +11,16 @@ void main() {
     String roundId = uuid();
     String hauntId = uuid();
     String playerId = uuid();
-    Round round =
-        new Round(id: roundId, order: 1, haunt: hauntId, team: new Set(), startedAt: now());
+    Round round = Round(id: roundId, order: 1, haunt: hauntId, team: Set(), startedAt: now());
     Map<String, List<Round>> rounds = {
       hauntId: [round]
     };
-    rounds = reduce(rounds, new PickPlayerAction(roundId, playerId));
+    rounds = reduce(rounds, PickPlayerAction(roundId, playerId, 1));
     expect(round.team, contains(playerId));
-    rounds = reduce(rounds, new RemovePlayerAction(roundId, playerId));
+    rounds = reduce(rounds, PickPlayerAction(roundId, uuid(), 1));
+    expect(round.team, contains(playerId));
+    expect(round.team.length, 1);
+    rounds = reduce(rounds, RemovePlayerAction(roundId, playerId));
     expect(round.team, isEmpty);
   });
 }

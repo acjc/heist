@@ -15,14 +15,17 @@ Round findRound(Map<String, List<Round>> rounds, String roundId) =>
 class PickPlayerAction extends Action<Map<String, List<Round>>> {
   final String roundId;
   final String playerId;
+  final int playersRequired;
 
-  PickPlayerAction(this.roundId, this.playerId);
+  PickPlayerAction(this.roundId, this.playerId, this.playersRequired);
 
   @override
   Map<String, List<Round>> reduce(Map<String, List<Round>> rounds, action) {
-    Map<String, List<Round>> updated = new Map.of(rounds);
+    Map<String, List<Round>> updated = Map.of(rounds);
     Round round = findRound(updated, roundId);
-    round.team.add(playerId);
+    if (round.team.length < playersRequired) {
+      round.team.add(playerId);
+    }
     return updated;
   }
 }
@@ -35,7 +38,7 @@ class RemovePlayerAction extends Action<Map<String, List<Round>>> {
 
   @override
   Map<String, List<Round>> reduce(Map<String, List<Round>> rounds, action) {
-    Map<String, List<Round>> updated = new Map.of(rounds);
+    Map<String, List<Round>> updated = Map.of(rounds);
     Round round = findRound(updated, roundId);
     round.team.remove(playerId);
     return updated;

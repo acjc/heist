@@ -610,14 +610,11 @@ class AppLocalizations {
         desc: 'Team picker title',
       );
 
-  String addPlayersInstructions(int playersPicked, int teamSize) {
-    return Intl.message(
-      "Add a player to your team by tapping JOIN TEAM on their screen ($playersPicked / $teamSize)",
-      name: 'addPlayersInstructions',
-      args: [playersPicked, teamSize],
-      desc: 'Team picker instructions',
-    );
-  }
+  String get addPlayersInstructions => Intl.message(
+        "Add a player to your team by tapping JOIN TEAM on their screen",
+        name: 'addPlayersInstructions',
+        desc: 'Team picker instructions',
+      );
 
   String pickedTeamSize(int playersPicked, int teamSize) {
     return Intl.message(

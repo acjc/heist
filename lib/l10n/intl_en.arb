@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-10-23T17:08:40.350",
+  "@@last_modified": "2018-10-23T23:54:14.202787",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -443,14 +443,11 @@
     "type": "text",
     "placeholders": {}
   },
-  "addPlayersInstructions": "Add a player to your team by tapping JOIN TEAM on their screen ({playersPicked} / {teamSize})",
+  "addPlayersInstructions": "Add a player to your team by tapping JOIN TEAM on their screen",
   "@addPlayersInstructions": {
     "description": "Team picker instructions",
     "type": "text",
-    "placeholders": {
-      "playersPicked": {},
-      "teamSize": {}
-    }
+    "placeholders": {}
   },
   "pickedTeamSize": "TEAM ({playersPicked} / {teamSize})",
   "@pickedTeamSize": {

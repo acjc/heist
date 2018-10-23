@@ -12,7 +12,6 @@ import 'package:heist/reducers/round_reducers.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
-import 'package:heist/widget/selection_board.dart';
 import 'package:redux/redux.dart';
 import 'package:screen/screen.dart';
 
@@ -140,7 +139,7 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
       ),
       onPressed: !currentTeamIsFull
           ? () {
-              _store.dispatch(PickPlayerAction(round.id, myId));
+              _store.dispatch(PickPlayerAction(round.id, myId, playersRequired));
               _store.dispatch(PickPlayerMiddlewareAction(myId, playersRequired));
             }
           : null,
@@ -452,60 +451,49 @@ class TeamPickerState extends TeamSelectionState {
     bool submittingTeam,
   ) =>
       Expanded(
-        child: Padding(
-          padding: paddingMedium,
-          child: Card(
-            elevation: 6.0,
-            child: Padding(
-              padding: paddingSmall,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AnimationListenable<Color>(
-                    animation: _pulseAnimation,
-                    builder: (context, value, _) => teamSelectionIcon(goingOnHaunt, value, 100.0),
-                  ),
-                  Column(
-                    children: [
-                      Padding(
-                        padding: paddingSmall,
-                        child: Text(
-                          AppLocalizations.of(context).pickATeam,
-                          textAlign: TextAlign.center,
-                          style: boldTextStyle,
-                        ),
-                      ),
-                      Text(
-                        AppLocalizations.of(context)
-                            .addPlayersInstructions(team.length, playersRequired),
+        child: Card(
+          elevation: 6.0,
+          margin: paddingMedium,
+          child: Padding(
+            padding: paddingSmall,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AnimationListenable<Color>(
+                  animation: _pulseAnimation,
+                  builder: (context, value, _) => teamSelectionIcon(goingOnHaunt, value, 100.0),
+                ),
+                Column(
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).pickATeam,
+                      textAlign: TextAlign.center,
+                      style: boldTextStyle,
+                    ),
+                    Padding(
+                      padding: paddingMedium,
+                      child: Text(
+                        AppLocalizations.of(context).addPlayersInstructions,
                         textAlign: TextAlign.center,
                       ),
-                      TeamGridView(_teamPickerChildren(team)),
-                    ],
-                  ),
-                  addRemovePlayerButton(goingOnHaunt, team.length == playersRequired),
-                  Column(
-                    children: [
-                      _actionButton(team, playersRequired, teamSubmitted, submittingTeam),
-                      Divider(),
-                      roundTitleContents(context, _store),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                    Text(
+                      '${team.length} / $playersRequired',
+                      style: bigNumberTextStyle,
+                    ),
+                  ],
+                ),
+                addRemovePlayerButton(goingOnHaunt, team.length == playersRequired),
+                Column(
+                  children: [
+                    _actionButton(team, playersRequired, teamSubmitted, submittingTeam),
+                    Divider(),
+                    roundTitleContents(context, _store),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
       );
-
-  List<Widget> _teamPickerChildren(Set<Player> team) {
-    List<Player> players = getPlayers(_store.state);
-    Player leader = currentLeader(_store.state);
-    return List.generate(players.length, (i) {
-      Player player = players[i];
-      bool isInTeam = team.contains(player);
-      bool isLeader = player.id == leader.id;
-      return playerTile(context, player.name, isInTeam, isLeader);
-    });
-  }
 }

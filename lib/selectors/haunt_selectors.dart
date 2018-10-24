@@ -23,6 +23,15 @@ final Selector<GameModel, bool> currentHauntIsActive = createSelector3(
 bool goingOnHaunt(GameModel gameModel) =>
     currentRound(gameModel).team.contains(getSelf(gameModel).id);
 
+Player leaderForHaunt(GameModel gameModel, Haunt haunt) {
+  Round lastRoundThatHappened = lastRoundForHaunt(getRoom(gameModel), getRounds(gameModel), haunt);
+  if (!lastRoundThatHappened.isAuction) {
+    return leaderForRound(gameModel, lastRoundThatHappened);
+  } else {
+    return null;
+  }
+}
+
 class Score {
   int scaryScore;
   int friendlyScore;

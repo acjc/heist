@@ -81,8 +81,9 @@ Color decisionColour(String decision) {
       return HeistColors.peach;
     case 'STEAL':
       return HeistColors.amber;
+    default:
+      return Colors.white;
   }
-  throw ArgumentError.value(decision, 'decision', 'Unknown decision');
 }
 
 class VerticalDivider extends StatelessWidget {

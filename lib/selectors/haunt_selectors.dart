@@ -32,6 +32,10 @@ Player leaderForHaunt(GameModel gameModel, Haunt haunt) {
   }
 }
 
+bool wasAuction(GameModel gameModel, Haunt haunt) {
+  return leaderForHaunt(gameModel, haunt) == null;
+}
+
 class Score {
   int scaryScore;
   int friendlyScore;

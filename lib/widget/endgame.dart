@@ -88,8 +88,10 @@ class _EndgameState extends State<Endgame> {
         child: Column(
           children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text(AppLocalizations.of(context).hauntTitle(haunt.order),
-                  style: boldTextStyle),
+              iconText(
+                  wasAuction(widget._store.state, haunt) ? Icon(Icons.timer) : null,
+                  Text(AppLocalizations.of(context).hauntTitle(haunt.order), style: boldTextStyle),
+                  trailingIcon: true),
               iconText(
                 Icon(Icons.bubble_chart),
                 Text(pot.toString(), style: infoTextStyle),

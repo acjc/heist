@@ -4,19 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:heist/l10n/messages_all.dart';
 import 'package:intl/intl.dart';
 
-// To add a new string or edit an existing one:
-// - Add a get method that returns an Intl.message here or modify the string in the existing method
-// - Run 'flutter pub pub run intl_translation:extract_to_arb --output-dir=lib/l10n lib/app_localizations.dart'
-//   This will update lib/l10n/intl_messages.arb
-// - Replace the content of lib/l10n/intl_en.arb with the content of the updated intl_messages.arb
-// - Manually update lib/l10n/intl_*.arb (where * isn't English) to reflect the changes
-// - Run 'flutter pub pub run intl_translation:generate_from_arb --output-dir=lib/l10n --no-use-deferred-loading lib/app_localizations.dart lib/l10n/intl_*.arb'
-//   This will update or create lib/l10n/messages_*.dart
-//
-// To add a new language, you need to copy lib/l10n/intl_messages.arb into a
-// new file lib/l10n/intl_*.arb file, where * is the code of the new language.
-// You also need to update the list of supported languages at the bottom of this
-// file (in isSupported) and the supportedLocales in main.dart.
+/// To add a new string or edit an existing one:
+/// - Add a get method that returns an Intl.message here or modify the string in the existing method
+/// - Run 'flutter pub pub run intl_translation:extract_to_arb --output-dir=lib/l10n lib/app_localizations.dart'
+///   This will update lib/l10n/intl_messages.arb
+/// - Replace the content of lib/l10n/intl_en.arb with the content of the updated intl_messages.arb
+/// - Manually update lib/l10n/intl_*.arb (where * isn't English) to reflect the changes
+/// - Run 'flutter pub pub run intl_translation:generate_from_arb --output-dir=lib/l10n --no-use-deferred-loading lib/app_localizations.dart lib/l10n/intl_*.arb'
+///   This will update or create lib/l10n/messages_*.dart
+///
+/// To add a new language, you need to copy lib/l10n/intl_messages.arb into a
+/// new file lib/l10n/intl_*.arb file, where * is the code of the new language.
+/// You also need to update the list of supported languages at the bottom of this
+/// file (in isSupported) and the supportedLocales in main.dart.
+///
+/// NB. Until we properly localise, you can just run ./localise.sh to update strings.
 class AppLocalizations {
   static Future<AppLocalizations> load(Locale locale) {
     final String name = locale.countryCode.isEmpty ? locale.languageCode : locale.toString();

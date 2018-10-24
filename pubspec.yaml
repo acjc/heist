@@ -17,6 +17,7 @@ dependencies:
   flutter_localizations:
       sdk: flutter
   connectivity: ^0.3.1
+  screen: ^0.0.4
 
 dev_dependencies:
   flutter_test:

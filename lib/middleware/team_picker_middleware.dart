@@ -14,8 +14,11 @@ class PickPlayerMiddlewareAction extends MiddlewareAction {
   PickPlayerMiddlewareAction(this.playerId, this.playersRequired);
 
   @override
-  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) =>
-      store.state.db.updateTeam(currentRound(store.state).id, playersRequired, playerId, true);
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) => withRequest(
+      Request.JoiningOrLeavingTeam,
+      store,
+      (store) =>
+          store.state.db.updateTeam(currentRound(store.state).id, playersRequired, playerId, true));
 }
 
 class RemovePlayerMiddlewareAction extends MiddlewareAction {
@@ -25,8 +28,11 @@ class RemovePlayerMiddlewareAction extends MiddlewareAction {
   RemovePlayerMiddlewareAction(this.playerId, this.playersRequired);
 
   @override
-  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) =>
-      store.state.db.updateTeam(currentRound(store.state).id, playersRequired, playerId, false);
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) => withRequest(
+      Request.JoiningOrLeavingTeam,
+      store,
+      (store) => store.state.db
+          .updateTeam(currentRound(store.state).id, playersRequired, playerId, false));
 }
 
 class AuctionBid {

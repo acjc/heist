@@ -89,8 +89,11 @@ class _EndgameState extends State<Endgame> {
           children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               iconText(
-                  wasAuction(widget._store.state, haunt) ? Icon(Icons.timer) : null,
-                  Text(AppLocalizations.of(context).hauntTitle(haunt.order), style: boldTextStyle),
+                  wasAuction(widget._store.state, haunt)
+                      ? Icon(Icons.timer)
+                      : null,
+                  Text(AppLocalizations.of(context).hauntTitle(haunt.order),
+                      style: boldTextStyle),
                   trailingIcon: true),
               iconText(
                 Icon(Icons.bubble_chart),
@@ -203,6 +206,11 @@ class _EndgameState extends State<Endgame> {
         children.add(hauntSummary(haunt, lastRound.pot));
       }
     }
+
+    children.add(RaisedButton(
+        child: new Text(AppLocalizations.of(context).backHome,
+            style: Theme.of(context).textTheme.button),
+        onPressed: () => goBackToMainPage(context)));
 
     return Padding(
       padding: paddingMedium,

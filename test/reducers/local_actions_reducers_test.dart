@@ -29,4 +29,15 @@ void main() {
     expect(localActions.hauntActions.length, 1);
     expect(localActions.hauntActions[hauntId], contains(LocalHauntAction.HauntEndContinue));
   });
+
+  test('test record general local action', () {
+    LocalActions localActions = LocalActions.initial();
+
+    localActions = reduce(
+      localActions,
+      RecordGeneralLocalActionAction(GeneralLocalAction.SecretDescriptionClosed),
+    );
+    expect(localActions.generalActions.length, 1);
+    expect(localActions.generalActions, contains(GeneralLocalAction.SecretDescriptionClosed));
+  });
 }

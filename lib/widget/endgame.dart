@@ -75,8 +75,8 @@ class _EndgameState extends State<Endgame> {
         ),
       ));
 
-  Widget winner(Score score) => Card(
-        elevation: 2.0,
+  Widget winner(Score score) => TitledCard(
+        title: AppLocalizations.of(context).gameResult,
         child: Container(
           alignment: Alignment.center,
           padding: paddingMedium,
@@ -132,8 +132,8 @@ class _EndgameState extends State<Endgame> {
 
   Widget fullPlayerList() {
     List<Player> players = getPlayers(widget._store.state);
-    return Card(
-      elevation: 2.0,
+    return TitledCard(
+      title: AppLocalizations.of(context).playerRoles,
       child: Padding(
         padding: paddingMedium,
         child: Column(children: [
@@ -166,8 +166,7 @@ class _EndgameState extends State<Endgame> {
     Map<String, List<Round>> rounds = getRounds(widget._store.state);
     for (Haunt haunt in haunts) {
       if (haunt.allDecided) {
-        Round lastRound = lastRoundForHaunt(
-            getRoom(widget._store.state), rounds, haunt);
+        Round lastRound = lastRoundForHaunt(getRoom(widget._store.state), rounds, haunt);
         children.add(hauntSummary(haunt, lastRound.pot));
       }
     }

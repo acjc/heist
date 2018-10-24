@@ -149,8 +149,9 @@ class _HauntEndState extends State<HauntEnd> {
       ],
     );
 
-    return GameCard(
+    return TitledCard(
       margin: paddingMedium,
+      title: AppLocalizations.of(context).hauntResult,
       child: Padding(
         padding: paddingMedium,
         child: Column(children: children),

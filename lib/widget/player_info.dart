@@ -9,35 +9,34 @@ import 'package:redux/redux.dart';
 
 import 'common.dart';
 
-Widget playerInfo(Store<GameModel> store) {
-  return StoreConnector<GameModel, PlayerInfoViewModel>(
-      distinct: true,
-      converter: (store) => PlayerInfoViewModel._(
-            getSelf(store.state),
-            currentBalance(store.state),
-            amountReceivedThisRound(store.state),
+Widget playerInfo(Store<GameModel> store) => StoreConnector<GameModel, PlayerInfoViewModel>(
+    distinct: true,
+    converter: (store) => PlayerInfoViewModel._(
+          getSelf(store.state),
+          currentBalance(store.state),
+          amountReceivedThisRound(store.state),
+        ),
+    builder: (context, viewModel) {
+      if (viewModel.me == null) {
+        return Container();
+      }
+      return TitledCard(
+        title: AppLocalizations.of(context).playerInfo,
+        child: Padding(
+          padding: paddingMedium,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              roomCode(context, getRoom(store.state).code),
+              VerticalDivider(),
+              playerName(context, viewModel.me),
+              VerticalDivider(),
+              playerBalance(viewModel.balance, viewModel.amountReceivedThisRound),
+            ],
           ),
-      builder: (context, viewModel) {
-        if (viewModel.me == null) {
-          return Container();
-        }
-        return GameCard(
-          child: Padding(
-            padding: paddingMedium,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                roomCode(context, getRoom(store.state).code),
-                VerticalDivider(),
-                playerName(context, viewModel.me),
-                VerticalDivider(),
-                playerBalance(viewModel.balance, viewModel.amountReceivedThisRound),
-              ],
-            ),
-          ),
-        );
-      });
-}
+        ),
+      );
+    });
 
 Widget roomCode(BuildContext context, String code) => Column(
       children: [

@@ -72,27 +72,15 @@ Widget bidding(Store<GameModel> store) => StoreConnector<GameModel, BiddingViewM
       Haunt heist = currentHaunt(store.state);
       bool auction = isAuction(store.state);
 
-      List<Widget> children = auction
-          ? [
-              Container(
-                padding: paddingTitle,
-                child: Text(AppLocalizations.of(context).auctionTitle.toUpperCase(),
-                    style: titleTextStyle),
-              ),
-              Text(
-                AppLocalizations.of(context).auctionDescription(heist.numPlayers),
-                style: infoTextStyle,
-              ),
-            ]
-          : [
-              Container(
-                padding: paddingTitle,
-                child: Text(
-                  AppLocalizations.of(context).bidding,
-                  style: titleTextStyle,
-                ),
-              ),
-            ];
+      List<Widget> children = [];
+      if (auction) {
+        children.add(
+          Text(
+            AppLocalizations.of(context).auctionDescription(heist.numPlayers),
+            style: infoTextStyle,
+          ),
+        );
+      }
 
       String proposedBidText = viewModel.bid == null
           ? AppLocalizations.of(context).noBid
@@ -165,10 +153,13 @@ Widget bidding(Store<GameModel> store) => StoreConnector<GameModel, BiddingViewM
         ),
       ]);
 
-      return Card(
-          elevation: 2.0,
+      String title = auction
+          ? AppLocalizations.of(context).auctionTitle
+          : AppLocalizations.of(context).bidding;
+      return TitledCard(
+          title: title,
           child: Container(
-              padding: paddingLarge,
+              padding: paddingMedium,
               alignment: Alignment.center,
               child: Column(
                 children: children,

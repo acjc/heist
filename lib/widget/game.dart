@@ -12,6 +12,7 @@ import 'package:heist/main.dart';
 import 'package:heist/middleware/game_middleware.dart';
 import 'package:heist/middleware/room_middleware.dart';
 import 'package:heist/middleware/team_picker_middleware.dart';
+import 'package:heist/reducers/local_actions_reducers.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/reducers/request_reducers.dart';
 import 'package:heist/reducers/subscription_reducers.dart';
@@ -109,6 +110,15 @@ class GameState extends State<Game> {
           style: descriptionTextStyle,
           textAlign: TextAlign.center,
         ),
+        expanded:
+            !generalLocalActionRecorded(_store.state, GeneralLocalAction.AuctionDescriptionClosed),
+        onExpansionChanged: (open) {
+          if (!open) {
+            _store.dispatch(
+              RecordGeneralLocalActionAction(GeneralLocalAction.AuctionDescriptionClosed),
+            );
+          }
+        },
       ));
     } else {
       children.add(HeaderCard(
@@ -116,7 +126,17 @@ class GameState extends State<Game> {
         child: Text(
           AppLocalizations.of(context).auctionHeaderDescription,
           style: descriptionTextStyle,
+          textAlign: TextAlign.center,
         ),
+        expanded:
+            !generalLocalActionRecorded(_store.state, GeneralLocalAction.BiddingDescriptionClosed),
+        onExpansionChanged: (open) {
+          if (!open) {
+            _store.dispatch(
+              RecordGeneralLocalActionAction(GeneralLocalAction.BiddingDescriptionClosed),
+            );
+          }
+        },
       ));
     }
 

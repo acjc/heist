@@ -40,7 +40,7 @@ Widget playerInfo(Store<GameModel> store) => StoreConnector<GameModel, PlayerInf
 
 Widget roomCode(BuildContext context, String code) => Column(
       children: [
-        Text('Room', style: Theme.of(context).textTheme.caption),
+        Text(AppLocalizations.of(context).room, style: Theme.of(context).textTheme.caption),
         Text(code, style: Theme.of(context).textTheme.subhead),
       ],
     );

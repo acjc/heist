@@ -153,40 +153,44 @@ class Subscriptions {
 class LocalActions {
   /// Map of ID -> LocalAction for parts of the UI independent of firestore,
   /// e.g. Round ID -> { round end continue button tapped }
-  final Map<String, Set<LocalHauntAction>> localHauntActions;
-  final Map<String, Set<LocalRoundAction>> localRoundActions;
+  final Map<String, Set<LocalHauntAction>> hauntActions;
+  final Map<String, Set<LocalRoundAction>> roundActions;
+  final Set<GeneralLocalAction> generalActions;
 
-  LocalActions({this.localHauntActions, this.localRoundActions});
+  LocalActions({this.hauntActions, this.roundActions, this.generalActions});
 
   factory LocalActions.initial() => LocalActions(
-        localHauntActions: {},
-        localRoundActions: {},
+        hauntActions: {},
+        roundActions: {},
+        generalActions: Set(),
       );
 
   LocalActions copyWith({
-    Map<String, Set<LocalHauntAction>> localHauntActions,
-    Map<String, Set<LocalRoundAction>> localRoundActions,
-  }) {
-    return new LocalActions(
-      localHauntActions: localHauntActions ?? this.localHauntActions,
-      localRoundActions: localRoundActions ?? this.localRoundActions,
-    );
-  }
+    Map<String, Set<LocalHauntAction>> hauntActions,
+    Map<String, Set<LocalRoundAction>> roundActions,
+    Set<GeneralLocalAction> generalActions,
+  }) =>
+      LocalActions(
+        hauntActions: hauntActions ?? this.hauntActions,
+        roundActions: roundActions ?? this.roundActions,
+        generalActions: generalActions ?? this.generalActions,
+      );
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is LocalActions &&
           runtimeType == other.runtimeType &&
-          localHauntActions == other.localHauntActions &&
-          localRoundActions == other.localRoundActions;
+          hauntActions == other.hauntActions &&
+          roundActions == other.roundActions &&
+          generalActions == other.generalActions;
 
   @override
-  int get hashCode => localHauntActions.hashCode ^ localRoundActions.hashCode;
+  int get hashCode => hauntActions.hashCode ^ roundActions.hashCode ^ generalActions.hashCode;
 
   @override
   String toString() {
-    return 'LocalActions{localHauntActions: $localHauntActions, localRoundActions: $localRoundActions}';
+    return 'LocalActions{hauntActions: $hauntActions, roundActions: $roundActions, generalActions: $generalActions}';
   }
 }
 
@@ -215,4 +219,10 @@ enum LocalHauntAction {
 enum LocalRoundAction {
   TeamSelectionContinue,
   RoundEndContinue,
+}
+
+enum GeneralLocalAction {
+  SecretDescriptionClosed,
+  BiddingDescriptionClosed,
+  AuctionDescriptionClosed,
 }

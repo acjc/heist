@@ -6,6 +6,7 @@ import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/room_middleware.dart';
+import 'package:heist/reducers/local_actions_reducers.dart';
 import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -75,6 +76,15 @@ class SecretBoardState extends State<SecretBoard> {
           textAlign: TextAlign.center,
           style: descriptionTextStyle,
         ),
+        expanded:
+            !generalLocalActionRecorded(_store.state, GeneralLocalAction.SecretDescriptionClosed),
+        onExpansionChanged: (open) {
+          if (!open) {
+            _store.dispatch(
+              RecordGeneralLocalActionAction(GeneralLocalAction.SecretDescriptionClosed),
+            );
+          }
+        },
       );
 
   Widget _playerList() => new StoreConnector<GameModel, List<Player>>(

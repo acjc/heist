@@ -446,6 +446,12 @@ class AppLocalizations {
         desc: 'Descripton for the secret screen',
       );
 
+  String get room => Intl.message(
+        'Room',
+        name: 'room',
+        desc: 'Room code label',
+      );
+
   String get playerInfo => Intl.message(
         'Player Info',
         name: 'playerInfo',

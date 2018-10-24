@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-10-24T23:27:56.725707",
+  "@@last_modified": "2018-10-24T23:34:42.880501",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -310,6 +310,12 @@
   "secretHeaderDescription": "This screen contains information which should be known only to you. Be careful not to accidentally show it to any other players!\n\nHere, you can see your ectoplasm, your team and your role. You'll find details about any secret information or actions available to you.\n\nThere are also helpful reminders about the other players and roles in this game.",
   "@secretHeaderDescription": {
     "description": "Descripton for the secret screen",
+    "type": "text",
+    "placeholders": {}
+  },
+  "room": "Room",
+  "@room": {
+    "description": "Room code label",
     "type": "text",
     "placeholders": {}
   },

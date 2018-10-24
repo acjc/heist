@@ -138,6 +138,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "putYouInTeam" : MessageLookupByLibrary.simpleMessage(" to pick you and tap JOIN TEAM below"),
     "role" : MessageLookupByLibrary.simpleMessage("Role"),
     "roleInfo" : MessageLookupByLibrary.simpleMessage("Role Info"),
+    "room" : MessageLookupByLibrary.simpleMessage("Room"),
     "roundTitle" : m13,
     "scaryGhost" : MessageLookupByLibrary.simpleMessage("Scary Ghost"),
     "scaryTeam" : m14,

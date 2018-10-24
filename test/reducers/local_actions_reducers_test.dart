@@ -14,8 +14,8 @@ void main() {
       localActions,
       RecordLocalRoundActionAction(roundId, LocalRoundAction.RoundEndContinue),
     );
-    expect(localActions.localRoundActions.length, 1);
-    expect(localActions.localRoundActions[roundId], contains(LocalRoundAction.RoundEndContinue));
+    expect(localActions.roundActions.length, 1);
+    expect(localActions.roundActions[roundId], contains(LocalRoundAction.RoundEndContinue));
   });
 
   test('test record local haunt action', () {
@@ -26,7 +26,7 @@ void main() {
       localActions,
       RecordLocalHauntActionAction(hauntId, LocalHauntAction.HauntEndContinue),
     );
-    expect(localActions.localHauntActions.length, 1);
-    expect(localActions.localHauntActions[hauntId], contains(LocalHauntAction.HauntEndContinue));
+    expect(localActions.hauntActions.length, 1);
+    expect(localActions.hauntActions[hauntId], contains(LocalHauntAction.HauntEndContinue));
   });
 }

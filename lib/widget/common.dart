@@ -113,11 +113,13 @@ class HeaderCard extends StatelessWidget {
   @required
   final Widget child;
   final bool expanded;
+  final ValueChanged<bool> onExpansionChanged;
 
   HeaderCard({
     this.title,
     this.child,
     this.expanded = true,
+    this.onExpansionChanged,
   });
 
   @override
@@ -140,6 +142,7 @@ class HeaderCard extends StatelessWidget {
             ),
             ExpansionTile(
               initiallyExpanded: expanded,
+              onExpansionChanged: onExpansionChanged,
               leading: Icon(Icons.help_outline, color: HeistColors.amber),
               title: Container(
                 alignment: Alignment.center,

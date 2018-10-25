@@ -351,16 +351,14 @@ class _WaitForTeamState extends TeamSelectionState {
     );
 
     return Expanded(
-      child: Padding(
-        padding: paddingMedium,
-        child: Card(
-          elevation: 6.0,
-          child: Padding(
-            padding: paddingSmall,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: children,
-            ),
+      child: TitledCard(
+        title: AppLocalizations.of(context).teamSelection,
+        margin: paddingMedium,
+        child: Padding(
+          padding: paddingSmall,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: children,
           ),
         ),
       ),
@@ -448,8 +446,8 @@ class TeamPickerState extends TeamSelectionState {
 
   Widget _teamPickerCard(_TeamPickerViewModel viewModel, bool goingOnHaunt, int playersRequired) =>
       Expanded(
-        child: Card(
-          elevation: 6.0,
+        child: TitledCard(
+          title: AppLocalizations.of(context).teamSelection,
           margin: paddingMedium,
           child: Padding(
             padding: paddingSmall,

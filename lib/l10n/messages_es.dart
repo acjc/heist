@@ -153,6 +153,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "success" : MessageLookupByLibrary.simpleMessage("Success"),
     "team" : MessageLookupByLibrary.simpleMessage("Team"),
     "teamScores" : m17,
+    "teamSelection" : MessageLookupByLibrary.simpleMessage("Team Selection"),
     "title" : MessageLookupByLibrary.simpleMessage("Heist"),
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),
     "waitingForPlayers" : m18,

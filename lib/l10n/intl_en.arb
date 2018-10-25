@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-10-24T23:34:42.880501",
+  "@@last_modified": "2018-10-25T01:21:48.341159",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -458,6 +458,12 @@
       "amount": {},
       "recipientName": {}
     }
+  },
+  "teamSelection": "Team Selection",
+  "@teamSelection": {
+    "description": "Team selection title",
+    "type": "text",
+    "placeholders": {}
   },
   "pickedYou": " picked you in the team!",
   "@pickedYou": {

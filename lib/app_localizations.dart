@@ -623,6 +623,12 @@ class AppLocalizations {
 
   // Picking a team
 
+  String get teamSelection => Intl.message(
+        'Team Selection',
+        name: 'teamSelection',
+        desc: 'Team selection title',
+      );
+
   String get pickedYou {
     return Intl.message(
       ' picked you in the team!',

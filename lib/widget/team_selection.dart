@@ -64,9 +64,8 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
 
   Animation<Color> _getPulseTween(bool goingOnHaunt, bool fullTeam) {
     if (fullTeam) {
-      Color beginColor = goingOnHaunt ? Colors.green : Colors.redAccent;
-      Color endColor = goingOnHaunt ? HeistColors.green : HeistColors.peach;
-      return ColorTween(begin: beginColor, end: endColor).animate(_pulseController)
+      Color endColor = goingOnHaunt ? HeistColors.translucentGreen : HeistColors.translucentPeach;
+      return ColorTween(begin: Colors.transparent, end: endColor).animate(_pulseController)
         ..addStatusListener((status) {
           if (status == AnimationStatus.completed) {
             _pulseController.reverse();
@@ -75,8 +74,7 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
           }
         });
     }
-    return ConstantTween<Color>(goingOnHaunt ? HeistColors.green : HeistColors.peach)
-        .animate(_pulseController);
+    return ConstantTween<Color>(Colors.transparent).animate(_pulseController);
   }
 
   @protected
@@ -280,12 +278,11 @@ class _WaitForTeamState extends TeamSelectionState {
       );
 
   Widget waitForTeamMessage(bool goingOnHaunt, String leaderName) {
-    const TextStyle defaultTextStyle = const TextStyle(color: Colors.black87, fontSize: 16.0);
     if (goingOnHaunt) {
       return RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
-          style: defaultTextStyle,
+          style: infoTextStyle,
           children: [
             TextSpan(text: leaderName, style: boldTextStyle),
             TextSpan(text: AppLocalizations.of(context).pickedYou),
@@ -298,12 +295,11 @@ class _WaitForTeamState extends TeamSelectionState {
       children: [
         Padding(
           padding: paddingSmall,
-          child: Text(AppLocalizations.of(context).notPicked, style: infoTextStyle),
         ),
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
-            style: defaultTextStyle,
+            style: infoTextStyle,
             children: [
               TextSpan(text: AppLocalizations.of(context).convince),
               TextSpan(text: leaderName, style: boldTextStyle),
@@ -328,9 +324,10 @@ class _WaitForTeamState extends TeamSelectionState {
   Widget _tokenCard(_WaitForTeamViewModel viewModel) {
     String leaderName = currentLeader(_store.state).name;
     List<Widget> children = [
-      AnimationListenable<Color>(
-        animation: _pulseAnimation,
-        builder: (context, value, _) => teamSelectionIcon(viewModel.goingOnHaunt, value, 250.0),
+      teamSelectionIcon(
+        viewModel.goingOnHaunt,
+        viewModel.goingOnHaunt ? HeistColors.green : HeistColors.peach,
+        250.0,
       ),
       waitForTeamMessage(viewModel.goingOnHaunt, leaderName),
     ];

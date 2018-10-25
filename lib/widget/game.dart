@@ -193,7 +193,7 @@ class GameState extends State<Game> {
 
     // Team selection
     if (shouldShowTeamSelection(viewModel)) {
-      return Theme(data: lightTheme, child: TeamSelection(_store, isMyGo(_store.state)));
+      return TeamSelection(_store, isMyGo(_store.state));
     }
 
     // Bidding & gifting

@@ -8,11 +8,9 @@ import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/middleware/team_picker_middleware.dart';
 import 'package:heist/reducers/local_actions_reducers.dart';
-import 'package:heist/reducers/round_reducers.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
-import 'package:heist/widget/selection_board.dart';
 import 'package:redux/redux.dart';
 import 'package:screen/screen.dart';
 
@@ -66,9 +64,8 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
 
   Animation<Color> _getPulseTween(bool goingOnHaunt, bool fullTeam) {
     if (fullTeam) {
-      Color beginColor = goingOnHaunt ? Colors.green : Colors.redAccent;
-      Color endColor = goingOnHaunt ? HeistColors.green : HeistColors.peach;
-      return ColorTween(begin: beginColor, end: endColor).animate(_pulseController)
+      Color endColor = goingOnHaunt ? HeistColors.translucentGreen : HeistColors.translucentPeach;
+      return ColorTween(begin: Colors.transparent, end: endColor).animate(_pulseController)
         ..addStatusListener((status) {
           if (status == AnimationStatus.completed) {
             _pulseController.reverse();
@@ -77,8 +74,7 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
           }
         });
     }
-    return ConstantTween<Color>(goingOnHaunt ? HeistColors.green : HeistColors.peach)
-        .animate(_pulseController);
+    return ConstantTween<Color>(Colors.transparent).animate(_pulseController);
   }
 
   @protected
@@ -113,6 +109,34 @@ abstract class TeamSelectionState extends State<TeamSelection> with TickerProvid
                   LocalRoundAction.TeamSelectionContinue,
                 ))),
       );
+
+  @protected
+  Widget addRemovePlayerButton(bool goingOnHaunt, bool currentTeamIsFull, bool loading) {
+    String myId = getSelf(_store.state).id;
+    int playersRequired = currentHaunt(_store.state).numPlayers;
+
+    if (goingOnHaunt) {
+      return RaisedButton(
+        child: Text(
+          AppLocalizations.of(context).leaveTeam,
+          style: Theme.of(context).textTheme.button,
+        ),
+        onPressed: !loading
+            ? () => _store.dispatch(RemovePlayerMiddlewareAction(myId, playersRequired))
+            : null,
+      );
+    }
+
+    return RaisedButton(
+      child: Text(
+        AppLocalizations.of(context).joinTeam,
+        style: Theme.of(context).textTheme.button,
+      ),
+      onPressed: !currentTeamIsFull && !loading
+          ? () => _store.dispatch(PickPlayerMiddlewareAction(myId, playersRequired))
+          : null,
+    );
+  }
 
   @protected
   Widget _ghosties(int total) => Container(
@@ -185,11 +209,18 @@ class _WaitForTeamViewModel {
   @required
   bool goingOnHaunt;
   @required
+  bool joiningOrLeaving;
+  @required
   bool currentTeamIsFull;
   @required
   bool teamSubmitted;
 
-  _WaitForTeamViewModel({this.goingOnHaunt, this.currentTeamIsFull, this.teamSubmitted});
+  _WaitForTeamViewModel({
+    this.goingOnHaunt,
+    this.joiningOrLeaving,
+    this.currentTeamIsFull,
+    this.teamSubmitted,
+  });
 
   @override
   bool operator ==(Object other) =>
@@ -197,15 +228,20 @@ class _WaitForTeamViewModel {
       other is _WaitForTeamViewModel &&
           runtimeType == other.runtimeType &&
           goingOnHaunt == other.goingOnHaunt &&
+          joiningOrLeaving == other.joiningOrLeaving &&
           currentTeamIsFull == other.currentTeamIsFull &&
           teamSubmitted == other.teamSubmitted;
 
   @override
-  int get hashCode => goingOnHaunt.hashCode ^ currentTeamIsFull.hashCode ^ teamSubmitted.hashCode;
+  int get hashCode =>
+      goingOnHaunt.hashCode ^
+      joiningOrLeaving.hashCode ^
+      currentTeamIsFull.hashCode ^
+      teamSubmitted.hashCode;
 
   @override
   String toString() {
-    return '_WaitForTeamViewModel{goingOnHaunt: $goingOnHaunt, currentTeamIsFull: $currentTeamIsFull, teamSubmitted: $teamSubmitted}';
+    return '_WaitForTeamViewModel{goingOnHaunt: $goingOnHaunt, joiningOrLeaving: $joiningOrLeaving, currentTeamIsFull: $currentTeamIsFull, teamSubmitted: $teamSubmitted}';
   }
 }
 
@@ -215,39 +251,38 @@ class _WaitForTeamState extends TeamSelectionState {
   @override
   Widget build(BuildContext context) => StoreConnector<GameModel, _WaitForTeamViewModel>(
         distinct: true,
-        converter: (store) => _WaitForTeamViewModel(
-              goingOnHaunt: goingOnHaunt(store.state),
-              currentTeamIsFull: currentTeamIsFull(store.state),
-              teamSubmitted: currentRound(store.state).teamSubmitted,
-            ),
+        converter: (store) {
+          Round round = currentRound(store.state);
+          return _WaitForTeamViewModel(
+            goingOnHaunt: goingOnHaunt(store.state),
+            joiningOrLeaving: requestInProcess(store.state, Request.JoiningOrLeavingTeam),
+            currentTeamIsFull: currentTeamIsFull(store.state),
+            teamSubmitted: round.teamSubmitted,
+          );
+        },
         onInit: (store) => _setUpPulse(goingOnHaunt(store.state), currentTeamIsFull(store.state)),
         onInitialBuild: (viewModel) => _runContinueButtonAnimation(viewModel.teamSubmitted),
         onWillChange: (viewModel) =>
             _setUpPulse(viewModel.goingOnHaunt, viewModel.currentTeamIsFull),
         onDidChange: (viewModel) => _runContinueButtonAnimation(viewModel.teamSubmitted),
-        builder: (context, viewModel) {
-          int playersRequired = currentHaunt(_store.state).numPlayers;
-          Player leader = currentLeader(_store.state);
-          return AnimationListenable<Color>(
-            animation: _pulseAnimation,
-            builder: (context, value, child) => Container(color: value, child: child),
-            staticChild: Column(
-              children: [
-                _tokenCard(viewModel.goingOnHaunt, leader.name, viewModel.teamSubmitted),
-                _ghosties(playersRequired),
-              ],
+        builder: (context, viewModel) => AnimationListenable<Color>(
+              animation: _pulseAnimation,
+              builder: (context, value, child) => Container(color: value, child: child),
+              staticChild: Column(
+                children: [
+                  _tokenCard(viewModel),
+                  _ghosties(currentHaunt(_store.state).numPlayers),
+                ],
+              ),
             ),
-          );
-        },
       );
 
-  Widget _waitForTeamMessage(bool goingOnHaunt, String leaderName) {
-    const TextStyle defaultTextStyle = const TextStyle(color: Colors.black87, fontSize: 16.0);
+  Widget waitForTeamMessage(bool goingOnHaunt, String leaderName) {
     if (goingOnHaunt) {
       return RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
-          style: defaultTextStyle,
+          style: infoTextStyle,
           children: [
             TextSpan(text: leaderName, style: boldTextStyle),
             TextSpan(text: AppLocalizations.of(context).pickedYou),
@@ -260,12 +295,11 @@ class _WaitForTeamState extends TeamSelectionState {
       children: [
         Padding(
           padding: paddingSmall,
-          child: Text(AppLocalizations.of(context).notPicked, style: infoTextStyle),
         ),
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
-            style: defaultTextStyle,
+            style: infoTextStyle,
             children: [
               TextSpan(text: AppLocalizations.of(context).convince),
               TextSpan(text: leaderName, style: boldTextStyle),
@@ -277,7 +311,7 @@ class _WaitForTeamState extends TeamSelectionState {
     );
   }
 
-  Widget _tokenContinue(String leaderName, bool teamSubmitted) {
+  Widget tokenContinue(String leaderName, bool teamSubmitted) {
     if (teamSubmitted) {
       return _continueButton();
     }
@@ -287,37 +321,56 @@ class _WaitForTeamState extends TeamSelectionState {
     );
   }
 
-  Widget _tokenCard(bool goingOnHaunt, String leaderName, bool teamSubmitted) => Expanded(
-        child: Padding(
-          padding: paddingMedium,
-          child: Card(
-            elevation: 6.0,
-            child: Padding(
-              padding: paddingSmall,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AnimationListenable<Color>(
-                    animation: _pulseAnimation,
-                    builder: (context, value, _) => teamSelectionIcon(goingOnHaunt, value, 250.0),
-                  ),
-                  _waitForTeamMessage(goingOnHaunt, leaderName),
-                  Column(
-                    children: [
-                      _tokenContinue(leaderName, teamSubmitted),
-                      Divider(),
-                      roundTitleContents(context, _store),
-                    ],
-                  ),
-                ],
-              ),
+  Widget _tokenCard(_WaitForTeamViewModel viewModel) {
+    String leaderName = currentLeader(_store.state).name;
+    List<Widget> children = [
+      teamSelectionIcon(
+        viewModel.goingOnHaunt,
+        viewModel.goingOnHaunt ? HeistColors.green : HeistColors.peach,
+        250.0,
+      ),
+      waitForTeamMessage(viewModel.goingOnHaunt, leaderName),
+    ];
+
+    if (!viewModel.teamSubmitted) {
+      children.add(addRemovePlayerButton(
+        viewModel.goingOnHaunt,
+        viewModel.currentTeamIsFull,
+        viewModel.joiningOrLeaving,
+      ));
+    }
+
+    children.add(
+      Column(
+        children: [
+          tokenContinue(leaderName, viewModel.teamSubmitted),
+          Divider(),
+          roundTitleContents(context, _store),
+        ],
+      ),
+    );
+
+    return Expanded(
+      child: Padding(
+        padding: paddingMedium,
+        child: Card(
+          elevation: 6.0,
+          child: Padding(
+            padding: paddingSmall,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: children,
             ),
           ),
         ),
-      );
+      ),
+    );
+  }
 }
 
 class _TeamPickerViewModel {
+  @required
+  bool joiningOrLeaving;
   @required
   Set<Player> team;
   @required
@@ -325,35 +378,39 @@ class _TeamPickerViewModel {
   @required
   bool submittingTeam;
 
-  _TeamPickerViewModel({this.team, this.teamSubmitted, this.submittingTeam});
+  _TeamPickerViewModel({this.joiningOrLeaving, this.team, this.teamSubmitted, this.submittingTeam});
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is _TeamPickerViewModel &&
           runtimeType == other.runtimeType &&
+          joiningOrLeaving == other.joiningOrLeaving &&
           team == other.team &&
           teamSubmitted == other.teamSubmitted &&
           submittingTeam == other.submittingTeam;
 
   @override
-  int get hashCode => team.hashCode ^ teamSubmitted.hashCode ^ submittingTeam.hashCode;
+  int get hashCode =>
+      joiningOrLeaving.hashCode ^ team.hashCode ^ teamSubmitted.hashCode ^ submittingTeam.hashCode;
 
   @override
   String toString() {
-    return '_TeamPickerViewModel{team: $team, teamSubmitted: $teamSubmitted, submittingTeam: $submittingTeam}';
+    return '_TeamPickerViewModel{joiningOrLeaving: $joiningOrLeaving, team: $team, teamSubmitted: $teamSubmitted, submittingTeam: $submittingTeam}';
   }
 }
 
 class TeamPickerState extends TeamSelectionState {
   TeamPickerState(Store<GameModel> store) : super(store);
 
-  Widget _actionButton(bool currentTeamIsFull, bool teamSubmitted, bool loading) {
+  Widget _actionButton(Set<Player> team, int playersRequired, bool teamSubmitted, bool loading) {
     if (teamSubmitted) {
       return _continueButton();
     }
     return RaisedButton(
-      onPressed: currentTeamIsFull && !loading ? () => _store.dispatch(SubmitTeamAction()) : null,
+      onPressed: team.length == playersRequired && !loading
+          ? () => _store.dispatch(SubmitTeamAction(team.map((p) => p.id).toSet()))
+          : null,
       child: Text(
         AppLocalizations.of(context).submitTeam,
         style: Theme.of(context).textTheme.button,
@@ -365,6 +422,7 @@ class TeamPickerState extends TeamSelectionState {
   Widget build(BuildContext context) => StoreConnector<GameModel, _TeamPickerViewModel>(
       distinct: true,
       converter: (store) => _TeamPickerViewModel(
+            joiningOrLeaving: requestInProcess(store.state, Request.JoiningOrLeavingTeam),
             team: currentTeam(store.state),
             teamSubmitted: currentRound(store.state).teamSubmitted,
             submittingTeam: requestInProcess(store.state, Request.SubmittingTeam),
@@ -381,85 +439,67 @@ class TeamPickerState extends TeamSelectionState {
           builder: (context, value, child) => Container(color: value, child: child),
           staticChild: Column(
             children: [
-              _teamPickerCard(
-                amGoingOnHaunt,
-                viewModel.team,
-                playersRequired,
-                viewModel.teamSubmitted,
-                viewModel.submittingTeam,
-              ),
+              _teamPickerCard(viewModel, amGoingOnHaunt, playersRequired),
               _ghosties(playersRequired),
             ],
           ),
         );
       });
 
-  Widget _teamPickerCard(bool goingOnHaunt, Set<Player> team, int playersRequired,
-          bool teamSubmitted, bool submittingTeam) =>
+  Widget _teamPickerCard(_TeamPickerViewModel viewModel, bool goingOnHaunt, int playersRequired) =>
       Expanded(
-        child: Padding(
-          padding: paddingMedium,
-          child: Card(
-            elevation: 6.0,
-            child: Padding(
-              padding: paddingSmall,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AnimationListenable<Color>(
-                    animation: _pulseAnimation,
-                    builder: (context, value, _) => teamSelectionIcon(goingOnHaunt, value, 100.0),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context).pickATeam(team.length, playersRequired),
-                        style: infoTextStyle,
+        child: Card(
+          elevation: 6.0,
+          margin: paddingMedium,
+          child: Padding(
+            padding: paddingSmall,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AnimationListenable<Color>(
+                  animation: _pulseAnimation,
+                  builder: (context, value, _) => teamSelectionIcon(goingOnHaunt, value, 100.0),
+                ),
+                Column(
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).pickATeam,
+                      textAlign: TextAlign.center,
+                      style: boldTextStyle,
+                    ),
+                    Padding(
+                      padding: paddingMedium,
+                      child: Text(
+                        AppLocalizations.of(context).addPlayersInstructions,
+                        textAlign: TextAlign.center,
                       ),
-                      TeamGridView(
-                        _teamPickerChildren(team, playersRequired, teamSubmitted, submittingTeam),
-                        childAspectRatio: 4.0,
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      _actionButton(team.length == playersRequired, teamSubmitted, submittingTeam),
-                      Divider(),
-                      roundTitleContents(context, _store),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                    Text(
+                      '${viewModel.team.length} / $playersRequired',
+                      style: bigNumberTextStyle,
+                    ),
+                  ],
+                ),
+                addRemovePlayerButton(
+                  goingOnHaunt,
+                  viewModel.team.length == playersRequired,
+                  viewModel.joiningOrLeaving,
+                ),
+                Column(
+                  children: [
+                    _actionButton(
+                      viewModel.team,
+                      playersRequired,
+                      viewModel.teamSubmitted,
+                      viewModel.submittingTeam,
+                    ),
+                    Divider(),
+                    roundTitleContents(context, _store),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
       );
-
-  List<Widget> _teamPickerChildren(
-      Set<Player> team, int playersRequired, bool teamSubmitted, bool loading) {
-    String roundId = currentRound(_store.state).id;
-    List<Player> players = getPlayers(_store.state);
-    Player leader = currentLeader(_store.state);
-    return List.generate(players.length, (i) {
-      Player player = players[i];
-      bool isInTeam = team.contains(player);
-      bool isLeader = player.id == leader.id;
-      bool enabled = (isInTeam || team.length < playersRequired) && !teamSubmitted && !loading;
-      return InkWell(
-          onTap: enabled ? () => _onTap(_store, roundId, player.id, isInTeam) : null,
-          child: playerTile(context, player.name, isInTeam, isLeader));
-    });
-  }
-
-  void _onTap(Store<GameModel> store, String roundId, String playerId, bool isInTeam) {
-    if (isInTeam) {
-      store.dispatch(RemovePlayerAction(roundId, playerId));
-      store.dispatch(RemovePlayerMiddlewareAction(playerId));
-    } else {
-      store.dispatch(PickPlayerAction(roundId, playerId));
-      store.dispatch(PickPlayerMiddlewareAction(playerId));
-    }
-  }
 }

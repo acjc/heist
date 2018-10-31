@@ -9,24 +9,30 @@ import 'middleware.dart';
 
 class PickPlayerMiddlewareAction extends MiddlewareAction {
   final String playerId;
+  final int playersRequired;
 
-  PickPlayerMiddlewareAction(this.playerId);
+  PickPlayerMiddlewareAction(this.playerId, this.playersRequired);
 
   @override
-  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
-    return store.state.db.updateTeam(currentRound(store.state).id, playerId, true);
-  }
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) => withRequest(
+      Request.JoiningOrLeavingTeam,
+      store,
+      (store) =>
+          store.state.db.updateTeam(currentRound(store.state).id, playersRequired, playerId, true));
 }
 
 class RemovePlayerMiddlewareAction extends MiddlewareAction {
   final String playerId;
+  final int playersRequired;
 
-  RemovePlayerMiddlewareAction(this.playerId);
+  RemovePlayerMiddlewareAction(this.playerId, this.playersRequired);
 
   @override
-  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
-    return store.state.db.updateTeam(currentRound(store.state).id, playerId, false);
-  }
+  Future<void> handle(Store<GameModel> store, action, NextDispatcher next) => withRequest(
+      Request.JoiningOrLeavingTeam,
+      store,
+      (store) => store.state.db
+          .updateTeam(currentRound(store.state).id, playersRequired, playerId, false));
 }
 
 class AuctionBid {
@@ -56,17 +62,21 @@ class ResolveAuctionWinnersAction extends MiddlewareAction {
       int numPlayers = currentHaunt(store.state).numPlayers;
       List<String> winners = _winners(round.bids, numPlayers);
       for (String playerId in winners) {
-        await store.state.db.updateTeam(round.id, playerId, true);
+        await store.state.db.updateTeam(round.id, numPlayers, playerId, true);
       }
-      await store.state.db.submitTeam(round.id);
+      await store.state.db.submitTeam(round.id, winners.toSet());
     });
   }
 }
 
 class SubmitTeamAction extends MiddlewareAction {
+  final Set<String> team;
+
+  SubmitTeamAction(this.team);
+
   @override
   Future<void> handle(Store<GameModel> store, action, NextDispatcher next) {
     return withRequest(Request.SubmittingTeam, store,
-        (store) => store.state.db.submitTeam(currentRound(store.state).id));
+        (store) => store.state.db.submitTeam(currentRound(store.state).id, team));
   }
 }

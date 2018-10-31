@@ -13,12 +13,12 @@ void main() {
     Store<GameModel> store = await initGame();
     String myId = getSelf(store.state).id;
 
-    await handle(store, new PickPlayerMiddlewareAction(myId));
+    await handle(store, PickPlayerMiddlewareAction(myId, 1));
     Player onlyTeamMember = currentTeam(store.state).single;
     expect(onlyTeamMember.id, myId);
     expect(onlyTeamMember.name, '_name');
 
-    await handle(store, new RemovePlayerMiddlewareAction(myId));
+    await handle(store, RemovePlayerMiddlewareAction(myId, 1));
     expect(currentTeam(store.state), isEmpty);
   });
 

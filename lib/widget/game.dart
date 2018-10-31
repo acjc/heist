@@ -116,27 +116,41 @@ class GameState extends State<Game> {
     );
   }
 
+  /// Show the results of the previous round if it exists and the user has not continued yet.
+  bool shouldShowPreviousRoundEnd(MainBoardViewModel viewModel) =>
+      viewModel.currentRound.order > 1 &&
+      !roundContinued(viewModel.localActions, previousRound(_store.state));
+
+  /// Show the results of the previous haunt if it exists and the user has not continued yet.
+  bool shouldShowPreviousHauntEnd(MainBoardViewModel viewModel) =>
+      viewModel.currentHaunt.order > 1 &&
+      !hauntContinued(viewModel.localActions, previousHaunt(_store.state));
+
+  /// Show team selection screen if it's not an auction, we haven't done bidding yet,
+  /// and either the team hasn't been submitted or the user has not yet continued to the bidding screen.
+  bool shouldShowTeamSelection(MainBoardViewModel viewModel) {
+    return !isAuction(_store.state) &&
+        !viewModel.biddingComplete &&
+        (!viewModel.currentRound.teamSubmitted ||
+            !teamSelectionContinued(viewModel.localActions, viewModel.currentRound));
+  }
+
   Widget _gameLoop(MainBoardViewModel viewModel) {
     // If a team has not been selected for the current round
     if (!viewModel.currentRound.teamSubmitted) {
       // Show bidding summary of previous round
-      if (viewModel.currentRound.order > 1 &&
-          !roundContinued(viewModel.localActions, previousRound(_store.state))) {
+      if (shouldShowPreviousRoundEnd(viewModel)) {
         return Theme(data: lightTheme, child: RoundEnd(_store, viewModel.currentRound.order - 1));
       }
       // Or haunt summary of previous haunt
-      if (viewModel.currentHaunt.order > 1 &&
-          !hauntContinued(viewModel.localActions, previousHaunt(_store.state))) {
+      if (shouldShowPreviousHauntEnd(viewModel)) {
         return appendFooter(HauntEnd(_store, viewModel.currentHaunt.order - 1));
       }
     }
 
-    // Team selection (not needed for auctions)
-    if (!isAuction(_store.state) &&
-        !viewModel.biddingComplete &&
-        (!viewModel.currentRound.teamSubmitted ||
-            !teamSelectionContinued(viewModel.localActions, viewModel.currentRound))) {
-      return Theme(data: lightTheme, child: TeamSelection(_store, isMyGo(_store.state)));
+    // Team selection
+    if (shouldShowTeamSelection(viewModel)) {
+      return TeamSelection(_store, isMyGo(_store.state));
     }
 
     // Bidding & gifting

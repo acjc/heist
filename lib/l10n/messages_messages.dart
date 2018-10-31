@@ -42,35 +42,34 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m11(name, role) => "${name} is ${role} \n";
 
-  static m12(playersPicked, teamSize) => "Pick a team: ${playersPicked} / ${teamSize}";
+  static m12(playersPicked, teamSize) => "TEAM (${playersPicked} / ${teamSize})";
 
-  static m13(playersPicked, teamSize) => "TEAM (${playersPicked} / ${teamSize})";
+  static m13(order) => "Player ${order}";
 
-  static m14(order) => "Player ${order}";
+  static m14(name, role) => "${name} (${role}) ->";
 
-  static m15(name, role) => "${name} (${role}) ->";
+  static m15(order) => "Round ${order}";
 
-  static m16(order) => "Round ${order}";
+  static m16(numRoles) => "SCARY TEAM (${numRoles})";
 
-  static m17(numRoles) => "SCARY TEAM (${numRoles})";
+  static m17(bertieDisplayName, stealOption) => "...shared between ${bertieDisplayName} and any players who chose ${stealOption} on the haunt";
 
-  static m18(bertieDisplayName, stealOption) => "...shared between ${bertieDisplayName} and any players who chose ${stealOption} on the haunt";
+  static m18(roomCode, owner) => "Room ${roomCode}: ${owner} is choosing the game roles";
 
-  static m19(roomCode, owner) => "Room ${roomCode}: ${owner} is choosing the game roles";
+  static m19(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
 
-  static m20(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
+  static m20(playersSoFar, totalPlayers) => "Waiting for players (${playersSoFar} / ${totalPlayers})";
 
-  static m21(playersSoFar, totalPlayers) => "Waiting for players (${playersSoFar} / ${totalPlayers})";
+  static m21(leaderName) => "Waiting for ${leaderName} to submit their team";
 
-  static m22(leaderName) => "Waiting for ${leaderName} to submit team";
-
-  static m23(winner) => "${winner} win!";
+  static m22(winner) => "${winner} win!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
     "accountantConfirmPlayer" : MessageLookupByLibrary.simpleMessage("CONFIRM SELECTION"),
     "accountantExplanation" : m0,
     "accountantPickPlayer" : MessageLookupByLibrary.simpleMessage("PICK BALANCE TO SEE"),
+    "addPlayersInstructions" : MessageLookupByLibrary.simpleMessage("Add a player to your team by tapping JOIN TEAM on their screen"),
     "auctionDescription" : m1,
     "auctionTitle" : MessageLookupByLibrary.simpleMessage("Auction!"),
     "bertie" : MessageLookupByLibrary.simpleMessage("Bertie"),
@@ -86,7 +85,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "brendaReceived" : m4,
     "cancelBid" : MessageLookupByLibrary.simpleMessage("CANCEL BID"),
     "chooseGameRoles" : m5,
-    "chooseGiftRecipient" : MessageLookupByLibrary.simpleMessage("Choose a player to send a gift to:"),
+    "chooseGiftRecipient" : MessageLookupByLibrary.simpleMessage("Choose a player to send a gift to"),
     "chooseNumberOfPlayers" : MessageLookupByLibrary.simpleMessage("Choose number of players"),
     "compulsoryRoles" : m6,
     "continueButton" : MessageLookupByLibrary.simpleMessage("CONTINUE"),
@@ -112,6 +111,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "identity" : m11,
     "invalidCode" : MessageLookupByLibrary.simpleMessage("Invalid code"),
     "joinGame" : MessageLookupByLibrary.simpleMessage("JOIN GAME"),
+    "joinTeam" : MessageLookupByLibrary.simpleMessage("JOIN TEAM"),
+    "leaveTeam" : MessageLookupByLibrary.simpleMessage("LEAVE TEAM"),
     "makeYourChoice" : MessageLookupByLibrary.simpleMessage("Make your choice..."),
     "noBid" : MessageLookupByLibrary.simpleMessage("No Bid"),
     "noConnectionDialogText" : MessageLookupByLibrary.simpleMessage("You need to be connected to the internet to be able to play."),
@@ -122,32 +123,32 @@ class MessageLookup extends MessageLookupByLibrary {
     "okButton" : MessageLookupByLibrary.simpleMessage("OK"),
     "onlyOwnerModifies" : MessageLookupByLibrary.simpleMessage("Only the person who created the room can choose roles."),
     "otherIdentities" : MessageLookupByLibrary.simpleMessage("You also know these identities"),
-    "pickATeam" : m12,
-    "pickedTeamSize" : m13,
+    "pickATeam" : MessageLookupByLibrary.simpleMessage("It\'s your turn to pick a team!"),
+    "pickedTeamSize" : m12,
     "pickedYou" : MessageLookupByLibrary.simpleMessage(" picked you in the team!"),
-    "playerOrder" : m14,
-    "playerRole" : m15,
+    "playerOrder" : m13,
+    "playerRole" : m14,
     "players" : MessageLookupByLibrary.simpleMessage("Players"),
     "pleaseEnterAName" : MessageLookupByLibrary.simpleMessage("Please enter a name"),
     "pot" : MessageLookupByLibrary.simpleMessage("Pot"),
     "price" : MessageLookupByLibrary.simpleMessage("Price"),
-    "putYouInTeam" : MessageLookupByLibrary.simpleMessage(" to put you in the team!"),
-    "roundTitle" : m16,
+    "putYouInTeam" : MessageLookupByLibrary.simpleMessage(" to pick you and tap JOIN TEAM below"),
+    "roundTitle" : m15,
     "scaryGhost" : MessageLookupByLibrary.simpleMessage("Scary Ghost"),
-    "scaryTeam" : m17,
+    "scaryTeam" : m16,
     "secretTab" : MessageLookupByLibrary.simpleMessage("SECRET"),
-    "sharedBetween" : m18,
-    "someoneElseChoosesGameRoles" : m19,
+    "sharedBetween" : m17,
+    "someoneElseChoosesGameRoles" : m18,
     "submit" : MessageLookupByLibrary.simpleMessage("SUBMIT"),
     "submitBid" : MessageLookupByLibrary.simpleMessage("SUBMIT BID"),
     "submitTeam" : MessageLookupByLibrary.simpleMessage("SUBMIT TEAM"),
     "success" : MessageLookupByLibrary.simpleMessage("Success"),
-    "teamScores" : m20,
+    "teamScores" : m19,
     "title" : MessageLookupByLibrary.simpleMessage("Heist"),
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),
-    "waitingForPlayers" : m21,
-    "waitingForTeamSubmission" : m22,
-    "winner" : m23,
+    "waitingForPlayers" : m20,
+    "waitingForTeamSubmission" : m21,
+    "winner" : m22,
     "youAreGoing" : MessageLookupByLibrary.simpleMessage("You\'re going on a haunt!"),
     "youHaveMadeYourChoice" : MessageLookupByLibrary.simpleMessage("You have made your choice!"),
     "yourBid" : MessageLookupByLibrary.simpleMessage("Your bid"),

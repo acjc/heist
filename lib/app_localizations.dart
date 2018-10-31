@@ -4,19 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:heist/l10n/messages_all.dart';
 import 'package:intl/intl.dart';
 
-// To add a new string or edit an existing one:
-// - Add a get method that returns an Intl.message here or modify the string in the existing method
-// - Run 'flutter pub pub run intl_translation:extract_to_arb --output-dir=lib/l10n lib/app_localizations.dart'
-//   This will update lib/l10n/intl_messages.arb
-// - Replace the content of lib/l10n/intl_en.arb with the content of the updated intl_messages.arb
-// - Manually update lib/l10n/intl_*.arb (where * isn't English) to reflect the changes
-// - Run 'flutter pub pub run intl_translation:generate_from_arb --output-dir=lib/l10n --no-use-deferred-loading lib/app_localizations.dart lib/l10n/intl_*.arb'
-//   This will update or create lib/l10n/messages_*.dart
-//
-// To add a new language, you need to copy lib/l10n/intl_messages.arb into a
-// new file lib/l10n/intl_*.arb file, where * is the code of the new language.
-// You also need to update the list of supported languages at the bottom of this
-// file (in isSupported) and the supportedLocales in main.dart.
+/// To add a new string or edit an existing one:
+/// - Add a get method that returns an Intl.message here or modify the string in the existing method
+/// - Run 'flutter pub pub run intl_translation:extract_to_arb --output-dir=lib/l10n lib/app_localizations.dart'
+///   This will update lib/l10n/intl_messages.arb
+/// - Replace the content of lib/l10n/intl_en.arb with the content of the updated intl_messages.arb
+/// - Manually update lib/l10n/intl_*.arb (where * isn't English) to reflect the changes
+/// - Run 'flutter pub pub run intl_translation:generate_from_arb --output-dir=lib/l10n --no-use-deferred-loading lib/app_localizations.dart lib/l10n/intl_*.arb'
+///   This will update or create lib/l10n/messages_*.dart
+///
+/// To add a new language, you need to copy lib/l10n/intl_messages.arb into a
+/// new file lib/l10n/intl_*.arb file, where * is the code of the new language.
+/// You also need to update the list of supported languages at the bottom of this
+/// file (in isSupported) and the supportedLocales in main.dart.
+///
+/// NB. Until we properly localise, you can just run ./localise.sh to update strings.
 class AppLocalizations {
   static Future<AppLocalizations> load(Locale locale) {
     final String name = locale.countryCode.isEmpty ? locale.languageCode : locale.toString();
@@ -530,7 +532,7 @@ class AppLocalizations {
 
   String get chooseGiftRecipient {
     return Intl.message(
-      'Choose a player to send a gift to:',
+      'Choose a player to send a gift to',
       name: 'chooseGiftRecipient',
       desc: 'Next to the list of players where you select who to send a gift to',
     );
@@ -573,29 +575,48 @@ class AppLocalizations {
 
   String get putYouInTeam {
     return Intl.message(
-      ' to put you in the team!',
+      " to pick you and tap JOIN TEAM below",
       name: 'putYouInTeam',
       desc: 'Convince leader to pick you in the team (2 / 2)',
     );
   }
 
+  String get joinTeam {
+    return Intl.message(
+      'JOIN TEAM',
+      name: 'joinTeam',
+      desc: 'JOIN TEAM button',
+    );
+  }
+
+  String get leaveTeam {
+    return Intl.message(
+      'LEAVE TEAM',
+      name: 'leaveTeam',
+      desc: 'LEAVE TEAM button',
+    );
+  }
+
   String waitingForTeamSubmission(String leaderName) {
     return Intl.message(
-      'Waiting for $leaderName to submit team',
+      'Waiting for $leaderName to submit their team',
       name: 'waitingForTeamSubmission',
       args: [leaderName],
       desc: 'Waiting for leader to submit team',
     );
   }
 
-  String pickATeam(int playersPicked, int teamSize) {
-    return Intl.message(
-      'Pick a team: $playersPicked / $teamSize',
-      name: 'pickATeam',
-      args: [playersPicked, teamSize],
-      desc: 'Team picker title',
-    );
-  }
+  String get pickATeam => Intl.message(
+        "It's your turn to pick a team!",
+        name: 'pickATeam',
+        desc: 'Team picker title',
+      );
+
+  String get addPlayersInstructions => Intl.message(
+        "Add a player to your team by tapping JOIN TEAM on their screen",
+        name: 'addPlayersInstructions',
+        desc: 'Team picker instructions',
+      );
 
   String pickedTeamSize(int playersPicked, int teamSize) {
     return Intl.message(

@@ -72,6 +72,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "addPlayersInstructions" : MessageLookupByLibrary.simpleMessage("Add a player to your team by tapping JOIN TEAM on their screen"),
     "auctionDescription" : m1,
     "auctionTitle" : MessageLookupByLibrary.simpleMessage("Auction!"),
+    "backHome" : MessageLookupByLibrary.simpleMessage("BACK TO HOME PAGE"),
     "bertie" : MessageLookupByLibrary.simpleMessage("Bertie"),
     "bertieConfirmPlayer" : MessageLookupByLibrary.simpleMessage("CONFIRM GUESS"),
     "bertieExplanation" : MessageLookupByLibrary.simpleMessage("You can try to guess who Brenda is ONCE during the game. If you get it right, you will no longer be restricted by maximum bid limits."),

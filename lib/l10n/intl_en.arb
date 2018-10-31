@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-10-23T23:54:14.202787",
+  "@@last_modified": "2018-10-31T21:30:07.024006",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -503,6 +503,12 @@
       "thiefScore": {},
       "agentScore": {}
     }
+  },
+  "backHome": "BACK TO HOME PAGE",
+  "@backHome": {
+    "description": "Button to go back to the home page at the end of a game",
+    "type": "text",
+    "placeholders": {}
   },
   "noConnectionDialogTitle": "No internet",
   "@noConnectionDialogTitle": {

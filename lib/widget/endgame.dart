@@ -3,6 +3,7 @@ import 'package:heist/app_localizations.dart';
 import 'package:heist/colors.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/role.dart';
+import 'package:heist/selectors/haunt_selectors.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
 import 'package:redux/redux.dart';
@@ -21,38 +22,63 @@ class Endgame extends StatefulWidget {
 class _EndgameState extends State<Endgame> {
   List<Widget> playerDecisions(Haunt haunt) {
     List<Widget> heistDecisions = [];
+    // hauntLeader is null in auctions
+    final Player hauntLeader = leaderForHaunt(widget._store.state, haunt);
+    bool leaderInHaunt = false;
     haunt.decisions.forEach((playerId, decision) {
-      Player player = getPlayerById(widget._store.state, playerId);
-      heistDecisions.add(
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('${player.name}:', style: infoTextStyle),
-            Text(
-              ' $decision',
-              style: TextStyle(
-                fontSize: 16.0,
-                color: decisionColour(decision),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      );
+      final bool playerIsLeader =
+          hauntLeader != null && hauntLeader.id == playerId;
+      if (playerIsLeader) {
+        leaderInHaunt = true;
+      }
+      heistDecisions
+          .add(getPlayerDecisionRow(playerId, decision, playerIsLeader));
     });
+    // make sure the haunt leader appears even if they weren't in the haunt
+    if (hauntLeader != null && !leaderInHaunt) {
+      heistDecisions.add(getPlayerDecisionRow(hauntLeader.id, "-", true));
+    }
     return heistDecisions;
+  }
+
+  Row getPlayerDecisionRow(
+      final String playerId, final String decision, final bool playerIsLeader) {
+    final Player player = getPlayerById(widget._store.state, playerId);
+    // put a star next to the leader's name, if there was a leader
+    final Widget playerNameText = Text('${player.name}:', style: infoTextStyle);
+    final Widget playerName = playerIsLeader
+        ? iconText(Icon(Icons.star_border), playerNameText)
+        : playerNameText;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        playerName,
+        Text(
+          ' $decision',
+          style: TextStyle(
+            fontSize: 16.0,
+            color: decisionColour(decision),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
   }
 
   Text heistResultText(bool wasSuccess) => wasSuccess
       ? Text(
           AppLocalizations.of(context).success.toUpperCase(),
           style: const TextStyle(
-              fontSize: 16.0, fontWeight: FontWeight.bold, color: HeistColors.green),
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+              color: HeistColors.green),
         )
       : Text(
           AppLocalizations.of(context).fail.toUpperCase(),
           style: const TextStyle(
-              fontSize: 16.0, fontWeight: FontWeight.bold, color: HeistColors.peach),
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+              color: HeistColors.peach),
         );
 
   Widget hauntSummary(Haunt haunt, int pot) => Card(
@@ -62,7 +88,13 @@ class _EndgameState extends State<Endgame> {
         child: Column(
           children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text(AppLocalizations.of(context).hauntTitle(haunt.order), style: boldTextStyle),
+              iconText(
+                  wasAuction(widget._store.state, haunt)
+                      ? Icon(Icons.timer)
+                      : null,
+                  Text(AppLocalizations.of(context).hauntTitle(haunt.order),
+                      style: boldTextStyle),
+                  trailingIcon: true),
               iconText(
                 Icon(Icons.bubble_chart),
                 Text(pot.toString(), style: infoTextStyle),
@@ -94,7 +126,8 @@ class _EndgameState extends State<Endgame> {
                 children: [
                   Text(Team.SCARY.toString(), style: infoTextStyle),
                   Text(
-                    AppLocalizations.of(context).teamScores(score.scaryScore, score.friendlyScore),
+                    AppLocalizations.of(context)
+                        .teamScores(score.scaryScore, score.friendlyScore),
                     style: TextStyle(fontSize: 32.0),
                   ),
                   Text(Team.FRIENDLY.toString(), style: infoTextStyle),
@@ -106,7 +139,8 @@ class _EndgameState extends State<Endgame> {
       );
 
   Widget fullPlayerListForTeam(List<Player> players, Team team, Color color) {
-    List<Player> playersInTeam = players.where((p) => Roles.getTeam(p.role) == team).toList();
+    List<Player> playersInTeam =
+        players.where((p) => Roles.getTeam(p.role) == team).toList();
     return Column(
       children: List.generate(playersInTeam.length, (i) {
         Player player = playersInTeam[i];
@@ -139,7 +173,8 @@ class _EndgameState extends State<Endgame> {
         child: Column(children: [
           Padding(
             padding: paddingTitle,
-            child: Text(AppLocalizations.of(context).players, style: titleTextStyle),
+            child: Text(AppLocalizations.of(context).players,
+                style: titleTextStyle),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -166,11 +201,16 @@ class _EndgameState extends State<Endgame> {
     Map<String, List<Round>> rounds = getRounds(widget._store.state);
     for (Haunt haunt in haunts) {
       if (haunt.allDecided) {
-        Round lastRound = lastRoundForHaunt(
-            getRoom(widget._store.state), rounds, haunt);
+        Round lastRound =
+            lastRoundForHaunt(getRoom(widget._store.state), rounds, haunt);
         children.add(hauntSummary(haunt, lastRound.pot));
       }
     }
+
+    children.add(RaisedButton(
+        child: new Text(AppLocalizations.of(context).backHome,
+            style: Theme.of(context).textTheme.button),
+        onPressed: () => goBackToMainPage(context)));
 
     return Padding(
       padding: paddingMedium,

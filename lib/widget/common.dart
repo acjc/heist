@@ -187,11 +187,13 @@ Color decisionColour(String decision) {
   }
 }
 
-class VerticalDivider extends StatelessWidget {
+/// We should replace this with Flutter's VerticalDividers but I couldn't get
+/// them to show up.
+class VerticalDividerHeist extends StatelessWidget {
   final double height;
   final Color color;
 
-  VerticalDivider({this.height = 50.0, this.color});
+  VerticalDividerHeist({this.height = 50.0, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -232,7 +234,7 @@ Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
 
   List<Widget> children = [
     titleSubtitle(context, AppLocalizations.of(context).hauntTitle(haunt.order), subtitle),
-    VerticalDivider(),
+    VerticalDividerHeist(),
     roundTitleIcon(Icons.people, haunt.numPlayers.toString()),
     roundTitleIcon(Icons.bubble_chart, haunt.price.toString()),
     roundTitleIcon(Icons.vertical_align_top, haunt.maximumBid.toString()),

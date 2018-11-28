@@ -79,12 +79,12 @@ class _HauntEndState extends State<HauntEnd> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text(AppLocalizations.of(context).hauntTitle(haunt.order), style: boldTextStyle),
-          VerticalDivider(),
+          VerticalDividerHeist(),
           iconText(
             Icon(Icons.bubble_chart),
             Text(pot.toString(), style: bigNumberTextStyle),
           ),
-          VerticalDivider(),
+          VerticalDividerHeist(),
           _hauntIcon(haunt.wasSuccess),
         ],
       );

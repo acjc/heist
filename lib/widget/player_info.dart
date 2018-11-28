@@ -28,9 +28,9 @@ Widget playerInfo(Store<GameModel> store) => StoreConnector<GameModel, PlayerInf
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               roomCode(context, getRoom(store.state).code),
-              VerticalDivider(),
+              VerticalDividerHeist(),
               playerName(context, viewModel.me),
-              VerticalDivider(),
+              VerticalDividerHeist(),
               playerBalance(viewModel.balance, viewModel.amountReceivedThisRound),
             ],
           ),

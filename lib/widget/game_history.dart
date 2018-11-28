@@ -94,7 +94,7 @@ class _GameHistoryState extends State<GameHistory> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: title,
       ),
-      VerticalDivider(height: 40.0),
+      VerticalDividerHeist(height: 40.0),
       hauntDetailsIcon(Icons.people, haunt.numPlayers.toString()),
       hauntDetailsIcon(Icons.bubble_chart, haunt.price.toString()),
       hauntDetailsIcon(Icons.vertical_align_top, haunt.maximumBid.toString()),
@@ -102,7 +102,7 @@ class _GameHistoryState extends State<GameHistory> {
 
     if (haunt.complete) {
       hauntDetailsChildren.addAll([
-        VerticalDivider(height: 40.0),
+        VerticalDividerHeist(height: 40.0),
         iconText(Icon(Icons.bubble_chart, size: 32.0),
             Text(lastRound.pot.toString(), style: bigNumberTextStyle)),
       ]);

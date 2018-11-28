@@ -12,6 +12,7 @@ import 'package:heist/main.dart';
 import 'package:heist/middleware/game_middleware.dart';
 import 'package:heist/middleware/room_middleware.dart';
 import 'package:heist/middleware/team_picker_middleware.dart';
+import 'package:heist/reducers/local_actions_reducers.dart';
 import 'package:heist/reducers/reducers.dart';
 import 'package:heist/reducers/request_reducers.dart';
 import 'package:heist/reducers/subscription_reducers.dart';
@@ -97,19 +98,61 @@ class GameState extends State<Game> {
     return null;
   }
 
-  Widget _biddingAndGifting(Store<GameModel> store) {
-    List<Widget> children = [
-      roundTitleCard(context, store),
-    ];
-    if (!isAuction(store.state)) {
+  Widget _biddingAndGifting() {
+    bool auction = isAuction(_store.state);
+    List<Widget> children = [];
+
+    if (!auction) {
+      children.add(HeaderCard(
+        title: AppLocalizations.of(context).biddingHeader,
+        child: Text(
+          AppLocalizations.of(context).biddingHeaderDescription,
+          style: descriptionTextStyle,
+          textAlign: TextAlign.center,
+        ),
+        expanded:
+            !generalLocalActionRecorded(_store.state, GeneralLocalAction.AuctionDescriptionClosed),
+        onExpansionChanged: (open) {
+          if (!open) {
+            _store.dispatch(
+              RecordGeneralLocalActionAction(GeneralLocalAction.AuctionDescriptionClosed),
+            );
+          }
+        },
+      ));
+    } else {
+      children.add(HeaderCard(
+        title: AppLocalizations.of(context).auctionTitle,
+        child: Text(
+          AppLocalizations.of(context).auctionHeaderDescription,
+          style: descriptionTextStyle,
+          textAlign: TextAlign.center,
+        ),
+        expanded:
+            !generalLocalActionRecorded(_store.state, GeneralLocalAction.BiddingDescriptionClosed),
+        onExpansionChanged: (open) {
+          if (!open) {
+            _store.dispatch(
+              RecordGeneralLocalActionAction(GeneralLocalAction.BiddingDescriptionClosed),
+            );
+          }
+        },
+      ));
+    }
+
+    children.add(roundTitleCard(context, _store));
+
+    if (!auction) {
       children.add(selectionBoard(_store));
     }
+
     children.addAll(
       [
-        bidding(store),
-        gifting(store),
+        bidding(_store),
+        gifting(_store),
       ],
     );
+
     return Padding(
       padding: paddingSmall,
       child: ListView(children: children),
@@ -155,7 +198,7 @@ class GameState extends State<Game> {
 
     // Bidding & gifting
     if (!viewModel.biddingComplete) {
-      return appendFooter(_biddingAndGifting(_store));
+      return appendFooter(_biddingAndGifting());
     }
 
     // Select team from auction if necessary

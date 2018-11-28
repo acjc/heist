@@ -24,18 +24,15 @@ class _ActiveHauntState extends State<ActiveHaunt> {
   Widget observeHaunt() => StoreConnector<GameModel, Map<String, String>>(
       distinct: true,
       converter: (store) => currentHaunt(store.state).decisions,
-      builder: (context, decisions) {
-        return Card(
-            elevation: 2.0,
+      builder: (context, decisions) => TitledCard(
+            title: AppLocalizations.of(context).hauntInProgress,
             child: Padding(
-                padding: paddingMedium,
-                child: Column(children: [
-                  Text(AppLocalizations.of(context).hauntInProgress, style: infoTextStyle),
-                  TeamGridView(
-                    observeHauntChildren(currentTeam(widget._store.state), decisions),
-                  ),
-                ])));
-      });
+              padding: paddingMedium,
+              child: TeamGridView(
+                observeHauntChildren(currentTeam(widget._store.state), decisions),
+              ),
+            ),
+          ));
 
   List<Widget> observeHauntChildren(Set<Player> team, Map<String, String> decisions) {
     Color color = Theme.of(context).primaryColor;
@@ -77,8 +74,8 @@ class _ActiveHauntState extends State<ActiveHaunt> {
             decisionButton(Tickle, Roles.getTeam(me.role) == Team.FRIENDLY),
           ]);
         }
-        return Card(
-            elevation: 2.0,
+        return TitledCard(
+            title: AppLocalizations.of(context).decision,
             child: Container(
                 padding: paddingMedium,
                 alignment: Alignment.center,

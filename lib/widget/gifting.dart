@@ -13,75 +13,79 @@ import 'package:redux/redux.dart';
 import 'common.dart';
 
 Widget giftSelector(BuildContext context, Store<GameModel> store, int giftAmount, int balance) =>
-    new Row(
+    Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         iconWidget(
           context,
           Icons.arrow_back,
-          () => store.dispatch(new DecrementGiftAmountAction()),
+          () => store.dispatch(DecrementGiftAmountAction()),
           giftAmount > 0,
         ),
-        new Text(giftAmount.toString(), style: bigNumberTextStyle),
+        Text(giftAmount.toString(), style: bigNumberTextStyle),
         iconWidget(
           context,
           Icons.arrow_forward,
-          () => store.dispatch(new IncrementGiftAmountAction(balance)),
+          () => store.dispatch(IncrementGiftAmountAction(balance)),
           giftAmount < balance,
         ),
       ],
     );
 
 Widget recipientSelection(
-    BuildContext context, Store<GameModel> store, int giftAmount, bool loading) {
+  BuildContext context,
+  Store<GameModel> store,
+  int giftAmount,
+  bool loading,
+) {
   List<Player> otherPlayers = getOtherPlayers(store.state);
-  return new TeamGridView(new List.generate(otherPlayers.length, (i) {
+  return TeamGridView(List.generate(otherPlayers.length, (i) {
     Player player = otherPlayers[i];
-    return new RaisedButton(
-      child: new Text(player.name, style: Theme.of(context).textTheme.button),
+    return RaisedButton(
+      child: Text(player.name, style: Theme.of(context).textTheme.button),
       onPressed: loading || giftAmount <= 0
           ? null
-          : () => store.dispatch(new SendGiftAction(player.id, giftAmount)),
+          : () => store.dispatch(SendGiftAction(player.id, giftAmount)),
     );
   }));
 }
 
-Widget gifting(Store<GameModel> store) => new StoreConnector<GameModel, GiftingViewModel>(
-    converter: (store) => new GiftingViewModel._(
+Widget gifting(Store<GameModel> store) => StoreConnector<GameModel, GiftingViewModel>(
+    converter: (store) => GiftingViewModel._(
         currentBalance(store.state),
         myCurrentGift(store.state),
         getGiftAmount(store.state),
         requestInProcess(store.state, Request.Gifting)),
     distinct: true,
     builder: (context, viewModel) {
-      List<Widget> children = [
-        new Container(
-          padding: paddingTitle,
-          child: new Text(AppLocalizations.of(context).giftingTitle, style: titleTextStyle),
-        ),
-      ];
-
+      List<Widget> children = [];
       if (viewModel.gift != null) {
         String recipientName = getPlayerById(store.state, viewModel.gift.recipient).name;
-        children.add(new Container(
+        children.add(Container(
             padding: paddingMedium,
-            child: new Text(
+            child: Text(
                 AppLocalizations.of(context).giftAlreadySent(viewModel.gift.amount, recipientName),
                 style: infoTextStyle)));
       } else {
-        children.addAll([
-          giftSelector(
-              context, store, min(viewModel.giftAmount, viewModel.balance), viewModel.balance),
-          new Text(AppLocalizations.of(context).chooseGiftRecipient, style: infoTextStyle),
-          recipientSelection(context, store, viewModel.giftAmount, viewModel.loading),
-        ]);
+        children.addAll(
+          [
+            giftSelector(
+              context,
+              store,
+              min(viewModel.giftAmount, viewModel.balance),
+              viewModel.balance,
+            ),
+            Text(AppLocalizations.of(context).chooseGiftRecipient, style: infoTextStyle),
+            recipientSelection(context, store, viewModel.giftAmount, viewModel.loading),
+          ],
+        );
       }
 
-      return new Card(
-        elevation: 2.0,
-        child: new Container(
-            padding: paddingLarge,
-            child: new Column(
+      return TitledCard(
+        title: AppLocalizations.of(context).giftingTitle,
+        child: Container(
+            padding: paddingMedium,
+            child: Column(
               children: children,
             )),
       );

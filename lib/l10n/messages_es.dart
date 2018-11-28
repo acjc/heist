@@ -22,9 +22,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m1(numPlayers) => "There are ${numPlayers} spots available! Highest, then fastest, bids win!";
 
-  static m2(name, result) => "You checked if ${name} is Brenda. This is ${result}";
+  static m2(name, result) => "You guessed if ${name} is Brenda.\n\nThis was ${result}";
 
-  static m3(length, numPlayers) => "Bidders so far (${length} / ${numPlayers})";
+  static m3(length, numPlayers) => "Bids in so far (${length} / ${numPlayers})";
 
   static m4(brendaDisplayName) => "...received by ${brendaDisplayName}";
 
@@ -36,33 +36,29 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m8(amount, recipientName) => "You have already sent a gift this round of ${amount} to ${recipientName}";
 
-  static m9(price) => "Price: ${price}";
+  static m9(order) => "Haunt ${order}";
 
-  static m10(order) => "Haunt ${order}";
+  static m10(name, role) => "${name} is ${role} \n";
 
-  static m11(name, role) => "${name} is ${role} \n";
+  static m11(playersPicked, teamSize) => "TEAM (${playersPicked} / ${teamSize})";
 
-  static m12(playersPicked, teamSize) => "TEAM (${playersPicked} / ${teamSize})";
+  static m12(order) => "Player ${order}";
 
-  static m13(order) => "Player ${order}";
+  static m13(order) => "Round ${order}";
 
-  static m14(name, role) => "${name} (${role}) ->";
+  static m14(numRoles) => "SCARY TEAM (${numRoles})";
 
-  static m15(order) => "Round ${order}";
+  static m15(bertieDisplayName, stealOption) => "...shared between ${bertieDisplayName} and any players who chose ${stealOption} on the haunt";
 
-  static m16(numRoles) => "SCARY TEAM (${numRoles})";
+  static m16(roomCode, owner) => "Room ${roomCode}: ${owner} is choosing the game roles";
 
-  static m17(bertieDisplayName, stealOption) => "...shared between ${bertieDisplayName} and any players who chose ${stealOption} on the haunt";
+  static m17(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
 
-  static m18(roomCode, owner) => "Room ${roomCode}: ${owner} is choosing the game roles";
+  static m18(playersSoFar, totalPlayers) => "Waiting for players (${playersSoFar} / ${totalPlayers})";
 
-  static m19(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
+  static m19(leaderName) => "Waiting for ${leaderName} to submit their team";
 
-  static m20(playersSoFar, totalPlayers) => "Waiting for players (${playersSoFar} / ${totalPlayers})";
-
-  static m21(leaderName) => "Waiting for ${leaderName} to submit their team";
-
-  static m22(winner) => "${winner} win!";
+  static m20(winner) => "${winner} win!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -71,17 +67,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "accountantPickPlayer" : MessageLookupByLibrary.simpleMessage("PICK BALANCE TO SEE"),
     "addPlayersInstructions" : MessageLookupByLibrary.simpleMessage("Add a player to your team by tapping JOIN TEAM on their screen"),
     "auctionDescription" : m1,
+    "auctionHeaderDescription" : MessageLookupByLibrary.simpleMessage("You\'ve failed to agree on a team 4 times in a row, so now it\'s time for an auction instead!\n\nThe players who bid the highest will get to go on the haunt. Tied bids will favour whoever submitted their bid first.\n\nYou can also gift ectoplasm to other players here (but only once per round). Gift to a teammate so they can go on the haunt with you!"),
     "auctionTitle" : MessageLookupByLibrary.simpleMessage("Auction!"),
     "backHome" : MessageLookupByLibrary.simpleMessage("BACK TO HOME PAGE"),
     "bertie" : MessageLookupByLibrary.simpleMessage("Bertie"),
     "bertieConfirmPlayer" : MessageLookupByLibrary.simpleMessage("CONFIRM GUESS"),
-    "bertieExplanation" : MessageLookupByLibrary.simpleMessage("You can try to guess who Brenda is ONCE during the game. If you get it right, you will no longer be restricted by maximum bid limits."),
+    "bertieExplanation" : MessageLookupByLibrary.simpleMessage("You are Bertie and that means you have ONE guess as to the identity of Brenda the Scariest Ghost which you can use at any point during the game. If you guess correctly, you will no longer be restricted by maximum bid limits!"),
     "bertiePickPlayer" : MessageLookupByLibrary.simpleMessage("SELECT YOUR BRENDA GUESS"),
     "bertieResult" : m2,
     "bertieResultRight" : MessageLookupByLibrary.simpleMessage("CORRECT!"),
     "bertieResultWrong" : MessageLookupByLibrary.simpleMessage("INCORRECT! :("),
     "bidders" : m3,
-    "bidding" : MessageLookupByLibrary.simpleMessage("BIDDING"),
+    "bidding" : MessageLookupByLibrary.simpleMessage("Bidding"),
+    "biddingHeader" : MessageLookupByLibrary.simpleMessage("Bidding is open!"),
+    "biddingHeaderDescription" : MessageLookupByLibrary.simpleMessage("Now that a team has been selected for this haunt, it\'s time to bid on that team! If you like the look of the team, bid high, or bid low to show your displeasure.\n\nYou can also gift ectoplasm to other players here (but only once per round). Gift to a teammate so you can both bid high on a team you agree on!"),
     "brenda" : MessageLookupByLibrary.simpleMessage("Brenda"),
     "brendaReceived" : m4,
     "cancelBid" : MessageLookupByLibrary.simpleMessage("CANCEL BID"),
@@ -94,6 +93,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "convince" : MessageLookupByLibrary.simpleMessage("Convince "),
     "createRoom" : MessageLookupByLibrary.simpleMessage("CREATE NEW GAME"),
     "createRoomTitle" : MessageLookupByLibrary.simpleMessage("Create new game"),
+    "decision" : MessageLookupByLibrary.simpleMessage("Decision"),
     "enterRoomCode" : MessageLookupByLibrary.simpleMessage("Enter an existing game code"),
     "enterYourName" : MessageLookupByLibrary.simpleMessage("Enter your name"),
     "fail" : MessageLookupByLibrary.simpleMessage("Fail"),
@@ -101,21 +101,22 @@ class MessageLookup extends MessageLookupByLibrary {
     "friendlyGhost" : MessageLookupByLibrary.simpleMessage("Friendly Ghost"),
     "friendlyTeam" : m7,
     "fullTeam" : MessageLookupByLibrary.simpleMessage("This team is full. Remove another role before adding this one."),
-    "gameTab" : MessageLookupByLibrary.simpleMessage("GAME"),
+    "gameResult" : MessageLookupByLibrary.simpleMessage("Game Result"),
     "giftAlreadySent" : m8,
-    "giftingTitle" : MessageLookupByLibrary.simpleMessage("GIFTING"),
+    "giftingTitle" : MessageLookupByLibrary.simpleMessage("Gifting"),
     "goingAhead" : MessageLookupByLibrary.simpleMessage("The haunt is going ahead without you!"),
-    "hauntInProgress" : MessageLookupByLibrary.simpleMessage("Haunt in progress..."),
-    "hauntPrice" : m9,
-    "hauntTitle" : m10,
+    "hauntInProgress" : MessageLookupByLibrary.simpleMessage("Haunt in progress"),
+    "hauntInfo" : MessageLookupByLibrary.simpleMessage("Haunt Info"),
+    "hauntResult" : MessageLookupByLibrary.simpleMessage("Haunt Result"),
+    "hauntTitle" : m9,
     "homepageTitle" : MessageLookupByLibrary.simpleMessage("Homepage"),
-    "identity" : m11,
+    "identity" : m10,
     "invalidCode" : MessageLookupByLibrary.simpleMessage("Invalid code"),
     "joinGame" : MessageLookupByLibrary.simpleMessage("JOIN GAME"),
     "joinTeam" : MessageLookupByLibrary.simpleMessage("JOIN TEAM"),
     "leaveTeam" : MessageLookupByLibrary.simpleMessage("LEAVE TEAM"),
     "makeYourChoice" : MessageLookupByLibrary.simpleMessage("Make your choice..."),
-    "noBid" : MessageLookupByLibrary.simpleMessage("No Bid"),
+    "noBid" : MessageLookupByLibrary.simpleMessage("-"),
     "noConnectionDialogText" : MessageLookupByLibrary.simpleMessage("You need to be connected to the internet to be able to play."),
     "noConnectionDialogTitle" : MessageLookupByLibrary.simpleMessage("No internet"),
     "notAllowed" : MessageLookupByLibrary.simpleMessage("You can\'t do that"),
@@ -125,35 +126,42 @@ class MessageLookup extends MessageLookupByLibrary {
     "onlyOwnerModifies" : MessageLookupByLibrary.simpleMessage("Only the person who created the room can choose roles."),
     "otherIdentities" : MessageLookupByLibrary.simpleMessage("You also know these identities"),
     "pickATeam" : MessageLookupByLibrary.simpleMessage("It\'s your turn to pick a team!"),
-    "pickedTeamSize" : m12,
+    "pickedTeamSize" : m11,
     "pickedYou" : MessageLookupByLibrary.simpleMessage(" picked you in the team!"),
-    "playerOrder" : m13,
-    "playerRole" : m14,
+    "playerInfo" : MessageLookupByLibrary.simpleMessage("Player Info"),
+    "playerList" : MessageLookupByLibrary.simpleMessage("Player List"),
+    "playerOrder" : m12,
+    "playerRoles" : MessageLookupByLibrary.simpleMessage("Player Roles"),
     "players" : MessageLookupByLibrary.simpleMessage("Players"),
     "pleaseEnterAName" : MessageLookupByLibrary.simpleMessage("Please enter a name"),
     "pot" : MessageLookupByLibrary.simpleMessage("Pot"),
     "price" : MessageLookupByLibrary.simpleMessage("Price"),
     "putYouInTeam" : MessageLookupByLibrary.simpleMessage(" to pick you and tap JOIN TEAM below"),
-    "roundTitle" : m15,
+    "role" : MessageLookupByLibrary.simpleMessage("Role"),
+    "roleInfo" : MessageLookupByLibrary.simpleMessage("Role Info"),
+    "room" : MessageLookupByLibrary.simpleMessage("Room"),
+    "roundTitle" : m13,
     "scaryGhost" : MessageLookupByLibrary.simpleMessage("Scary Ghost"),
-    "scaryTeam" : m16,
-    "secretTab" : MessageLookupByLibrary.simpleMessage("SECRET"),
-    "sharedBetween" : m17,
-    "someoneElseChoosesGameRoles" : m18,
+    "scaryTeam" : m14,
+    "secretActions" : MessageLookupByLibrary.simpleMessage("Secret Actions"),
+    "secretHeader" : MessageLookupByLibrary.simpleMessage("Secret"),
+    "secretHeaderDescription" : MessageLookupByLibrary.simpleMessage("This screen contains information which should be known only to you. Be careful not to accidentally show it to any other players!\n\nHere, you can see your ectoplasm, your team and your role. You\'ll find details about any secret information or actions available to you.\n\nThere are also helpful reminders about the other players and roles in this game."),
+    "sharedBetween" : m15,
+    "someoneElseChoosesGameRoles" : m16,
     "submit" : MessageLookupByLibrary.simpleMessage("SUBMIT"),
     "submitBid" : MessageLookupByLibrary.simpleMessage("SUBMIT BID"),
     "submitTeam" : MessageLookupByLibrary.simpleMessage("SUBMIT TEAM"),
     "success" : MessageLookupByLibrary.simpleMessage("Success"),
-    "teamScores" : m19,
+    "team" : MessageLookupByLibrary.simpleMessage("Team"),
+    "teamScores" : m17,
+    "teamSelection" : MessageLookupByLibrary.simpleMessage("Team Selection"),
     "title" : MessageLookupByLibrary.simpleMessage("Heist"),
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),
-    "waitingForPlayers" : m20,
-    "waitingForTeamSubmission" : m21,
-    "winner" : m22,
+    "waitingForPlayers" : m18,
+    "waitingForTeamSubmission" : m19,
+    "winner" : m20,
     "youAreGoing" : MessageLookupByLibrary.simpleMessage("You\'re going on a haunt!"),
     "youHaveMadeYourChoice" : MessageLookupByLibrary.simpleMessage("You have made your choice!"),
-    "yourBid" : MessageLookupByLibrary.simpleMessage("Your bid"),
-    "yourRole" : MessageLookupByLibrary.simpleMessage("Your role"),
-    "yourTeam" : MessageLookupByLibrary.simpleMessage("Your team")
+    "yourBid" : MessageLookupByLibrary.simpleMessage("Your bid")
   };
 }

@@ -26,13 +26,11 @@ class _EndgameState extends State<Endgame> {
     final Player hauntLeader = leaderForHaunt(widget._store.state, haunt);
     bool leaderInHaunt = false;
     haunt.decisions.forEach((playerId, decision) {
-      final bool playerIsLeader =
-          hauntLeader != null && hauntLeader.id == playerId;
+      final bool playerIsLeader = hauntLeader != null && hauntLeader.id == playerId;
       if (playerIsLeader) {
         leaderInHaunt = true;
       }
-      heistDecisions
-          .add(getPlayerDecisionRow(playerId, decision, playerIsLeader));
+      heistDecisions.add(getPlayerDecisionRow(playerId, decision, playerIsLeader));
     });
     // make sure the haunt leader appears even if they weren't in the haunt
     if (hauntLeader != null && !leaderInHaunt) {
@@ -46,9 +44,8 @@ class _EndgameState extends State<Endgame> {
     final Player player = getPlayerById(widget._store.state, playerId);
     // put a star next to the leader's name, if there was a leader
     final Widget playerNameText = Text('${player.name}:', style: infoTextStyle);
-    final Widget playerName = playerIsLeader
-        ? iconText(Icon(Icons.star_border), playerNameText)
-        : playerNameText;
+    final Widget playerName =
+        playerIsLeader ? iconText(Icon(Icons.star_border), playerNameText) : playerNameText;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -69,16 +66,12 @@ class _EndgameState extends State<Endgame> {
       ? Text(
           AppLocalizations.of(context).success.toUpperCase(),
           style: const TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.bold,
-              color: HeistColors.green),
+              fontSize: 16.0, fontWeight: FontWeight.bold, color: HeistColors.green),
         )
       : Text(
           AppLocalizations.of(context).fail.toUpperCase(),
           style: const TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.bold,
-              color: HeistColors.peach),
+              fontSize: 16.0, fontWeight: FontWeight.bold, color: HeistColors.peach),
         );
 
   Widget hauntSummary(Haunt haunt, int pot) => Card(
@@ -88,12 +81,8 @@ class _EndgameState extends State<Endgame> {
         child: Column(
           children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              iconText(
-                  wasAuction(widget._store.state, haunt)
-                      ? Icon(Icons.timer)
-                      : null,
-                  Text(AppLocalizations.of(context).hauntTitle(haunt.order),
-                      style: boldTextStyle),
+              iconText(wasAuction(widget._store.state, haunt) ? Icon(Icons.timer) : null,
+                  Text(AppLocalizations.of(context).hauntTitle(haunt.order), style: boldTextStyle),
                   trailingIcon: true),
               iconText(
                 Icon(Icons.bubble_chart),
@@ -107,8 +96,8 @@ class _EndgameState extends State<Endgame> {
         ),
       ));
 
-  Widget winner(Score score) => Card(
-        elevation: 2.0,
+  Widget winner(Score score) => TitledCard(
+        title: AppLocalizations.of(context).gameResult,
         child: Container(
           alignment: Alignment.center,
           padding: paddingMedium,
@@ -126,8 +115,7 @@ class _EndgameState extends State<Endgame> {
                 children: [
                   Text(Team.SCARY.toString(), style: infoTextStyle),
                   Text(
-                    AppLocalizations.of(context)
-                        .teamScores(score.scaryScore, score.friendlyScore),
+                    AppLocalizations.of(context).teamScores(score.scaryScore, score.friendlyScore),
                     style: TextStyle(fontSize: 32.0),
                   ),
                   Text(Team.FRIENDLY.toString(), style: infoTextStyle),
@@ -139,8 +127,7 @@ class _EndgameState extends State<Endgame> {
       );
 
   Widget fullPlayerListForTeam(List<Player> players, Team team, Color color) {
-    List<Player> playersInTeam =
-        players.where((p) => Roles.getTeam(p.role) == team).toList();
+    List<Player> playersInTeam = players.where((p) => Roles.getTeam(p.role) == team).toList();
     return Column(
       children: List.generate(playersInTeam.length, (i) {
         Player player = playersInTeam[i];
@@ -166,15 +153,14 @@ class _EndgameState extends State<Endgame> {
 
   Widget fullPlayerList() {
     List<Player> players = getPlayers(widget._store.state);
-    return Card(
-      elevation: 2.0,
+    return TitledCard(
+      title: AppLocalizations.of(context).playerRoles,
       child: Padding(
         padding: paddingMedium,
         child: Column(children: [
           Padding(
             padding: paddingTitle,
-            child: Text(AppLocalizations.of(context).players,
-                style: titleTextStyle),
+            child: Text(AppLocalizations.of(context).players, style: titleTextStyle),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -201,8 +187,7 @@ class _EndgameState extends State<Endgame> {
     Map<String, List<Round>> rounds = getRounds(widget._store.state);
     for (Haunt haunt in haunts) {
       if (haunt.allDecided) {
-        Round lastRound =
-            lastRoundForHaunt(getRoom(widget._store.state), rounds, haunt);
+        Round lastRound = lastRoundForHaunt(getRoom(widget._store.state), rounds, haunt);
         children.add(hauntSummary(haunt, lastRound.pot));
       }
     }

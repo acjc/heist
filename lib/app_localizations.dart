@@ -101,13 +101,17 @@ class AppLocalizations {
     );
   }
 
-  String get auctionTitle {
-    return Intl.message(
-      'Auction!',
-      name: 'auctionTitle',
-      desc: 'Auction title',
-    );
-  }
+  String get auctionTitle => Intl.message(
+        'Auction!',
+        name: 'auctionTitle',
+        desc: 'Auction title',
+      );
+
+  String get hauntInfo => Intl.message(
+        'Haunt Info',
+        name: 'hauntInfo',
+        desc: 'Haunt info',
+      );
 
   String roundTitle(int order) {
     return Intl.message(
@@ -238,11 +242,36 @@ class AppLocalizations {
 
   // Bidding
 
+  String get biddingHeader => Intl.message(
+        'Bidding is open!',
+        name: 'biddingHeader',
+        desc: 'Header of the bidding & gifting screen',
+      );
+
+  String get biddingHeaderDescription => Intl.message(
+        "Now that a team has been selected for this haunt, it's time to bid on that team! "
+            "If you like the look of the team, bid high, or bid low to show your displeasure.\n\n"
+            "You can also gift ectoplasm to other players here (but only once per round). "
+            "Gift to a teammate so you can both bid high on a team you agree on!",
+        name: 'biddingHeaderDescription',
+        desc: 'Description for the bidding & gifting screen',
+      );
+
+  String get auctionHeaderDescription => Intl.message(
+        "You've failed to agree on a team 4 times in a row, so now it's time for an auction instead!\n\n"
+            "The players who bid the highest will get to go on the haunt. Tied bids will favour whoever "
+            "submitted their bid first.\n\n"
+            "You can also gift ectoplasm to other players here (but only once per round). "
+            "Gift to a teammate so they can go on the haunt with you!",
+        name: 'auctionHeaderDescription',
+        desc: 'Description for the bidding & gifting screen during an auction',
+      );
+
   String get bidding {
     return Intl.message(
-      'BIDDING',
+      'Bidding',
       name: 'bidding',
-      desc: 'Title of the bidding section',
+      desc: 'Title of the bidding card',
     );
   }
 
@@ -264,7 +293,7 @@ class AppLocalizations {
 
   String get noBid {
     return Intl.message(
-      'No Bid',
+      '-',
       name: 'noBid',
       desc: "Player hasn't made a bid yet",
     );
@@ -281,7 +310,7 @@ class AppLocalizations {
 
   String bidders(int length, int numPlayers) {
     return Intl.message(
-      'Bidders so far ($length / $numPlayers)',
+      'Bids in so far ($length / $numPlayers)',
       name: 'bidders',
       args: [length, numPlayers],
       desc: 'Number of players that have bid over the total number of players',
@@ -345,9 +374,17 @@ class AppLocalizations {
 
   String get hauntInProgress {
     return Intl.message(
-      'Haunt in progress...',
+      'Haunt in progress',
       name: 'hauntInProgress',
       desc: 'Shown while a haunt is in progress',
+    );
+  }
+
+  String get decision {
+    return Intl.message(
+      'Decision',
+      name: 'decision',
+      desc: 'Decision title',
     );
   }
 
@@ -366,6 +403,12 @@ class AppLocalizations {
       desc: 'Shown when a player on a haunt has made a decision',
     );
   }
+
+  String get hauntResult => Intl.message(
+        'Haunt Result',
+        name: 'hauntResult',
+        desc: 'Haunt result title',
+      );
 
   String brendaReceived(String brendaDisplayName) {
     return Intl.message(
@@ -387,37 +430,51 @@ class AppLocalizations {
 
   // Game
 
-  String get gameTab {
-    return Intl.message(
-      'GAME',
-      name: 'gameTab',
-      desc: 'Title of the game tab',
-    );
-  }
+  String get secretHeader => Intl.message(
+        'Secret',
+        name: 'secretHeader',
+        desc: 'Title for the secret screen',
+      );
 
-  String get secretTab {
-    return Intl.message(
-      'SECRET',
-      name: 'secretTab',
-      desc: 'Title of the secret tab',
-    );
-  }
+  String get secretHeaderDescription => Intl.message(
+        "This screen contains information which should be known only to you. "
+            "Be careful not to accidentally show it to any other players!\n\n"
+            "Here, you can see your ectoplasm, your team and your role. "
+            "You'll find details about any secret information or actions available to you.\n\n"
+            "There are also helpful reminders about the other players and roles in this game.",
+        name: 'secretHeaderDescription',
+        desc: 'Descripton for the secret screen',
+      );
 
-  String get yourTeam {
-    return Intl.message(
-      'Your team',
-      name: 'yourTeam',
-      desc: 'Next to your team in the secret board',
-    );
-  }
+  String get room => Intl.message(
+        'Room',
+        name: 'room',
+        desc: 'Room code label',
+      );
 
-  String get yourRole {
-    return Intl.message(
-      'Your role',
-      name: 'yourRole',
-      desc: 'Next to your role in the secret board',
-    );
-  }
+  String get playerInfo => Intl.message(
+        'Player Info',
+        name: 'playerInfo',
+        desc: 'Player info title',
+      );
+
+  String get roleInfo => Intl.message(
+        'Role Info',
+        name: 'roleInfo',
+        desc: 'Role info title',
+      );
+
+  String get team => Intl.message(
+        'Team',
+        name: 'team',
+        desc: 'title',
+      );
+
+  String get role => Intl.message(
+        'Role',
+        name: 'role',
+        desc: 'Next to your role in the secret board',
+      );
 
   String get otherIdentities {
     return Intl.message(
@@ -433,6 +490,14 @@ class AppLocalizations {
       name: 'identity',
       args: [name, role],
       desc: 'Identity a player might know',
+    );
+  }
+
+  String get secretActions {
+    return Intl.message(
+      'Secret Actions',
+      name: 'secretActions',
+      desc: 'Secret actions title',
     );
   }
 
@@ -463,8 +528,9 @@ class AppLocalizations {
 
   String get bertieExplanation {
     return Intl.message(
-      'You can try to guess who Brenda is ONCE during the game.'
-          ' If you get it right, you will no longer be restricted by maximum bid limits.',
+      'You are Bertie and that means you have ONE guess as to the identity of '
+          'Brenda the Scariest Ghost which you can use at any point during the game.'
+          ' If you guess correctly, you will no longer be restricted by maximum bid limits!',
       name: 'bertieExplanation',
       desc: 'Tells Bertie what they can do',
     );
@@ -488,7 +554,7 @@ class AppLocalizations {
 
   String bertieResult(String name, String result) {
     return Intl.message(
-      'You checked if $name is Brenda. This is $result',
+      'You guessed if $name is Brenda.\n\nThis was $result',
       name: 'bertieResult',
       args: [name, result],
       desc: 'Tells Bertie whether they found Brenda after their guess',
@@ -511,6 +577,14 @@ class AppLocalizations {
     );
   }
 
+  String get playerList {
+    return Intl.message(
+      'Player List',
+      name: 'playerList',
+      desc: 'Player list title',
+    );
+  }
+
   String waitingForPlayers(int playersSoFar, int totalPlayers) {
     return Intl.message(
       'Waiting for players ($playersSoFar / $totalPlayers)',
@@ -524,7 +598,7 @@ class AppLocalizations {
 
   String get giftingTitle {
     return Intl.message(
-      'GIFTING',
+      'Gifting',
       name: 'giftingTitle',
       desc: 'Title of the gifting section',
     );
@@ -548,6 +622,12 @@ class AppLocalizations {
   }
 
   // Picking a team
+
+  String get teamSelection => Intl.message(
+        'Team Selection',
+        name: 'teamSelection',
+        desc: 'Team selection title',
+      );
 
   String get pickedYou {
     return Intl.message(
@@ -645,23 +725,17 @@ class AppLocalizations {
 
   // End of the game
 
-  String playerRole(String name, String role) {
-    return Intl.message(
-      '$name ($role) ->',
-      name: 'playerRole',
-      args: [name, role],
-      desc: 'The name and role of a player',
-    );
-  }
+  String get gameResult => Intl.message(
+        'Game Result',
+        name: 'gameResult',
+        desc: 'Endgame results title',
+      );
 
-  String hauntPrice(int price) {
-    return Intl.message(
-      'Price: $price',
-      name: 'hauntPrice',
-      args: [price],
-      desc: 'Price of a haunt',
-    );
-  }
+  String get playerRoles => Intl.message(
+        'Player Roles',
+        name: 'playerRoles',
+        desc: 'Endgame player roles title',
+      );
 
   String winner(String winner) {
     return Intl.message(

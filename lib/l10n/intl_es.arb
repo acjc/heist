@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-10-31T21:30:07.024006",
+  "@@last_modified": "2018-11-28T18:14:26.204031",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -51,6 +51,12 @@
   "auctionTitle": "Auction!",
   "@auctionTitle": {
     "description": "Auction title",
+    "type": "text",
+    "placeholders": {}
+  },
+  "hauntInfo": "Haunt Info",
+  "@hauntInfo": {
+    "description": "Haunt info",
     "type": "text",
     "placeholders": {}
   },
@@ -150,9 +156,27 @@
     "type": "text",
     "placeholders": {}
   },
-  "bidding": "BIDDING",
+  "biddingHeader": "Bidding is open!",
+  "@biddingHeader": {
+    "description": "Header of the bidding & gifting screen",
+    "type": "text",
+    "placeholders": {}
+  },
+  "biddingHeaderDescription": "Now that a team has been selected for this haunt, it's time to bid on that team! If you like the look of the team, bid high, or bid low to show your displeasure.\n\nYou can also gift ectoplasm to other players here (but only once per round). Gift to a teammate so you can both bid high on a team you agree on!",
+  "@biddingHeaderDescription": {
+    "description": "Description for the bidding & gifting screen",
+    "type": "text",
+    "placeholders": {}
+  },
+  "auctionHeaderDescription": "You've failed to agree on a team 4 times in a row, so now it's time for an auction instead!\n\nThe players who bid the highest will get to go on the haunt. Tied bids will favour whoever submitted their bid first.\n\nYou can also gift ectoplasm to other players here (but only once per round). Gift to a teammate so they can go on the haunt with you!",
+  "@auctionHeaderDescription": {
+    "description": "Description for the bidding & gifting screen during an auction",
+    "type": "text",
+    "placeholders": {}
+  },
+  "bidding": "Bidding",
   "@bidding": {
-    "description": "Title of the bidding section",
+    "description": "Title of the bidding card",
     "type": "text",
     "placeholders": {}
   },
@@ -168,7 +192,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "noBid": "No Bid",
+  "noBid": "-",
   "@noBid": {
     "description": "Player hasn't made a bid yet",
     "type": "text",
@@ -182,7 +206,7 @@
       "numPlayers": {}
     }
   },
-  "bidders": "Bidders so far ({length} / {numPlayers})",
+  "bidders": "Bids in so far ({length} / {numPlayers})",
   "@bidders": {
     "description": "Number of players that have bid over the total number of players",
     "type": "text",
@@ -230,9 +254,15 @@
     "type": "text",
     "placeholders": {}
   },
-  "hauntInProgress": "Haunt in progress...",
+  "hauntInProgress": "Haunt in progress",
   "@hauntInProgress": {
     "description": "Shown while a haunt is in progress",
+    "type": "text",
+    "placeholders": {}
+  },
+  "decision": "Decision",
+  "@decision": {
+    "description": "Decision title",
     "type": "text",
     "placeholders": {}
   },
@@ -245,6 +275,12 @@
   "youHaveMadeYourChoice": "You have made your choice!",
   "@youHaveMadeYourChoice": {
     "description": "Shown when a player on a haunt has made a decision",
+    "type": "text",
+    "placeholders": {}
+  },
+  "hauntResult": "Haunt Result",
+  "@hauntResult": {
+    "description": "Haunt result title",
     "type": "text",
     "placeholders": {}
   },
@@ -265,26 +301,44 @@
       "stealOption": {}
     }
   },
-  "gameTab": "GAME",
-  "@gameTab": {
-    "description": "Title of the game tab",
+  "secretHeader": "Secret",
+  "@secretHeader": {
+    "description": "Title for the secret screen",
     "type": "text",
     "placeholders": {}
   },
-  "secretTab": "SECRET",
-  "@secretTab": {
-    "description": "Title of the secret tab",
+  "secretHeaderDescription": "This screen contains information which should be known only to you. Be careful not to accidentally show it to any other players!\n\nHere, you can see your ectoplasm, your team and your role. You'll find details about any secret information or actions available to you.\n\nThere are also helpful reminders about the other players and roles in this game.",
+  "@secretHeaderDescription": {
+    "description": "Descripton for the secret screen",
     "type": "text",
     "placeholders": {}
   },
-  "yourTeam": "Your team",
-  "@yourTeam": {
-    "description": "Next to your team in the secret board",
+  "room": "Room",
+  "@room": {
+    "description": "Room code label",
     "type": "text",
     "placeholders": {}
   },
-  "yourRole": "Your role",
-  "@yourRole": {
+  "playerInfo": "Player Info",
+  "@playerInfo": {
+    "description": "Player info title",
+    "type": "text",
+    "placeholders": {}
+  },
+  "roleInfo": "Role Info",
+  "@roleInfo": {
+    "description": "Role info title",
+    "type": "text",
+    "placeholders": {}
+  },
+  "team": "Team",
+  "@team": {
+    "description": "title",
+    "type": "text",
+    "placeholders": {}
+  },
+  "role": "Role",
+  "@role": {
     "description": "Next to your role in the secret board",
     "type": "text",
     "placeholders": {}
@@ -303,6 +357,12 @@
       "name": {},
       "role": {}
     }
+  },
+  "secretActions": "Secret Actions",
+  "@secretActions": {
+    "description": "Secret actions title",
+    "type": "text",
+    "placeholders": {}
   },
   "accountantExplanation": "You can also see the balance of up to {maxBalances} people",
   "@accountantExplanation": {
@@ -324,7 +384,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "bertieExplanation": "You can try to guess who Brenda is ONCE during the game. If you get it right, you will no longer be restricted by maximum bid limits.",
+  "bertieExplanation": "You are Bertie and that means you have ONE guess as to the identity of Brenda the Scariest Ghost which you can use at any point during the game. If you guess correctly, you will no longer be restricted by maximum bid limits!",
   "@bertieExplanation": {
     "description": "Tells Bertie what they can do",
     "type": "text",
@@ -342,7 +402,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "bertieResult": "You checked if {name} is Brenda. This is {result}",
+  "bertieResult": "You guessed if {name} is Brenda.\n\nThis was {result}",
   "@bertieResult": {
     "description": "Tells Bertie whether they found Brenda after their guess",
     "type": "text",
@@ -363,6 +423,12 @@
     "type": "text",
     "placeholders": {}
   },
+  "playerList": "Player List",
+  "@playerList": {
+    "description": "Player list title",
+    "type": "text",
+    "placeholders": {}
+  },
   "waitingForPlayers": "Waiting for players ({playersSoFar} / {totalPlayers})",
   "@waitingForPlayers": {
     "description": "Shown while players are joining the room",
@@ -372,7 +438,7 @@
       "totalPlayers": {}
     }
   },
-  "giftingTitle": "GIFTING",
+  "giftingTitle": "Gifting",
   "@giftingTitle": {
     "description": "Title of the gifting section",
     "type": "text",
@@ -392,6 +458,12 @@
       "amount": {},
       "recipientName": {}
     }
+  },
+  "teamSelection": "Team Selection",
+  "@teamSelection": {
+    "description": "Team selection title",
+    "type": "text",
+    "placeholders": {}
   },
   "pickedYou": " picked you in the team!",
   "@pickedYou": {
@@ -470,22 +542,17 @@
     "type": "text",
     "placeholders": {}
   },
-  "playerRole": "{name} ({role}) ->",
-  "@playerRole": {
-    "description": "The name and role of a player",
+  "gameResult": "Game Result",
+  "@gameResult": {
+    "description": "Endgame results title",
     "type": "text",
-    "placeholders": {
-      "name": {},
-      "role": {}
-    }
+    "placeholders": {}
   },
-  "hauntPrice": "Price: {price}",
-  "@hauntPrice": {
-    "description": "Price of a haunt",
+  "playerRoles": "Player Roles",
+  "@playerRoles": {
+    "description": "Endgame player roles title",
     "type": "text",
-    "placeholders": {
-      "price": {}
-    }
+    "placeholders": {}
   },
   "winner": "{winner} win!",
   "@winner": {

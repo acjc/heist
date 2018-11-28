@@ -17,6 +17,7 @@ const EdgeInsets paddingNano = const EdgeInsets.all(4.0);
 const EdgeInsets paddingTitle = const EdgeInsets.only(bottom: 12.0);
 const EdgeInsets paddingBelowText = const EdgeInsets.only(bottom: 4.0);
 
+const TextStyle descriptionTextStyle = const TextStyle(fontSize: 14.0);
 const TextStyle infoTextStyle = const TextStyle(fontSize: 16.0);
 const TextStyle boldTextStyle = const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold);
 const TextStyle bigNumberTextStyle = const TextStyle(fontSize: 30.0, fontWeight: FontWeight.w300);
@@ -57,6 +58,106 @@ class GameCard extends Card {
           child: child,
           margin: margin,
         );
+}
+
+/// Card with a title banner in the top-left corner
+class TitledCard extends StatelessWidget {
+  static const double defaultMargin = 4.0;
+
+  @required
+  final String title;
+  @required
+  final Widget child;
+  final double elevation;
+  final EdgeInsets margin;
+
+  TitledCard({
+    this.title,
+    this.child,
+    this.elevation,
+    this.margin = const EdgeInsets.all(defaultMargin),
+  });
+
+  @override
+  Widget build(BuildContext context) => Stack(
+        children: [
+          GameCard(
+            elevation: elevation,
+            margin: margin,
+            child: Padding(
+              padding: EdgeInsets.only(top: 32.0),
+              child: child,
+            ),
+          ),
+          Positioned(
+            top: 12.0 + margin.top,
+            left: margin.left - defaultMargin,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+              child: Text(title, style: Theme.of(context).textTheme.subhead),
+              decoration: BoxDecoration(
+                boxShadow: tileShadow,
+                borderRadius: BorderRadius.circular(8.0),
+                color: HeistColors.purple,
+              ),
+            ),
+          )
+        ],
+      );
+}
+
+/// Collapsible card with a large title across the top
+class HeaderCard extends StatelessWidget {
+  @required
+  final String title;
+  @required
+  final Widget child;
+  final bool expanded;
+  final ValueChanged<bool> onExpansionChanged;
+
+  HeaderCard({
+    this.title,
+    this.child,
+    this.expanded = true,
+    this.onExpansionChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) => GameCard(
+        child: Stack(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    // Match the height of the ExpansionTile title
+                    child: ListTile(title: Text('')),
+                    decoration: BoxDecoration(
+                      boxShadow: tileShadow,
+                      color: HeistColors.blue,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            ExpansionTile(
+              initiallyExpanded: expanded,
+              onExpansionChanged: onExpansionChanged,
+              leading: Icon(Icons.help_outline, color: HeistColors.amber),
+              title: Container(
+                alignment: Alignment.center,
+                child: Text(title, style: Theme.of(context).textTheme.title),
+              ),
+              children: [
+                Padding(
+                  padding: paddingMedium,
+                  child: child,
+                ),
+              ],
+            )
+          ],
+        ),
+      );
 }
 
 /// A tappable icon, e.g. left and right arrows
@@ -144,7 +245,8 @@ Widget roundTitleContents(BuildContext context, Store<GameModel> store) {
 }
 
 /// Card describing the current haunt and round
-Widget roundTitleCard(BuildContext context, Store<GameModel> store) => GameCard(
+Widget roundTitleCard(BuildContext context, Store<GameModel> store) => TitledCard(
+      title: AppLocalizations.of(context).hauntInfo,
       child: Padding(
         padding: paddingSmall,
         child: roundTitleContents(context, store),

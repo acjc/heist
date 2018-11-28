@@ -6,6 +6,7 @@ import 'package:heist/app_localizations.dart';
 import 'package:heist/db/database_model.dart';
 import 'package:heist/main.dart';
 import 'package:heist/middleware/room_middleware.dart';
+import 'package:heist/reducers/local_actions_reducers.dart';
 import 'package:heist/role.dart';
 import 'package:heist/selectors/selectors.dart';
 import 'package:heist/state.dart';
@@ -42,15 +43,16 @@ class SecretBoardState extends State<SecretBoard> {
       distinct: true,
       builder: (context, viewModel) {
         List<Widget> children = [
+          description(),
           playerInfo(_store),
-          _playerList(),
-          _getTeamAndRoleCard(viewModel.me),
+          _getSecretInfoCard(viewModel.me),
         ];
 
-        _addExtraIdsCardIfNeeded(viewModel.me, children);
         _addAccountantCardIfNeeded(viewModel.me, children, viewModel.selectingVisibleToAccountant);
-        _addLeadAgentCardIfNeeded(
+        _addBertieCardIfNeeded(
             viewModel.me, children, viewModel.brendaGuess, viewModel.guessingBrenda);
+
+        children.add(_playerList());
 
         return Column(
           children: [
@@ -67,6 +69,24 @@ class SecretBoardState extends State<SecretBoard> {
         );
       });
 
+  Widget description() => HeaderCard(
+        title: AppLocalizations.of(context).secretHeader,
+        child: Text(
+          AppLocalizations.of(context).secretHeaderDescription,
+          textAlign: TextAlign.center,
+          style: descriptionTextStyle,
+        ),
+        expanded:
+            !generalLocalActionRecorded(_store.state, GeneralLocalAction.SecretDescriptionClosed),
+        onExpansionChanged: (open) {
+          if (!open) {
+            _store.dispatch(
+              RecordGeneralLocalActionAction(GeneralLocalAction.SecretDescriptionClosed),
+            );
+          }
+        },
+      );
+
   Widget _playerList() => new StoreConnector<GameModel, List<Player>>(
         distinct: true,
         converter: (store) => getPlayers(store.state),
@@ -76,13 +96,7 @@ class SecretBoardState extends State<SecretBoard> {
           }
           Player me = getSelf(_store.state);
           Player leader = currentLeader(_store.state);
-          List<Widget> children = [
-            new Padding(
-              padding: paddingTitle,
-              child: const Text('Players', style: titleTextStyle),
-            ),
-          ];
-          children.addAll(new List.generate(players.length, (i) {
+          List<Widget> children = new List.generate(players.length, (i) {
             Player player = players[i];
             TextStyle textStyle = player.id == me.id ? boldTextStyle : infoTextStyle;
             if (player.id == leader.id) {
@@ -105,8 +119,9 @@ class SecretBoardState extends State<SecretBoard> {
               padding: paddingBelowText,
               child: new Text('${player.order}. ${player.name}', style: textStyle),
             );
-          }));
-          return new GameCard(
+          });
+          return new TitledCard(
+            title: AppLocalizations.of(context).playerList,
             child: new Padding(
               padding: paddingMedium,
               child: new Column(children: children),
@@ -115,60 +130,50 @@ class SecretBoardState extends State<SecretBoard> {
         },
       );
 
-  Card _getTeamAndRoleCard(Player me) {
-    return new GameCard(
-        child: new Padding(
-            padding: paddingMedium,
-            child: new Row(
-              children: [
-                new Column(
-                  children: [
-                    new Text(
-                      AppLocalizations.of(context).yourTeam,
-                      style: infoTextStyle,
-                    ),
-                    new Padding(
-                      padding: paddingTitle,
-                      child: new Text(
-                        "${Roles.getTeam(me.role).toString()}",
-                        style: titleTextStyle,
-                      ),
-                    ),
-                    new Text(
-                      AppLocalizations.of(context).yourRole,
-                      style: infoTextStyle,
-                    ),
-                    new Text(
-                      "${Roles.getRoleDisplayName(context, me.role)}",
-                      style: titleTextStyle,
-                    ),
-                  ],
-                ),
-              ],
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-            )));
-  }
+  Widget _getSecretInfoCard(Player me) {
+    List<Widget> children = [
+      Text(AppLocalizations.of(context).team),
+      Padding(
+        padding: paddingTitle,
+        child: Text(
+          "${Roles.getTeam(me.role).toString()}",
+          style: Theme.of(context).textTheme.subhead,
+        ),
+      ),
+      Text(AppLocalizations.of(context).role),
+      Text(
+        "${Roles.getRoleDisplayName(context, me.role).toUpperCase()}",
+        style: Theme.of(context).textTheme.subhead,
+      ),
+    ];
 
-  // show the identities the player knows, if any
-  _addExtraIdsCardIfNeeded(final Player me, final List<Widget> children) {
     if (Roles.getKnownIds(me.role) != null) {
-      children.add(new GameCard(
-          child: new Padding(
-              padding: paddingMedium,
-              child: new Column(children: [
-                new ListTile(
-                  title: new Text(
-                    AppLocalizations.of(context).otherIdentities,
-                    style: infoTextStyle,
-                  ),
-                  subtitle: new Text(
-                    "${_getFormattedKnownIds(Roles.getKnownIds(me.role))}",
-                    style: infoTextStyle,
-                  ),
-                ),
-              ]))));
+      children.add(Padding(
+          padding: paddingMedium,
+          child: ListTile(
+            title: Text(AppLocalizations.of(context).otherIdentities),
+            subtitle: Text(
+              "${_getFormattedKnownIds(Roles.getKnownIds(me.role))}",
+              style: Theme.of(context).textTheme.subhead,
+            ),
+          )));
     }
+
+    return TitledCard(
+      title: AppLocalizations.of(context).roleInfo,
+      child: Padding(
+        padding: paddingMedium,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: children,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   String _getFormattedKnownIds(Set<String> knownIds) {
@@ -180,9 +185,8 @@ class SecretBoardState extends State<SecretBoard> {
     return formattedKnownIds;
   }
 
-  // show the balances the accountant knows, if needed
-  _addAccountantCardIfNeeded(
-      final Player me, final List<Widget> children, final bool selectingVisibleToAccountant) {
+  /// Show the balances the accountant knows, if needed
+  _addAccountantCardIfNeeded(Player me, List<Widget> children, bool selectingVisibleToAccountant) {
     if (me.role == Roles.accountant.roleId) {
       final List<Widget> tiles = [];
       // the accountant can reveal a balance per completed haunt up to a maximum
@@ -244,20 +248,34 @@ class SecretBoardState extends State<SecretBoard> {
                     getPlayerByName(_store.state, _accountantSelection).id))));
       }
 
-      children.add(new GameCard(
-          child: new Padding(padding: paddingMedium, child: new Column(children: tiles))));
+      children.add(
+        new TitledCard(
+          title: AppLocalizations.of(context).secretActions,
+          child: new Padding(
+            padding: paddingMedium,
+            child: new Column(children: tiles),
+          ),
+        ),
+      );
     }
   }
 
-  // show the UI to guess Brenda, if needed
-  _addLeadAgentCardIfNeeded(final Player me, final List<Widget> children, final String brendaGuess,
-      final bool guessingKingpin) {
+  /// Show the UI to guess Brenda, if needed
+  _addBertieCardIfNeeded(
+    Player me,
+    List<Widget> children,
+    String brendaGuess,
+    bool guessingBrenda,
+  ) {
     if (me.role == Roles.bertie.roleId) {
       // the lead agent can try to guess who Brenda is once during a game
       List<Widget> tiles = [
         Padding(
           padding: paddingTiny,
-          child: Text(AppLocalizations.of(context).bertieExplanation),
+          child: Text(
+            AppLocalizations.of(context).bertieExplanation,
+            textAlign: TextAlign.center,
+          ),
         ),
       ];
 
@@ -285,7 +303,7 @@ class SecretBoardState extends State<SecretBoard> {
               AppLocalizations.of(context).bertieConfirmPlayer,
               style: Theme.of(context).textTheme.button,
             ),
-            onPressed: guessingKingpin
+            onPressed: guessingBrenda
                 ? null
                 : () => _store.dispatch(
                     new GuessBrendaAction(getPlayerByName(_store.state, _brendaGuess).id))));
@@ -296,12 +314,22 @@ class SecretBoardState extends State<SecretBoard> {
             : AppLocalizations.of(context).bertieResultWrong;
         tiles.add(Padding(
           padding: paddingTiny,
-          child: new Text(AppLocalizations.of(context).bertieResult(brendaGuessName, result)),
+          child: new Text(
+            AppLocalizations.of(context).bertieResult(brendaGuessName, result),
+            textAlign: TextAlign.center,
+          ),
         ));
       }
 
-      children.add(new GameCard(
-          child: new Padding(padding: paddingMedium, child: new Column(children: tiles))));
+      children.add(
+        new TitledCard(
+          title: AppLocalizations.of(context).secretActions,
+          child: new Padding(
+            padding: paddingMedium,
+            child: new Column(children: tiles),
+          ),
+        ),
+      );
     }
   }
 }

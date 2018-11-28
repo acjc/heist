@@ -7,34 +7,23 @@ import 'package:heist/state.dart';
 import 'package:heist/widget/common.dart';
 import 'package:redux/redux.dart';
 
-Widget selectionBoard(Store<GameModel> store) => new StoreConnector<GameModel, Set<Player>>(
+Widget selectionBoard(Store<GameModel> store) => StoreConnector<GameModel, Set<Player>>(
     converter: (store) => currentTeam(store.state),
     distinct: true,
     builder: (context, team) {
       List<Player> players = getPlayers(store.state);
       Player leader = currentLeader(store.state);
-      return new Card(
-        elevation: 2.0,
-        child: new Container(
+      return TitledCard(
+        title: AppLocalizations.of(context).team,
+        child: Container(
             padding: paddingMedium,
-            child: new Column(children: [
-              new Container(
-                padding: paddingTitle,
-                child: new Text(
-                    AppLocalizations.of(context).pickedTeamSize(
-                      team.length,
-                      currentHaunt(store.state).numPlayers,
-                    ),
-                    style: titleTextStyle),
-              ),
-              new TeamGridView(selectionBoardChildren(context, players, team, leader)),
-            ])),
+            child: TeamGridView(selectionBoardChildren(context, players, team, leader))),
       );
     });
 
 List<Widget> selectionBoardChildren(
         BuildContext context, List<Player> players, Set<Player> team, Player leader) =>
-    new List.generate(players.length, (i) {
+    List.generate(players.length, (i) {
       Player player = players[i];
       bool isInTeam = team.contains(player);
       bool isLeader = player.id == leader.id;

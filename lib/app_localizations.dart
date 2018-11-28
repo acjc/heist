@@ -755,6 +755,14 @@ class AppLocalizations {
     );
   }
 
+  String get backHome {
+    return Intl.message(
+      'BACK TO HOME PAGE',
+      name: 'backHome',
+      desc: 'Button to go back to the home page at the end of a game',
+    );
+  }
+
   // No connection
 
   String get noConnectionDialogTitle {

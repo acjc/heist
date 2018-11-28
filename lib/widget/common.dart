@@ -182,8 +182,9 @@ Color decisionColour(String decision) {
       return HeistColors.peach;
     case 'STEAL':
       return HeistColors.amber;
+    default:
+      return Colors.white;
   }
-  throw ArgumentError.value(decision, 'decision', 'Unknown decision');
 }
 
 class VerticalDivider extends StatelessWidget {
@@ -303,7 +304,7 @@ Future<Null> showNoConnectionDialog(BuildContext context) async {
         onWillPop: () {
           // intercept back button and go to home page when tapped
           return Future(() async {
-            _goBackToMainPage(context);
+            goBackToMainPage(context);
             return false;
           });
         },
@@ -315,7 +316,7 @@ Future<Null> showNoConnectionDialog(BuildContext context) async {
             FlatButton(
               child: Text(AppLocalizations.of(context).okButton),
               onPressed: () {
-                _goBackToMainPage(context);
+                goBackToMainPage(context);
               },
             ),
           ],
@@ -325,6 +326,6 @@ Future<Null> showNoConnectionDialog(BuildContext context) async {
   );
 }
 
-_goBackToMainPage(BuildContext context) {
+goBackToMainPage(BuildContext context) {
   Navigator.popUntil(context, ModalRoute.withName('/'));
 }

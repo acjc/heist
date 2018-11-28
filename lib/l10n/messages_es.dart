@@ -69,6 +69,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "auctionDescription" : m1,
     "auctionHeaderDescription" : MessageLookupByLibrary.simpleMessage("You\'ve failed to agree on a team 4 times in a row, so now it\'s time for an auction instead!\n\nThe players who bid the highest will get to go on the haunt. Tied bids will favour whoever submitted their bid first.\n\nYou can also gift ectoplasm to other players here (but only once per round). Gift to a teammate so they can go on the haunt with you!"),
     "auctionTitle" : MessageLookupByLibrary.simpleMessage("Auction!"),
+    "backHome" : MessageLookupByLibrary.simpleMessage("BACK TO HOME PAGE"),
     "bertie" : MessageLookupByLibrary.simpleMessage("Bertie"),
     "bertieConfirmPlayer" : MessageLookupByLibrary.simpleMessage("CONFIRM GUESS"),
     "bertieExplanation" : MessageLookupByLibrary.simpleMessage("You are Bertie and that means you have ONE guess as to the identity of Brenda the Scariest Ghost which you can use at any point during the game. If you guess correctly, you will no longer be restricted by maximum bid limits!"),

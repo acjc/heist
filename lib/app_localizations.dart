@@ -726,7 +726,7 @@ class AppLocalizations {
   // End of the game
 
   String get gameResult => Intl.message(
-        'Game result',
+        'Game Result',
         name: 'gameResult',
         desc: 'Endgame results title',
       );

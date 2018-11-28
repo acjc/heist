@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2018-11-28T18:12:43.028951",
+  "@@last_modified": "2018-11-28T18:14:26.204031",
   "title": "Heist",
   "@title": {
     "description": "Title for the Heist application",
@@ -542,7 +542,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "gameResult": "Game result",
+  "gameResult": "Game Result",
   "@gameResult": {
     "description": "Endgame results title",
     "type": "text",

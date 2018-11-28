@@ -101,7 +101,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "friendlyGhost" : MessageLookupByLibrary.simpleMessage("Friendly Ghost"),
     "friendlyTeam" : m7,
     "fullTeam" : MessageLookupByLibrary.simpleMessage("This team is full. Remove another role before adding this one."),
-    "gameResult" : MessageLookupByLibrary.simpleMessage("Game result"),
+    "gameResult" : MessageLookupByLibrary.simpleMessage("Game Result"),
     "giftAlreadySent" : m8,
     "giftingTitle" : MessageLookupByLibrary.simpleMessage("Gifting"),
     "goingAhead" : MessageLookupByLibrary.simpleMessage("The haunt is going ahead without you!"),

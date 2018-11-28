@@ -102,7 +102,7 @@ class GameState extends State<Game> {
     bool auction = isAuction(_store.state);
     List<Widget> children = [];
 
-    if (auction) {
+    if (!auction) {
       children.add(HeaderCard(
         title: AppLocalizations.of(context).biddingHeader,
         child: Text(

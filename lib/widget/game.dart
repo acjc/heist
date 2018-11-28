@@ -337,8 +337,8 @@ class GameState extends State<Game> {
       ),
     ]..addAll(List.generate(playersSoFar.length, (i) => Text(playersSoFar[i].name)));
     return Center(
-      child: Card(
-        elevation: 2.0,
+      child: TitledCard(
+        title: AppLocalizations.of(context).roomAndCode(getRoom(_store.state).code),
         margin: paddingLarge,
         child: Padding(
           padding: paddingLarge,

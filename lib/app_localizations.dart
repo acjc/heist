@@ -452,6 +452,15 @@ class AppLocalizations {
         desc: 'Room code label',
       );
 
+  String roomAndCode(String roomCode) {
+    return Intl.message(
+      'Room $roomCode',
+      name: 'roomAndCode',
+      args: [roomCode],
+      desc: 'Room code label followed by room code',
+    );
+  }
+
   String get playerInfo => Intl.message(
         'Player Info',
         name: 'playerInfo',

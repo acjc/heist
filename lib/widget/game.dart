@@ -57,15 +57,16 @@ class GameState extends State<Game> {
     super.initState();
     SystemChrome.setEnabledSystemUIOverlays([]);
     _store.dispatch(new LoadGameAction());
-    _connectivitySubscription =
-        new Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+    _connectivitySubscription = new Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) {
       // Note that on Android, this does not guarantee connection to Internet.
       // For instance, the app might have wifi access but it might be a VPN or
       // a hotel WiFi with no access.
       if (result == ConnectivityResult.none) {
         // connectivity was lost, start the timer
-        _connectivityTimer =
-            new Timer(const Duration(seconds: 5), () => showNoConnectionDialog(context));
+        _connectivityTimer = new Timer(
+            const Duration(seconds: 5), () => showNoConnectionDialog(context));
       } else {
         // connectivity is back, cancel the timer
         _connectivityTimer?.cancel();
@@ -110,12 +111,13 @@ class GameState extends State<Game> {
           style: descriptionTextStyle,
           textAlign: TextAlign.center,
         ),
-        expanded:
-            !generalLocalActionRecorded(_store.state, GeneralLocalAction.AuctionDescriptionClosed),
+        expanded: !generalLocalActionRecorded(
+            _store.state, GeneralLocalAction.AuctionDescriptionClosed),
         onExpansionChanged: (open) {
           if (!open) {
             _store.dispatch(
-              RecordGeneralLocalActionAction(GeneralLocalAction.AuctionDescriptionClosed),
+              RecordGeneralLocalActionAction(
+                  GeneralLocalAction.AuctionDescriptionClosed),
             );
           }
         },
@@ -128,12 +130,13 @@ class GameState extends State<Game> {
           style: descriptionTextStyle,
           textAlign: TextAlign.center,
         ),
-        expanded:
-            !generalLocalActionRecorded(_store.state, GeneralLocalAction.BiddingDescriptionClosed),
+        expanded: !generalLocalActionRecorded(
+            _store.state, GeneralLocalAction.BiddingDescriptionClosed),
         onExpansionChanged: (open) {
           if (!open) {
             _store.dispatch(
-              RecordGeneralLocalActionAction(GeneralLocalAction.BiddingDescriptionClosed),
+              RecordGeneralLocalActionAction(
+                  GeneralLocalAction.BiddingDescriptionClosed),
             );
           }
         },
@@ -175,7 +178,8 @@ class GameState extends State<Game> {
     return !isAuction(_store.state) &&
         !viewModel.biddingComplete &&
         (!viewModel.currentRound.teamSubmitted ||
-            !teamSelectionContinued(viewModel.localActions, viewModel.currentRound));
+            !teamSelectionContinued(
+                viewModel.localActions, viewModel.currentRound));
   }
 
   Widget _gameLoop(MainBoardViewModel viewModel) {
@@ -183,7 +187,9 @@ class GameState extends State<Game> {
     if (!viewModel.currentRound.teamSubmitted) {
       // Show bidding summary of previous round
       if (shouldShowPreviousRoundEnd(viewModel)) {
-        return Theme(data: lightTheme, child: RoundEnd(_store, viewModel.currentRound.order - 1));
+        return Theme(
+            data: lightTheme,
+            child: RoundEnd(_store, viewModel.currentRound.order - 1));
       }
       // Or haunt summary of previous haunt
       if (shouldShowPreviousHauntEnd(viewModel)) {
@@ -209,7 +215,9 @@ class GameState extends State<Game> {
     // Bidding summary
     if (!viewModel.currentRound.complete ||
         !roundContinued(viewModel.localActions, viewModel.currentRound)) {
-      return Theme(data: lightTheme, child: RoundEnd(_store, viewModel.currentRound.order));
+      return Theme(
+          data: lightTheme,
+          child: RoundEnd(_store, viewModel.currentRound.order));
     }
 
     // Haunt is currently happening
@@ -237,8 +245,9 @@ class GameState extends State<Game> {
       child: GameHistory(_store),
     );
 
-    List<Widget> children =
-        indicatorOnRight ? [gameHistory, rightIndicator()] : [leftIndicator(), gameHistory];
+    List<Widget> children = indicatorOnRight
+        ? [gameHistory, rightIndicator()]
+        : [leftIndicator(), gameHistory];
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
       child: Row(children: children),
@@ -312,7 +321,8 @@ class GameState extends State<Game> {
             currentRound: round,
             localActions: getLocalActions(_store.state),
             biddingComplete: biddingComplete(store.state),
-            resolvingAuction: requestInProcess(store.state, Request.ResolvingAuction),
+            resolvingAuction:
+                requestInProcess(store.state, Request.ResolvingAuction),
             hauntIsActive: currentHauntIsActive(store.state),
           );
         },
@@ -331,14 +341,16 @@ class GameState extends State<Game> {
       Padding(
         padding: paddingTitle,
         child: Text(
-          AppLocalizations.of(context).waitingForPlayers(playersSoFar.length, numPlayers),
+          AppLocalizations.of(context)
+              .waitingForPlayers(playersSoFar.length, numPlayers),
           style: Theme.of(context).textTheme.title,
         ),
       ),
-    ]..addAll(List.generate(playersSoFar.length, (i) => Text(playersSoFar[i].name)));
+    ]..addAll(
+        List.generate(playersSoFar.length, (i) => Text(playersSoFar[i].name)));
     return Center(
-      child: Card(
-        elevation: 2.0,
+      child: TitledCard(
+        title: AppLocalizations.of(context).roomAndCode(getRoom(_store.state).code),
         margin: paddingLarge,
         child: Padding(
           padding: paddingLarge,
@@ -371,7 +383,8 @@ class GameState extends State<Game> {
           }
 
           if (viewModel.waitingForPlayers) {
-            return _waitingForPlayers(viewModel.playersSoFar, getRoom(_store.state).numPlayers);
+            return _waitingForPlayers(
+                viewModel.playersSoFar, getRoom(_store.state).numPlayers);
           }
 
           if (viewModel.isNewGame) {
@@ -383,7 +396,9 @@ class GameState extends State<Game> {
       );
 
   Widget _mainBoard() => StoreConnector<GameModel, GameActiveViewModel>(
-      converter: (store) => GameActiveViewModel._(gameIsReady(store.state), gameOver(store.state),
+      converter: (store) => GameActiveViewModel._(
+          gameIsReady(store.state),
+          gameOver(store.state),
           requestInProcess(store.state, Request.CompletingGame)),
       distinct: true,
       builder: (context, viewModel) {
@@ -419,7 +434,9 @@ class GameState extends State<Game> {
             Scaffold(
               resizeToAvoidBottomPadding: false,
               backgroundColor: Colors.transparent,
-              endDrawer: isDebugMode() ? Drawer(child: ReduxDevTools<GameModel>(_store)) : null,
+              endDrawer: isDebugMode()
+                  ? Drawer(child: ReduxDevTools<GameModel>(_store))
+                  : null,
               body: _secretBoard(),
             ),
           ],
@@ -436,8 +453,8 @@ class LoadingScreenViewModel {
   final bool isNewGame;
   final List<Player> playersSoFar;
 
-  LoadingScreenViewModel._(this.roomIsAvailable, this.rolesHaveBeenChosen, this.waitingForPlayers,
-      this.isNewGame, this.playersSoFar);
+  LoadingScreenViewModel._(this.roomIsAvailable, this.rolesHaveBeenChosen,
+      this.waitingForPlayers, this.isNewGame, this.playersSoFar);
 
   @override
   bool operator ==(Object other) =>
@@ -527,7 +544,8 @@ class GameActiveViewModel {
           completingGame == other.completingGame;
 
   @override
-  int get hashCode => gameIsReady.hashCode ^ gameOver.hashCode ^ completingGame.hashCode;
+  int get hashCode =>
+      gameIsReady.hashCode ^ gameOver.hashCode ^ completingGame.hashCode;
 
   @override
   String toString() {
@@ -540,7 +558,8 @@ void resetGameStore(Store<GameModel> store) {
   store.dispatch(CancelSubscriptionsAction());
   store.dispatch(UpdateStateAction<LocalActions>(LocalActions.initial()));
 
-  store.dispatch(UpdateStateAction<Room>(Room.initial(isDebugMode() ? 2 : minPlayers)));
+  store.dispatch(
+      UpdateStateAction<Room>(Room.initial(isDebugMode() ? 2 : minPlayers)));
   store.dispatch(UpdateStateAction<List<Player>>([]));
   store.dispatch(UpdateStateAction<List<Haunt>>([]));
   store.dispatch(UpdateStateAction<Map<Haunt, List<Round>>>({}));

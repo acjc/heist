@@ -44,21 +44,23 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m12(order) => "Player ${order}";
 
-  static m13(order) => "Round ${order}";
+  static m13(roomCode) => "Room ${roomCode}";
 
-  static m14(numRoles) => "SCARY TEAM (${numRoles})";
+  static m14(order) => "Round ${order}";
 
-  static m15(bertieDisplayName, stealOption) => "...shared between ${bertieDisplayName} and any players who chose ${stealOption} on the haunt";
+  static m15(numRoles) => "SCARY TEAM (${numRoles})";
 
-  static m16(roomCode, owner) => "Room ${roomCode}: ${owner} is choosing the game roles";
+  static m16(bertieDisplayName, stealOption) => "...shared between ${bertieDisplayName} and any players who chose ${stealOption} on the haunt";
 
-  static m17(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
+  static m17(roomCode, owner) => "Room ${roomCode}: ${owner} is choosing the game roles";
 
-  static m18(playersSoFar, totalPlayers) => "Waiting for players (${playersSoFar} / ${totalPlayers})";
+  static m18(thiefScore, agentScore) => "${thiefScore} - ${agentScore}";
 
-  static m19(leaderName) => "Waiting for ${leaderName} to submit their team";
+  static m19(playersSoFar, totalPlayers) => "Waiting for players (${playersSoFar} / ${totalPlayers})";
 
-  static m20(winner) => "${winner} win!";
+  static m20(leaderName) => "Waiting for ${leaderName} to submit their team";
+
+  static m21(winner) => "${winner} win!";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
@@ -140,26 +142,27 @@ class MessageLookup extends MessageLookupByLibrary {
     "role" : MessageLookupByLibrary.simpleMessage("Role"),
     "roleInfo" : MessageLookupByLibrary.simpleMessage("Role Info"),
     "room" : MessageLookupByLibrary.simpleMessage("Room"),
-    "roundTitle" : m13,
+    "roomAndCode" : m13,
+    "roundTitle" : m14,
     "scaryGhost" : MessageLookupByLibrary.simpleMessage("Scary Ghost"),
-    "scaryTeam" : m14,
+    "scaryTeam" : m15,
     "secretActions" : MessageLookupByLibrary.simpleMessage("Secret Actions"),
     "secretHeader" : MessageLookupByLibrary.simpleMessage("Secret"),
     "secretHeaderDescription" : MessageLookupByLibrary.simpleMessage("This screen contains information which should be known only to you. Be careful not to accidentally show it to any other players!\n\nHere, you can see your ectoplasm, your team and your role. You\'ll find details about any secret information or actions available to you.\n\nThere are also helpful reminders about the other players and roles in this game."),
-    "sharedBetween" : m15,
-    "someoneElseChoosesGameRoles" : m16,
+    "sharedBetween" : m16,
+    "someoneElseChoosesGameRoles" : m17,
     "submit" : MessageLookupByLibrary.simpleMessage("SUBMIT"),
     "submitBid" : MessageLookupByLibrary.simpleMessage("SUBMIT BID"),
     "submitTeam" : MessageLookupByLibrary.simpleMessage("SUBMIT TEAM"),
     "success" : MessageLookupByLibrary.simpleMessage("Success"),
     "team" : MessageLookupByLibrary.simpleMessage("Team"),
-    "teamScores" : m17,
+    "teamScores" : m18,
     "teamSelection" : MessageLookupByLibrary.simpleMessage("Team Selection"),
     "title" : MessageLookupByLibrary.simpleMessage("Heist"),
     "unlimited" : MessageLookupByLibrary.simpleMessage("You have no maximum bid limit for this round"),
-    "waitingForPlayers" : m18,
-    "waitingForTeamSubmission" : m19,
-    "winner" : m20,
+    "waitingForPlayers" : m19,
+    "waitingForTeamSubmission" : m20,
+    "winner" : m21,
     "youAreGoing" : MessageLookupByLibrary.simpleMessage("You\'re going on a haunt!"),
     "youHaveMadeYourChoice" : MessageLookupByLibrary.simpleMessage("You have made your choice!"),
     "yourBid" : MessageLookupByLibrary.simpleMessage("Your bid")
